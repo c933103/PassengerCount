@@ -1,3 +1,9 @@
+// Initialize Supabase client
+const SUPABASE_URL = 'https://jirzkyvwfpbblvyivikw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_0kIKdtX9LexyIBg_DJAGCA_LziliiaI';
+const { createClient } = supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 async function loadKMBStops() {
   const { route, bound, service_type } = selectedRoute;
 
@@ -541,4 +547,149 @@ function escapeCsvField(field) {
     return '"' + field.replace(/"/g, '""') + '"';
   }
   return field;
+}
+
+async function uploadToDatabase() {
+  // Validate route selection
+  if (!selectedRoute) {
+    alert('Please select a route first');
+    return;
+  }
+
+  // Get survey data
+  const surveyerName = document.getElementById('surveyerName').value;
+  const surveyDate = document.getElementById('surveyDate').value;
+  const dayOfWeek = document.getElementById('dayOfWeek').textContent;
+  const vehicleNumber = document.getElementById('vehicleNumber').value;
+  const surveyNotes = document.getElementById('surveyNotes').value;
+  const operator = selectedRoute.co === 'CTB' ? 'Citybus (CTB)' : (selectedRoute.co === 'KMB' ? 'KMB' : selectedRoute.co);
+
+  // Validate required fields
+  if (!surveyerName || !vehicleNumber) {
+    alert('Please fill in Surveyor Name and Vehicle Number');
+    return;
+  }
+
+  // Get passenger data rows
+  const rows = document.querySelectorAll('#tableBody tr');
+  if (rows.length === 0) {
+    alert('No passenger data to upload');
+    return;
+  }
+
+  // Collect passenger data
+  const passengerLogs = [];
+  let cumulativeBoarding = null;
+  let survey_start_time = null;
+  let survey_start = null;
+  let survey_end = null;
+  let isFirstDataRow = true;
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const inputs = row.querySelectorAll('input');
+
+    const stopText = cells[0].innerText.split('\n');
+    const stop_tc = stopText[0];
+    const stop_en = stopText[1];
+    const time = inputs[0].value;
+    const boardingInput = inputs[1].value;
+    const alightingInput = inputs[2].value;
+    const boarding = boardingInput ? parseInt(boardingInput) : 0;
+    const alighting = alightingInput ? parseInt(alightingInput) : 0;
+    const onboard = inputs[3].value ? parseInt(inputs[3].value) : 0;
+    const notes = inputs[4].value;
+
+    // Only include rows with data
+    if (time || boarding > 0 || alighting > 0 || onboard > 0) {
+      // For first data row, capture start information
+      if (isFirstDataRow) {
+        survey_start_time = time;
+        survey_start = stop_tc;
+        cumulativeBoarding = onboard || 0;
+        isFirstDataRow = false;
+      }
+      
+      // Update end information for each row (last row with data)
+      survey_end = stop_tc;
+      
+      // Calculate cumulative boarding
+      cumulativeBoarding = (cumulativeBoarding || 0) + boarding;
+
+      passengerLogs.push({
+        stop_tc,
+        stop_en,
+        stop_time: time,
+        boarding: boarding > 0 ? boarding : null,
+        alighting: alighting > 0 ? alighting : null,
+        onboard: onboard > 0 ? onboard : null,
+        total: cumulativeBoarding,
+        notes: notes || null
+      });
+    }
+  });
+
+  if (passengerLogs.length === 0) {
+    alert('No passenger data to upload');
+    return;
+  }
+
+  try {
+    // Show loading state
+    const uploadBtn = event.target;
+    const originalText = uploadBtn.textContent;
+    uploadBtn.textContent = 'Uploading...';
+    uploadBtn.disabled = true;
+
+    // Insert survey data
+    const { data: surveyData, error: surveyError } = await supabaseClient
+      .from('surveys')
+      .insert([
+        {
+          surveyor_name: surveyerName,
+          survey_date: surveyDate,
+          survey_day: dayOfWeek,
+          operator,
+          route: selectedRoute.route,
+          survey_start_time,
+          survey_start,
+          survey_end,
+          vehicle_number: vehicleNumber,
+          general_notes: surveyNotes || null
+        }
+      ])
+      .select();
+
+    if (surveyError) {
+      throw new Error(`Survey insert error: ${surveyError.message}`);
+    }
+
+    const surveyId = surveyData[0].id;
+
+    // Insert passenger logs
+    const logsToInsert = passengerLogs.map(log => ({
+      ...log,
+      survey_id: surveyId
+    }));
+
+    const { error: logsError } = await supabaseClient
+      .from('passenger_logs')
+      .insert(logsToInsert);
+
+    if (logsError) {
+      throw new Error(`Passenger logs insert error: ${logsError.message}`);
+    }
+
+    // Success feedback
+    uploadBtn.textContent = originalText;
+    uploadBtn.disabled = false;
+    alert(`Survey uploaded successfully!\nSurvey ID: ${surveyId}\nPassenger entries: ${passengerLogs.length}`);
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    const uploadBtn = event.target;
+    uploadBtn.textContent = originalText;
+    uploadBtn.disabled = false;
+    alert(`Upload failed: ${error.message}\n\nPlease check the browser console (F12) for details.`);
+  }
 }
