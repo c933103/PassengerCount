@@ -628,11 +628,15 @@ async function uploadToDatabase(buttonElement) {
     return false;
   }
 
+  // Declare originalText outside try-catch so it's available in catch block
+  let originalText = '';
+  if (buttonElement) {
+    originalText = buttonElement.textContent;
+  }
+
   try {
     // Show loading state
-    let originalText = '';
     if (buttonElement) {
-      originalText = buttonElement.textContent;
       buttonElement.textContent = 'Uploading...';
       buttonElement.disabled = true;
     }
@@ -657,14 +661,14 @@ async function uploadToDatabase(buttonElement) {
       .select();
 
     if (surveyError) {
-      throw new Error(`Survey insert error: ${surveyError.message}`);
-    }
+      // Provide helpful error message for RLS issues
+      if (surveyError.message.includes('row-level security')) {
+        throw new Error(`Row-Level Security (RLS) Policy Error!\n\nYou need to enable public inserts on your Supabase tables:\n\n1. Go to your Supabase dashboard\n2. Navigate to Authentication > Policies\n3. For the 'surveys' table, create policy:\n   - Allow: INSERT WITH CHECK (true)\n4. For the 'passenger_logs' table, create policy:\n   - Allow: INSERT WITH CHECK (true)\n\nAfter setting up policies, try again.`);\n      }\n      throw new Error(`Survey insert error: ${surveyError.message}`);\n    }
 
     const surveyId = surveyData[0].id;
 
     // Insert passenger logs
-    const logsToInsert = passengerLogs.map(log => ({
-      ...log,
+    const logsToInsert = passengerLogs.map(log => ({\n      ...log,
       survey_id: surveyId
     }));
 
@@ -673,8 +677,7 @@ async function uploadToDatabase(buttonElement) {
       .insert(logsToInsert);
 
     if (logsError) {
-      throw new Error(`Passenger logs insert error: ${logsError.message}`);
-    }
+      throw new Error(`Passenger logs insert error: ${logsError.message}`);\n    }
 
     // Success feedback
     if (buttonElement) {
@@ -690,7 +693,7 @@ async function uploadToDatabase(buttonElement) {
       buttonElement.textContent = originalText;
       buttonElement.disabled = false;
     }
-    alert(`Upload failed: ${error.message}\n\nPlease check the browser console (F12) for details.`);
+    alert(`Upload failed: ${error.message}`);
     return false;
   }
 }
