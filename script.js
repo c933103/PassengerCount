@@ -613,7 +613,7 @@ async function uploadToDatabase(buttonElement) {
       passengerLogs.push({
         stop_tc,
         stop_en,
-        stop_time: time,
+        stop_time: (time && time.trim() !== "") ? time : null,
         boarding: boarding > 0 ? boarding : null,
         alighting: alighting > 0 ? alighting : null,
         onboard: onboard > 0 ? onboard : null,
@@ -651,7 +651,7 @@ async function uploadToDatabase(buttonElement) {
           survey_day: dayOfWeek,
           operator,
           route: selectedRoute.route,
-          survey_start_time: survey_start_time || null,
+          survey_start_time: (survey_start_time && survey_start_time.trim() !== "") ? survey_start_time : null,
           survey_start: survey_start || null,
           survey_end: survey_end || null,
           vehicle_number: vehicleNumber,
