@@ -643,13 +643,13 @@ async function uploadToDatabase(buttonElement) {
       .insert([
         {
           surveyor_name: surveyerName,
-          survey_date: surveyDate,
+          survey_date: surveyDate || null,
           survey_day: dayOfWeek,
           operator,
           route: selectedRoute.route,
-          survey_start_time,
-          survey_start,
-          survey_end,
+          survey_start_time: survey_start_time || null,
+          survey_start: survey_start || null,
+          survey_end: survey_end || null,
           vehicle_number: vehicleNumber,
           general_notes: surveyNotes || null
         }
