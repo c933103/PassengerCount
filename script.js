@@ -549,32 +549,26 @@ function escapeCsvField(field) {
   return field;
 }
 
-async function uploadToDatabase() {
+async function uploadToDatabase(buttonElement) {
   // Validate route selection
   if (!selectedRoute) {
     alert('Please select a route first');
-    return;
+    return false;
   }
 
-  // Get survey data
-  const surveyerName = document.getElementById('surveyerName').value;
+  // Get survey data (all fields are now optional)
+  const surveyerName = document.getElementById('surveyerName').value || 'Unknown';
   const surveyDate = document.getElementById('surveyDate').value;
   const dayOfWeek = document.getElementById('dayOfWeek').textContent;
-  const vehicleNumber = document.getElementById('vehicleNumber').value;
-  const surveyNotes = document.getElementById('surveyNotes').value;
+  const vehicleNumber = document.getElementById('vehicleNumber').value || 'N/A';
+  const surveyNotes = document.getElementById('surveyNotes').value || '';
   const operator = selectedRoute.co === 'CTB' ? 'Citybus (CTB)' : (selectedRoute.co === 'KMB' ? 'KMB' : selectedRoute.co);
-
-  // Validate required fields
-  if (!surveyerName || !vehicleNumber) {
-    alert('Please fill in Surveyor Name and Vehicle Number');
-    return;
-  }
 
   // Get passenger data rows
   const rows = document.querySelectorAll('#tableBody tr');
   if (rows.length === 0) {
     alert('No passenger data to upload');
-    return;
+    return false;
   }
 
   // Collect passenger data
@@ -631,15 +625,17 @@ async function uploadToDatabase() {
 
   if (passengerLogs.length === 0) {
     alert('No passenger data to upload');
-    return;
+    return false;
   }
 
   try {
     // Show loading state
-    const uploadBtn = event.target;
-    const originalText = uploadBtn.textContent;
-    uploadBtn.textContent = 'Uploading...';
-    uploadBtn.disabled = true;
+    let originalText = '';
+    if (buttonElement) {
+      originalText = buttonElement.textContent;
+      buttonElement.textContent = 'Uploading...';
+      buttonElement.disabled = true;
+    }
 
     // Insert survey data
     const { data: surveyData, error: surveyError } = await supabaseClient
@@ -681,15 +677,30 @@ async function uploadToDatabase() {
     }
 
     // Success feedback
-    uploadBtn.textContent = originalText;
-    uploadBtn.disabled = false;
+    if (buttonElement) {
+      buttonElement.textContent = originalText;
+      buttonElement.disabled = false;
+    }
     alert(`Survey uploaded successfully!\nSurvey ID: ${surveyId}\nPassenger entries: ${passengerLogs.length}`);
+    return true;
 
   } catch (error) {
     console.error('Upload error:', error);
-    const uploadBtn = event.target;
-    uploadBtn.textContent = originalText;
-    uploadBtn.disabled = false;
+    if (buttonElement) {
+      buttonElement.textContent = originalText;
+      buttonElement.disabled = false;
+    }
     alert(`Upload failed: ${error.message}\n\nPlease check the browser console (F12) for details.`);
+    return false;
+  }
+}
+
+async function uploadAndDownloadCSV(buttonElement) {
+  const success = await uploadToDatabase(buttonElement);
+  if (success) {
+    // Small delay to let user see the success message
+    setTimeout(() => {
+      exportCSV();
+    }, 500);
   }
 }

@@ -72,8 +72,13 @@
 </table>
 
 <br>
-<button onclick="exportCSV()" class="export-btn">Export to CSV</button>
-<button onclick="uploadToDatabase()" class="export-btn" style="background-color: #27ae60; margin-left: 10px;">Upload to Database</button>
+
+<div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
+  <h4>Data Management</h4>
+  <button onclick="uploadAndDownloadCSV(this)" class="export-btn" style="background-color: #27ae60;">Upload to Database & Download CSV</button>
+  <button onclick="uploadToDatabase(this)" class="export-btn" style="background-color: #27ae60; margin-left: 10px;">Upload to Database Only</button>
+  <button onclick="exportCSV()" class="export-btn" style="margin-left: 10px;">Download CSV Only</button>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
