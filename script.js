@@ -1,6 +1,6 @@
 // Initialize Supabase client
 const SUPABASE_URL = 'https://jirzkyvwfpbblvyivikw.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_0kIKdtX9LexyIBg_DJAGCA_LziliiaI';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppcnpreXZ3ZnBiYmx2eWl2aWt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NDcwMDQsImV4cCI6MjA5NTEyMzAwNH0.rlaM5GKsC5WUtEXH_5VINFYDq4tCFdFiLo27s5B6-Xc';
 const { createClient } = supabase;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -663,12 +663,16 @@ async function uploadToDatabase(buttonElement) {
     if (surveyError) {
       // Provide helpful error message for RLS issues
       if (surveyError.message.includes('row-level security')) {
-        throw new Error(`Row-Level Security (RLS) Policy Error!\n\nYou need to enable public inserts on your Supabase tables:\n\n1. Go to your Supabase dashboard\n2. Navigate to Authentication > Policies\n3. For the 'surveys' table, create policy:\n   - Allow: INSERT WITH CHECK (true)\n4. For the 'passenger_logs' table, create policy:\n   - Allow: INSERT WITH CHECK (true)\n\nAfter setting up policies, try again.`);\n      }\n      throw new Error(`Survey insert error: ${surveyError.message}`);\n    }
+        throw new Error(`Row-Level Security (RLS) Policy Error!\n\nYou need to enable public inserts on your Supabase tables:\n\n1. Go to your Supabase dashboard\n2. Navigate to Authentication > Policies\n3. For the 'surveys' table, create policy:\n   - Allow: INSERT WITH CHECK (true)\n4. For the 'passenger_logs' table, create policy:\n   - Allow: INSERT WITH CHECK (true)\n\nAfter setting up policies, try again.`);
+      }
+      throw new Error(`Survey insert error: ${surveyError.message}`);
+    }
 
     const surveyId = surveyData[0].id;
 
     // Insert passenger logs
-    const logsToInsert = passengerLogs.map(log => ({\n      ...log,
+    const logsToInsert = passengerLogs.map(log => ({
+      ...log,
       survey_id: surveyId
     }));
 
@@ -677,7 +681,8 @@ async function uploadToDatabase(buttonElement) {
       .insert(logsToInsert);
 
     if (logsError) {
-      throw new Error(`Passenger logs insert error: ${logsError.message}`);\n    }
+      throw new Error(`Passenger logs insert error: ${logsError.message}`);
+    }
 
     // Success feedback
     if (buttonElement) {
