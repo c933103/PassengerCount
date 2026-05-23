@@ -628,11 +628,15 @@ async function uploadToDatabase(buttonElement) {
     return false;
   }
 
+  // Declare originalText OUTSIDE try-catch so it's available in catch block
+  let originalText = '';
+  if (buttonElement) {
+    originalText = buttonElement.textContent;
+  }
+
   try {
     // Show loading state
-    let originalText = '';
     if (buttonElement) {
-      originalText = buttonElement.textContent;
       buttonElement.textContent = 'Uploading...';
       buttonElement.disabled = true;
     }
