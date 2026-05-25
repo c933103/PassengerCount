@@ -411,26 +411,25 @@ function recalculateOnboardColumn() {
   // Calculate BACKWARDS from reference row to first stop with data
   let currentOnboard = referenceOnboard;
   for (let i = referenceRowIndex - 1; i >= 0; i--) {
+    // 1. Look at the row immediately AFTER 'i' to find the metrics that caused the change
+    const nextRowInputs = rows[i + 1].querySelectorAll("input");
+    const nextBoarding = parseInt(nextRowInputs[1].value) || 0;
+    const nextAlighting = parseInt(nextRowInputs[2].value) || 0;
+
+    // 2. Reverse the math using the changes from the stop the bus just came from
+    currentOnboard = currentOnboard - nextBoarding + nextAlighting;
+
+    // 3. Target the current row 'i' to write the calculated value
     const inputs = rows[i].querySelectorAll("input");
-    const boardingInput = inputs[1];
-    const alightingInput = inputs[2];
     const onboardInput = inputs[3];
 
-    const boarding = parseInt(boardingInput.value) || 0;
-    const alighting = parseInt(alightingInput.value) || 0;
-
-    // Only calculate if this row has boarding or alighting data
-    if (boarding > 0 || alighting > 0) {
-      // Reverse calculation: onboard_prev = onboard_current - boarding_current + alighting_current
-      currentOnboard = currentOnboard - boarding + alighting;
-      // Only autofill if not manually entered
-      if (!onboardInput.value || onboardInput.value === '') {
-        onboardInput.value = currentOnboard;
-        onboardInput.dataset.autofilled = 'true';
-      } else {
-        // If manually entered, use it as new reference
-        currentOnboard = parseInt(onboardInput.value);
-      }
+    // Always fill backward rows step-by-step, removing the 'boarding > 0' skip constraint
+    if (!onboardInput.value || onboardInput.value === '') {
+      onboardInput.value = currentOnboard;
+      onboardInput.dataset.autofilled = 'true';
+    } else {
+      // If the user manually typed something here, update our tracking anchor
+      currentOnboard = parseInt(onboardInput.value);
     }
   }
 
