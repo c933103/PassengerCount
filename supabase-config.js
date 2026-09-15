@@ -1,0 +1,2 @@
+export const SUPABASE_URL='https://jirzkyvwfpbblvyivikw.supabase.co';
+export const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYXNlIiwicmVmIjoiamlyemt5dndmcGJibHZ5aXZpa3ciLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc3OTU0NzAwNCwiZXhwIjoyMDk1MTIzMDA0fQ.rlaM5GKsC5WUtEXH_5VINFYDq4tCFdFiLo27s5B6-Xc';
