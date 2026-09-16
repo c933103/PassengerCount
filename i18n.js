@@ -40,12 +40,11 @@ export const messages = {
     variant: "Direction {direction} · Variant {variant} · {n} stops",
     running: "Within estimated running time",
     serviceWindowHelp:
-      "A departure stays in the suggested list through its journey time plus a 10-minute delay allowance. Other variants can always be expanded and selected.",
+      "Trips are suggested from 10 minutes before departure until the journey ends plus 10 minutes for delays. These allowances are fixed. For frequency-based service, this allowance extends from the end of the departure window. Other variants can always be expanded and selected.",
     upcoming: "Departure soon",
     inactive: "Outside the current service window",
     unknownService: "Timetable incomplete — choose manually",
     timeData: "Time filter & government data",
-    upcomingWindow: "Upcoming departures (minutes)",
     refreshData: "Update government data",
     governmentData: "Transport Department government data · {date}",
     dataLoading: "Loading government routes and timetables…",
@@ -207,7 +206,7 @@ export const messages = {
   },
   "yue-Hant-HK": {
     serviceWindowHelp:
-      "每班車開出後，直到預計行車時間加 10 分鐘延誤寬限結束，仍會列入建議路線。其他路線變體隨時可以展開及選取。",
+      "由開車前 10 分鐘起，直到預計行車時間加 10 分鐘延誤寬限結束，都會列入建議路線。前後寬限固定為 10 分鐘。如果資料只列班次間隔，就由發車時段結束起計行車時間及寬限。其他路線變體隨時可以展開及選取。",
     deleteRecords: "刪除記錄",
     okay: "確定",
     selectedRecords: "已選取 {n} 份記錄",
@@ -248,7 +247,6 @@ export const messages = {
     inactive: "不在目前服務時段",
     unknownService: "時間表資料不足，請手動選擇",
     timeData: "時段篩選及政府資料",
-    upcomingWindow: "即將開出的班次（分鐘）",
     refreshData: "更新政府資料",
     governmentData: "運輸署政府資料 · {date}",
     dataLoading: "正在載入政府路線及時間表…",

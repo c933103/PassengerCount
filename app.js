@@ -125,6 +125,7 @@ function showScreen(next) {
   if (next !== "home") {
     deleteMode = false;
     selectedRecordIds.clear();
+    document.body.classList.remove("selectingRecords");
   }
   screen = next;
   state.screen = next;
@@ -173,6 +174,7 @@ function goHome() {
   showScreen("home");
 }
 function updateRecordSelection() {
+  document.body.classList.toggle("selectingRecords", deleteMode);
   $("deleteRecords").hidden = deleteMode;
   $("deleteRecords").disabled = !state.surveys.length;
   $("recordSelection").hidden = !deleteMode;
@@ -253,6 +255,7 @@ function requestDelete() {
   }
   $("deleteError").hidden = true;
   $("deleteDialog").showModal();
+  $("deleteReview").scrollTop = 0;
 }
 function confirmDelete() {
   const ids = new Set(pendingDeleteIds);
@@ -271,6 +274,7 @@ function confirmDelete() {
   } catch {
     $("deleteError").textContent = t("deleteFailed");
     $("deleteError").hidden = false;
+    $("deleteError").scrollIntoView({ block: "nearest" });
     return;
   }
   Object.assign(state, next);
@@ -311,7 +315,6 @@ async function search(force = false) {
     state.search = {
       number,
       operator: $("operator").value,
-      upcoming: $("upcoming").value,
     };
     persist();
     renderMatches();
@@ -326,7 +329,7 @@ function renderMatches() {
   $("otherResults").replaceChildren();
   let hidden = 0;
   for (const route of matches) {
-    const status = serviceStatus(route, data, new Date(), +$("upcoming").value),
+    const status = serviceStatus(route, data, new Date()),
       button = document.createElement("button");
     button.className = "route";
     button.textContent = `${operator(route.operator)} ${route.route} · ${name({ name: route.orig })} → ${name({ name: route.dest })}`;
@@ -1124,11 +1127,6 @@ $("search").onsubmit = (e) => {
   search();
 };
 $("operator").onchange = () => search();
-$("upcoming").onchange = () => {
-  state.search = { ...state.search, upcoming: $("upcoming").value };
-  persist();
-  renderMatches();
-};
 $("refreshData").onclick = async () => {
   $("refreshData").disabled = true;
   try {
@@ -1344,12 +1342,17 @@ function measureDock() {
   );
 }
 new ResizeObserver(measureDock).observe($("entryDock"));
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty(
+    "--selection-height",
+    `${Math.ceil($("recordSelection").getBoundingClientRect().height)}px`,
+  );
+}).observe($("recordSelection"));
 const query = state.search || {};
 const initialScreen = state.screen || cur()?.screen;
 $("route").value = query.number || "";
 setLanguage(state.language);
 $("operator").value = query.operator || "";
-$("upcoming").value = query.upcoming || "30";
 if (cur()) {
   target = { index: cur().activeIndex || 0, field: "boarding" };
   $("allStops").open = cur().tableExpanded === true;

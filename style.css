@@ -655,12 +655,22 @@ body[data-screen="count"] main {
 }
 
 #recordSelection {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 1000px);
+  z-index: 800;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
   background: #f0f4f3;
+  border-top: 1px solid #b6cac0;
   align-items: center;
+}
+body.selectingRecords main {
+  padding-bottom: calc(var(--selection-height, 100px) + 24px);
+}
+html:has(body.selectingRecords) {
+  scroll-padding-bottom: calc(var(--selection-height, 100px) + 12px);
 }
 #selectedRecordCount {
   flex: 1;
@@ -687,13 +697,44 @@ body[data-screen="count"] main {
   overflow-wrap: anywhere;
 }
 #deleteSummary {
-  max-height: 45vh;
-  overflow: auto;
   padding-left: 22px;
   font-size: 0.85rem;
+  overflow-wrap: anywhere;
 }
 #deleteSummary li {
   margin: 10px 0;
+}
+#deleteDialog {
+  padding: 12px;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+#deleteDialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#deleteTitle {
+  flex: none;
+  margin: 0;
+}
+#deleteReview {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+#deleteHelp {
+  margin-top: 0;
+  font-size: 0.85rem;
+}
+#deleteDialog .deleteActions {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #b6cac0;
+  padding-top: 10px;
 }
 
 #entryDock .tripControls {

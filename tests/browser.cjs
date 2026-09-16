@@ -75,7 +75,7 @@ const data = {
     executablePath: process.env.CHROME_PATH || undefined,
     args: ["--no-sandbox"],
   });
-  async function open(seed = {}, width = 412) {
+  async function open(seed = {}, width = 412, catalogue = data, time = "2026-09-15T06:10:00Z") {
     const context = await browser.newContext({
       viewport: { width, height: 850 },
       geolocation: { latitude: 22.301, longitude: 114.171, accuracy: 10 },
@@ -89,7 +89,7 @@ const data = {
     });
     await context.route("**/data/government-routes.json.gz", (r) =>
       r.fulfill({
-        body: require("zlib").gzipSync(JSON.stringify(data)),
+        body: require("zlib").gzipSync(JSON.stringify(catalogue)),
         contentType: "application/octet-stream",
       }),
     );
@@ -110,7 +110,7 @@ const data = {
         saveCsv: (csv, name) => window.captureCSV(csv, name),
       };
     }, seed);
-    await page.clock.setFixedTime(new Date("2026-09-15T06:10:00Z"));
+    await page.clock.setFixedTime(new Date(time));
     await page.goto(base);
     await page.waitForFunction(
       () => document.querySelector("#new").textContent.length > 0,
@@ -595,13 +595,95 @@ const data = {
     saved().surveys.map((s) => s.id),
     [ids[1]],
   );
+  // Long trip lists must not push selection/confirmation controls off screen.
+  await context.close();
+  const manyState = JSON.parse(seed["passenger-count:workspace:v2"]);
+  manyState.currentId = null;
+  manyState.screen = "home";
+  manyState.language = "yue-Hant-HK";
+  const sample = manyState.surveys[0];
+  manyState.surveys = Array.from({ length: 80 }, (_, i) => ({
+    ...structuredClone(sample), id: `long-trip-${i}`, vehicle: `BUS-${i}`,
+    route: { ...sample.route, route: `N${i}`, dest: { en: "A very long destination name for overflow testing", zh: "很長的目的地名稱，用作檢查大量行程刪除清單的畫面" } },
+  }));
+  ({ context, page } = await open({ "passenger-count:workspace:v2": JSON.stringify(manyState) }, 360));
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.locator("#deleteRecords").click();
+  async function controlsVisible(selectors) {
+    for (const selector of selectors) {
+      const box = await page.locator(selector).boundingBox(), viewport = page.viewportSize();
+      assert.ok(box && box.x >= 0 && box.y >= 0 && box.x + box.width <= viewport.width + 1 && box.y + box.height <= viewport.height + 1, `${selector} fits ${JSON.stringify(viewport)}: ${JSON.stringify(box)}`);
+    }
+  }
+  for (const checkbox of await page.locator("#recordList input[type=checkbox]").all())
+    await checkbox.check();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await controlsVisible(["#selectionOkay", "#cancelSelection"]);
+  const lastCard = await page.locator(".recordCard").last().boundingBox();
+  assert.ok(lastCard.y + lastCard.height <= (await page.locator("#recordSelection").boundingBox()).y, "last trip scrolls above selection controls");
+  await page.locator("#selectionOkay").click();
+  assert.equal(await page.locator("#deleteSummary li").count(), 80);
+  for (const [width, height, fontSize] of [[360, 740, 16], [740, 360, 16], [320, 568, 24]]) {
+    await page.setViewportSize({ width, height });
+    await page.evaluate((size) => document.documentElement.style.fontSize = `${size}px`, fontSize);
+    await controlsVisible(["#deleteTitle", "#cancelDelete", "#confirmDelete"]);
+    const footerBefore = await page.locator("#confirmDelete").boundingBox();
+    await page.locator("#deleteReview").evaluate((el) => el.scrollTop = el.scrollHeight);
+    assert.ok(await page.locator("#deleteReview").evaluate((el) => el.scrollTop > 0));
+    assert.deepEqual(await page.locator("#confirmDelete").boundingBox(), footerBefore, "confirmation buttons do not scroll with the list");
+    const last = await page.locator("#deleteSummary li").last().boundingBox();
+    assert.ok(last.y + last.height <= footerBefore.y, "last selected trip can be reviewed above the footer");
+  }
+  if (process.env.SCREENSHOT_PATH)
+    await page.screenshot({ path: process.env.SCREENSHOT_PATH.replace(".png", "-long-delete.png") });
+  await page.locator("#cancelDelete").click();
+  assert.equal(await page.locator("#recordList input:checked").count(), 80);
+  await controlsVisible(["#selectionOkay", "#cancelSelection"]);
+  await page.locator("#selectionOkay").click();
+  assert.equal(await page.locator("#deleteReview").evaluate((el) => el.scrollTop), 0, "reopened confirmation begins at the first trip");
+  await page.evaluate(() => window.__failSave = true);
+  await page.locator("#confirmDelete").click();
+  await controlsVisible(["#deleteError", "#cancelDelete", "#confirmDelete"]);
+  await flush();
+  assert.equal(saved().surveys.length, 80);
+  await page.evaluate(() => window.__failSave = false);
+  await page.locator("#confirmDelete").click();
+  await flush();
+  assert.equal(saved().surveys.length, 0);
+
+  // Reproduce the actual N8 screenshot using the bundled government data.
+  await context.close();
+  const bundled = JSON.parse(require("zlib").gunzipSync(fs.readFileSync(path.join(root, "data/government-routes.json.gz"))));
+  ({ context, page } = await open({}, 360, bundled, "2026-09-16T05:32:00+08:00"));
+  await page.locator("#new").click();
+  await page.locator("#route").fill("N8");
+  await page.locator("#search button").click();
+  await page.locator("#results .route").first().waitFor();
+  assert.equal(await page.locator("#results .route").count(), 1);
+  assert.match(await page.locator("#results .route").textContent(), /1000594/);
+  assert.equal(await page.locator("#otherResults .route").count(), 2);
+  assert.equal(await page.locator("#upcoming").count(), 0, "tolerance is fixed, with no configurable selector");
+  if (process.env.SCREENSHOT_PATH)
+    await page.screenshot({ path: process.env.SCREENSHOT_PATH.replace(".png", "-n8.png") });
+
+  // Saved legacy preference cannot override the fixed allowance.
+  await context.close();
+  ({ context, page } = await open({ "passenger-count:workspace:v2": JSON.stringify({ ...manyState, surveys: [], search: { number: "1", upcoming: "120" } }) }, 360, data, "2026-09-15T11:49:59+08:00"));
+  await page.locator("#new").click();
+  await page.locator("#route").fill("1");
+  await page.locator("#search button").click();
+  await page.waitForFunction(() => document.querySelectorAll("#otherResults .route").length === 2);
+  assert.equal(await page.locator("#results .route").count(), 0);
+  await page.clock.setFixedTime(new Date("2026-09-15T11:50:00+08:00"));
+  await page.locator("#search button").click();
+  await page.waitForFunction(() => document.querySelectorAll("#results .route .upcoming").length === 2);
   assert.equal(
     requests.some((u) => /hkbus|routeFareList/.test(u)),
     false,
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, and fixed 10-minute early tolerance overriding old preferences.",
   );
   await browser.close();
   server.close();

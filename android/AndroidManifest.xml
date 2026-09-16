@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.c933103.passengercount" android:versionCode="6" android:versionName="1.5">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.c933103.passengercount" android:versionCode="7" android:versionName="1.6">
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

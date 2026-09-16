@@ -76,15 +76,6 @@
           </details>
           <details>
             <summary data-i18n="timeData"></summary>
-            <label
-              ><span data-i18n="upcomingWindow"></span
-              ><select id="upcoming">
-                <option>15</option>
-                <option selected>30</option>
-                <option>60</option>
-                <option>120</option>
-              </select></label
-            >
             <p id="clock"></p>
             <p data-i18n="serviceWindowHelp"></p>
             <button
@@ -396,13 +387,15 @@
       <dialog
         id="deleteDialog"
         aria-labelledby="deleteTitle"
-        aria-describedby="deleteHelp deleteSummary"
+        aria-describedby="deleteHelp"
       >
         <h2 id="deleteTitle" data-i18n="deleteRecords"></h2>
-        <ul id="deleteSummary"></ul>
-        <p id="deleteHelp" data-i18n="deleteHelp"></p>
-        <p id="deleteError" class="warning" role="alert" hidden></p>
-        <div class="buttons">
+        <div id="deleteReview" tabindex="0" role="region" aria-labelledby="deleteTitle">
+          <p id="deleteHelp" data-i18n="deleteHelp"></p>
+          <ul id="deleteSummary"></ul>
+          <p id="deleteError" class="warning" role="alert" hidden></p>
+        </div>
+        <div class="buttons deleteActions">
           <button
             id="cancelDelete"
             class="secondary"

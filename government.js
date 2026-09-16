@@ -1,5 +1,5 @@
-// Keep a departure visible through its journey plus this delay allowance.
-export const SERVICE_DELAY_MINUTES = 10;
+// Fixed allowance before departures and after expected journey completion.
+export const SERVICE_TOLERANCE_MINUTES = 10;
 // Normalizes only the Transport Department's own GTFS feed. No operator/third-party database.
 export const GOVERNMENT_SOURCE = "hk-td-gtfs-v1";
 export const GOVERNMENT_URLS = {
@@ -151,7 +151,7 @@ export function normalizeGovernment(files, translated = {}, meta = {}) {
     if (start === null || end === null || !(headway > 0))
       throw Error("Invalid government headway");
     if (end < start) end += 86400;
-    t.windows.push([start, end, headway]);
+    t.windows.push([start, end, headway, f.exact_times === "1" ? 1 : 0]);
   }
   const calendars = {};
   for (const c of read("calendar"))
@@ -225,8 +225,13 @@ export function normalizeGovernment(files, translated = {}, meta = {}) {
       : t.start !== null
         ? [[t.start, t.start, 0]]
         : [];
-    for (const [a, b, h] of windows)
-      variant.schedule.push([t.service_id, a, b, h, duration]);
+    for (const [a, b, h, exact] of windows) {
+      // The optional sixth field distinguishes an exact departure sequence.
+      // Missing/zero means frequency-based service, including existing catalogues.
+      const schedule = [t.service_id, a, b, h, duration];
+      if (exact === 1) schedule.push(1);
+      variant.schedule.push(schedule);
+    }
   }
   if (!Object.keys(routeList).length)
     throw Error("Government feed contains no supported bus routes");
@@ -260,7 +265,6 @@ export function governmentServiceStatus(
   route,
   data,
   now = new Date(),
-  upcoming = 30,
 ) {
   if (!route.schedule?.length)
     return { kind: "unknown", text: "Timetable unavailable — select manually" };
@@ -274,7 +278,7 @@ export function governmentServiceStatus(
   for (const offset of [-2, -1, 0, 1]) {
     const date = new Date(dayStart + offset * 86400000),
       stamp = date.toISOString().slice(0, 10).replaceAll("-", "");
-    for (const [service, start, end, headway, duration] of route.schedule) {
+    for (const [service, start, end, headway, duration, exact = 0] of route.schedule) {
       const cal = data.calendars?.[service];
       if (!cal) {
         unknown = true;
@@ -290,6 +294,19 @@ export function governmentServiceStatus(
       if (!operates) continue;
       const a = start + offset * 86400,
         b = end + offset * 86400;
+      if (headway > 0 && exact !== 1) {
+        // GTFS exact_times=0 (also the default when omitted) is a frequency
+        // window, not departures at start + n * headway. A bus may leave near
+        // its end; retain that window through the journey and delay allowance.
+        // https://gtfs.org/documentation/schedule/reference/#frequenciestxt
+        if (clock >= a) {
+          if (clock <= b || (Number.isFinite(duration) &&
+              clock <= b + duration + SERVICE_TOLERANCE_MINUTES * 60))
+            running = true;
+          else if (!Number.isFinite(duration)) unknown = true;
+        } else next = Math.min(next, a - clock);
+        continue;
+      }
       let last = a,
         following = a;
       if (headway > 0) {
@@ -302,7 +319,7 @@ export function governmentServiceStatus(
       if (last !== null && last <= clock) {
         if (
           Number.isFinite(duration) &&
-          last + duration + SERVICE_DELAY_MINUTES * 60 >= clock
+          last + duration + SERVICE_TOLERANCE_MINUTES * 60 >= clock
         )
           running = true;
         // Without a duration there is no supported completion cutoff.
@@ -316,7 +333,7 @@ export function governmentServiceStatus(
       kind: "active",
       text: "Within estimated running time, including a 10-minute delay allowance",
     };
-  if (next <= upcoming * 60)
+  if (next <= SERVICE_TOLERANCE_MINUTES * 60)
     return {
       kind: "upcoming",
       text: `Next scheduled departure in ${Math.ceil(next / 60)} min`,

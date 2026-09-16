@@ -3,7 +3,7 @@ export { emptyRow, validPassengerCount } from "./survey.js";
 import {
   governmentServiceStatus,
   agencyStopName,
-  SERVICE_DELAY_MINUTES,
+  SERVICE_TOLERANCE_MINUTES,
 } from "./government.js";
 export const OPERATORS = {
   kmb: "KMB",
@@ -31,9 +31,9 @@ const mins = (v) => {
     ? +s.slice(0, 2) * 60 + +s.slice(2)
     : NaN;
 };
-export function serviceStatus(route, data, now = new Date(), upcoming = 30) {
+export function serviceStatus(route, data, now = new Date()) {
   if (route.source === "hk-td-gtfs-v1")
-    return governmentServiceStatus(route, data, now, upcoming);
+    return governmentServiceStatus(route, data, now);
   if (!route.freq || !Object.keys(route.freq).length)
     return { kind: "unknown", text: "Timetable unavailable — select manually" };
   const c = hkClock(now),
@@ -67,7 +67,7 @@ export function serviceStatus(route, data, now = new Date(), upcoming = 30) {
           b = end + offset * 1440 - c.minutes - now.getUTCSeconds() / 60;
         if (
           (a <= 0 && b >= 0) ||
-          (hasJourney && a <= 0 && b + journey + SERVICE_DELAY_MINUTES >= 0)
+          (hasJourney && a <= 0 && b + journey + SERVICE_TOLERANCE_MINUTES >= 0)
         )
           running = true;
         if (!hasJourney && b < 0 && offset >= -1) departedWithoutJourney = true;
@@ -80,7 +80,7 @@ export function serviceStatus(route, data, now = new Date(), upcoming = 30) {
       kind: "active",
       text: "Within estimated running time, including a 10-minute delay allowance",
     };
-  if (next <= upcoming)
+  if (next <= SERVICE_TOLERANCE_MINUTES)
     return { kind: "upcoming", text: `Starts in ${next} min` };
   if (unknown || departedWithoutJourney)
     return {
