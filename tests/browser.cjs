@@ -131,6 +131,19 @@ const data = {
     );
     await page.evaluate(() => new Promise((r) => setTimeout(r, 50)));
   }
+  async function finishAndReview(button = "complete") {
+    const id = current().id;
+    await page.locator("#" + button).click();
+    await flush();
+    assert.equal(
+      await page.locator("#homeScreen").isVisible(),
+      true,
+      "save exits directly to the main screen",
+    );
+    assert.equal(saved().surveys.find((s) => s.id === id).status, "completed");
+    await page.locator(`.recordCard[data-id="${id}"] button`).first().click();
+    assert.equal(await page.locator("#recordScreen").isVisible(), true);
+  }
   async function key(n) {
     await page.locator(`[data-key="${n}"]`).click();
   }
@@ -225,10 +238,22 @@ const data = {
         alighting: rect("alighting"),
         keys: rect("keypad"),
         actions: rect("recordNext"),
+        save: rect("complete"),
+        pause: rect("pause"),
+        abort: rect("abort"),
       };
     });
     assert.ok(geometry.dock.top >= 0, "dock fits in viewport");
-    for (const part of ["stop", "boarding", "alighting", "keys", "actions"]) {
+    for (const part of [
+      "stop",
+      "boarding",
+      "alighting",
+      "keys",
+      "actions",
+      "save",
+      "pause",
+      "abort",
+    ]) {
       const r = geometry[part];
       assert.ok(
         r.top >= geometry.dock.top && r.bottom <= geometry.height + 1,
@@ -257,8 +282,9 @@ const data = {
     );
     const complete = await page.locator("#complete").boundingBox();
     assert.ok(
-      complete.y + complete.height <= after.y,
-      "trip controls can scroll above the dock",
+      complete.y >= after.y &&
+        complete.y + complete.height <= after.y + after.height,
+      "save remains inside the pinned dock after scrolling",
     );
     await page.evaluate(() => window.scrollTo(0, 0));
   }
@@ -321,7 +347,7 @@ const data = {
     () => Math.abs(window.__map.getCenter().lat - 22.304) < 0.00001,
   );
   assert.equal(await page.locator(".leaflet-tooltip").count(), 3);
-  await page.locator("#complete").click();
+  await finishAndReview("recordNext");
   await flush();
   assert.equal(current().status, "completed");
   assert.equal(await page.locator("#recordScreen").isVisible(), true);
@@ -347,6 +373,15 @@ const data = {
     .click();
   await key(5);
   assert.equal(await page.locator("#countIssues").isVisible(), false);
+  const originalEnd = current().endIndex;
+  await finishAndReview("saveCompleted");
+  assert.equal(
+    current().endIndex,
+    originalEnd,
+    "saving completed edits preserves the trip end",
+  );
+  await page.locator("#editRecord").click();
+
   // Custom corrections insert before an existing row without moving its observations.
   await page.locator("#corrections summary").click();
   await page.locator("#addStop").click();
@@ -388,7 +423,7 @@ const data = {
   await page.locator("#abort").click();
   assert.match(await page.locator("#recordList").textContent(), /Aborted/);
   await page.locator("#recordList button").first().click();
-  await page.locator("#complete").click();
+  await finishAndReview();
   assert.equal(await page.locator("#recordIssues").isVisible(), false);
   await page.locator("#csv").click();
   await flush();
@@ -445,9 +480,31 @@ const data = {
   await page.locator("#skipAlighting").click();
   await page.locator("#skipBoarding").click();
   await key(6);
+  assert.equal(await page.locator("#recordNext").textContent(), "記錄最後一站");
   await page.locator("#recordNext").click();
   assert.equal(await page.locator("#active").inputValue(), "2");
-  await page.locator("#complete").click();
+  assert.equal(await page.locator("#countScreen").isVisible(), true);
+  assert.equal(
+    await page.locator("#recordNext").textContent(),
+    "儲存並返回主頁",
+  );
+  await flush();
+  const finalStopSeed = { ...disk };
+  await context.close();
+  ({ context, page } = await open(finalStopSeed, 360));
+  assert.equal(
+    await page.locator("#recordNext").textContent(),
+    "儲存並返回主頁",
+    "recorded final-stop action survives cold recovery",
+  );
+  // A failed save must keep the counting screen open so the user can retry.
+  await page.evaluate(() => (window.__failSave = true));
+  await page.locator("#recordNext").click();
+  assert.equal(await page.locator("#countScreen").isVisible(), true);
+  await flush();
+  assert.equal(current().status, "in_progress");
+  await page.evaluate(() => (window.__failSave = false));
+  await finishAndReview("recordNext");
   assert.equal(await page.locator("#recordIssues").isVisible(), false);
   await page.locator("#language").selectOption("en");
   await flush();
@@ -544,7 +601,7 @@ const data = {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery and the inclusive 14:10 service window.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls.",
   );
   await browser.close();
   server.close();

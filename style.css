@@ -514,7 +514,7 @@ body[data-screen="count"] footer {
   font-weight: 650;
   color: #18343c;
 }
-/* Reserve the panel's measured height so every table row and trip control can scroll above it. */
+/* Reserve the panel's measured height so every table row can scroll above it. */
 html:has(body[data-screen="count"]) {
   scroll-padding-bottom: calc(var(--entry-dock-height, 420px) + 12px);
 }
@@ -535,7 +535,7 @@ body[data-screen="count"] main {
   border-radius: 12px 12px 0 0;
   box-shadow: 0 -4px 16px #18343c24;
   display: grid;
-  grid-template-areas: "stop" "fields" "summary" "keypad" "actions";
+  grid-template-areas: "stop" "fields" "summary" "keypad" "actions" "trip";
   gap: 5px;
 }
 .dockStop {
@@ -633,7 +633,7 @@ body[data-screen="count"] main {
 @media (max-height: 600px) {
   #entryDock {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: "stop stop" "fields keypad" "summary keypad" "actions actions";
+    grid-template-areas: "stop stop" "fields keypad" "summary keypad" "actions actions" "trip trip";
     gap: 4px 10px;
   }
   #entryDock .keypad button {
@@ -694,4 +694,30 @@ body[data-screen="count"] main {
 }
 #deleteSummary li {
   margin: 10px 0;
+}
+
+#entryDock .tripControls {
+  grid-area: trip;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding-top: 6px;
+  border-top: 1px solid #b3c9bf;
+}
+#entryDock .tripControls button {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 5px;
+  font-size: 0.75rem;
+}
+@media (max-height: 600px) {
+  #entryDock .tripControls {
+    margin-top: 0;
+    padding-top: 4px;
+  }
+  #entryDock .tripControls button {
+    min-height: 34px;
+  }
 }

@@ -496,15 +496,20 @@ function renderCount() {
   $("keypadTarget").textContent = t(target.field);
   $("prev").disabled = s.activeIndex === 0;
   $("next").disabled = s.activeIndex === s.stops.length - 1;
+  const lastStop = s.activeIndex === s.stops.length - 1;
+  const finishReady = lastStop && row.recorded;
   $("recordNext").textContent = t(
-    s.activeIndex === s.stops.length - 1 ? "recordLast" : "recordNext",
+    finishReady ? "saveHome" : lastStop ? "recordLast" : "recordNext",
   );
+  $("recordNext").dataset.action = finishReady ? "finish" : "record";
   $("nextField").textContent = t(
     target.field === "boarding"
       ? "nextField"
-      : s.activeIndex === s.stops.length - 1
-        ? "recordLast"
-        : "recordNext",
+      : finishReady
+        ? "saveHome"
+        : lastStop
+          ? "recordLast"
+          : "recordNext",
   );
   for (const [id, value] of [
     ["stopTime", row.time],
@@ -672,7 +677,13 @@ function enterKey(key) {
 function advanceField() {
   if (target.field === "boarding") {
     active(cur().activeIndex, "alighting");
-  } else saveStop(true);
+  } else recordOrFinish();
+}
+function recordOrFinish() {
+  const s = cur();
+  if (s.activeIndex === s.stops.length - 1 && s.rows[s.activeIndex].recorded)
+    complete();
+  else saveStop(true);
 }
 function saveStop(advance = false, noChange = false) {
   const s = cur();
@@ -687,19 +698,24 @@ function pause(status) {
   s.status = status;
   s.updatedAt = new Date().toISOString();
   s[status === "aborted" ? "abortedAt" : "pausedAt"] = s.updatedAt;
-  persist();
-  goHome();
+  if (persist()) {
+    error();
+    goHome();
+  }
 }
 function complete() {
   const s = cur();
-  recordStop(s, s.activeIndex, hkClock().time);
-  completeSurvey(s, s.activeIndex);
-  const saved = persist();
-  showScreen("record");
-  if (!saved) {
-    error(t("recordFailed"));
-    $("completedMessage").textContent = t("recordFailed");
+  if (s.status !== "completed") {
+    recordStop(s, s.activeIndex, hkClock().time);
+    completeSurvey(s, s.activeIndex);
   }
+  if (!persist()) {
+    error(t("recordFailed"));
+    renderCount();
+    return;
+  }
+  error();
+  goHome();
 }
 function renderRecord() {
   const s = cur();
@@ -1185,7 +1201,7 @@ for (const [f, id] of [
     else saveStop(true);
   };
 $("noChange").onclick = () => saveStop(true, true);
-$("recordNext").onclick = () => saveStop(true);
+$("recordNext").onclick = recordOrFinish;
 $("recordStay").onclick = () => saveStop(false);
 $("skipStop").onclick = () => {
   const s = cur(),
@@ -1256,10 +1272,7 @@ $("allStops").ontoggle = () => {
 $("complete").onclick = complete;
 $("pause").onclick = () => pause("paused");
 $("abort").onclick = () => pause("aborted");
-$("saveCompleted").onclick = () => {
-  edit();
-  showScreen("record");
-};
+$("saveCompleted").onclick = complete;
 $("editRecord").onclick = () => {
   target = { index: cur().activeIndex, field: "boarding" };
   showScreen("count");

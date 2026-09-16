@@ -218,13 +218,6 @@
             ></button>
           </div>
         </details>
-        <section class="tripControls">
-          <button id="complete" data-i18n="complete"></button
-          ><button id="pause" class="secondary" data-i18n="pause"></button
-          ><button id="abort" class="secondary" data-i18n="abort"></button
-          ><button id="saveCompleted" data-i18n="saveCompleted" hidden></button>
-          <p data-i18n="finishHint"></p>
-        </section>
         <section id="entryDock" aria-label="Passenger count entry">
           <div class="dockStop">
             <button id="prev" class="secondary" data-i18n-aria="previous">
@@ -297,6 +290,26 @@
             ></button
             ><button id="recordNext" data-i18n="recordNext"></button>
           </div>
+          <section
+            class="tripControls"
+            data-i18n-aria="tripActions"
+            aria-label="Trip controls"
+          >
+            <button id="complete" data-i18n="saveHome"></button>
+            <button
+              id="pause"
+              class="secondary"
+              data-i18n="pauseHome"
+              data-i18n-aria="pause"
+            ></button>
+            <button
+              id="abort"
+              class="secondary"
+              data-i18n="abortHome"
+              data-i18n-aria="abort"
+            ></button>
+            <button id="saveCompleted" data-i18n="saveHome" hidden></button>
+          </section>
         </section>
       </section>
       <section id="recordScreen" hidden>
