@@ -1,1 +1,269 @@
-:root{font:16px system-ui;color:#18343c;background:#f0f4f3;--a:#146858}*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1500px;margin:auto;padding:18px}header,.spread{display:flex;justify-content:space-between;align-items:center}h1{margin:0;font-size:clamp(1.45rem,3vw,2rem)}h2{font-size:1.15rem;margin:0 0 12px}small{color:var(--a);font-weight:750;letter-spacing:.13em}.panel{background:#fff;border:1px solid #d4e0dc;border-radius:12px;padding:18px;margin-bottom:15px}.row,.buttons{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.row label{flex:1 1 220px}label{display:grid;gap:5px;font-size:.88rem;font-weight:650}input,select,textarea,button{font:inherit;min-height:44px;border-radius:6px}input,select,textarea{border:1px solid #a9bdb6;padding:9px;width:100%;min-width:0}button{border:0;background:var(--a);color:white;font-weight:650;padding:9px 14px}.secondary{background:#edf4f1;color:#215548;border:1px solid #bed0c9}.error{padding:12px;background:#fff0e8;color:#843611;border:1px solid #d28963;border-radius:6px}.route{width:100%;text-align:left;background:#f4f8f6;color:#18343c;border:1px solid #cadbd4;margin:6px 0}.route span{display:block;font-size:.82rem;font-weight:400}.active{color:var(--a)!important;font-weight:700!important}.unknown{color:#80591b!important}.grid{display:grid;grid-template-columns:minmax(310px,.8fr) minmax(0,1.5fr);gap:15px;align-items:start}.grid aside{position:sticky;top:10px}#map{height:390px;border:1px solid #bdccc7;border-radius:7px;margin:10px 0}.stopIcon{border-radius:50%;background:var(--a);color:white;text-align:center;font:bold 11px/24px system-ui;border:2px solid white}.stopIcon.selected{background:#b75b12}.leaflet-tooltip{white-space:normal;max-width:180px}.table{overflow:auto}table{width:100%;border-collapse:collapse;font-size:.84rem}th{background:#edf3f0;text-align:left;padding:8px}td{padding:7px 4px;border-bottom:1px solid #dce5e0}td input[type=number]{width:75px}td input[type=time]{width:115px}.selectedRow{background:#fff3dc}.derived{background:#eff5f2}.check{display:flex;align-items:center}.check input{width:20px;min-height:20px}.mobile{display:none}p,footer{color:#526b70;font-size:.84rem;line-height:1.45}a{color:var(--a)}[hidden]{display:none!important}@media(max-width:720px){header,main,footer{padding:11px}.grid{display:block}.grid aside{position:static}#map{height:340px}.mobile{display:flex}table,tbody,tr,td{display:block}thead{display:none}tr{padding:10px 0;border-bottom:1px solid #ccd9d4}td{border:0}td input,td input[type=number],td input[type=time]{width:100%}body:not(.showAll) #body tr:not(.selectedRow){display:none}}
+:root {
+  font: 16px system-ui;
+  color: #18343c;
+  background: #f0f4f3;
+  --a: #146858;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header,
+main,
+footer {
+  max-width: 1500px;
+  margin: auto;
+  padding: 18px;
+}
+header,
+.spread {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+h2 {
+  font-size: 1.15rem;
+  margin: 0 0 12px;
+}
+small {
+  color: var(--a);
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+.panel {
+  background: #fff;
+  border: 1px solid #d4e0dc;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 15px;
+}
+.row,
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+}
+.row label {
+  flex: 1 1 220px;
+}
+label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  min-height: 44px;
+  border-radius: 6px;
+}
+input,
+select,
+textarea {
+  border: 1px solid #a9bdb6;
+  padding: 9px;
+  width: 100%;
+  min-width: 0;
+}
+button {
+  border: 0;
+  background: var(--a);
+  color: white;
+  font-weight: 650;
+  padding: 9px 14px;
+}
+.secondary {
+  background: #edf4f1;
+  color: #215548;
+  border: 1px solid #bed0c9;
+}
+.error {
+  padding: 12px;
+  background: #fff0e8;
+  color: #843611;
+  border: 1px solid #d28963;
+  border-radius: 6px;
+}
+.route {
+  width: 100%;
+  text-align: left;
+  background: #f4f8f6;
+  color: #18343c;
+  border: 1px solid #cadbd4;
+  margin: 6px 0;
+}
+.route span {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+.active {
+  color: var(--a) !important;
+  font-weight: 700 !important;
+}
+.unknown {
+  color: #80591b !important;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(310px, 0.8fr) minmax(0, 1.5fr);
+  gap: 15px;
+  align-items: start;
+}
+.grid aside {
+  position: sticky;
+  top: 10px;
+}
+#map {
+  height: 390px;
+  border: 1px solid #bdccc7;
+  border-radius: 7px;
+  margin: 10px 0;
+}
+.stopIcon {
+  border-radius: 50%;
+  background: var(--a);
+  color: white;
+  text-align: center;
+  font: bold 11px/24px system-ui;
+  border: 2px solid white;
+}
+.stopIcon.selected {
+  background: #b75b12;
+}
+.leaflet-tooltip {
+  white-space: normal;
+  max-width: 180px;
+}
+.table {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+th {
+  background: #edf3f0;
+  text-align: left;
+  padding: 8px;
+}
+td {
+  padding: 7px 4px;
+  border-bottom: 1px solid #dce5e0;
+}
+td input[type="number"] {
+  width: 75px;
+}
+td input[type="time"] {
+  width: 115px;
+}
+.selectedRow {
+  background: #fff3dc;
+}
+.derived {
+  background: #eff5f2;
+}
+.check {
+  display: flex;
+  align-items: center;
+}
+.check input {
+  width: 20px;
+  min-height: 20px;
+}
+.mobile {
+  display: none;
+}
+p,
+footer {
+  color: #526b70;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+a {
+  color: var(--a);
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 720px) {
+  header,
+  main,
+  footer {
+    padding: 11px;
+  }
+  .grid {
+    display: block;
+  }
+  .grid aside {
+    position: static;
+  }
+  #map {
+    height: 340px;
+  }
+  .mobile {
+    display: flex;
+  }
+  table,
+  tbody,
+  tr,
+  td {
+    display: block;
+  }
+  thead {
+    display: none;
+  }
+  tr {
+    padding: 10px 0;
+    border-bottom: 1px solid #ccd9d4;
+  }
+  td {
+    border: 0;
+  }
+  td input,
+  td input[type="number"],
+  td input[type="time"] {
+    width: 100%;
+  }
+  body:not(.showAll) #body tr:not(.selectedRow) {
+    display: none;
+  }
+}
+
+.countLabel {
+  font-size: 0.78rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+button:disabled {
+  opacity: 0.5;
+}
+header {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#saveStatus {
+  font-size: 0.8rem;
+}
+select {
+  max-width: 100%;
+}
+.leaflet-container {
+  isolation: isolate;
+}
+
+.leaflet-tooltip {
+  min-width: 120px;
+  max-width: 200px;
+}
