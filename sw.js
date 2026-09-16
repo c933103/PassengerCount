@@ -1,4 +1,4 @@
-const C = "passenger-count-v5";
+const C = "passenger-count-v6";
 const F = [
   "./",
   "./index.html",

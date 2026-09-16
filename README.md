@@ -4,7 +4,7 @@ An Android app and web app for bus passenger surveys.
 
 ## Use on Android
 
-1. Download **PassengerCount-1.2.apk** to your phone and open it.
+1. Download **PassengerCount-1.3.apk** to your phone and open it.
 2. If Android asks, allow this download source to install the app, then tap **Install**.
 3. Open **PassengerCount** from your home screen. Enter your name once, find a route, and choose a direction / variation.
 4. Allow location access to get a suggested starting stop. Confirm it or choose another stop. The app opens counting with a live map, selected stop, boarding / alighting fields and a large 0–9 keypad. Cantonese (Hong Kong, Traditional Chinese) is the default; the header switches to English and remembers your choice.
@@ -17,7 +17,7 @@ Government routes, stops and timetables are bundled, so route selection and coun
 
 ## Survey features
 
-- Remembered surveyor and a home screen listing draft, counting, paused, aborted and completed records. Pause or abort returns home without deleting observations; records can be resumed or reviewed.
+- Remembered surveyor and a home screen listing draft, counting, paused, aborted and completed records. Pause or abort returns home without deleting observations; records can be resumed or reviewed. Delete a saved record from its home-screen card or record details; the confirmation identifies the trip. Deletion is committed immediately and retains the record if storage fails. Exported files and uploaded copies are independent.
 - Hong Kong time and published schedules prioritize route variants running or starting soon; other variants can be expanded. This is timetable guidance, not live bus tracking.
 - KMB, Long Win, Citybus, New Lantao Bus, MTR Bus, green minibuses, Discovery Bay, Park Island and cross-boundary coaches, from the Transport Department government GTFS feed.
 - GPS suggestions, manual starting stops, the map stop picker and the counting stop picker update the same active row. Confirming the start opens counting mode; saved surveys reopen in counting mode.
@@ -26,6 +26,7 @@ Government routes, stops and timetables are bundled, so route selection and coun
 - Skip boarding or alighting independently when not applicable. **No passenger change** explicitly records both counts as zero, including at the final stop. Unobserved, skipped and recorded stops remain distinguishable.
 - Onboard is calculated rather than required on every stop. Optional known counts can anchor the trip immediately before the starting stop, after the ending stop, or after any individual stop. A trip starting at the route origin assumes an empty vehicle unless a known initial count is entered. Completing at the actual last stop assumes an empty vehicle there unless a known final count is entered. Both assumptions can be disabled for through services or split circular routes.
 - **Backward calculation is intentional:** a known onboard count calculates unobserved earlier stops. Unknown changes are temporarily treated as zero, with inferred values marked as estimates where that assumption affects the calculation. Without an anchor, absolute onboard counts remain unknown. Negative counts, incompatible manual counts and conflicting empty-endpoint assumptions are shown for correction; the app does not silently force totals to match.
+- The current stop selector, boarding/alighting fields and digit keypad stay pinned to the bottom of the counting screen. The map, table and trip controls scroll above them, with reserved space so controls are never hidden behind the panel. Short screens use a compact layout.
 - Expand the full editable stop table at any time while counting. Select a numeric cell and use the keypad to correct it; time, notes and recorded status can also be edited. The live map and selected stop stay above the table.
 - Completed records are saved internally and show boarding / alighting bars and an onboard trend line. Unknown onboard values leave gaps in the line. Completed records remain editable with immediate autosave.
 - Add missing stops before or after any stop, optionally using current GPS coordinates. Edit incorrect stop names or locations. Corrections apply to the survey snapshot and retain existing counts and sequence alignment.
@@ -62,7 +63,7 @@ For web development only, serve this directory with any static web server. Deplo
 
 ## Validation and device checklist
 
-The build checks the APK signature. Automated tests cover government feed conversion and timetables, stop synchronization, live map following, numeric input rejection, skipped fields, zero-change final stops, boundary deductions and inconsistencies, in-progress table editing, missing stops and overlapping circular sections, pause/abort/resume, completion and charts, both languages, CSV export, storage failures and restoration into a fresh browser context. These tests do not replace Android device testing.
+The build checks the APK signature. Automated tests cover government feed conversion and timetables, stop synchronization, live map following, numeric input rejection, skipped fields, zero-change final stops, boundary deductions and inconsistencies, in-progress table editing, missing stops and overlapping circular sections, pause/abort/resume, completion and charts, both languages, CSV export, fixed-panel visibility while scrolling and rotating, record deletion/cancellation, storage failures and restoration into a fresh browser context. These tests do not replace Android device testing.
 
 Before wider distribution, install on a phone and check precise/approximate/denied location, CSV save/cancel, screen rotation, keyboard/system bar insets, offline restart and force-stop recovery. No physical Android device or emulator was available during the initial build.
 

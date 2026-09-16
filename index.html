@@ -117,21 +117,7 @@
           ></button>
         </div>
         <div id="countMapHost"></div>
-        <label class="stopPicker"
-          ><span data-i18n="enteringAt"></span
-          ><select id="active"></select
-        ></label>
         <p id="rowStatus" class="status"></p>
-        <div class="stopActions">
-          <button id="prev" class="secondary" data-i18n="previous"></button
-          ><button id="next" class="secondary" data-i18n="nextStop"></button
-          ><button
-            id="useNearest"
-            class="secondary"
-            data-i18n="useNearest"
-            hidden
-          ></button>
-        </div>
         <div id="countIssues" class="warning" role="status" hidden></div>
         <details id="allStops">
           <summary data-i18n="allStops"></summary>
@@ -152,55 +138,6 @@
             </table>
           </div>
         </details>
-        <div class="countFields">
-          <label
-            ><span data-i18n="boarding"></span
-            ><input
-              id="boarding"
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              readonly /><button
-              id="skipBoarding"
-              class="secondary small"
-              data-i18n="skip"
-            ></button></label
-          ><label
-            ><span data-i18n="alighting"></span
-            ><input
-              id="alighting"
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              readonly /><button
-              id="skipAlighting"
-              class="secondary small"
-              data-i18n="skip"
-            ></button
-          ></label>
-        </div>
-        <div class="onboardSummary">
-          <span data-i18n="onboard"></span>: <output id="onboard"></output>
-          <small id="onboardSource"></small>
-        </div>
-        <p id="keypadTarget" class="status"></p>
-        <div id="keypad" class="keypad">
-          <button data-key="1">1</button><button data-key="2">2</button
-          ><button data-key="3">3</button><button data-key="4">4</button
-          ><button data-key="5">5</button><button data-key="6">6</button
-          ><button data-key="7">7</button><button data-key="8">8</button
-          ><button data-key="9">9</button
-          ><button data-key="clear" class="secondary" data-i18n="clear"></button
-          ><button data-key="0">0</button
-          ><button data-key="backspace" class="secondary" aria-label="Delete">
-            ⌫
-          </button>
-        </div>
-        <div class="buttons countButtons">
-          <button id="nextField" data-i18n="nextField"></button
-          ><button id="noChange" class="secondary" data-i18n="noChange"></button
-          ><button id="recordNext" data-i18n="recordNext"></button>
-        </div>
         <details>
           <summary data-i18n="details"></summary>
           <label
@@ -271,6 +208,79 @@
           ><button id="saveCompleted" data-i18n="saveCompleted" hidden></button>
           <p data-i18n="finishHint"></p>
         </section>
+        <section id="entryDock" aria-label="Passenger count entry">
+          <div class="dockStop">
+            <button id="prev" class="secondary" data-i18n-aria="previous">
+              ‹
+            </button>
+            <label class="stopPicker"
+              ><span data-i18n="enteringAt"></span
+              ><select id="active"></select
+            ></label>
+            <button id="next" class="secondary" data-i18n-aria="nextStop">
+              ›
+            </button>
+          </div>
+          <div class="countFields">
+            <label
+              ><span data-i18n="boarding"></span
+              ><input
+                id="boarding"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                readonly /><button
+                id="skipBoarding"
+                class="secondary small"
+                data-i18n="skip"
+              ></button></label
+            ><label
+              ><span data-i18n="alighting"></span
+              ><input
+                id="alighting"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                readonly /><button
+                id="skipAlighting"
+                class="secondary small"
+                data-i18n="skip"
+              ></button
+            ></label>
+          </div>
+          <div class="entrySummary">
+            <div class="onboardSummary">
+              <span data-i18n="onboard"></span>: <output id="onboard"></output>
+              <small id="onboardSource"></small>
+            </div>
+            <p id="keypadTarget" class="status" aria-live="polite"></p>
+          </div>
+          <div id="keypad" class="keypad">
+            <button data-key="1">1</button><button data-key="2">2</button
+            ><button data-key="3">3</button><button data-key="4">4</button
+            ><button data-key="5">5</button><button data-key="6">6</button
+            ><button data-key="7">7</button><button data-key="8">8</button
+            ><button data-key="9">9</button
+            ><button
+              data-key="clear"
+              class="secondary"
+              data-i18n="clear"
+            ></button
+            ><button data-key="0">0</button
+            ><button data-key="backspace" class="secondary" aria-label="Delete">
+              ⌫
+            </button>
+          </div>
+          <div class="buttons countButtons">
+            <button id="nextField" data-i18n="nextField"></button
+            ><button
+              id="noChange"
+              class="secondary"
+              data-i18n="noChange"
+            ></button
+            ><button id="recordNext" data-i18n="recordNext"></button>
+          </div>
+        </section>
       </section>
       <section id="recordScreen" hidden>
         <div class="spread">
@@ -290,7 +300,12 @@
         <p data-i18n="chartUnknown"></p>
         <div class="buttons">
           <button id="editRecord" data-i18n="editRecord"></button
-          ><button id="csv" class="secondary" data-i18n="export"></button
+          ><button
+            id="deleteRecord"
+            class="danger"
+            data-i18n="deleteRecord"
+          ></button>
+          <button id="csv" class="secondary" data-i18n="export"></button
           ><button id="upload" class="secondary" data-i18n="upload"></button>
         </div>
         <p id="uploadStatus"></p>
@@ -323,6 +338,12 @@
             <div id="map"></div>
             <div class="buttons mapButtons">
               <button
+                id="useNearest"
+                class="secondary"
+                data-i18n="useNearest"
+                hidden
+              ></button>
+              <button
                 id="myLocation"
                 class="secondary"
                 data-i18n="follow"
@@ -347,6 +368,29 @@
           </div>
         </section>
       </div>
+      <dialog
+        id="deleteDialog"
+        aria-labelledby="deleteTitle"
+        aria-describedby="deleteHelp deleteSummary"
+      >
+        <h2 id="deleteTitle" data-i18n="deleteRecord"></h2>
+        <p id="deleteSummary"></p>
+        <p id="deleteHelp" data-i18n="deleteHelp"></p>
+        <p id="deleteError" class="warning" role="alert" hidden></p>
+        <div class="buttons">
+          <button
+            id="cancelDelete"
+            class="secondary"
+            data-i18n="cancel"
+            autofocus
+          ></button
+          ><button
+            id="confirmDelete"
+            class="danger"
+            data-i18n="deleteConfirm"
+          ></button>
+        </div>
+      </dialog>
       <dialog id="stopDialog">
         <form id="stopForm">
           <h2 id="stopDialogTitle"></h2>

@@ -95,6 +95,7 @@ const data = {
       window.PassengerCountAndroid = {
         get: (k) => native[k] ?? null,
         set: (k, v) => {
+          if (window.__failSave) return false;
           native[k] = v;
           window.captureDisk(k, v);
           return true;
@@ -185,6 +186,70 @@ const data = {
     ),
     4,
   );
+  async function checkDock() {
+    await page.waitForFunction(
+      () =>
+        Math.abs(
+          document.querySelector("#entryDock").getBoundingClientRect().bottom -
+            innerHeight,
+        ) < 2,
+    );
+    const geometry = await page.evaluate(() => {
+      const rect = (id) => {
+        const r = document.getElementById(id).getBoundingClientRect();
+        return { top: r.top, bottom: r.bottom, left: r.left, right: r.right };
+      };
+      return {
+        height: innerHeight,
+        width: innerWidth,
+        dock: rect("entryDock"),
+        stop: rect("active"),
+        boarding: rect("boarding"),
+        alighting: rect("alighting"),
+        keys: rect("keypad"),
+        actions: rect("recordNext"),
+      };
+    });
+    assert.ok(geometry.dock.top >= 0, "dock fits in viewport");
+    for (const part of ["stop", "boarding", "alighting", "keys", "actions"]) {
+      const r = geometry[part];
+      assert.ok(
+        r.top >= geometry.dock.top && r.bottom <= geometry.height + 1,
+        `${part} stays visible`,
+      );
+      assert.ok(
+        r.left >= 0 && r.right <= geometry.width + 1,
+        `${part} fits horizontally`,
+      );
+    }
+    assert.ok(
+      geometry.stop.bottom <= geometry.keys.top,
+      "stop name stays above keypad",
+    );
+    if (geometry.height > 600)
+      assert.ok(
+        geometry.boarding.bottom <= geometry.keys.top,
+        "count fields stay above keypad",
+      );
+    const before = geometry.dock;
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    const after = await page.locator("#entryDock").boundingBox();
+    assert.ok(
+      Math.abs(before.top - after.y) < 2,
+      "scrolling never moves the dock",
+    );
+    const complete = await page.locator("#complete").boundingBox();
+    assert.ok(
+      complete.y + complete.height <= after.y,
+      "trip controls can scroll above the dock",
+    );
+    await page.evaluate(() => window.scrollTo(0, 0));
+  }
+  await checkDock();
+  await page.setViewportSize({ width: 740, height: 360 });
+  await checkDock();
+  await page.setViewportSize({ width: 412, height: 850 });
+  await checkDock();
   await key(3);
   await page.keyboard.type("e.-+abc");
   assert.equal(await page.locator("#boarding").inputValue(), "3");
@@ -336,6 +401,8 @@ const data = {
   const seed = { ...disk };
   await context.close();
   ({ context, page } = await open(seed, 360));
+  await page.setViewportSize({ width: 360, height: 740 });
+  await checkDock();
   assert.equal(await page.locator("html").getAttribute("lang"), "yue-Hant-HK");
   assert.equal(await page.locator("#countScreen").isVisible(), true);
   assert.equal(await page.locator("#active").inputValue(), "1");
@@ -356,7 +423,7 @@ const data = {
   if (process.env.SCREENSHOT_PATH)
     await page.screenshot({
       path: process.env.SCREENSHOT_PATH,
-      fullPage: true,
+      fullPage: false,
     });
   await page.locator("#skipAlighting").click();
   await page.locator("#skipBoarding").click();
@@ -368,13 +435,55 @@ const data = {
   await page.locator("#language").selectOption("en");
   await flush();
   assert.equal(saved().language, "en");
+  // Deleting a selected record is transactional, cancellable, and survives app restoration.
+  const removedId = current().id,
+    keptId = saved().surveys.find((s) => s.id !== removedId).id;
+  await page.locator("#deleteRecord").click();
+  assert.match(await page.locator("#deleteSummary").textContent(), /Completed/);
+  await page.locator("#cancelDelete").click();
+  await flush();
+  assert.equal(saved().surveys.length, 2);
+  await page.locator("#deleteRecord").click();
+  await page.evaluate(() => (window.__failSave = true));
+  await page.locator("#confirmDelete").click();
+  assert.equal(await page.locator("#deleteError").isVisible(), true);
+  await flush();
+  assert.equal(saved().surveys.length, 2);
+  await page.evaluate(() => (window.__failSave = false));
+  await page.locator("#confirmDelete").click();
+  await flush();
+  assert.equal(await page.locator("#homeScreen").isVisible(), true);
+  assert.equal(saved().currentId, null);
+  assert.deepEqual(
+    saved().surveys.map((s) => s.id),
+    [keptId],
+  );
+  const deletedSeed = { ...disk };
+  await context.close();
+  ({ context, page } = await open(deletedSeed, 360));
+  assert.equal(await page.locator(".recordCard").count(), 1);
+  assert.equal(
+    await page.locator(`[data-delete-id="${removedId}"]`).count(),
+    0,
+  );
+  await page.locator(`[data-delete-id="${keptId}"]`).click();
+  await page.locator("#cancelDelete").click();
+  assert.equal(await page.locator(".recordCard").count(), 1);
+  await page.locator(`[data-delete-id="${keptId}"]`).click();
+  await page.locator("#confirmDelete").click();
+  await flush();
+  assert.equal(saved().surveys.length, 0);
+  assert.match(
+    await page.locator("#recordList").textContent(),
+    /No saved records/,
+  );
   assert.equal(
     requests.some((u) => /hkbus|routeFareList/.test(u)),
     false,
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and saved-record deletion/cancellation/storage failure/recovery.",
   );
   await browser.close();
   server.close();

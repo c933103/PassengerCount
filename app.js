@@ -44,6 +44,7 @@ let data,
   sectionOptions = [],
   sectionStops = [],
   uploadBusy = false;
+let pendingDeleteId = null;
 const cur = () => state.surveys.find((s) => s.id === state.currentId);
 const t = (key, values) => translate(state.language, key, values);
 const name = (stop) =>
@@ -89,6 +90,10 @@ function setLanguage(language) {
   document
     .querySelectorAll("[data-i18n]")
     .forEach((el) => (el.textContent = t(el.dataset.i18n)));
+  document
+    .querySelectorAll("[data-i18n-aria]")
+    .forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+  $("entryDock").setAttribute("aria-label", t("countEntry"));
   window.PassengerCountAndroid?.setLanguage?.(language);
   const chosen = $("operator").value;
   $("operator").replaceChildren(new Option(t("allOperators"), ""));
@@ -153,6 +158,7 @@ function showScreen(next) {
     });
     locate();
   }
+  measureDock();
   persist();
   window.scrollTo(0, 0);
 }
@@ -191,9 +197,47 @@ function renderHome() {
       review.onclick = () => openSurvey(s.id, "record");
       buttons.append(review);
     }
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.dataset.deleteId = s.id;
+    remove.textContent = t("deleteRecord");
+    remove.onclick = () => requestDelete(s.id);
+    buttons.append(remove);
     card.append(title, detail, buttons);
     list.append(card);
   }
+}
+function requestDelete(id) {
+  const s = state.surveys.find((record) => record.id === id);
+  if (!s) return;
+  pendingDeleteId = id;
+  $("deleteSummary").textContent =
+    `${s.route.route} → ${name({ name: s.route.dest })} · ${s.date} · ${s.vehicle || ""} · ${t(s.status)}`;
+  $("deleteError").hidden = true;
+  $("deleteDialog").showModal();
+}
+function confirmDelete() {
+  if (!state.surveys.some((s) => s.id === pendingDeleteId)) return;
+  const next = {
+    ...state,
+    surveys: state.surveys.filter((s) => s.id !== pendingDeleteId),
+  };
+  if (next.currentId === pendingDeleteId) {
+    next.currentId = null;
+    next.screen = "home";
+  }
+  // Commit removal before changing the UI; a failed write retains the record.
+  try {
+    save(next);
+  } catch {
+    $("deleteError").textContent = t("deleteFailed");
+    $("deleteError").hidden = false;
+    return;
+  }
+  Object.assign(state, next);
+  pendingDeleteId = null;
+  $("deleteDialog").close();
+  showScreen("home");
 }
 function openSurvey(id, mode) {
   state.currentId = id;
@@ -408,8 +452,7 @@ function renderCount() {
       : row.onboard !== ""
         ? ""
         : t(result.estimated[s.activeIndex] ? "estimate" : "auto");
-  $("keypadTarget").textContent =
-    `${stopLabel(s.stops[target.index], target.index)} · ${t(target.field)}`;
+  $("keypadTarget").textContent = t(target.field);
   $("prev").disabled = s.activeIndex === 0;
   $("next").disabled = s.activeIndex === s.stops.length - 1;
   $("recordNext").textContent = t(
@@ -1003,6 +1046,12 @@ $("setupHome").onclick = () => {
   goHome();
 };
 $("recordHome").onclick = goHome;
+$("deleteRecord").onclick = () => requestDelete(cur().id);
+$("confirmDelete").onclick = confirmDelete;
+$("cancelDelete").onclick = () => $("deleteDialog").close();
+$("deleteDialog").addEventListener("close", () => {
+  pendingDeleteId = null;
+});
 $("search").onsubmit = (e) => {
   e.preventDefault();
   search();
@@ -1222,6 +1271,15 @@ $("sectionChoice").onchange = chooseSection;
 $("sectionOverlap").onchange = renderSectionPreview;
 $("joinSection").onclick = joinSection;
 $("cancelSection").onclick = () => $("sectionDialog").close();
+function measureDock() {
+  if (screen !== "count") return;
+  const height = Math.ceil($("entryDock").getBoundingClientRect().height);
+  document.documentElement.style.setProperty(
+    "--entry-dock-height",
+    `${height}px`,
+  );
+}
+new ResizeObserver(measureDock).observe($("entryDock"));
 const query = state.search || {};
 const initialScreen = state.screen || cur()?.screen;
 $("route").value = query.number || "";

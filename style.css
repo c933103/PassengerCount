@@ -500,3 +500,156 @@ body[data-screen="count"] footer {
   top: 0;
   z-index: 1;
 }
+
+.danger {
+  background: #fff1ed;
+  border: 1px solid #cc8e7d;
+  color: #982f1b;
+}
+#confirmDelete {
+  background: #982f1b;
+  color: white;
+}
+#deleteSummary {
+  font-weight: 650;
+  color: #18343c;
+}
+/* Reserve the panel's measured height so every table row and trip control can scroll above it. */
+html:has(body[data-screen="count"]) {
+  scroll-padding-bottom: calc(var(--entry-dock-height, 420px) + 12px);
+}
+body[data-screen="count"] main {
+  padding-bottom: calc(var(--entry-dock-height, 420px) + 24px);
+}
+#entryDock {
+  position: fixed;
+  z-index: 800;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 850px);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: #f0f4f3;
+  border: 1px solid #b3c9bf;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 16px #18343c24;
+  display: grid;
+  grid-template-areas: "stop" "fields" "summary" "keypad" "actions";
+  gap: 5px;
+}
+.dockStop {
+  grid-area: stop;
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+#entryDock .stopPicker {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  gap: 1px;
+}
+#entryDock .stopPicker span {
+  font-size: 0.7rem;
+}
+#entryDock .stopPicker select {
+  min-height: 40px;
+  height: 40px;
+  padding: 6px;
+}
+.dockStop button {
+  min-width: 38px;
+  min-height: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 1.5rem;
+}
+#entryDock .countFields {
+  grid-area: fields;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  gap: 10px;
+}
+#entryDock .countFields label {
+  gap: 2px;
+  font-size: 0.78rem;
+}
+#entryDock .countFields input {
+  min-height: 42px;
+  height: 42px;
+  padding: 2px;
+  font-size: 1.7rem;
+}
+#entryDock .countFields button {
+  min-height: 28px;
+  padding: 3px 6px;
+}
+.entrySummary {
+  grid-area: summary;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+#entryDock .onboardSummary {
+  margin: 0;
+  font-size: 0.8rem;
+}
+#entryDock .onboardSummary output {
+  font-size: 1.15rem;
+}
+#entryDock #keypadTarget {
+  margin: 0;
+  font-weight: 650;
+}
+#entryDock .keypad {
+  grid-area: keypad;
+  max-width: none;
+  width: 100%;
+  gap: 5px;
+}
+#entryDock .keypad button {
+  min-height: 42px;
+  padding: 4px;
+  font-size: 1.3rem;
+}
+#entryDock .keypad button.secondary {
+  font-size: 0.8rem;
+}
+#entryDock .countButtons {
+  grid-area: actions;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 0;
+}
+#entryDock .countButtons button {
+  max-width: none;
+  min-height: 40px;
+  padding: 5px;
+  font-size: 0.78rem;
+}
+@media (max-height: 600px) {
+  #entryDock {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "stop stop" "fields keypad" "summary keypad" "actions actions";
+    gap: 4px 10px;
+  }
+  #entryDock .keypad button {
+    min-height: 32px;
+    padding: 2px;
+    font-size: 1.1rem;
+  }
+  #entryDock .countFields input {
+    min-height: 36px;
+    height: 36px;
+  }
+  #entryDock .countButtons button {
+    min-height: 34px;
+  }
+  #entryDock .entrySummary {
+    flex-wrap: wrap;
+    gap: 0 8px;
+  }
+}
