@@ -39,7 +39,7 @@ const route = (ids, dest) => ({
   bound: { nlb: "1" },
   stops: { nlb: ids },
   source: "hk-td-gtfs-v1",
-  schedule: [],
+  schedule: [["daily", 12 * 3600, 12 * 3600, 0, 7200]],
 });
 const data = {
   source: { id: "hk-td-gtfs-v1", retrievedAt: new Date().toISOString() },
@@ -59,7 +59,14 @@ const data = {
       },
     ]),
   ),
-  calendars: {},
+  calendars: {
+    daily: {
+      days: [1, 1, 1, 1, 1, 1, 1],
+      start: "20260101",
+      end: "20261231",
+      exceptions: {},
+    },
+  },
 };
 (async () => {
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
@@ -103,6 +110,7 @@ const data = {
         saveCsv: (csv, name) => window.captureCSV(csv, name),
       };
     }, seed);
+    await page.clock.setFixedTime(new Date("2026-09-15T06:10:00Z"));
     await page.goto(base);
     await page.waitForFunction(
       () => document.querySelector("#new").textContent.length > 0,
@@ -143,6 +151,15 @@ const data = {
   await page.locator("#new").click();
   await page.locator("#route").fill("1");
   await page.locator("#search button").click();
+  await page
+    .locator("#results button.route")
+    .first()
+    .waitFor({ state: "visible" });
+  assert.equal(
+    await page.locator("#results button.route").count(),
+    2,
+    "12:00 + 120 min + 10 min remains suggested at 14:10",
+  );
   await page.evaluate(() =>
     L.Map.addInitHook(function () {
       window.__map = this;
@@ -435,15 +452,47 @@ const data = {
   await page.locator("#language").selectOption("en");
   await flush();
   assert.equal(saved().language, "en");
-  // Deleting a selected record is transactional, cancellable, and survives app restoration.
-  const removedId = current().id,
-    keptId = saved().surveys.find((s) => s.id !== removedId).id;
-  await page.locator("#deleteRecord").click();
-  assert.match(await page.locator("#deleteSummary").textContent(), /Completed/);
+  // Master selection -> checkboxes -> OK -> listed confirmation; no per-record deletion.
+  const ids = saved().surveys.map((s) => s.id);
+  await page.locator("#recordHome").click();
+  assert.equal(
+    await page.locator("#recordList input[type=checkbox]").count(),
+    0,
+  );
+  assert.equal(await page.locator("[data-delete-id],#deleteRecord").count(), 0);
+  await page.locator("#deleteRecords").click();
+  assert.equal(
+    await page.locator("#recordList input[type=checkbox]").count(),
+    2,
+  );
+  assert.equal(await page.locator("#selectionOkay").isDisabled(), true);
+  await page.locator(`input[data-record-id="${ids[0]}"]`).check();
+  await page.locator(`input[data-record-id="${ids[1]}"]`).check();
+  assert.equal(
+    await page.locator("#deleteDialog").isVisible(),
+    false,
+    "checkboxes alone cannot open confirmation",
+  );
+  await page.locator("#selectionOkay").click();
+  assert.equal(await page.locator("#deleteSummary li").count(), 2);
+  assert.match(await page.locator("#deleteTitle").textContent(), /2/);
+  assert.deepEqual(
+    (
+      await page
+        .locator("#deleteSummary li")
+        .evaluateAll((items) => items.map((x) => x.dataset.recordId))
+    ).sort(),
+    [...ids].sort(),
+  );
+  for (const item of await page.locator("#deleteSummary li").all())
+    assert.match(await item.textContent(), /1 · New Lantao Bus/);
+  if (process.env.SCREENSHOT_PATH)
+    await page.screenshot({
+      path: process.env.SCREENSHOT_PATH.replace(".png", "-delete.png"),
+    });
   await page.locator("#cancelDelete").click();
-  await flush();
-  assert.equal(saved().surveys.length, 2);
-  await page.locator("#deleteRecord").click();
+  assert.equal(await page.locator("#recordList input:checked").count(), 2);
+  await page.locator("#selectionOkay").click();
   await page.evaluate(() => (window.__failSave = true));
   await page.locator("#confirmDelete").click();
   assert.equal(await page.locator("#deleteError").isVisible(), true);
@@ -452,30 +501,42 @@ const data = {
   await page.evaluate(() => (window.__failSave = false));
   await page.locator("#confirmDelete").click();
   await flush();
-  assert.equal(await page.locator("#homeScreen").isVisible(), true);
-  assert.equal(saved().currentId, null);
-  assert.deepEqual(
-    saved().surveys.map((s) => s.id),
-    [keptId],
-  );
+  assert.equal(saved().surveys.length, 0);
+  assert.equal(await page.locator("#deleteRecords").isDisabled(), true);
+  // Cold restore after bulk deletion cannot resurrect either trip.
   const deletedSeed = { ...disk };
   await context.close();
   ({ context, page } = await open(deletedSeed, 360));
-  assert.equal(await page.locator(".recordCard").count(), 1);
-  assert.equal(
-    await page.locator(`[data-delete-id="${removedId}"]`).count(),
-    0,
-  );
-  await page.locator(`[data-delete-id="${keptId}"]`).click();
-  await page.locator("#cancelDelete").click();
-  assert.equal(await page.locator(".recordCard").count(), 1);
-  await page.locator(`[data-delete-id="${keptId}"]`).click();
-  await page.locator("#confirmDelete").click();
-  await flush();
-  assert.equal(saved().surveys.length, 0);
+  assert.equal(await page.locator(".recordCard").count(), 0);
   assert.match(
     await page.locator("#recordList").textContent(),
     /No saved records/,
+  );
+  // Select only one of the two saved fixtures: the unselected record must survive.
+  await context.close();
+  ({ context, page } = await open(seed, 360));
+  await page.locator("#pause").click();
+  await page.locator("#deleteRecords").click();
+  await page.locator(`input[data-record-id="${ids[0]}"]`).check();
+  await page.locator("#cancelSelection").click();
+  assert.equal(
+    await page.locator("#recordList input[type=checkbox]").count(),
+    0,
+  );
+  await page.locator("#deleteRecords").click();
+  assert.equal(await page.locator("#recordList input:checked").count(), 0);
+  await page.locator(`input[data-record-id="${ids[0]}"]`).check();
+  await page.locator("#selectionOkay").click();
+  assert.equal(await page.locator("#deleteSummary li").count(), 1);
+  assert.equal(
+    await page.locator("#deleteSummary li").getAttribute("data-record-id"),
+    ids[0],
+  );
+  await page.locator("#confirmDelete").click();
+  await flush();
+  assert.deepEqual(
+    saved().surveys.map((s) => s.id),
+    [ids[1]],
   );
   assert.equal(
     requests.some((u) => /hkbus|routeFareList/.test(u)),
@@ -483,7 +544,7 @@ const data = {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and saved-record deletion/cancellation/storage failure/recovery.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery and the inclusive 14:10 service window.",
   );
   await browser.close();
   server.close();

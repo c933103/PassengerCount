@@ -30,7 +30,23 @@
             ><input id="surveyor" autocomplete="name" /></label
           ><button id="new" data-i18n="newTrip"></button>
         </section>
-        <h2 data-i18n="records"></h2>
+        <div class="spread">
+          <h2 data-i18n="records"></h2>
+          <button
+            id="deleteRecords"
+            class="danger"
+            data-i18n="deleteRecords"
+          ></button>
+        </div>
+        <div id="recordSelection" class="buttons" hidden>
+          <span id="selectedRecordCount" role="status"></span
+          ><button id="selectionOkay" data-i18n="okay" disabled></button
+          ><button
+            id="cancelSelection"
+            class="secondary"
+            data-i18n="cancel"
+          ></button>
+        </div>
         <div id="recordList"></div>
       </section>
       <section id="setupScreen" hidden>
@@ -70,6 +86,7 @@
               </select></label
             >
             <p id="clock"></p>
+            <p data-i18n="serviceWindowHelp"></p>
             <button
               id="refreshData"
               class="secondary"
@@ -299,12 +316,7 @@
         <div id="chart" class="chart"></div>
         <p data-i18n="chartUnknown"></p>
         <div class="buttons">
-          <button id="editRecord" data-i18n="editRecord"></button
-          ><button
-            id="deleteRecord"
-            class="danger"
-            data-i18n="deleteRecord"
-          ></button>
+          <button id="editRecord" data-i18n="editRecord"></button>
           <button id="csv" class="secondary" data-i18n="export"></button
           ><button id="upload" class="secondary" data-i18n="upload"></button>
         </div>
@@ -373,8 +385,8 @@
         aria-labelledby="deleteTitle"
         aria-describedby="deleteHelp deleteSummary"
       >
-        <h2 id="deleteTitle" data-i18n="deleteRecord"></h2>
-        <p id="deleteSummary"></p>
+        <h2 id="deleteTitle" data-i18n="deleteRecords"></h2>
+        <ul id="deleteSummary"></ul>
         <p id="deleteHelp" data-i18n="deleteHelp"></p>
         <p id="deleteError" class="warning" role="alert" hidden></p>
         <div class="buttons">

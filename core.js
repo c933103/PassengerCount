@@ -1,6 +1,10 @@
 import { calculateOnboard, rowObserved } from "./survey.js";
 export { emptyRow, validPassengerCount } from "./survey.js";
-import { governmentServiceStatus, agencyStopName } from "./government.js";
+import {
+  governmentServiceStatus,
+  agencyStopName,
+  SERVICE_DELAY_MINUTES,
+} from "./government.js";
 export const OPERATORS = {
   kmb: "KMB",
   ctb: "Citybus",
@@ -59,16 +63,23 @@ export function serviceStatus(route, data, now = new Date(), upcoming = 30) {
           continue;
         }
         if (end < start) end += 1440;
-        const a = start + offset * 1440 - c.minutes,
-          b = end + offset * 1440 - c.minutes;
-        if ((a <= 0 && b >= 0) || (hasJourney && a <= 0 && b + journey >= 0))
+        const a = start + offset * 1440 - c.minutes - now.getUTCSeconds() / 60,
+          b = end + offset * 1440 - c.minutes - now.getUTCSeconds() / 60;
+        if (
+          (a <= 0 && b >= 0) ||
+          (hasJourney && a <= 0 && b + journey + SERVICE_DELAY_MINUTES >= 0)
+        )
           running = true;
         if (!hasJourney && b < 0 && offset >= -1) departedWithoutJourney = true;
         if (a > 0) next = Math.min(next, a);
       }
     }
   }
-  if (running) return { kind: "active", text: "Scheduled to be running now" };
+  if (running)
+    return {
+      kind: "active",
+      text: "Within estimated running time, including a 10-minute delay allowance",
+    };
   if (next <= upcoming)
     return { kind: "upcoming", text: `Starts in ${next} min` };
   if (unknown || departedWithoutJourney)

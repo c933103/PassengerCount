@@ -44,7 +44,9 @@ let data,
   sectionOptions = [],
   sectionStops = [],
   uploadBusy = false;
-let pendingDeleteId = null;
+let deleteMode = false;
+const selectedRecordIds = new Set();
+let pendingDeleteIds = [];
 const cur = () => state.surveys.find((s) => s.id === state.currentId);
 const t = (key, values) => translate(state.language, key, values);
 const name = (stop) =>
@@ -120,6 +122,10 @@ function setLanguage(language) {
   persist();
 }
 function showScreen(next) {
+  if (next !== "home") {
+    deleteMode = false;
+    selectedRecordIds.clear();
+  }
   screen = next;
   state.screen = next;
   document.body.dataset.screen = next;
@@ -166,7 +172,17 @@ function goHome() {
   state.currentId = null;
   showScreen("home");
 }
+function updateRecordSelection() {
+  $("deleteRecords").hidden = deleteMode;
+  $("deleteRecords").disabled = !state.surveys.length;
+  $("recordSelection").hidden = !deleteMode;
+  $("selectionOkay").disabled = !selectedRecordIds.size;
+  $("selectedRecordCount").textContent = t("selectedRecords", {
+    n: selectedRecordIds.size,
+  });
+}
 function renderHome() {
+  updateRecordSelection();
   const list = $("recordList");
   list.replaceChildren();
   if (!state.surveys.length) {
@@ -197,36 +213,59 @@ function renderHome() {
       review.onclick = () => openSurvey(s.id, "record");
       buttons.append(review);
     }
-    const remove = document.createElement("button");
-    remove.className = "danger";
-    remove.dataset.deleteId = s.id;
-    remove.textContent = t("deleteRecord");
-    remove.onclick = () => requestDelete(s.id);
-    buttons.append(remove);
-    card.append(title, detail, buttons);
+    if (deleteMode) {
+      const label = document.createElement("label");
+      label.className = "recordSelect";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.recordId = s.id;
+      checkbox.checked = selectedRecordIds.has(s.id);
+      checkbox.setAttribute(
+        "aria-label",
+        t("selectRecord", { route: s.route.route, date: s.date }),
+      );
+      checkbox.onchange = () => {
+        if (checkbox.checked) selectedRecordIds.add(s.id);
+        else selectedRecordIds.delete(s.id);
+        updateRecordSelection();
+      };
+      const description = document.createElement("div");
+      description.append(title, detail);
+      label.append(checkbox, description);
+      card.append(label);
+    } else card.append(title, detail, buttons);
     list.append(card);
   }
 }
-function requestDelete(id) {
-  const s = state.surveys.find((record) => record.id === id);
-  if (!s) return;
-  pendingDeleteId = id;
-  $("deleteSummary").textContent =
-    `${s.route.route} → ${name({ name: s.route.dest })} · ${s.date} · ${s.vehicle || ""} · ${t(s.status)}`;
+function requestDelete() {
+  const records = state.surveys.filter((s) => selectedRecordIds.has(s.id));
+  if (!records.length) return;
+  pendingDeleteIds = records.map((s) => s.id);
+  $("deleteTitle").textContent = t("deleteSelectedTitle", {
+    n: records.length,
+  });
+  $("deleteSummary").replaceChildren();
+  for (const s of records) {
+    const item = document.createElement("li");
+    item.dataset.recordId = s.id;
+    item.textContent = `${s.route.route} · ${operator(s.route.operator)} · ${name({ name: s.route.orig })} → ${name({ name: s.route.dest })} · ${s.date} ${s.rows[s.startIndex]?.time || ""} · ${s.vehicle || ""} · ${t(s.status)}`;
+    $("deleteSummary").append(item);
+  }
   $("deleteError").hidden = true;
   $("deleteDialog").showModal();
 }
 function confirmDelete() {
-  if (!state.surveys.some((s) => s.id === pendingDeleteId)) return;
+  const ids = new Set(pendingDeleteIds);
+  if (!state.surveys.some((s) => ids.has(s.id))) return;
   const next = {
     ...state,
-    surveys: state.surveys.filter((s) => s.id !== pendingDeleteId),
+    surveys: state.surveys.filter((s) => !ids.has(s.id)),
   };
-  if (next.currentId === pendingDeleteId) {
+  if (ids.has(next.currentId)) {
     next.currentId = null;
     next.screen = "home";
   }
-  // Commit removal before changing the UI; a failed write retains the record.
+  // Commit the whole selection together; a failed write retains every record.
   try {
     save(next);
   } catch {
@@ -235,7 +274,9 @@ function confirmDelete() {
     return;
   }
   Object.assign(state, next);
-  pendingDeleteId = null;
+  deleteMode = false;
+  selectedRecordIds.clear();
+  pendingDeleteIds = [];
   $("deleteDialog").close();
   showScreen("home");
 }
@@ -1046,11 +1087,21 @@ $("setupHome").onclick = () => {
   goHome();
 };
 $("recordHome").onclick = goHome;
-$("deleteRecord").onclick = () => requestDelete(cur().id);
+$("deleteRecords").onclick = () => {
+  deleteMode = true;
+  selectedRecordIds.clear();
+  renderHome();
+};
+$("cancelSelection").onclick = () => {
+  deleteMode = false;
+  selectedRecordIds.clear();
+  renderHome();
+};
+$("selectionOkay").onclick = requestDelete;
 $("confirmDelete").onclick = confirmDelete;
 $("cancelDelete").onclick = () => $("deleteDialog").close();
 $("deleteDialog").addEventListener("close", () => {
-  pendingDeleteId = null;
+  pendingDeleteIds = [];
 });
 $("search").onsubmit = (e) => {
   e.preventDefault();

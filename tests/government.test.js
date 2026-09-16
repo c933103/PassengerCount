@@ -119,3 +119,60 @@ test("incomplete government feed fails rather than supplying wrong stops", () =>
     /sequence/,
   );
 });
+
+test("12:00 departure with 120-minute journey remains active through 14:10 inclusive", () => {
+  const data = normalizeGovernment(files),
+    route = { schedule: [["weekday", 12 * 3600, 12 * 3600, 0, 120 * 60]] };
+  for (const time of ["04:00:00", "06:00:00", "06:09:59", "06:10:00"])
+    assert.equal(
+      governmentServiceStatus(route, data, new Date(`2026-09-15T${time}Z`))
+        .kind,
+      "active",
+      time,
+    );
+  assert.equal(
+    governmentServiceStatus(route, data, new Date("2026-09-15T06:10:01Z")).kind,
+    "inactive",
+  );
+});
+test("frequency windows use the actual last departure then journey and delay allowance", () => {
+  const data = normalizeGovernment(files),
+    route = { schedule: [["weekday", 10 * 3600, 12 * 3600 + 600, 600, 7200]] };
+  assert.equal(
+    governmentServiceStatus(route, data, new Date("2026-09-15T06:10:00Z")).kind,
+    "active",
+  );
+  assert.equal(
+    governmentServiceStatus(route, data, new Date("2026-09-15T06:10:01Z")).kind,
+    "inactive",
+  );
+});
+test("previous-day trips retain their delay allowance after the service calendar ends", () => {
+  const data = {
+      calendars: {
+        once: {
+          days: [1, 1, 1, 1, 1, 1, 1],
+          start: "20260915",
+          end: "20260915",
+          exceptions: {},
+        },
+      },
+    },
+    route = { schedule: [["once", 23 * 3600, 23 * 3600, 0, 7200]] };
+  assert.equal(
+    governmentServiceStatus(route, data, new Date("2026-09-15T17:10:00Z")).kind,
+    "active",
+  );
+  assert.equal(
+    governmentServiceStatus(route, data, new Date("2026-09-15T17:10:01Z")).kind,
+    "inactive",
+  );
+});
+test("missing journey time remains unknown instead of inventing a completion cutoff", () => {
+  const data = normalizeGovernment(files),
+    route = { schedule: [["weekday", 12 * 3600, 12 * 3600, 0, null]] };
+  assert.equal(
+    governmentServiceStatus(route, data, new Date("2026-09-15T07:00:00Z")).kind,
+    "unknown",
+  );
+});

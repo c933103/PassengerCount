@@ -4,7 +4,7 @@ An Android app and web app for bus passenger surveys.
 
 ## Use on Android
 
-1. Download **PassengerCount-1.3.apk** to your phone and open it.
+1. Download **PassengerCount-1.4.apk** to your phone and open it.
 2. If Android asks, allow this download source to install the app, then tap **Install**.
 3. Open **PassengerCount** from your home screen. Enter your name once, find a route, and choose a direction / variation.
 4. Allow location access to get a suggested starting stop. Confirm it or choose another stop. The app opens counting with a live map, selected stop, boarding / alighting fields and a large 0–9 keypad. Cantonese (Hong Kong, Traditional Chinese) is the default; the header switches to English and remembers your choice.
@@ -17,8 +17,8 @@ Government routes, stops and timetables are bundled, so route selection and coun
 
 ## Survey features
 
-- Remembered surveyor and a home screen listing draft, counting, paused, aborted and completed records. Pause or abort returns home without deleting observations; records can be resumed or reviewed. Delete a saved record from its home-screen card or record details; the confirmation identifies the trip. Deletion is committed immediately and retains the record if storage fails. Exported files and uploaded copies are independent.
-- Hong Kong time and published schedules prioritize route variants running or starting soon; other variants can be expanded. This is timetable guidance, not live bus tracking.
+- Remembered surveyor and a home screen listing draft, counting, paused, aborted and completed records. Pause or abort returns home without deleting observations; records can be resumed or reviewed. Use **Delete records** on the home screen to enable trip checkboxes. Select trips, tap **OK**, then review the route/trip list in the confirmation before deleting. The selection is removed in one save; a storage failure retains every record. Exported files and uploaded copies are independent.
+- Hong Kong time and published schedules prioritize route variants running or starting soon. A departure remains suggested through its journey duration plus a 10-minute delay allowance, inclusive of the end time (12:00 + 120 minutes + 10 minutes remains available at 14:10). The calculation also covers previous-day departures crossing midnight; other variants can be expanded. This is timetable guidance, not live bus tracking.
 - KMB, Long Win, Citybus, New Lantao Bus, MTR Bus, green minibuses, Discovery Bay, Park Island and cross-boundary coaches, from the Transport Department government GTFS feed.
 - GPS suggestions, manual starting stops, the map stop picker and the counting stop picker update the same active row. Confirming the start opens counting mode; saved surveys reopen in counting mode.
 - Passenger counts accept non-negative whole numbers only. The built-in keypad has digits, backspace and clear; hardware digits and valid numeric paste are supported. Letters, signs, decimals and exponent notation are rejected.

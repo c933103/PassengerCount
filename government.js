@@ -1,3 +1,5 @@
+// Keep a departure visible through its journey plus this delay allowance.
+export const SERVICE_DELAY_MINUTES = 10;
 // Normalizes only the Transport Department's own GTFS feed. No operator/third-party database.
 export const GOVERNMENT_SOURCE = "hk-td-gtfs-v1";
 export const GOVERNMENT_URLS = {
@@ -298,13 +300,22 @@ export function governmentServiceStatus(
         following = nextIndex <= count ? a + nextIndex * headway : Infinity;
       } else if (a < clock) following = Infinity;
       if (last !== null && last <= clock) {
-        if (duration !== null && last + duration >= clock) running = true;
-        else if (duration === null && clock - last <= 7200) unknown = true;
+        if (
+          Number.isFinite(duration) &&
+          last + duration + SERVICE_DELAY_MINUTES * 60 >= clock
+        )
+          running = true;
+        // Without a duration there is no supported completion cutoff.
+        else if (!Number.isFinite(duration)) unknown = true;
       }
       if (following >= clock) next = Math.min(next, following - clock);
     }
   }
-  if (running) return { kind: "active", text: "Scheduled to be running now" };
+  if (running)
+    return {
+      kind: "active",
+      text: "Within estimated running time, including a 10-minute delay allowance",
+    };
   if (next <= upcoming * 60)
     return {
       kind: "upcoming",
