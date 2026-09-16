@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
 const disk = {},
   errors = [],
   requests = [];
-let exported, browser;
+let exported, exportedPng, browser;
 const route = (ids, dest) => ({
   route: "1",
   agency: "NLB",
@@ -87,6 +87,9 @@ const data = {
     await context.exposeBinding("captureCSV", (_, csv, name) => {
       exported = { csv, name };
     });
+    await context.exposeBinding("capturePNG", (_, base64, name) => {
+      exportedPng = { base64, name };
+    });
     await context.route("**/data/government-routes.json.gz", (r) =>
       r.fulfill({
         body: require("zlib").gzipSync(JSON.stringify(catalogue)),
@@ -99,6 +102,13 @@ const data = {
     page.on("request", (r) => requests.push(r.url()));
     await page.addInitScript((seed) => {
       const native = { ...seed };
+      const defaultFolder = "/storage/emulated/0/Download/PaxCountRecord";
+      const finishExport = (name) => {
+        const result = { ok: !window.__failExport, path: `${native.exportDirectory || defaultFolder}/${name}` };
+        native.exportResult = JSON.stringify(result);
+        window.captureDisk("exportResult", native.exportResult);
+        queueMicrotask(() => window.dispatchEvent(new CustomEvent("export-result", { detail: result })));
+      };
       window.PassengerCountAndroid = {
         get: (k) => native[k] ?? null,
         set: (k, v) => {
@@ -107,7 +117,20 @@ const data = {
           window.captureDisk(k, v);
           return true;
         },
-        saveCsv: (csv, name) => window.captureCSV(csv, name),
+        saveCsv: (csv, name) => { window.captureCSV(csv, name); finishExport(name); },
+        savePng: (base64, name) => { window.capturePNG(base64, name); finishExport(name); },
+        getExportDirectory: () => native.exportDirectory || defaultFolder,
+        getExportResult: () => native.exportResult || null,
+        chooseExportDirectory: () => {
+          native.exportDirectory = "/storage/emulated/0/PaxCountRecord";
+          window.captureDisk("exportDirectory", native.exportDirectory);
+          window.dispatchEvent(new Event("export-directory-changed"));
+        },
+        resetExportDirectory: () => {
+          delete native.exportDirectory;
+          window.captureDisk("exportDirectory", null);
+          window.dispatchEvent(new Event("export-directory-changed"));
+        },
       };
     }, seed);
     await page.clock.setFixedTime(new Date(time));
@@ -195,7 +218,11 @@ const data = {
   );
   assert.equal(await page.locator("#start").inputValue(), "0");
   await page.locator("#vehicle").fill("AB1234");
+  await page.locator("#selectedStop").click();
+  assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "false");
   await page.locator("#confirm").click();
+  assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "counting starts with GPS following even after inspecting setup map");
+  await page.waitForFunction(() => Math.abs(window.__map.getCenter().lat - 22.302) < 0.00001);
   assert.equal(await page.locator("#setupScreen").isVisible(), false);
   assert.equal(await page.locator("#onboard").textContent(), "0");
   assert.equal(
@@ -361,7 +388,7 @@ const data = {
     1,
   );
   await page.locator("#editRecord").click();
-  await page.locator("#allStops summary").click();
+  assert.equal(await page.locator("#allStops").evaluate((e) => e.open), true, "editing a completed trip opens its table");
   await page
     .locator('#body tr[data-i="0"] input[data-field="boarding"]')
     .click();
@@ -414,12 +441,22 @@ const data = {
   await page.locator("#active").selectOption("4");
   await page.locator("#noChange").click();
   await page.locator("#noChange").click();
+  await page.locator("#whole").click();
+  assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "false");
   await page.locator("#pause").click();
   assert.equal(await page.locator("#homeScreen").isVisible(), true);
   assert.match(await page.locator("#recordList").textContent(), /Paused/);
   await page.locator("#recordList button").first().click();
   assert.equal(await page.locator("#allStops").evaluate((e) => e.open), true);
   assert.equal(await page.locator("#active").inputValue(), "5");
+  assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "resume restores GPS following");
+  await page.locator("#selectedStop").click();
+  await page.locator("#toggleMap").click();
+  await page.locator("#toggleMap").click();
+  await page.waitForFunction(() => document.querySelector("#myLocation").getAttribute("aria-pressed") === "true");
+  await page.locator("#whole").click();
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "foregrounding restores GPS following");
   await page.locator("#abort").click();
   assert.match(await page.locator("#recordList").textContent(), /Aborted/);
   await page.locator("#recordList button").first().click();
@@ -677,13 +714,99 @@ const data = {
   await page.clock.setFixedTime(new Date("2026-09-15T11:50:00+08:00"));
   await page.locator("#search button").click();
   await page.waitForFunction(() => document.querySelectorAll("#results .route .upcoming").length === 2);
+  // Reopen a completed trip, correct its table, continue, and save again.
+  await context.close();
+  const reopening = structuredClone(sample);
+  reopening.id = "reopening-trip";
+  reopening.status = "completed";
+  reopening.endIndex = 0;
+  reopening.activeIndex = 0;
+  reopening.completedAt = "2026-09-15T06:00:00Z";
+  reopening.finalOnboard = "";
+  ({ context, page } = await open({ "passenger-count:workspace:v2": JSON.stringify({ ...manyState, surveys: [reopening], language: "en" }) }, 360));
+  await page.locator("#recordList button").first().click();
+  await page.locator("#continueRecord").click();
+  await flush();
+  assert.equal(current().id, "reopening-trip");
+  assert.equal(current().status, "in_progress");
+  assert.equal(current().endIndex, null);
+  assert.equal(current().completedAt, null);
+  assert.deepEqual(current().rows, reopening.rows);
+  assert.equal(await page.locator("#active").inputValue(), "1");
+  if (!await page.locator("#allStops").evaluate((e) => e.open)) await page.locator("#allStops summary").click();
+  await page.locator('#body tr[data-i="0"] input[data-field="boarding"]').click();
+  await key(9);
+  await flush();
+  assert.equal(current().rows[0].boarding, "9");
+  await page.locator("#active").selectOption("1");
+  await page.locator("#noChange").click();
+  await finishAndReview();
+  assert.equal(current().id, "reopening-trip");
+  assert.equal(current().rows[0].boarding, "9");
+
+  // Chart fits narrow screens and PNG export contains real image bytes and path feedback.
+  for (const width of [320, 740]) {
+    await page.setViewportSize({ width, height: 740 });
+    await page.waitForFunction(() => document.querySelector("#chart svg").viewBox.baseVal.width === document.querySelector("#chart").clientWidth);
+    const box = await page.locator("#chart svg").boundingBox();
+    assert.ok(box.width <= width && box.x + box.width <= width);
+    assert.ok(await page.locator("#chart").evaluate((e) => e.scrollWidth <= e.clientWidth));
+  }
+  await page.setViewportSize({ width: 360, height: 740 });
+  const chartState = saved();
+  const chartTrip = chartState.surveys.find((s) => s.id === chartState.currentId);
+  const chartStops = chartTrip.stops, chartRows = chartTrip.rows;
+  chartTrip.stops = Array.from({ length: 80 }, (_, i) => ({ ...chartStops[i % chartStops.length], sequence: i + 1 }));
+  chartTrip.rows = Array.from({ length: 80 }, (_, i) => ({ ...chartRows[i % chartRows.length] }));
+  chartTrip.endIndex = 79;
+  const chartSeed = { ...disk, "passenger-count:workspace:v2": JSON.stringify(chartState) };
+  await context.close();
+  ({ context, page } = await open(chartSeed, 360));
+  await page.locator("#recordScreen").waitFor();
+  assert.equal(await page.locator('#chart rect[data-series="boarding"]').count(), 80);
+  assert.ok(await page.locator("#chart").evaluate((e) => e.scrollWidth <= e.clientWidth), "80 stops fit the screen");
+  await page.locator("#saveChart").click();
+  await flush();
+  assert.match(exportedPng.name, /\.png$/);
+  assert.deepEqual([...Buffer.from(exportedPng.base64, "base64").subarray(0, 8)], [137,80,78,71,13,10,26,10]);
+  assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/Download\/PaxCountRecord\/.*\.png/);
+  if (process.env.SCREENSHOT_PATH) fs.writeFileSync(process.env.SCREENSHOT_PATH.replace(".png", "-chart.png"), Buffer.from(exportedPng.base64, "base64"));
+  await page.locator("#csv").click();
+  await flush();
+  assert.match(await page.locator("#exportStatus").textContent(), /\.csv/);
+  await page.evaluate(() => window.__failExport = true);
+  await page.locator("#csv").click();
+  await flush();
+  assert.match(await page.locator("#exportStatus").textContent(), /Export failed/);
+  assert.equal(current().status, "completed");
+  await page.evaluate(() => window.__failExport = false);
+
+  await page.locator("#recordHome").click();
+  await page.locator("#exportSettings summary").click();
+  assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
+  await page.locator("#chooseExportDirectory").click();
+  assert.equal(await page.locator("#exportDirectory").textContent(), "/storage/emulated/0/PaxCountRecord");
+  await flush();
+  const folderSeed = { ...disk };
+  await context.close();
+  ({ context, page } = await open(folderSeed, 360));
+  await page.locator("#exportSettings summary").click();
+  assert.equal(await page.locator("#exportDirectory").textContent(), "/storage/emulated/0/PaxCountRecord", "folder survives cold restart");
+  await page.locator("#recordList button").first().click();
+  await page.locator("#csv").click();
+  await flush();
+  assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/PaxCountRecord\/.*\.csv/);
+  await page.locator("#recordHome").click();
+  await page.locator("#resetExportDirectory").click();
+  assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
+
   assert.equal(
     requests.some((u) => /hkbus|routeFareList/.test(u)),
     false,
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, and fixed 10-minute early tolerance overriding old preferences.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, fixed 10-minute early tolerance overriding old preferences; GPS following on map/resume/foreground, completed-trip reopening and correction, responsive PNG charts, and remembered export folders with full-path/error feedback.",
   );
   await browser.close();
   server.close();

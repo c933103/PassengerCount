@@ -16,12 +16,13 @@ import {
   recordStop,
   skipField,
   completeSurvey,
+  reopenSurvey,
   insertStop,
   overlapCount,
   appendSection,
 } from "./survey.js";
 import { DEFAULT_LANGUAGE, translate } from "./i18n.js";
-import { renderChart } from "./charts.js";
+import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes } from "./data.js";
 import { uploadSurvey } from "./upload.js";
@@ -113,6 +114,7 @@ function setLanguage(language) {
     if (map) setupMap();
   }
   setFollow(followGps);
+  refreshExportSettings();
   $("toggleMap").textContent = t(
     $("mapContents").hidden ? "showMap" : "hideMap",
   );
@@ -122,6 +124,7 @@ function setLanguage(language) {
   persist();
 }
 function showScreen(next) {
+  if (next === "setup" || next === "count") setFollow(true);
   if (next !== "home") {
     deleteMode = false;
     selectedRecordIds.clear();
@@ -723,6 +726,7 @@ function complete() {
 function renderRecord() {
   const s = cur();
   if (!s) return;
+  $("continueRecord").hidden = s.status !== "completed";
   const result = calculateOnboard(s);
   $("recordTitle").textContent = `${s.route.route} · ${t(s.status)}`;
   $("recordSummary").textContent = t("recordSummary", {
@@ -1056,20 +1060,55 @@ function joinSection() {
   setupMap();
   renderCount();
 }
+function exportFilename(extension) {
+  const s = cur(), stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  return `bus-${s.route.route}-${s.date}-${s.id.slice(0, 8)}-${stamp}.${extension}`;
+}
+function exportResult(result, reveal = false) {
+  $("exportStatus").textContent = result.ok
+    ? t("exportSaved", { path: result.path }) : t("exportFailed");
+  $("exportStatus").classList.toggle("warning", !result.ok);
+  if (reveal && screen === "record") $("exportStatus").scrollIntoView({ block: "nearest" });
+}
+function refreshExportSettings() {
+  const native = window.PassengerCountAndroid;
+  $("exportDirectory").textContent = native?.getExportDirectory?.() || t("browserFolder");
+  $("chooseExportDirectory").hidden = !native?.chooseExportDirectory;
+  $("resetExportDirectory").hidden = !native?.resetExportDirectory;
+}
+function browserDownload(href, filename) {
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = filename;
+  a.click();
+  $("exportStatus").classList.remove("warning");
+  $("exportStatus").textContent = t("downloadStarted");
+}
 function download() {
-  const s = cur();
-  if (!s) return;
-  const csv = makeCSV(s),
-    filename = `bus-${s.route.route}-${s.date}.csv`;
+  if (!cur()) return;
+  const csv = makeCSV(cur()), filename = exportFilename("csv");
+  $("exportStatus").textContent = t("exporting");
   if (window.PassengerCountAndroid) {
     window.PassengerCountAndroid.saveCsv(csv, filename);
     return;
   }
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  const href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  browserDownload(href, filename);
+  setTimeout(() => URL.revokeObjectURL(href), 5000);
+}
+async function saveChart() {
+  $("saveChart").disabled = true;
+  $("exportStatus").textContent = t("exporting");
+  try {
+    const png = await chartPng($("chart")), filename = exportFilename("png");
+    if (window.PassengerCountAndroid?.savePng)
+      window.PassengerCountAndroid.savePng(png.split(",")[1], filename);
+    else browserDownload(png, filename);
+  } catch {
+    exportResult({ ok: false });
+  } finally {
+    $("saveChart").disabled = false;
+  }
 }
 async function upload() {
   const s = cur();
@@ -1272,10 +1311,29 @@ $("pause").onclick = () => pause("paused");
 $("abort").onclick = () => pause("aborted");
 $("saveCompleted").onclick = complete;
 $("editRecord").onclick = () => {
+  cur().tableExpanded = true;
   target = { index: cur().activeIndex, field: "boarding" };
   showScreen("count");
 };
+$("continueRecord").onclick = () => {
+  try {
+    reopenSurvey(cur());
+    error();
+    target = { index: cur().activeIndex, field: "boarding" };
+    showScreen("count");
+  } catch {
+    error(t("continueConflict"));
+  }
+};
 $("csv").onclick = download;
+$("saveChart").onclick = saveChart;
+$("chooseExportDirectory").onclick = () => window.PassengerCountAndroid?.chooseExportDirectory();
+$("resetExportDirectory").onclick = () => {
+  window.PassengerCountAndroid?.resetExportDirectory();
+  refreshExportSettings();
+};
+window.addEventListener("export-directory-changed", refreshExportSettings);
+window.addEventListener("export-result", (event) => exportResult(event.detail, true));
 $("upload").onclick = upload;
 $("toggleMap").onclick = () => {
   $("mapContents").hidden = !$("mapContents").hidden;
@@ -1284,6 +1342,7 @@ $("toggleMap").onclick = () => {
   );
   if (!$("mapContents").hidden)
     requestAnimationFrame(() => {
+      setFollow(true);
       map?.invalidateSize();
       centerMap();
     });
@@ -1342,6 +1401,14 @@ function measureDock() {
   );
 }
 new ResizeObserver(measureDock).observe($("entryDock"));
+let chartWidth = 0;
+new ResizeObserver(() => {
+  const width = $("chart").clientWidth;
+  if (screen === "record" && cur() && width && width !== chartWidth) {
+    chartWidth = width;
+    renderChart($("chart"), cur(), t, name);
+  }
+}).observe($("chart"));
 new ResizeObserver(() => {
   document.documentElement.style.setProperty(
     "--selection-height",
@@ -1366,12 +1433,20 @@ if (cur()) {
           : "home",
   );
 } else showScreen("home");
+try {
+  const result = window.PassengerCountAndroid?.getExportResult?.();
+  if (result) exportResult(JSON.parse(result));
+} catch {}
 if (query.number) search();
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
     if (data && matches.length) renderMatches();
-    if (cur() && (screen === "count" || screen === "setup")) locate(true);
+    if (cur() && (screen === "count" || screen === "setup")) {
+      setFollow(true);
+      centerMap();
+      locate(true);
+    }
   }
 });
 setInterval(() => {

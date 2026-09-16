@@ -18,12 +18,13 @@ export function renderChart(container, s, t, stopName) {
     ],
     min = Math.min(...all),
     max = Math.max(1, ...all),
-    width = Math.max(360, s.rows.length * 44 + 70),
-    height = 280,
+    width = Math.max(260, container.clientWidth || 360),
+    height = 320,
     left = 42,
-    top = 20,
-    bottom = 230,
+    top = 72,
+    bottom = 280,
     step = (width - left - 20) / Math.max(s.rows.length, 1),
+    labelEvery = Math.max(1, Math.ceil(s.rows.length / Math.max(2, (width - left) / 32))),
     y = (v) => bottom - ((v - min) / (max - min)) * (bottom - top),
     x = (i) => left + step * (i + 0.5);
   const svg = make("svg", {
@@ -32,7 +33,15 @@ export function renderChart(container, s, t, stopName) {
     height,
     role: "img",
     "aria-label": t("chart"),
+    xmlns: ns,
   });
+  svg.append(make("rect", { width, height, fill: "white" }));
+  svg.append(make("text", { x: 12, y: 23, "font-size": 14, fill: "#18343c" }, `${s.route.route} · ${s.date}`));
+  for (const [i, field, color] of [[0, "boarding", "#16836b"], [1, "alighting", "#df8a31"], [2, "onboard", "#3152b5"]]) {
+    const legendX = 12 + i * (width - 24) / 3;
+    svg.append(make("rect", { x: legendX, y: 42, width: 9, height: 9, fill: color }));
+    svg.append(make("text", { x: legendX + 13, y: 51, "font-size": 11, fill: "#18343c" }, t(field)));
+  }
   svg.append(make("title", {}, t("chartLegend")));
   for (let i = 0; i <= 4; i++) {
     const value = min + ((max - min) * i) / 4;
@@ -93,7 +102,7 @@ export function renderChart(container, s, t, stopName) {
       const point = make("circle", {
         cx: x(i),
         cy: y(value),
-        r: 3,
+        r: Math.min(3, step / 4),
         fill: "#3152b5",
         "data-series": "onboard",
         "data-stop": i,
@@ -107,7 +116,7 @@ export function renderChart(container, s, t, stopName) {
       );
       svg.append(point);
     }
-    svg.append(
+    if (i % labelEvery === 0 || i === s.rows.length - 1) svg.append(
       make(
         "text",
         {
@@ -131,4 +140,18 @@ export function renderChart(container, s, t, stopName) {
     }),
   );
   container.replaceChildren(svg);
+}
+
+export async function chartPng(container) {
+  const svg = container.querySelector("svg");
+  if (!svg) throw Error("Chart unavailable");
+  const image = new Image();
+  const xml = new XMLSerializer().serializeToString(svg);
+  image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(xml)}`;
+  await image.decode();
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(svg.viewBox.baseVal.width * 3);
+  canvas.height = Math.ceil(svg.viewBox.baseVal.height * 3);
+  canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/png");
 }

@@ -24,6 +24,15 @@
     <main>
       <div id="error" role="alert" class="warning" hidden></div>
       <section id="homeScreen">
+        <details id="exportSettings" class="panel">
+          <summary data-i18n="settings"></summary>
+          <p data-i18n="exportFolder"></p>
+          <p id="exportDirectory" class="savedPath"></p>
+          <div class="buttons">
+            <button id="chooseExportDirectory" data-i18n="changeFolder"></button>
+            <button id="resetExportDirectory" class="secondary" data-i18n="defaultFolder"></button>
+          </div>
+        </details>
         <section class="panel row">
           <label
             ><span data-i18n="surveyor"></span
@@ -312,19 +321,17 @@
         <p id="completedMessage" class="status"></p>
         <div id="recordIssues" class="warning" hidden></div>
         <h3 data-i18n="chart"></h3>
-        <div class="legend">
-          <span class="boardLegend" data-i18n="boarding"></span
-          ><span class="alightLegend" data-i18n="alighting"></span
-          ><span class="onboardLegend" data-i18n="onboard"></span>
-        </div>
         <div id="chart" class="chart"></div>
         <p data-i18n="chartUnknown"></p>
         <div class="buttons">
+          <button id="continueRecord" data-i18n="continueRecord"></button>
           <button id="editRecord" data-i18n="editRecord"></button>
+          <button id="saveChart" class="secondary" data-i18n="saveChart"></button>
           <button id="csv" class="secondary" data-i18n="export"></button
           ><button id="upload" class="secondary" data-i18n="upload"></button>
         </div>
         <p id="uploadStatus"></p>
+        <p id="exportStatus" class="savedPath" role="status"></p>
         <div class="table">
           <table>
             <thead>

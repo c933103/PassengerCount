@@ -17,7 +17,7 @@ done
 cp -R "$ROOT/vendor" "$ROOT/data" "$BUILD/assets/www/"
 "$TOOLS/aapt2" compile --dir "$ROOT/android/res" -o "$BUILD/resources.zip"
 "$TOOLS/aapt2" link -o "$BUILD/base.apk" -I "$PLATFORM" --manifest "$ROOT/android/AndroidManifest.xml" -A "$BUILD/assets" "$BUILD/resources.zip"
-javac -encoding UTF-8 -source 8 -target 8 -bootclasspath "$PLATFORM:$TOOLS/core-lambda-stubs.jar" -d "$BUILD/classes" "$ROOT/android/src/io/github/c933103/passengercount/MainActivity.java"
+javac -encoding UTF-8 -source 8 -target 8 -bootclasspath "$PLATFORM:$TOOLS/core-lambda-stubs.jar" -d "$BUILD/classes" "$ROOT/android/src/app/passengercount/"*.java
 find "$BUILD/classes" -name '*.class' -print0 | xargs -0 "$TOOLS/d8" --lib "$PLATFORM" --min-api 26 --output "$BUILD/dex"
 cp "$BUILD/base.apk" "$BUILD/unsigned.apk"
 (cd "$BUILD/dex" && zip -q "$BUILD/unsigned.apk" classes.dex)

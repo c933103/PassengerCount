@@ -1,4 +1,4 @@
-package io.github.c933103.passengercount;
+package app.passengercount;
 
 import android.Manifest;
 import android.app.Activity;
@@ -19,14 +19,16 @@ import java.util.Map;
 /** An offline app shell. Only packaged, trusted content can access the bridge. */
 public final class MainActivity extends Activity {
     private static final String ORIGIN = "https://appassets.androidplatform.net";
-    private static final int LOCATION = 10, EXPORT = 11;
+    private static final int LOCATION = 10, EXPORT_DIRECTORY = 11, LEGACY_STORAGE = 12;
+    private final java.util.concurrent.ExecutorService exports = java.util.concurrent.Executors.newSingleThreadExecutor();
+    private Runnable pendingLegacyExport;
+    private boolean choosingDirectory;
     private WebView web;
     private GeolocationPermissions.Callback locationCallback;
     private String locationOrigin;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        if (state == null) pendingExport().delete();
         createWebView();
     }
 
@@ -52,7 +54,7 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.6");
+        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.7");
         web.addJavascriptInterface(new DeviceStorage(), "PassengerCountAndroid");
         web.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -119,7 +121,7 @@ public final class MainActivity extends Activity {
             connection.setConnectTimeout(20000);
             connection.setReadTimeout(60000);
             connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("User-Agent", "PassengerCount/1.6");
+            connection.setRequestProperty("User-Agent", "PassengerCount/1.7");
             if (connection.getResponseCode() != 200) { connection.disconnect(); return missing(); }
             Map<String, String> headers = new HashMap<>();
             headers.put("Cache-Control", "no-store");
@@ -147,6 +149,13 @@ public final class MainActivity extends Activity {
     }
     @Override public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
         super.onRequestPermissionsResult(code, permissions, results);
+        if (code == LEGACY_STORAGE && pendingLegacyExport != null) {
+            Runnable task = pendingLegacyExport;
+            pendingLegacyExport = null;
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                exports.execute(task);
+            else exportResult(false, "");
+        }
         if (code == LOCATION && locationCallback != null) {
             locationCallback.invoke(locationOrigin, hasLocation(), false);
             locationCallback = null;
@@ -168,52 +177,102 @@ public final class MainActivity extends Activity {
                 prefs.edit().putString("language", language).commit();
         }
         @JavascriptInterface public void saveCsv(String content, String filename) {
-            runOnUiThread(() -> exportCsv(content, filename));
+            queueExport(() -> {
+                try {
+                    if (content == null || content.length() > 10_000_000 || !filename.endsWith(".csv"))
+                        throw new IOException("Invalid CSV");
+                    exportResult(true, new ExportStorage(MainActivity.this).save(content.getBytes(StandardCharsets.UTF_8), filename, "text/csv"));
+                } catch (Exception e) { exportResult(false, ""); }
+            });
         }
+        @JavascriptInterface public void savePng(String base64, String filename) {
+            queueExport(() -> {
+                try {
+                    if (base64 == null || base64.length() > 20_000_000 || !filename.endsWith(".png"))
+                        throw new IOException("Invalid image");
+                    byte[] bytes = android.util.Base64.decode(base64, android.util.Base64.DEFAULT);
+                    byte[] signature = {(byte)137, 80, 78, 71, 13, 10, 26, 10};
+                    if (bytes.length < signature.length) throw new IOException("Invalid PNG");
+                    for (int i = 0; i < signature.length; i++)
+                        if (bytes[i] != signature[i]) throw new IOException("Invalid PNG");
+                    exportResult(true, new ExportStorage(MainActivity.this).save(bytes, filename, "image/png"));
+                } catch (Exception e) { exportResult(false, ""); }
+            });
+        }
+        @JavascriptInterface public String getExportDirectory() { return new ExportStorage(MainActivity.this).directory(); }
+        @JavascriptInterface public String getExportResult() { return getSharedPreferences("exports", MODE_PRIVATE).getString("result", null); }
+        @JavascriptInterface public void chooseExportDirectory() { runOnUiThread(() -> chooseDirectory()); }
+        @JavascriptInterface public void resetExportDirectory() { runOnUiThread(() -> storeDirectory(null)); }
     }
-
-    private File pendingExport() { return new File(getFilesDir(), "pending-export.csv"); }
-    private void exportCsv(String content, String filename) {
-        if (pendingExport().exists()) { toast("Finish or cancel the current export first."); return; }
+    private void queueExport(Runnable task) {
+        runOnUiThread(() -> {
+            if (Build.VERSION.SDK_INT < 29 && new ExportStorage(this).tree() == null &&
+                    checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (pendingLegacyExport != null) { exportResult(false, ""); return; }
+                pendingLegacyExport = task;
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, LEGACY_STORAGE);
+            } else exports.execute(task);
+        });
+    }
+    private void exportResult(boolean ok, String path) {
         try {
-            try (FileOutputStream output = new FileOutputStream(pendingExport())) {
-                output.write(content.getBytes(StandardCharsets.UTF_8));
-                output.getFD().sync();
-            }
-            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("text/csv");
-            intent.putExtra(Intent.EXTRA_TITLE, filename.replaceAll("[^a-zA-Z0-9._-]", "_"));
-            startActivityForResult(intent, EXPORT);
-        } catch (IOException | android.content.ActivityNotFoundException e) {
-            pendingExport().delete();
-            toast("Cannot open the file picker. Your survey is still saved in the app.");
+            org.json.JSONObject result = new org.json.JSONObject();
+            result.put("ok", ok); result.put("path", path);
+            String json = result.toString();
+            getSharedPreferences("exports", MODE_PRIVATE).edit().putString("result", json).commit();
+            emit("export-result", json);
+        } catch (org.json.JSONException ignored) {}
+    }
+    private void emit(String event, String json) {
+        runOnUiThread(() -> {
+            if (web != null) web.evaluateJavascript("window.dispatchEvent(new CustomEvent(" +
+                org.json.JSONObject.quote(event) + ",{detail:" + json + "}));", null);
+        });
+    }
+    private void chooseDirectory() {
+        if (choosingDirectory) return;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+            Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        String tree = new ExportStorage(this).tree();
+        Uri initial = tree == null
+            ? android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:Download/PaxCountRecord")
+            : Uri.parse(tree);
+        intent.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI, initial);
+        try { startActivityForResult(intent, EXPORT_DIRECTORY); choosingDirectory = true; }
+        catch (android.content.ActivityNotFoundException e) { toast("Cannot open folder picker."); }
+    }
+    private boolean storeDirectory(String tree) {
+        ExportStorage storage = new ExportStorage(this);
+        String old = storage.tree();
+        if (!storage.setTree(tree)) { toast("Cannot save export folder."); return false; }
+        if (old != null && !old.equals(tree)) {
+            try { getContentResolver().releasePersistableUriPermission(Uri.parse(old),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION); }
+            catch (SecurityException ignored) {}
         }
+        emit("export-directory-changed", "null");
+        return true;
     }
     @Override protected void onActivityResult(int code, int result, Intent data) {
         super.onActivityResult(code, result, data);
-        if (code != EXPORT) return;
+        if (code != EXPORT_DIRECTORY) return;
+        choosingDirectory = false;
+        if (result != RESULT_OK || data == null || data.getData() == null) return;
+        Uri tree = data.getData();
+        int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try {
-            if (result == RESULT_OK && data != null && data.getData() != null) {
-                try (InputStream input = new FileInputStream(pendingExport());
-                     OutputStream output = getContentResolver().openOutputStream(data.getData(), "wt")) {
-                    if (output == null) throw new IOException("No output stream");
-                    byte[] buffer = new byte[8192]; int n;
-                    while ((n = input.read(buffer)) != -1) output.write(buffer, 0, n);
-                }
-                toast("CSV saved.");
-            }
-        } catch (IOException e) { toast("CSV could not be saved. Your survey is still in the app; try again."); }
-        finally { pendingExport().delete(); }
+            if ((flags & Intent.FLAG_GRANT_WRITE_URI_PERMISSION) == 0) throw new SecurityException("No write permission");
+            getContentResolver().takePersistableUriPermission(tree, flags);
+            if (!storeDirectory(tree.toString())) getContentResolver().releasePersistableUriPermission(tree, flags);
+        } catch (SecurityException e) { toast("Cannot save export folder."); }
     }
     private void toast(String message) {
         if (!"en".equals(getSharedPreferences("surveys", MODE_PRIVATE).getString("language", "yue-Hant-HK"))) {
             switch (message) {
                 case "No browser available.": message = "未有可用的瀏覽器。"; break;
-                case "Finish or cancel the current export first.": message = "請先完成或取消目前的匯出。"; break;
-                case "Cannot open the file picker. Your survey is still saved in the app.": message = "未能開啟檔案選擇器。點算記錄仍保存在應用程式內。"; break;
-                case "CSV saved.": message = "已儲存 CSV。"; break;
-                case "CSV could not be saved. Your survey is still in the app; try again.": message = "未能儲存 CSV。點算記錄仍保存在應用程式內，請再試。"; break;
+                case "Cannot open folder picker.": message = "未能開啟資料夾選擇器。"; break;
+                case "Cannot save export folder.": message = "未能儲存匯出資料夾設定，原有設定已保留。"; break;
             }
         }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
@@ -223,6 +282,8 @@ public final class MainActivity extends Activity {
     @Override protected void onDestroy() {
         if (locationCallback != null) locationCallback.invoke(locationOrigin, false, false);
         if (web != null) { web.removeJavascriptInterface("PassengerCountAndroid"); web.destroy(); }
+        web = null;
+        exports.shutdown();
         super.onDestroy();
     }
 }

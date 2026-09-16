@@ -174,6 +174,23 @@ export function completeSurvey(s, index, now = new Date().toISOString()) {
   s.updatedAt = now;
   return calculateOnboard(s);
 }
+export function reopenSurvey(s, now = new Date().toISOString()) {
+  if (s.status !== "completed") return;
+  const end = Number.isInteger(s.endIndex) ? s.endIndex : s.activeIndex;
+  const row = s.rows[end];
+  // A known final count belongs at the old end, not at a future terminus.
+  // Preserve both observations by requiring an existing conflict to be corrected.
+  if (s.finalOnboard !== "" && row.onboard !== "" &&
+      Number(s.finalOnboard) !== Number(row.onboard))
+    throw Error("Conflicting final count");
+  if (s.finalOnboard !== "") row.onboard = s.finalOnboard;
+  s.finalOnboard = "";
+  s.endIndex = null;
+  s.completedAt = null;
+  s.status = "in_progress";
+  s.activeIndex = Math.min(end + 1, s.rows.length - 1);
+  s.updatedAt = now;
+}
 function shiftIndexes(s, index) {
   for (const key of ["startIndex", "pendingStart", "activeIndex", "endIndex"])
     if (Number.isInteger(s[key]) && s[key] >= index) s[key]++;

@@ -433,7 +433,17 @@ td small {
 }
 .chart svg {
   display: block;
-  max-width: none;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+.savedPath {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+#myLocation[aria-pressed="true"] {
+  background: var(--a);
+  color: white;
 }
 dialog {
   border: 1px solid #b6cac0;

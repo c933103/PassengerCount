@@ -8,6 +8,7 @@ import {
   skipField,
   rowObserved,
   completeSurvey,
+  reopenSurvey,
   insertStop,
   appendSection,
   overlapCount,
@@ -240,4 +241,50 @@ test("default Cantonese and English have matching UI keys and interpolation", ()
   );
   assert.equal(translate("en", "skipPrefix", { n: 2 }), "Skip first 2 stops");
   assert.match(translate(DEFAULT_LANGUAGE, "skipPrefix", { n: 2 }), /2/);
+});
+
+
+test("reopening a completed journey preserves rows and releases its completed boundary", () => {
+  const s = survey(4);
+  recordStop(s, 0, "12:00", true);
+  s.rows[1].boarding = "5";
+  recordStop(s, 1, "12:10");
+  completeSurvey(s, 1);
+  s.finalOnboard = "5";
+  const id = s.id;
+  reopenSurvey(s);
+  assert.equal(s.id, id);
+  assert.equal(s.status, "in_progress");
+  assert.equal(s.endIndex, null);
+  assert.equal(s.completedAt, null);
+  assert.equal(s.finalOnboard, "");
+  assert.equal(s.rows[1].onboard, "5");
+  assert.equal(s.rows[1].boarding, "5");
+  assert.equal(s.rows[1].time, "12:10");
+  assert.equal(s.activeIndex, 2);
+  assert.equal(s.rows[2].recorded, false);
+  s.rows[2].alighting = "2";
+  recordStop(s, 2, "12:20");
+  assert.equal(calculateOnboard(s).values[2], 3);
+});
+test("reopening an accidental terminus completion removes assumed zero without altering observations", () => {
+  const s = survey(3, 1);
+  recordStop(s, 1, "12:00", true);
+  recordStop(s, 2, "12:10", true);
+  completeSurvey(s, 2);
+  assert.equal(calculateOnboard(s).values[2], 0);
+  const rows = structuredClone(s.rows);
+  reopenSurvey(s);
+  assert.deepEqual(s.rows, rows);
+  assert.equal(calculateOnboard(s).values[2], null);
+  assert.equal(s.activeIndex, 2);
+});
+test("reopening cannot discard incompatible entered final counts", () => {
+  const s = survey(3);
+  s.rows[1].onboard = "3";
+  s.finalOnboard = "5";
+  completeSurvey(s, 1);
+  const before = structuredClone(s);
+  assert.throws(() => reopenSurvey(s), /Conflicting/);
+  assert.deepEqual(s, before);
 });

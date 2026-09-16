@@ -1,6 +1,19 @@
 export const DEFAULT_LANGUAGE = "yue-Hant-HK";
 export const messages = {
   en: {
+    settings: "Settings",
+    exportFolder: "CSV and chart export folder",
+    changeFolder: "Change folder",
+    defaultFolder: "Use default folder",
+    browserFolder: "Your browser controls the download location.",
+    continueRecord: "Continue recording",
+    continueConflict: "The final onboard count conflicts with the count at that stop. Use Edit table to correct it before continuing.",
+    saveChart: "Save chart (PNG)",
+    exporting: "Saving…",
+    exportSaved: "Saved to:\n{path}",
+    exportFailed: "Export failed. Your trip remains saved. Check the export folder in Settings and retry.",
+    downloadStarted: "Download started; check your browser's downloads.",
+
     app: "PassengerCount",
     language: "Language",
     home: "Home",
@@ -119,7 +132,7 @@ export const messages = {
       "Complete at the selected stop. Your record is saved inside the app automatically.",
     completedSaved: "Completed record saved in the app",
     recordSummary: "{n} recorded stops · {date}",
-    editRecord: "Edit record",
+    editRecord: "Edit table",
     chart: "Passenger chart",
     chartLegend: "Bars: boarding / alighting · Line: onboard",
     chartUnknown: "Unknown onboard counts appear as gaps.",
@@ -205,6 +218,19 @@ export const messages = {
     operator_xb: "Cross-boundary coach",
   },
   "yue-Hant-HK": {
+    settings: "設定",
+    exportFolder: "CSV 及圖表匯出資料夾",
+    changeFolder: "更改資料夾",
+    defaultFolder: "使用預設資料夾",
+    browserFolder: "下載位置由瀏覽器設定控制。",
+    continueRecord: "繼續點算同一行程",
+    continueConflict: "最後車上人數與該站已輸入人數不一致，請先編輯表格更正，再繼續點算。",
+    saveChart: "儲存圖表（PNG）",
+    exporting: "正在儲存…",
+    exportSaved: "已儲存至：\n{path}",
+    exportFailed: "匯出失敗，行程記錄仍已儲存。請在設定檢查匯出資料夾後再試。",
+    downloadStarted: "已開始下載，請查看瀏覽器的下載項目。",
+
     serviceWindowHelp:
       "由開車前 10 分鐘起，直到預計行車時間加 10 分鐘延誤寬限結束，都會列入建議路線。前後寬限固定為 10 分鐘。如果資料只列班次間隔，就由發車時段結束起計行車時間及寬限。其他路線變體隨時可以展開及選取。",
     deleteRecords: "刪除記錄",
@@ -316,7 +342,7 @@ export const messages = {
     finishHint: "在目前選定車站結束。記錄會自動儲存在應用程式內。",
     completedSaved: "已完成，記錄已儲存在應用程式內",
     recordSummary: "已記錄 {n} 個站 · {date}",
-    editRecord: "修改記錄",
+    editRecord: "編輯表格",
     chart: "乘客人數圖表",
     chartLegend: "柱狀：上車／落車　折線：車上人數",
     chartUnknown: "未知的車上人數會留空，不會連線。",
