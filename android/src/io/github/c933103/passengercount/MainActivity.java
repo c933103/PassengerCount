@@ -52,7 +52,7 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.1");
         web.addJavascriptInterface(new DeviceStorage(), "PassengerCountAndroid");
         web.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -61,6 +61,9 @@ public final class MainActivity extends Activity {
                 String path = uri.getPath();
                 if (path == null || path.equals("/")) path = "/index.html";
                 if (path.contains("..") || !request.getMethod().equals("GET")) return missing();
+                if (path.equals("/government/en.zip") || path.equals("/government/zh.zip")) {
+                    return governmentArchive(path.endsWith("en.zip") ? "en" : "tc");
+                }
                 try {
                     InputStream body = getAssets().open("www" + path);
                     String mime = path.endsWith(".js") ? "text/javascript" : path.endsWith(".css") ? "text/css"
@@ -71,7 +74,7 @@ public final class MainActivity extends Activity {
                     headers.put("X-Content-Type-Options", "nosniff");
                     headers.put("Content-Security-Policy", "default-src 'self'; script-src 'self'; "
                         + "style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; "
-                        + "connect-src 'self' https://data.hkbus.app https://hkbus.github.io "
+                        + "connect-src 'self' https://static.data.gov.hk "
                         + "https://jirzkyvwfpbblvyivikw.supabase.co; frame-src 'none'; object-src 'none'; "
                         + "base-uri 'none'; form-action 'none'");
                     return new WebResourceResponse(mime, "UTF-8", 200, "OK", headers, body);
@@ -105,6 +108,29 @@ public final class MainActivity extends Activity {
             }
         });
         web.loadUrl(ORIGIN + "/index.html");
+    }
+
+    // Only two fixed government archives are proxied; this is not an arbitrary URL fetcher.
+    // The government file host omits CORS headers, so WebView requests use our own origin.
+    private WebResourceResponse governmentArchive(String language) {
+        try {
+            java.net.URL url = new java.net.URL("https://static.data.gov.hk/td/pt-headway-" + language + "/gtfs.zip");
+            final javax.net.ssl.HttpsURLConnection connection = (javax.net.ssl.HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(20000);
+            connection.setReadTimeout(60000);
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestProperty("User-Agent", "PassengerCount/1.1");
+            if (connection.getResponseCode() != 200) { connection.disconnect(); return missing(); }
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Cache-Control", "no-store");
+            headers.put("X-Content-Type-Options", "nosniff");
+            String modified = connection.getHeaderField("Last-Modified");
+            if (modified != null) headers.put("Last-Modified", modified);
+            InputStream stream = new FilterInputStream(connection.getInputStream()) {
+                @Override public void close() throws IOException { try { super.close(); } finally { connection.disconnect(); } }
+            };
+            return new WebResourceResponse("application/zip", null, 200, "OK", headers, stream);
+        } catch (IOException e) { return missing(); }
     }
 
     private static boolean trusted(Uri uri) {

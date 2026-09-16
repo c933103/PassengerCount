@@ -1,10 +1,14 @@
-const C = "passenger-count-v3";
+const C = "passenger-count-v4";
 const F = [
   "./",
   "./index.html",
   "./app.js",
   "./core.js",
   "./data.js",
+  "./government.js",
+  "./route-worker.js",
+  "./data/government-routes.json.gz",
+  "./vendor/fflate/fflate.js",
   "./storage.js",
   "./upload.js",
   "./supabase-config.js",

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#143b46" />
-    <title>Bus Passenger Counter</title>
+    <title>PassengerCount</title>
     <link rel="manifest" href="manifest.json" />
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
     <link rel="stylesheet" href="style.css" />
@@ -13,151 +13,224 @@
   </head>
   <body>
     <header>
-      <div>
-        <small>FIELD SURVEY</small>
-        <h1>Bus Passenger Counter</h1>
-      </div>
-      <span id="saveStatus">Loading…</span>
+      <h1>PassengerCount</h1>
+      <span id="saveStatus" role="status">Loading…</span>
     </header>
     <main>
-      <div id="error" class="error" hidden></div>
-      <section class="panel row">
-        <label
-          >Surveyor name<input
-            id="surveyor"
-            placeholder="Remembered on this device" /></label
-        ><label
-          >Saved surveys<select id="saved">
-            <option value="">New survey</option>
-          </select></label
-        ><button id="new" class="secondary">New survey</button>
-      </section>
-      <section class="panel">
-        <h2>Route & direction</h2>
-        <form id="search" class="row">
+      <div id="error" class="error" role="alert" hidden></div>
+      <div id="setup">
+        <section class="panel row">
           <label
-            >Route number<input
-              id="route"
-              required
-              placeholder="e.g. 88X" /></label
+            >Surveyor name<input
+              id="surveyor"
+              placeholder="Remembered on this device"
+              autocomplete="name" /></label
           ><label
-            >Operator<select id="operator">
-              <option value="">All bus operators</option>
-              <option value="kmb">KMB / Long Win</option>
-              <option value="ctb">Citybus</option>
-              <option value="nlb">New Lantao Bus</option>
-              <option value="lrtfeeder">MTR Bus</option>
-              <option value="gmb">Green minibus</option>
+            >Saved surveys<select id="saved">
+              <option value="">New survey</option>
             </select></label
-          ><button>Find route</button>
-        </form>
-        <p id="dataStatus"></p>
-        <p id="clock"></p>
-        <div id="results"></div>
-        <details id="other" hidden>
-          <summary id="otherTitle"></summary>
-          <div id="otherResults"></div>
-        </details>
-        <details>
-          <summary>Time filter & data</summary>
-          <label
-            >Upcoming departures<select id="upcoming">
-              <option>15</option>
-              <option selected>30</option>
-              <option>60</option>
-              <option value="120">120 minutes</option>
-            </select></label
-          >
-          <p>
-            Uses Hong Kong time and published schedules. It does not confirm
-            live operation.
-          </p>
-        </details>
-      </section>
-      <section id="survey" hidden>
+          ><button id="new" class="secondary">New survey</button>
+        </section>
         <section class="panel">
-          <small>CURRENT SURVEY</small>
+          <h2>Route & direction</h2>
+          <form id="search" class="row">
+            <label
+              >Route number<input
+                id="route"
+                required
+                placeholder="e.g. 88X"
+                autocapitalize="characters"
+                autocomplete="off" /></label
+            ><label
+              >Operator<select id="operator">
+                <option value="">All bus operators</option>
+              </select></label
+            ><button>Find route</button>
+          </form>
+          <p id="dataStatus"></p>
+          <div id="results"></div>
+          <details id="other" hidden>
+            <summary id="otherTitle"></summary>
+            <div id="otherResults"></div>
+          </details>
+          <details>
+            <summary>Time filter & government data</summary>
+            <label
+              >Upcoming departures<select id="upcoming">
+                <option value="15">15 minutes</option>
+                <option value="30" selected>30 minutes</option>
+                <option value="60">60 minutes</option>
+                <option value="120">120 minutes</option>
+              </select></label
+            >
+            <p id="clock"></p>
+            <button type="button" id="refreshData" class="secondary">
+              Update government data
+            </button>
+            <p>
+              Uses Hong Kong time and published timetables. Temporary diversions
+              and live operation may differ.
+            </p>
+          </details>
+        </section>
+        <section id="tripSetup" class="panel" hidden>
           <h2 id="selected"></h2>
           <div class="row">
             <label>Date<input id="date" type="date" /></label
             ><label>Vehicle number<input id="vehicle" /></label>
           </div>
-          <label>General notes<textarea id="notes"></textarea></label>
-          <div class="row">
-            <label>Starting stop<select id="start"></select></label
-            ><button id="confirm">Confirm start stop</button>
-          </div>
+          <label>General notes<textarea id="notes" rows="2"></textarea></label
+          ><label>Starting stop<select id="start"></select></label>
           <p id="startStatus"></p>
-        </section>
-        <div class="grid">
-          <aside class="panel">
-            <div class="spread">
-              <h2>Check your stop</h2>
-              <button id="locate" class="secondary">Use GPS</button>
-            </div>
-            <p id="gps">Waiting for location…</p>
-            <div id="map"></div>
-            <div class="buttons">
-              <button id="myLocation" class="secondary">My location</button
-              ><button id="selectedStop" class="secondary">Selected stop</button
-              ><button id="whole" class="secondary">Whole route</button>
-            </div>
-            <label>Entering data at<select id="active"></select></label>
-            <div class="buttons">
-              <button id="prev" class="secondary">Previous</button
-              ><button id="next" class="secondary">Next stop</button>
-            </div>
-            <p>
-              Blue: GPS. Orange: selected stop. Tap a labelled stop to select
-              it.
-            </p>
-          </aside>
-          <section class="panel">
-            <div class="spread">
-              <h2>Passenger counts</h2>
-              <label class="check"
-                ><input id="all" type="checkbox" />Show all stops</label
-              >
-            </div>
-            <p>
-              Enter one known onboard count to calculate earlier counts.
-              Calculated values are marked auto.
-            </p>
-            <div class="table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Stop</th>
-                    <th>Time</th>
-                    <th>Boarding</th>
-                    <th>Alighting</th>
-                    <th>Onboard</th>
-                    <th>Notes</th>
-                  </tr>
-                </thead>
-                <tbody id="body"></tbody>
-              </table>
-            </div>
-            <div class="buttons mobile">
-              <button id="entryPrev" class="secondary">Previous</button
-              ><button id="entryNext">Next stop</button>
-            </div>
-          </section>
-        </div>
-        <section class="panel">
-          <h2>Save a copy</h2>
           <div class="buttons">
-            <button id="csv">Download CSV</button
-            ><button id="upload" class="secondary">Upload to database</button
-            ><button id="both" class="secondary">Upload & download CSV</button>
+            <button id="confirm">Confirm stop & start counting</button
+            ><button id="resume" class="secondary" hidden>
+              Resume counting</button
+            ><button id="setupMap" class="secondary">Check map</button>
           </div>
-          <p id="uploadStatus"></p>
         </section>
+      </div>
+      <section id="countScreen" hidden aria-label="Passenger counting">
+        <div class="countTop">
+          <span id="tripTitle"></span
+          ><button id="settings" class="secondary">Settings</button>
+        </div>
+        <label class="stopPicker"
+          >Entering data at<select id="active"></select
+        ></label>
+        <div class="stopActions">
+          <button id="prev" class="secondary">Previous</button
+          ><button id="checkMap" class="secondary">Map / GPS</button
+          ><button id="next">Next stop</button>
+        </div>
+        <p id="nearby" class="nearby" aria-live="polite"></p>
+        <button id="useNearest" class="secondary" hidden>
+          Use nearest stop
+        </button>
+        <div class="countFields">
+          <label
+            >Boarding<input
+              id="boarding"
+              data-count="boarding"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              readonly
+              aria-label="Boarding passengers"
+              placeholder="—"
+          /></label>
+          <label
+            >Alighting<input
+              id="alighting"
+              data-count="alighting"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              readonly
+              aria-label="Alighting passengers"
+              placeholder="—"
+          /></label>
+          <label
+            >Onboard<input
+              id="onboard"
+              data-count="onboard"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              readonly
+              aria-label="Onboard passengers"
+              placeholder="—" /><span id="onboardSource"></span
+          ></label>
+        </div>
+        <div
+          id="keypad"
+          class="keypad"
+          aria-label="Passenger count numeric keypad"
+        >
+          <button data-key="1">1</button><button data-key="2">2</button
+          ><button data-key="3">3</button> <button data-key="4">4</button
+          ><button data-key="5">5</button><button data-key="6">6</button>
+          <button data-key="7">7</button><button data-key="8">8</button
+          ><button data-key="9">9</button>
+          <button data-key="clear" class="secondary">Clear</button
+          ><button data-key="0">0</button
+          ><button
+            data-key="backspace"
+            class="secondary"
+            aria-label="Delete last digit"
+          >
+            ⌫
+          </button>
+        </div>
+        <button id="nextField" class="nextField">Next field</button>
+        <details id="stopDetails">
+          <summary>Time, notes & all stops</summary>
+          <label>Time<input id="stopTime" type="time" /></label
+          ><label>Stop notes<input id="stopNotes" /></label
+          ><button id="review" class="secondary">Review all stops</button>
+        </details>
+        <div class="countBottom">
+          <button id="finish" class="secondary">Finish / export</button>
+        </div>
+      </section>
+      <section id="mapScreen" hidden>
+        <div class="spread">
+          <h2>Check your stop</h2>
+          <button id="mapBack">Back</button>
+        </div>
+        <p id="gps" role="status">Waiting for location…</p>
+        <div id="map"></div>
+        <div class="buttons">
+          <button id="myLocation">Follow GPS</button
+          ><button id="selectedStop" class="secondary">Selected stop</button
+          ><button id="whole" class="secondary">Whole route</button
+          ><button id="locate" class="secondary">Retry GPS</button>
+        </div>
+        <p id="mapMode">Following GPS</p>
+        <label>Selected stop<select id="mapStop"></select></label
+        ><button id="useMapStop">Use this stop</button>
+        <p>
+          Blue: current GPS location. Orange: selected stop. Tap a named stop to
+          select it.
+        </p>
+      </section>
+      <section id="reviewScreen" class="panel" hidden>
+        <div class="spread">
+          <h2>Review & export</h2>
+          <button id="reviewBack">Back to counting</button>
+        </div>
+        <p>
+          Tap a stop to edit its counts. A known onboard count calculates
+          unobserved earlier stops; calculated values are marked auto.
+        </p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th>Stop</th>
+                <th>Time</th>
+                <th>Boarding</th>
+                <th>Alighting</th>
+                <th>Onboard</th>
+              </tr>
+            </thead>
+            <tbody id="body"></tbody>
+          </table>
+        </div>
+        <div class="buttons">
+          <button id="csv">Save CSV</button
+          ><button id="upload" class="secondary">Upload to database</button
+          ><button id="both" class="secondary">Upload & save CSV</button>
+        </div>
+        <p id="uploadStatus"></p>
       </section>
     </main>
-    <footer>
-      Route data:
-      <a href="https://github.com/hkbus/hk-bus-crawling">HK Bus Crawling@2021</a
+    <footer id="attribution">
+      Route, stop and timetable data:
+      <a href="https://data.gov.hk/en-data/dataset/hk-td-tis_11-pt-headway-en"
+        >Transport Department / DATA.GOV.HK</a
+      >. © Government of the Hong Kong SAR.
+      <a href="https://data.gov.hk/en/terms-and-conditions">Data reuse terms</a
       >. Map © OpenStreetMap contributors.
     </footer>
   </body>

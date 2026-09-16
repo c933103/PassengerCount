@@ -4,26 +4,37 @@ An Android app and web app for bus passenger surveys.
 
 ## Use on Android
 
-1. Download **PassengerCount.apk** to your phone and open it.
+1. Download **PassengerCount-1.1.apk** to your phone and open it.
 2. If Android asks, allow this download source to install the app, then tap **Install**.
 3. Open **PassengerCount** from your home screen. Enter your name once, find a route, and choose a direction / variation.
-4. Allow location access to get a suggested starting stop. Confirm it or choose another stop, then enter counts.
+4. Allow location access to get a suggested starting stop. Confirm it or choose another stop. The app opens a compact screen with the selected stop, three count fields and a large 0–9 keypad.
 
 No terminal, Python, npm or local server is needed to use the Android app. Requires Android 8 or newer and an up-to-date Android System WebView.
 
-The app bundles its interface and map library. Every edit, selected route, confirmed start and active stop is committed immediately to app-private device storage, so it survives Android stopping the app or discarding its WebView. **Download CSV** opens Android's file picker. Uninstalling the app or clearing its app data removes local surveys; exported CSV files are independent copies. Surveys in a browser are separate from those in the Android app.
+The app bundles its interface and map library. Every edit, selected route, confirmed start and active stop is committed immediately to app-private device storage, so it survives Android stopping the app or discarding its WebView. **Finish / export → Save CSV** opens Android's file picker. Uninstalling the app or clearing its app data removes local surveys; exported CSV files are independent copies. Surveys in a browser are separate from those in the Android app.
 
-Internet is needed for the first route download, map tiles, timetable refreshes and database uploads. Previously opened surveys and the app interface work offline; the route catalogue is cached after downloading. GPS permission is optional, and start stops can always be chosen manually.
+Government routes, stops and timetables are bundled, so route selection and counting work on the first launch offline. Internet is needed for map tiles, timetable refreshes and database uploads. The Android app refreshes government data in the background once the saved catalogue is 14 days old; **Time filter & government data → Update government data** also refreshes it manually. Downloads are processed in a worker so the counting screen stays responsive. Failed updates retain the bundled or saved government catalogue. GPS permission is optional, and start stops can always be chosen manually.
 
 ## Survey features
 
 - Remembered surveyor and saved surveys.
 - Hong Kong time and published schedules prioritize route variants running or starting soon; other variants can be expanded. This is timetable guidance, not live bus tracking.
-- KMB / Long Win, Citybus, New Lantao Bus, MTR Bus and green minibuses, using [HK Bus Crawling](https://github.com/hkbus/hk-bus-crawling).
-- GPS suggests a stop on the selected variant, with manual confirmation and override.
-- Street-level map with numbered, named stops, current location and location accuracy.
+- KMB, Long Win, Citybus, New Lantao Bus, MTR Bus, green minibuses, Discovery Bay, Park Island and cross-boundary coaches, from the Transport Department government GTFS feed.
+- GPS suggestions, manual starting stops, the map stop picker and the counting stop picker update the same active row. Confirming the start opens counting mode; saved surveys reopen in counting mode.
+- Passenger counts accept non-negative whole numbers only. The built-in keypad has digits, backspace and clear; hardware digits and valid numeric paste are supported. Letters, signs, decimals and exponent notation are rejected.
+- Street-level map with numbered, named stops, current location and location accuracy. It follows every GPS fix by default. Dragging the map, inspecting a selected stop or viewing the whole route pauses following; **Follow GPS** resumes it. GPS never silently changes a confirmed entry stop; **Use nearest stop** changes it explicitly.
 - **Backward calculation is intentional:** a known onboard count calculates unobserved earlier stops. Derived counts remain distinct from entered values.
 - CSV export and the existing Supabase database upload.
+
+## Government data and attribution
+
+All new route searches use the [Transport Department headway dataset](https://data.gov.hk/en-data/dataset/hk-td-tis_11-pt-headway-en), fetched from the government’s [English GTFS archive](https://static.data.gov.hk/td/pt-headway-en/gtfs.zip) and [Traditional Chinese GTFS archive](https://static.data.gov.hk/td/pt-headway-tc/gtfs.zip). There is no HK Bus Crawling or operator API dependency. Stops, their sequence, directions, route variations, journey times, calendars and holiday exceptions all come from those archives.
+
+Route, stop and timetable data © Government of the Hong Kong SAR. Source: Transport Department / DATA.GOV.HK. Reuse is governed by the [DATA.GOV.HK terms](https://data.gov.hk/en/terms-and-conditions), including source and ownership attribution. Government data is not public domain. Attribution is included in the interface, bundled catalogue and CSV exports. Existing surveys keep their original stop snapshots and entered records, so an app or catalogue update cannot rewrite recorded observations.
+
+`government.js` is the shared converter for the app and build script. It groups trips by government route ID, bound and ordered stop sequence, preserving shortened / alternate variants and repeated stops. Timetable filtering uses validity dates, weekday calendars, exceptions, overnight times, headways and published journey durations. The shipped catalogue was downloaded on 2026-09-16 from the government feed published on 2026-09-11 (3,511 variants / 9,250 stops).
+
+Regenerate the bundled catalogue with `node scripts/build-government-data.mjs [english.zip] [traditional-chinese.zip]`. Without arguments, the script downloads the official archives. The native wrapper proxies only those two fixed government URLs to its own HTTPS origin because the government file host does not provide browser CORS headers. A plain static website uses the bundled catalogue; direct refresh is subject to that browser restriction.
 
 ## Developer build
 
@@ -45,8 +56,8 @@ For web development only, serve this directory with any static web server. Deplo
 
 ## Validation and device checklist
 
-The build checks the APK signature. Automated tests cover calculations, timetable filtering, storage failures, route selection, GPS suggestion, CSV handoff and restoration into a fresh browser context. These tests do not replace Android device testing.
+The build checks the APK signature. Automated tests cover government feed conversion and timetables, stop synchronization, live map following and pause/resume, numeric input rejection, backward calculations, CSV export, storage failures and restoration into a fresh browser context. These tests do not replace Android device testing.
 
 Before wider distribution, install on a phone and check precise/approximate/denied location, CSV save/cancel, screen rotation, keyboard/system bar insets, offline restart and force-stop recovery. No physical Android device or emulator was available during the initial build.
 
-Leaflet 1.9.4 is bundled under its BSD-2-Clause license in `vendor/leaflet/LICENSE`. Map tiles are provided by OpenStreetMap; route data attribution appears in the app.
+fflate 0.8.3 is bundled under its MIT license in `vendor/fflate/LICENSE`. Leaflet 1.9.4 is bundled under its BSD-2-Clause license in `vendor/leaflet/LICENSE`. Map tiles are provided by OpenStreetMap; route data attribution appears in the app.
