@@ -4,46 +4,72 @@ import {
   serviceStatus,
   variants,
   stopsFor,
-  emptyRow,
-  onboardValues,
   nearestStops,
   makeCSV,
   validPassengerCount,
 } from "./core.js";
+import {
+  emptyRow,
+  migrateSurvey,
+  calculateOnboard,
+  rowObserved,
+  recordStop,
+  skipField,
+  completeSurvey,
+  insertStop,
+  overlapCount,
+  appendSection,
+} from "./survey.js";
+import { DEFAULT_LANGUAGE, translate } from "./i18n.js";
+import { renderChart } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes } from "./data.js";
 import { uploadSurvey } from "./upload.js";
-const $ = (id) => document.getElementById(id),
-  fields = ["boarding", "alighting", "onboard"];
-let state = load(),
-  data,
+const $ = (id) => document.getElementById(id);
+const state = load();
+state.language ??= DEFAULT_LANGUAGE;
+state.surveys.forEach(migrateSurvey);
+let data,
   matches = [],
+  screen = "home",
   map,
   markers = [],
   position,
   watch,
-  screen = "setup",
-  mapReturn = "setup",
   followGps = true,
-  selectedField = "boarding",
+  nearestIndex = null,
+  target = { index: 0, field: "boarding" },
   replaceOnDigit = true,
-  nearestIndex = null;
+  stopEditIndex = null,
+  sectionOptions = [],
+  sectionStops = [],
+  uploadBusy = false;
 const cur = () => state.surveys.find((s) => s.id === state.currentId);
-const stopLabel = (stop, i) =>
-  `${i + 1}. ${stop.name.zh ? stop.name.zh + " · " : ""}${stop.name.en}`;
+const t = (key, values) => translate(state.language, key, values);
+const name = (stop) =>
+  stop?.name?.[state.language === "en" ? "en" : "zh"] ||
+  stop?.name?.en ||
+  stop?.name?.zh ||
+  "";
+const stopLabel = (stop, index) =>
+  `${index + 1}. ${name(stop)}${stop.custom ? " · " + t("customStop") : stop.modified ? " · " + t("modifiedStop") : ""}`;
+const operator = (co) =>
+  t("operator_" + co) === "operator_" + co
+    ? OPERATORS[co] || co
+    : t("operator_" + co);
 const validLocation = (x) => Number.isFinite(x?.lat) && Number.isFinite(x?.lng);
-const error = (message) => {
+function error(message = "") {
   $("error").textContent = message;
   $("error").hidden = !message;
-};
+}
 function persist() {
   try {
     save(state);
-    $("saveStatus").textContent = "Saved on this device";
+    $("saveStatus").textContent = t("saved");
     return true;
   } catch {
-    $("saveStatus").textContent = "NOT SAVED";
-    error("Device storage is unavailable. Save a CSV before closing.");
+    $("saveStatus").textContent = t("notSaved");
+    error(t("saveError"));
     return false;
   }
 }
@@ -55,48 +81,147 @@ function edit() {
   }
   persist();
 }
+function setLanguage(language) {
+  state.language = language;
+  document.documentElement.lang = language;
+  document.title = t("app");
+  $("language").value = language;
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach((el) => (el.textContent = t(el.dataset.i18n)));
+  window.PassengerCountAndroid?.setLanguage?.(language);
+  const chosen = $("operator").value;
+  $("operator").replaceChildren(new Option(t("allOperators"), ""));
+  for (const co of Object.keys(OPERATORS))
+    $("operator").add(new Option(operator(co), co));
+  $("operator").value = chosen;
+  renderHome();
+  if (data) renderMatches();
+  if (cur()) {
+    renderSetup();
+    buildStopOptions();
+    buildTable();
+    renderCount();
+    if (screen === "record") renderRecord();
+    if (map) setupMap();
+  }
+  setFollow(followGps);
+  $("toggleMap").textContent = t(
+    $("mapContents").hidden ? "showMap" : "hideMap",
+  );
+  document
+    .querySelector("[data-key=backspace]")
+    .setAttribute("aria-label", t("deleteDigit"));
+  persist();
+}
 function showScreen(next) {
   screen = next;
+  state.screen = next;
   document.body.dataset.screen = next;
-  for (const [id, value] of [
-    ["setup", "setup"],
-    ["countScreen", "count"],
-    ["mapScreen", "map"],
-    ["reviewScreen", "review"],
-  ])
-    $(id).hidden = value !== next;
-  if (cur()) {
-    cur().screen = next === "map" ? mapReturn : next;
-    persist();
+  for (const key of ["home", "setup", "count", "record"])
+    $(key + "Screen").hidden = key !== next;
+  const s = cur();
+  if (s) s.screen = next;
+  const host =
+    next === "count" && s
+      ? $("countMapHost")
+      : next === "setup" && s
+        ? $("setupMapHost")
+        : $("mapParking");
+  host.append($("mapPanel"));
+  if (next === "home") {
+    renderHome();
+    if (watch !== undefined) {
+      navigator.geolocation?.clearWatch(watch);
+      watch = undefined;
+    }
   }
-  if (next === "count") renderCount();
-  if (next === "review") renderReview();
-  if (next === "map") {
+  if (next === "setup") renderSetup();
+  if (next === "count") {
+    $("allStops").open = s.tableExpanded === true;
+    buildStopOptions();
+    buildTable();
+    renderCount();
+    locate();
+  }
+  if (next === "record") renderRecord();
+  if ((next === "count" || next === "setup") && s) {
     setupMap();
     requestAnimationFrame(() => {
       map?.invalidateSize();
       centerMap();
     });
+    locate();
   }
+  persist();
   window.scrollTo(0, 0);
 }
-function list() {
-  $("saved").replaceChildren(new Option("New survey", ""));
-  for (const s of [...state.surveys].reverse())
-    $("saved").add(
-      new Option(
-        `${s.date} · ${s.route.route} ${OPERATORS[s.route.operator] || s.route.operator} → ${s.route.dest.en} · ${s.vehicle || "No vehicle"}`,
-        s.id,
-      ),
-    );
-  $("saved").value = state.currentId || "";
+function goHome() {
+  state.currentId = null;
+  showScreen("home");
+}
+function renderHome() {
+  const list = $("recordList");
+  list.replaceChildren();
+  if (!state.surveys.length) {
+    list.textContent = t("noRecords");
+    return;
+  }
+  for (const s of [...state.surveys].sort((a, b) =>
+    (b.updatedAt || "").localeCompare(a.updatedAt || ""),
+  )) {
+    const card = document.createElement("article");
+    card.className = "recordCard";
+    card.dataset.id = s.id;
+    const title = document.createElement("h3");
+    title.textContent = `${s.route.route} · ${operator(s.route.operator)} → ${name({ name: s.route.dest })}`;
+    const detail = document.createElement("p");
+    detail.textContent = `${t(s.status)} · ${s.date} · ${s.vehicle || ""} · ${s.rows.filter((r) => r.recorded).length}/${s.stops.length}`;
+    const buttons = document.createElement("div");
+    buttons.className = "buttons";
+    const open = document.createElement("button");
+    open.textContent = t(s.status === "completed" ? "view" : "resume");
+    open.onclick = () =>
+      openSurvey(s.id, s.status === "completed" ? "record" : "resume");
+    buttons.append(open);
+    if (s.status !== "completed") {
+      const review = document.createElement("button");
+      review.className = "secondary";
+      review.textContent = t("view");
+      review.onclick = () => openSurvey(s.id, "record");
+      buttons.append(review);
+    }
+    card.append(title, detail, buttons);
+    list.append(card);
+  }
+}
+function openSurvey(id, mode) {
+  state.currentId = id;
+  const s = cur();
+  if (!s) return;
+  target = { index: s.activeIndex || 0, field: "boarding" };
+  replaceOnDigit = true;
+  nearestIndex = null;
+  if (mode === "resume" && s.startIndex != null) {
+    s.status = "in_progress";
+    s.completedAt = null;
+    showScreen("count");
+  } else showScreen(mode === "record" ? "record" : "setup");
+}
+function dataStatus(raw) {
+  const date = /\d{4}-\d{2}-\d{2}/.exec(raw)?.[0];
+  $("dataStatus").textContent = /Loading|Downloading/.test(raw)
+    ? t("dataLoading")
+    : date
+      ? t("governmentData", { date })
+      : t("dataUnavailable");
 }
 async function search(force = false) {
   const number = $("route").value.trim();
   if (!number && !force) return;
-  error("");
+  error();
   try {
-    data = await routes((x) => ($("dataStatus").textContent = x), force);
+    data = await routes(dataStatus, force);
     matches = number ? variants(data, number, $("operator").value) : [];
     state.search = {
       number,
@@ -105,43 +230,52 @@ async function search(force = false) {
     };
     persist();
     renderMatches();
-  } catch (e) {
-    error(e.message);
+  } catch {
+    error(t("dataUnavailable"));
   }
 }
 function renderMatches() {
-  const c = hkClock();
-  $("clock").textContent = `${c.date} ${c.time} (Hong Kong)`;
+  const clock = hkClock();
+  $("clock").textContent = `${clock.date} ${clock.time} (UTC+8)`;
   $("results").replaceChildren();
   $("otherResults").replaceChildren();
   let hidden = 0;
-  for (const r of matches) {
-    const status = serviceStatus(r, data, new Date(), +$("upcoming").value),
+  for (const route of matches) {
+    const status = serviceStatus(route, data, new Date(), +$("upcoming").value),
       button = document.createElement("button");
     button.className = "route";
-    button.textContent = `${OPERATORS[r.operator]} ${r.route} · ${r.orig.en} → ${r.dest.en}`;
-    const extra = document.createElement("span");
-    extra.textContent = `${r.orig.zh || ""} → ${r.dest.zh || ""} · Direction ${r.direction} · Variant ${r.serviceType} · ${r.stopIds.length} stops`;
+    button.textContent = `${operator(route.operator)} ${route.route} · ${name({ name: route.orig })} → ${name({ name: route.dest })}`;
+    const info = document.createElement("span");
+    info.textContent = t("variant", {
+      direction: route.direction,
+      variant: route.serviceType,
+      n: route.stopIds.length,
+    });
     const badge = document.createElement("span");
     badge.className = status.kind;
-    badge.textContent = status.text;
-    button.append(extra, badge);
-    button.onclick = () => selectRoute(r);
+    badge.textContent = t(
+      {
+        active: "running",
+        upcoming: "upcoming",
+        inactive: "inactive",
+        unknown: "unknownService",
+      }[status.kind],
+    );
+    button.append(info, badge);
+    button.onclick = () => selectRoute(route);
     if (status.kind === "inactive") {
       $("otherResults").append(button);
       hidden++;
     } else $("results").append(button);
   }
   $("other").hidden = !hidden;
-  $("otherTitle").textContent = `Show ${hidden} other directions / variants`;
+  $("otherTitle").textContent = t("otherVariants", { n: hidden });
   if (!$("results").children.length)
-    $("results").textContent = matches.length
-      ? "No scheduled variants in this window. Expand the other variants."
-      : "No matching routes found.";
+    $("results").textContent = t(matches.length ? "noCurrent" : "noMatches");
 }
 function selectRoute(route) {
   const stops = stopsFor(route, data),
-    s = {
+    s = migrateSurvey({
       id: crypto.randomUUID(),
       route,
       stops,
@@ -149,174 +283,374 @@ function selectRoute(route) {
       date: hkClock().date,
       vehicle: "",
       notes: "",
-      surveyor: $("surveyor").value,
+      surveyor: $("surveyor").value || loadSurveyor(),
       startIndex: null,
       pendingStart: null,
       startSource: null,
       activeIndex: 0,
       screen: "setup",
       updatedAt: new Date().toISOString(),
-    };
+    });
   state.surveys.push(s);
   state.currentId = s.id;
+  target = { index: 0, field: "boarding" };
   followGps = true;
-  persist();
-  renderSurvey();
+  nearestIndex = null;
+  buildTable();
+  renderSetup();
   showScreen("setup");
+  suggest();
   $("tripSetup").scrollIntoView({ block: "start" });
 }
-function renderSurvey() {
+function renderSetup() {
   const s = cur();
-  list();
   $("tripSetup").hidden = !s;
-  if (!s) {
-    $("surveyor").value = loadSurveyor();
-    showScreen("setup");
-    return;
-  }
-  $("surveyor").value = s.surveyor;
+  if (!s) return;
   $("selected").textContent =
-    `${OPERATORS[s.route.operator] || s.route.operator} ${s.route.route} · ${s.route.orig.en} → ${s.route.dest.en}`;
-  for (const f of ["date", "vehicle", "notes"]) $(f).value = s[f];
-  $("start").replaceChildren(new Option("Choose or wait for GPS", ""));
+    `${operator(s.route.operator)} ${s.route.route} · ${name({ name: s.route.orig })} → ${name({ name: s.route.dest })}`;
+  for (const field of ["date", "vehicle", "notes"]) $(field).value = s[field];
+  buildStopOptions();
+  $("resume").hidden = s.startIndex == null;
+  $("confirm").disabled = s.pendingStart == null;
+}
+function buildStopOptions() {
+  const s = cur();
+  if (!s) return;
+  const initial = $("start");
+  initial.replaceChildren(new Option(t("chooseStop"), ""));
   $("active").replaceChildren();
-  $("mapStop").replaceChildren();
-  s.stops.forEach((stop, i) => {
-    for (const id of ["start", "active", "mapStop"])
-      $(id).add(new Option(stopLabel(stop, i), String(i)));
-  });
-  $("start").value = s.pendingStart ?? s.startIndex ?? "";
-  nearestIndex = null;
-  startStatus();
-  active(s.activeIndex || 0);
-  if (map) setupMap();
-  suggest();
-  locate();
+  for (const [i, stop] of s.stops.entries()) {
+    initial.add(new Option(stopLabel(stop, i), String(i)));
+    $("active").add(new Option(stopLabel(stop, i), String(i)));
+  }
+  initial.value = s.pendingStart ?? s.startIndex ?? "";
+  $("active").value = String(s.activeIndex || 0);
 }
 function selectPending(index, source) {
   const s = cur();
-  if (!s || !s.stops[index]) return;
+  if (!s?.stops[index]) return;
   s.pendingStart = index;
   s.startSource = source;
+  if (s.startIndex == null) s.startsAtOrigin = index === 0;
   $("start").value = String(index);
+  $("confirm").disabled = false;
   active(index);
   edit();
-  startStatus();
 }
-function startStatus() {
+function active(index, field = "boarding") {
   const s = cur();
-  if (!s) return;
-  $("confirm").disabled = s.pendingStart == null;
-  $("resume").hidden = s.startIndex == null;
-  $("startStatus").textContent =
-    s.pendingStart == null
-      ? "Allow GPS to suggest a stop, or choose manually."
-      : `Selected: ${stopLabel(s.stops[s.pendingStart], s.pendingStart)}. Confirm to start counting here.`;
-}
-function active(index) {
-  const s = cur();
-  if (!s || !s.stops[index]) return;
+  if (!s?.stops[index]) return;
   s.activeIndex = index;
+  target = { index, field };
+  replaceOnDigit = true;
   $("active").value = String(index);
-  $("mapStop").value = String(index);
   for (const [i, marker] of markers.entries())
     marker?.setIcon(icon(i, i === index));
-  selectedField = "boarding";
-  replaceOnDigit = true;
   renderCount();
-  if (screen === "review") renderReview();
   persist();
+}
+const rowState = (r) =>
+  r.recorded
+    ? "recorded"
+    : r.unobserved
+      ? "rowSkipped"
+      : rowObserved(r)
+        ? "in_progress"
+        : "notObserved";
+function showIssues(container, result) {
+  container.hidden = !result.issues.length;
+  container.replaceChildren();
+  if (!result.issues.length) return;
+  const title = document.createElement("strong");
+  title.textContent = t("countConflict");
+  const list = document.createElement("ul");
+  for (const issue of result.issues) {
+    const item = document.createElement("li");
+    item.textContent = t(
+      issue.type === "boundary"
+        ? "boundaryConflict"
+        : issue.type === "anchors"
+          ? "anchorConflict"
+          : "negativeConflict",
+      {
+        stop: issue.index === -1 ? t("origin") : issue.index + 1,
+        expected: issue.expected,
+        actual: issue.actual,
+      },
+    );
+    list.append(item);
+  }
+  container.append(title, list);
 }
 function renderCount() {
   const s = cur();
   if (!s) return;
   const row = s.rows[s.activeIndex],
-    onboard = onboardValues(s.rows)[s.activeIndex];
-  $("tripTitle").textContent = `${s.route.route} → ${s.route.dest.en}`;
+    result = calculateOnboard(s);
+  $("tripTitle").textContent =
+    `${s.route.route} → ${name({ name: s.route.dest })}`;
   $("active").value = String(s.activeIndex);
-  for (const field of fields) {
+  $("rowStatus").textContent = t(rowState(row));
+  for (const field of ["boarding", "alighting"]) {
     const input = $(field);
-    input.value =
-      field === "onboard" && row.onboard === "" ? (onboard ?? "") : row[field];
-    input.classList.toggle("selectedField", field === selectedField);
+    input.value = row[field];
+    input.placeholder = row.skipped?.[field] ? t("notApplicable") : "—";
     input.classList.toggle(
-      "derived",
-      field === "onboard" && row.onboard === "" && onboard !== null,
+      "selectedField",
+      target.index === s.activeIndex && target.field === field,
     );
   }
+  const onboard = result.values[s.activeIndex];
+  $("onboard").textContent = onboard ?? t("unknown");
   $("onboardSource").textContent =
-    row.onboard === "" && onboard !== null ? "auto · tap to override" : "";
+    onboard === null
+      ? ""
+      : row.onboard !== ""
+        ? ""
+        : t(result.estimated[s.activeIndex] ? "estimate" : "auto");
+  $("keypadTarget").textContent =
+    `${stopLabel(s.stops[target.index], target.index)} · ${t(target.field)}`;
   $("prev").disabled = s.activeIndex === 0;
   $("next").disabled = s.activeIndex === s.stops.length - 1;
-  $("stopTime").value = row.time;
-  $("stopNotes").value = row.notes;
-  $("nextField").textContent =
-    selectedField === "onboard"
-      ? "Next stop"
-      : selectedField === "boarding"
-        ? "Next: alighting"
-        : "Next: onboard";
-  renderNearby();
+  $("recordNext").textContent = t(
+    s.activeIndex === s.stops.length - 1 ? "recordLast" : "recordNext",
+  );
+  $("nextField").textContent = t(
+    target.field === "boarding"
+      ? "nextField"
+      : s.activeIndex === s.stops.length - 1
+        ? "recordLast"
+        : "recordNext",
+  );
+  for (const [id, value] of [
+    ["stopTime", row.time],
+    ["stopNotes", row.notes],
+    ["initialOnboard", s.initialOnboard],
+    ["finalOnboard", s.finalOnboard],
+    ["knownOnboard", row.onboard],
+  ])
+    if (document.activeElement !== $(id)) $(id).value = value;
+  $("startsAtOrigin").checked = s.startsAtOrigin;
+  $("endsAtTerminus").checked = s.endsAtTerminus;
+  showIssues($("countIssues"), result);
+  updateTable(result);
+  const completed = s.status === "completed";
+  $("saveCompleted").hidden = !completed;
+  for (const id of ["complete", "pause", "abort"]) $(id).hidden = completed;
+  if (completed) $("rowStatus").textContent = t("editCompleted");
+  renderGpsText();
 }
-function selectField(field) {
-  selectedField = field;
-  replaceOnDigit = true;
-  renderCount();
-}
-function enterKey(key) {
+function buildTable() {
   const s = cur();
   if (!s) return;
-  const row = s.rows[s.activeIndex];
-  let value = row[selectedField];
+  const body = $("body");
+  body.replaceChildren();
+  s.rows.forEach((row, index) => {
+    const tr = document.createElement("tr");
+    tr.dataset.i = String(index);
+    const title = document.createElement("td"),
+      button = document.createElement("button");
+    button.className = "stopLink";
+    button.textContent = stopLabel(s.stops[index], index);
+    button.onclick = () => active(index);
+    title.append(button);
+    tr.append(title);
+    for (const field of ["time", "boarding", "alighting", "onboard"]) {
+      const td = document.createElement("td"),
+        input = document.createElement("input");
+      input.dataset.field = field;
+      input.dataset.i = String(index);
+      input.setAttribute(
+        "aria-label",
+        `${t(field === "time" ? "stopTime" : field)} · ${stopLabel(s.stops[index], index)}`,
+      );
+      input.type = field === "time" ? "time" : "text";
+      if (field !== "time") {
+        input.readOnly = true;
+        input.inputMode = "numeric";
+        input.pattern = "[0-9]*";
+        input.onfocus = () => active(index, field);
+        input.onclick = () => active(index, field);
+        bindNumericPaste(input, index, field);
+      } else
+        input.oninput = () => {
+          row.time = input.value;
+          edit();
+        };
+      td.append(input);
+      if (field === "onboard") td.append(document.createElement("small"));
+      tr.append(td);
+    }
+    const statusCell = document.createElement("td"),
+      status = document.createElement("select");
+    status.dataset.rowState = String(index);
+    for (const [key, label] of [
+      ["pending", "notObserved"],
+      ["recorded", "recorded"],
+      ["skipped", "rowSkipped"],
+    ])
+      status.add(new Option(t(label), key));
+    status.onchange = () => {
+      if (status.value === "recorded") recordStop(s, index, hkClock().time);
+      else {
+        row.recorded = false;
+        row.unobserved = status.value === "skipped";
+      }
+      edit();
+      renderCount();
+    };
+    statusCell.append(status);
+    tr.append(statusCell);
+    const notes = document.createElement("td"),
+      input = document.createElement("input");
+    input.dataset.field = "notes";
+    input.type = "text";
+    input.value = row.notes;
+    input.oninput = () => {
+      row.notes = input.value;
+      edit();
+    };
+    notes.append(input);
+    tr.append(notes);
+    body.append(tr);
+  });
+  updateTable(calculateOnboard(s));
+}
+function updateTable(result) {
+  const s = cur();
+  if (!s) return;
+  $("body")
+    .querySelectorAll("tr")
+    .forEach((tr, i) => {
+      const row = s.rows[i];
+      tr.classList.toggle("selectedRow", i === s.activeIndex);
+      tr.querySelectorAll("input").forEach((input) => {
+        const field = input.dataset.field;
+        if (document.activeElement !== input || input.readOnly)
+          input.value =
+            field === "onboard" && row.onboard === ""
+              ? (result.values[i] ?? "")
+              : row[field];
+        input.classList.toggle(
+          "selectedField",
+          target.index === i && target.field === field,
+        );
+        input.classList.toggle(
+          "derived",
+          field === "onboard" &&
+            row.onboard === "" &&
+            result.values[i] !== null,
+        );
+        if (field === "boarding" || field === "alighting")
+          input.placeholder = row.skipped?.[field] ? t("notApplicable") : "—";
+      });
+      tr.querySelector("small").textContent =
+        row.onboard === "" && result.values[i] !== null
+          ? t(result.estimated[i] ? "estimate" : "auto")
+          : "";
+      tr.querySelector("select").value = row.recorded
+        ? "recorded"
+        : row.unobserved
+          ? "skipped"
+          : "pending";
+    });
+}
+function setCount(index, field, value) {
+  if (!validPassengerCount(value)) return false;
+  const row = cur().rows[index];
+  row[field] = value;
+  row.skipped ??= {};
+  row.skipped[field] = false;
+  row.unobserved = false;
+  if (value !== "" && !row.time) row.time = hkClock().time;
+  edit();
+  renderCount();
+  return true;
+}
+function bindNumericPaste(input, index, field) {
+  input.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const i = index ?? cur().activeIndex;
+    setCount(i, field, e.clipboardData.getData("text").trim());
+  });
+}
+function enterKey(key) {
+  const row = cur()?.rows[target.index];
+  if (!row) return;
+  let value = row[target.field];
   if (key === "clear") value = "";
   else if (key === "backspace") value = value.slice(0, -1);
   else if (/^[0-9]$/.test(key))
     value = replaceOnDigit ? key : value === "0" ? key : value + key;
   else return;
-  if (!validPassengerCount(value)) return;
-  replaceOnDigit = false;
-  row[selectedField] = value;
-  if (value !== "" && !row.time) row.time = hkClock().time;
+  if (setCount(target.index, target.field, value)) replaceOnDigit = false;
+}
+function advanceField() {
+  if (target.field === "boarding") {
+    active(cur().activeIndex, "alighting");
+  } else saveStop(true);
+}
+function saveStop(advance = false, noChange = false) {
+  const s = cur();
+  recordStop(s, s.activeIndex, hkClock().time, noChange);
+  s.rows[s.activeIndex].unobserved = false;
   edit();
-  renderCount();
+  if (advance && s.activeIndex < s.stops.length - 1) active(s.activeIndex + 1);
+  else renderCount();
 }
-function nextField() {
-  const i = fields.indexOf(selectedField);
-  if (i < 2) selectField(fields[i + 1]);
-  else if (cur().activeIndex < cur().stops.length - 1)
-    active(cur().activeIndex + 1);
+function pause(status) {
+  const s = cur();
+  s.status = status;
+  s.updatedAt = new Date().toISOString();
+  s[status === "aborted" ? "abortedAt" : "pausedAt"] = s.updatedAt;
+  persist();
+  goHome();
 }
-function renderReview() {
+function complete() {
+  const s = cur();
+  recordStop(s, s.activeIndex, hkClock().time);
+  completeSurvey(s, s.activeIndex);
+  const saved = persist();
+  showScreen("record");
+  if (!saved) {
+    error(t("recordFailed"));
+    $("completedMessage").textContent = t("recordFailed");
+  }
+}
+function renderRecord() {
   const s = cur();
   if (!s) return;
-  const counts = onboardValues(s.rows);
-  $("body").replaceChildren();
+  const result = calculateOnboard(s);
+  $("recordTitle").textContent = `${s.route.route} · ${t(s.status)}`;
+  $("recordSummary").textContent = t("recordSummary", {
+    n: s.rows.filter((r) => r.recorded).length,
+    date: s.date,
+  });
+  $("completedMessage").textContent =
+    s.status === "completed" ? t("completedSaved") : t("pauseHelp");
+  $("uploadStatus").textContent = s.upload?.done ? t("uploaded") : "";
+  showIssues($("recordIssues"), result);
+  renderChart($("chart"), s, t, name);
+  $("recordBody").replaceChildren();
   s.rows.forEach((row, i) => {
     const tr = document.createElement("tr");
-    tr.dataset.i = String(i);
-    tr.classList.toggle("selectedRow", i === s.activeIndex);
-    const td = document.createElement("td"),
-      button = document.createElement("button");
-    button.textContent = stopLabel(s.stops[i], i);
-    button.onclick = () => {
-      active(i);
-      showScreen("count");
-    };
-    td.append(button);
-    tr.append(td);
-    for (const field of ["time", ...fields]) {
+    const label = document.createElement("td");
+    label.textContent = stopLabel(s.stops[i], i);
+    tr.append(label);
+    for (const field of ["boarding", "alighting", "onboard"]) {
       const cell = document.createElement("td");
-      cell.dataset.f = field;
-      cell.textContent = field === "onboard" ? (counts[i] ?? "") : row[field];
-      if (field === "onboard" && row.onboard === "" && counts[i] !== null) {
-        const tag = document.createElement("span");
-        tag.className = "derivedText";
-        tag.textContent = "auto";
-        cell.append(tag);
-      }
+      cell.textContent =
+        field === "onboard"
+          ? (result.values[i] ?? t("unknown"))
+          : row.skipped?.[field]
+            ? t("notApplicable")
+            : row[field];
       tr.append(cell);
     }
-    $("body").append(tr);
+    const status = document.createElement("td");
+    status.textContent = t(rowState(row));
+    tr.append(status);
+    $("recordBody").append(tr);
   });
 }
 const icon = (i, selected) =>
@@ -328,22 +662,17 @@ const icon = (i, selected) =>
   });
 function setFollow(value) {
   followGps = value;
-  $("myLocation").textContent = value ? "Following GPS" : "Follow GPS";
+  $("myLocation").textContent = t(value ? "following" : "follow");
   $("myLocation").setAttribute("aria-pressed", String(value));
-  $("mapMode").textContent = value
-    ? "Following current GPS location"
-    : "Map inspection · tap Follow GPS to resume";
+  $("mapMode").textContent = value ? "" : t("mapInspect");
 }
 function centerMap() {
   if (!map) return;
+  const selected = cur()?.stops[cur()?.activeIndex];
   if (followGps && position)
     map.setView([position.lat, position.lng], 18, { animate: false });
-  else if (!position) {
-    const s = cur(),
-      stop = s?.stops[s.activeIndex];
-    if (validLocation(stop))
-      map.setView([stop.lat, stop.lng], 18, { animate: false });
-  }
+  else if (!position && validLocation(selected))
+    map.setView([selected.lat, selected.lng], 18, { animate: false });
 }
 function setupMap() {
   const s = cur();
@@ -371,7 +700,7 @@ function setupMap() {
         direction: i % 2 ? "left" : "right",
       })
       .on("click", () => {
-        if (mapReturn === "setup") selectPending(i, "manual");
+        if (screen === "setup") selectPending(i, "manual");
         else active(i);
       })
       .addTo(map);
@@ -408,7 +737,7 @@ function updateGps() {
 }
 function locate(restart = false) {
   if (!navigator.geolocation) {
-    $("gps").textContent = "GPS unavailable; choose a stop manually.";
+    $("gps").textContent = t("gpsUnavailable");
     return;
   }
   if (watch !== undefined && !restart) return;
@@ -425,19 +754,15 @@ function locate(restart = false) {
       suggest();
     },
     (e) => {
-      $("gps").textContent =
-        e.code === 1
-          ? "Location permission is off. Choose a stop manually."
-          : "Cannot get a fresh location. Choose manually or retry.";
       position = null;
       nearestIndex = null;
+      $("gps").textContent = t(e.code === 1 ? "gpsDenied" : "gpsUnavailable");
       if (map?.gps) {
         map.gps.remove();
         map.accuracy.remove();
         map.gps = null;
-        map.accuracy = null;
       }
-      renderNearby();
+      renderGpsText();
     },
     { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 },
   );
@@ -445,37 +770,188 @@ function locate(restart = false) {
 function suggest() {
   const s = cur();
   if (!s || !position || Date.now() - position.timestamp > 60000) return;
-  const nearest = nearestStops(s.stops, position)[0];
-  if (!nearest) return;
-  nearestIndex = nearest.index;
-  $("gps").textContent =
-    `GPS ±${Math.round(position.accuracy)} m · Nearest: ${stopLabel(nearest, nearest.index)} (${Math.round(nearest.distance)} m away)`;
+  const candidates = nearestStops(s.stops, position);
+  if (!candidates.length) return;
+  const nearest = candidates[0];
+  const nearby = candidates.filter((x) => x.distance <= nearest.distance + 15);
+  nearestIndex = nearby.reduce(
+    (best, x) =>
+      Math.abs(x.index - s.activeIndex) < Math.abs(best.index - s.activeIndex)
+        ? x
+        : best,
+    nearest,
+  ).index;
   if (
     s.startIndex == null &&
     s.startSource !== "manual" &&
-    s.pendingStart !== nearest.index
+    s.pendingStart !== nearestIndex
   )
-    selectPending(nearest.index, "gps");
-  renderNearby();
+    selectPending(nearestIndex, "gps");
+  renderGpsText();
 }
-function renderNearby() {
+function renderGpsText() {
   const s = cur();
   if (!s) return;
   const fresh =
     position &&
     Date.now() - position.timestamp < 60000 &&
-    nearestIndex !== null;
-  $("nearby").textContent = fresh
-    ? `GPS nearest: ${nearestIndex + 1}. ${s.stops[nearestIndex].name.en}`
-    : "GPS unavailable · choose the stop manually";
-  $("useNearest").hidden = !fresh || nearestIndex === s.activeIndex;
+    nearestIndex !== null &&
+    Boolean(s.stops[nearestIndex]);
   if (fresh)
-    $("useNearest").textContent = `Use nearest stop: ${nearestIndex + 1}`;
+    $("gps").textContent = t("gpsFix", {
+      accuracy: Math.round(position.accuracy),
+      stop: stopLabel(s.stops[nearestIndex], nearestIndex),
+    });
+  else $("gps").textContent = t("gpsUnavailable");
+  $("useNearest").hidden = !fresh || nearestIndex === s.activeIndex;
 }
-function openMap() {
-  mapReturn = screen;
-  showScreen("map");
-  locate();
+function openStopForm(editing) {
+  const s = cur();
+  stopEditIndex = editing ? s.activeIndex : null;
+  $("stopDialogTitle").textContent = t(editing ? "editStop" : "addStop");
+  $("insertLabel").hidden = editing;
+  $("insertPosition").replaceChildren();
+  s.stops.forEach((stop, i) =>
+    $("insertPosition").add(
+      new Option(t("before", { stop: stopLabel(stop, i) }), String(i)),
+    ),
+  );
+  $("insertPosition").add(new Option(t("afterLast"), String(s.stops.length)));
+  $("insertPosition").value = String(s.activeIndex + 1);
+  const stop = editing ? s.stops[s.activeIndex] : null;
+  $("stopNameZh").value = stop?.name.zh || "";
+  $("stopNameEn").value = stop?.name.en || "";
+  $("stopLat").value = stop?.lat ?? "";
+  $("stopLng").value = stop?.lng ?? "";
+  $("stopFormError").hidden = true;
+  $("stopDialog").showModal();
+}
+function saveStopForm(e) {
+  e.preventDefault();
+  const s = cur(),
+    zh = $("stopNameZh").value.trim(),
+    en = $("stopNameEn").value.trim(),
+    a = $("stopLat").value.trim(),
+    b = $("stopLng").value.trim();
+  let message = "";
+  if (!zh && !en) message = t("stopNameRequired");
+  const lat = a === "" ? null : Number(a),
+    lng = b === "" ? null : Number(b);
+  if (
+    (a === "") !== (b === "") ||
+    (a !== "" &&
+      (!Number.isFinite(lat) ||
+        !Number.isFinite(lng) ||
+        Math.abs(lat) > 90 ||
+        Math.abs(lng) > 180))
+  )
+    message = t("invalidCoordinates");
+  if (message) {
+    $("stopFormError").textContent = message;
+    $("stopFormError").hidden = false;
+    return;
+  }
+  if (stopEditIndex === null) {
+    const i = +$("insertPosition").value;
+    insertStop(s, i, {
+      id: `custom:${crypto.randomUUID()}`,
+      name: { zh, en },
+      lat,
+      lng,
+    });
+    target.index = s.activeIndex;
+  } else {
+    const stop = s.stops[stopEditIndex];
+    stop.original ??= { name: { ...stop.name }, lat: stop.lat, lng: stop.lng };
+    Object.assign(stop, { name: { zh, en }, lat, lng, modified: true });
+    s.routeEdits.push({
+      type: "edit",
+      id: stop.id,
+      index: stopEditIndex,
+      at: new Date().toISOString(),
+    });
+  }
+  edit();
+  $("stopDialog").close();
+  buildStopOptions();
+  buildTable();
+  setupMap();
+  renderCount();
+}
+async function findSections(e) {
+  e?.preventDefault();
+  const s = cur();
+  $("sectionChoice").replaceChildren();
+  sectionOptions = [];
+  sectionStops = [];
+  $("sectionStops").replaceChildren();
+  $("sectionOverlap").replaceChildren();
+  $("joinSection").disabled = true;
+  try {
+    data = await routes(dataStatus);
+    sectionOptions = variants(data, $("sectionNumber").value, s.route.operator);
+    sectionOptions.forEach((route, i) =>
+      $("sectionChoice").add(
+        new Option(
+          `${route.route} · ${name({ name: route.orig })} → ${name({ name: route.dest })} · ${route.stopIds.length}`,
+          String(i),
+        ),
+      ),
+    );
+    chooseSection();
+  } catch {
+    $("sectionPreview").textContent = t("dataUnavailable");
+  }
+}
+function chooseSection() {
+  const route = sectionOptions[+$("sectionChoice").value];
+  if (!route) {
+    $("sectionPreview").textContent = t("noMatches");
+    return;
+  }
+  sectionStops = stopsFor(route, data);
+  $("sectionOverlap").replaceChildren();
+  for (let i = 0; i < sectionStops.length; i++)
+    $("sectionOverlap").add(
+      new Option(i ? t("skipPrefix", { n: i }) : t("keepAll"), String(i)),
+    );
+  const overlap = overlapCount(cur().stops, sectionStops);
+  $("sectionOverlap").value = String(
+    overlap === sectionStops.length ? 0 : overlap,
+  );
+  renderSectionPreview();
+}
+function renderSectionPreview() {
+  if (!sectionStops.length) return;
+  const skip = +$("sectionOverlap").value,
+    s = cur();
+  $("sectionPreview").textContent =
+    t("joinPreview", {
+      old: s.stops.length,
+      skip,
+      added: sectionStops.length - skip,
+    }) +
+    " " +
+    t("joinEnd", { stop: name(sectionStops.at(-1)) });
+  $("sectionStops").replaceChildren();
+  sectionStops.slice(skip).forEach((stop, i) => {
+    const li = document.createElement("li");
+    li.textContent = stopLabel(stop, s.stops.length + i);
+    $("sectionStops").append(li);
+  });
+  $("joinSection").disabled = skip >= sectionStops.length;
+}
+function joinSection() {
+  const s = cur(),
+    route = sectionOptions[+$("sectionChoice").value];
+  if (!route) return;
+  appendSection(s, route, sectionStops, +$("sectionOverlap").value);
+  edit();
+  $("sectionDialog").close();
+  buildStopOptions();
+  buildTable();
+  setupMap();
+  renderCount();
 }
 function download() {
   const s = cur();
@@ -492,39 +968,41 @@ function download() {
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 }
-async function upload(withCSV) {
+async function upload() {
   const s = cur();
-  if (withCSV) download();
-  if (s.startIndex == null)
-    return error("Confirm the starting stop before uploading.");
-  if (!s.rows.some((r) => Object.values(r).some((v) => v !== "")))
-    return error("Enter passenger data before uploading.");
-  $("upload").disabled = $("both").disabled = true;
+  if (uploadBusy) return;
+  if (!s.rows.some(rowObserved)) return error(t("noObservations"));
+  uploadBusy = true;
+  $("upload").disabled = true;
   try {
-    $("uploadStatus").textContent = "Uploading…";
+    $("uploadStatus").textContent = t("uploading");
     await uploadSurvey(s, persist);
-    $("uploadStatus").textContent = "Survey uploaded; local copy retained.";
-  } catch (e) {
-    error(`Upload failed: ${e.message}`);
-    $("uploadStatus").textContent = "Local survey retained.";
+    $("uploadStatus").textContent = t("uploaded");
+  } catch {
+    error(t("uploadError"));
   } finally {
-    $("upload").disabled = $("both").disabled = false;
+    uploadBusy = false;
+    $("upload").disabled = false;
   }
 }
-for (const [code, name] of Object.entries(OPERATORS))
-  $("operator").add(new Option(name, code));
+$("language").onchange = () => setLanguage($("language").value);
 $("surveyor").value = loadSurveyor();
 $("surveyor").oninput = () => {
   try {
     saveSurveyor($("surveyor").value);
   } catch {
-    error("Cannot save the surveyor name.");
-  }
-  if (cur()) {
-    cur().surveyor = $("surveyor").value;
-    edit();
+    error(t("saveError"));
   }
 };
+$("new").onclick = () => {
+  state.currentId = null;
+  showScreen("setup");
+};
+$("setupHome").onclick = () => {
+  if (cur()?.status === "in_progress") cur().status = "paused";
+  goHome();
+};
+$("recordHome").onclick = goHome;
 $("search").onsubmit = (e) => {
   e.preventDefault();
   search();
@@ -543,40 +1021,35 @@ $("refreshData").onclick = async () => {
     $("refreshData").disabled = false;
   }
 };
-$("saved").onchange = () => {
-  state.currentId = $("saved").value || null;
-  persist();
-  renderSurvey();
-  if (cur()?.startIndex != null) showScreen("count");
-};
-$("new").onclick = () => {
-  state.currentId = null;
-  persist();
-  renderSurvey();
-};
-for (const field of ["date", "vehicle", "notes"])
-  $(field).oninput = () => {
-    cur()[field] = $(field).value;
+for (const f of ["date", "vehicle", "notes"])
+  $(f).oninput = () => {
+    cur()[f] = $(f).value;
     edit();
-    list();
   };
 $("start").onchange = () => {
   if ($("start").value === "") {
     cur().pendingStart = null;
     cur().startSource = "manual";
+    $("confirm").disabled = true;
     edit();
-    startStatus();
   } else selectPending(+$("start").value, "manual");
 };
 $("confirm").onclick = () => {
   const s = cur();
   if (s.pendingStart == null) return;
+  if (s.startIndex !== s.pendingStart) s.startsAtOrigin = s.pendingStart === 0;
   s.startIndex = s.pendingStart;
+  s.status = "in_progress";
+  s.endIndex = null;
+  s.completedAt = null;
   active(s.startIndex);
   edit();
   showScreen("count");
 };
-$("resume").onclick = () => showScreen("count");
+$("resume").onclick = () => {
+  if (cur().status !== "completed") cur().status = "in_progress";
+  showScreen("count");
+};
 $("settings").onclick = () => showScreen("setup");
 $("active").onchange = () => active(+$("active").value);
 $("prev").onclick = () => active(cur().activeIndex - 1);
@@ -589,21 +1062,9 @@ $("useNearest").onclick = () => {
   )
     active(nearestIndex);
 };
-for (const field of fields) {
-  $(field).onfocus = () => selectField(field);
-  $(field).onclick = () => selectField(field);
-  $(field).addEventListener("paste", (e) => {
-    e.preventDefault();
-    const value = e.clipboardData.getData("text");
-    if (validPassengerCount(value)) {
-      const row = cur().rows[cur().activeIndex];
-      row[field] = value;
-      if (value && !row.time) row.time = hkClock().time;
-      replaceOnDigit = false;
-      edit();
-      renderCount();
-    }
-  });
+for (const f of ["boarding", "alighting"]) {
+  $(f).onfocus = $(f).onclick = () => active(cur().activeIndex, f);
+  bindNumericPaste($(f), null, f);
 }
 $("keypad").onpointerdown = (e) => {
   if (e.target.closest("button")) e.preventDefault();
@@ -612,45 +1073,109 @@ $("keypad").onclick = (e) => {
   const key = e.target.closest("[data-key]")?.dataset.key;
   if (key) enterKey(key);
 };
-$("nextField").onclick = nextField;
+$("nextField").onclick = advanceField;
+for (const [f, id] of [
+  ["boarding", "skipBoarding"],
+  ["alighting", "skipAlighting"],
+])
+  $(id).onclick = () => {
+    skipField(cur(), cur().activeIndex, f);
+    edit();
+    if (f === "boarding") active(cur().activeIndex, "alighting");
+    else saveStop(true);
+  };
+$("noChange").onclick = () => saveStop(true, true);
+$("recordNext").onclick = () => saveStop(true);
+$("recordStay").onclick = () => saveStop(false);
+$("skipStop").onclick = () => {
+  const s = cur(),
+    r = s.rows[s.activeIndex];
+  r.unobserved = true;
+  r.recorded = false;
+  edit();
+  if (s.activeIndex < s.stops.length - 1) active(s.activeIndex + 1);
+  else renderCount();
+};
 document.addEventListener("keydown", (e) => {
-  if (screen !== "count" || e.ctrlKey || e.altKey || e.metaKey) return;
-  const editing = document.activeElement;
-  if (editing && ["stopTime", "stopNotes", "active"].includes(editing.id))
+  if (
+    screen !== "count" ||
+    document.querySelector("dialog[open]") ||
+    e.ctrlKey ||
+    e.altKey ||
+    e.metaKey
+  )
     return;
+  const el = document.activeElement;
+  if (el?.matches("input:not([readonly]),textarea,select")) return;
   if (/^[0-9]$/.test(e.key)) {
     e.preventDefault();
     enterKey(e.key);
   } else if (e.key === "Backspace" || e.key === "Delete") {
     e.preventDefault();
     enterKey(e.key === "Backspace" ? "backspace" : "clear");
-  } else if (e.key === "Enter" && fields.includes(editing?.id)) {
+  } else if (e.key === "Enter" && el?.matches("input[readonly]")) {
     e.preventDefault();
-    nextField();
+    advanceField();
   }
 });
-$("stopTime").oninput = () => {
-  cur().rows[cur().activeIndex].time = $("stopTime").value;
-  edit();
-};
-$("stopNotes").oninput = () => {
-  cur().rows[cur().activeIndex].notes = $("stopNotes").value;
-  edit();
-};
-$("setupMap").onclick = $("checkMap").onclick = openMap;
-$("mapBack").onclick = () => showScreen(mapReturn);
-$("useMapStop").onclick = () => {
-  if (mapReturn === "setup") {
-    selectPending(+$("mapStop").value, "manual");
-    showScreen("setup");
-  } else {
-    active(+$("mapStop").value);
-    showScreen("count");
+for (const [id, field] of [
+  ["stopTime", "time"],
+  ["stopNotes", "notes"],
+])
+  $(id).oninput = () => {
+    cur().rows[cur().activeIndex][field] = $(id).value;
+    edit();
+    updateTable(calculateOnboard(cur()));
+  };
+for (const field of ["initialOnboard", "finalOnboard", "knownOnboard"])
+  $(field).oninput = () => {
+    const s = cur(),
+      value = $(field).value,
+      old = field === "knownOnboard" ? s.rows[s.activeIndex].onboard : s[field];
+    if (!validPassengerCount(value)) {
+      $(field).value = old;
+      return;
+    }
+    if (field === "knownOnboard") s.rows[s.activeIndex].onboard = value;
+    else s[field] = value;
+    edit();
+    renderCount();
+  };
+for (const field of ["startsAtOrigin", "endsAtTerminus"])
+  $(field).onchange = () => {
+    cur()[field] = $(field).checked;
+    edit();
+    renderCount();
+  };
+$("allStops").ontoggle = () => {
+  if (cur()) {
+    cur().tableExpanded = $("allStops").open;
+    persist();
   }
 };
-$("mapStop").onchange = () => {
-  if (mapReturn === "setup") selectPending(+$("mapStop").value, "manual");
-  else active(+$("mapStop").value);
+$("complete").onclick = complete;
+$("pause").onclick = () => pause("paused");
+$("abort").onclick = () => pause("aborted");
+$("saveCompleted").onclick = () => {
+  edit();
+  showScreen("record");
+};
+$("editRecord").onclick = () => {
+  target = { index: cur().activeIndex, field: "boarding" };
+  showScreen("count");
+};
+$("csv").onclick = download;
+$("upload").onclick = upload;
+$("toggleMap").onclick = () => {
+  $("mapContents").hidden = !$("mapContents").hidden;
+  $("toggleMap").textContent = t(
+    $("mapContents").hidden ? "showMap" : "hideMap",
+  );
+  if (!$("mapContents").hidden)
+    requestAnimationFrame(() => {
+      map?.invalidateSize();
+      centerMap();
+    });
 };
 $("myLocation").onclick = () => {
   setFollow(true);
@@ -659,7 +1184,7 @@ $("myLocation").onclick = () => {
 };
 $("locate").onclick = () => locate(true);
 $("selectedStop").onclick = () => {
-  const stop = cur().stops[cur().activeIndex];
+  const stop = cur()?.stops[cur()?.activeIndex];
   if (map && validLocation(stop)) {
     setFollow(false);
     map.setView([stop.lat, stop.lng], 18, { animate: false });
@@ -671,39 +1196,65 @@ $("whole").onclick = () => {
     .map((s) => [s.lat, s.lng]);
   if (map && points.length) {
     setFollow(false);
-    map.fitBounds(points, { padding: [30, 30] });
+    map.fitBounds(points, { padding: [25, 25] });
   }
 };
-$("review").onclick = $("finish").onclick = () => showScreen("review");
-$("reviewBack").onclick = () => showScreen("count");
-$("csv").onclick = download;
-$("upload").onclick = () => upload(false);
-$("both").onclick = () => upload(true);
+$("addStop").onclick = () => openStopForm(false);
+$("editStop").onclick = () => openStopForm(true);
+$("stopForm").onsubmit = saveStopForm;
+$("cancelStop").onclick = () => $("stopDialog").close();
+$("stopUseGps").onclick = () => {
+  if (position && Date.now() - position.timestamp < 60000) {
+    $("stopLat").value = position.lat;
+    $("stopLng").value = position.lng;
+  } else {
+    $("stopFormError").textContent = t("gpsUnavailable");
+    $("stopFormError").hidden = false;
+  }
+};
+$("continueRoute").onclick = () => {
+  $("sectionNumber").value = cur().route.route;
+  $("sectionDialog").showModal();
+  findSections();
+};
+$("sectionSearch").onsubmit = findSections;
+$("sectionChoice").onchange = chooseSection;
+$("sectionOverlap").onchange = renderSectionPreview;
+$("joinSection").onclick = joinSection;
+$("cancelSection").onclick = () => $("sectionDialog").close();
 const query = state.search || {};
+const initialScreen = state.screen || cur()?.screen;
 $("route").value = query.number || "";
+setLanguage(state.language);
 $("operator").value = query.operator || "";
 $("upcoming").value = query.upcoming || "30";
-const resumeScreen = cur()?.screen;
-renderSurvey();
-if (cur()?.startIndex != null)
-  showScreen(resumeScreen === "setup" ? "setup" : "count");
-else showScreen("setup");
-persist();
+if (cur()) {
+  target = { index: cur().activeIndex || 0, field: "boarding" };
+  $("allStops").open = cur().tableExpanded === true;
+  showScreen(
+    cur().status === "completed"
+      ? "record"
+      : initialScreen === "count" && cur().status === "in_progress"
+        ? "count"
+        : initialScreen === "setup"
+          ? "setup"
+          : "home",
+  );
+} else showScreen("home");
 if (query.number) search();
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
     if (data && matches.length) renderMatches();
-    if (cur()) locate(true);
+    if (cur() && (screen === "count" || screen === "setup")) locate(true);
   }
 });
 setInterval(() => {
   if (data && matches.length) renderMatches();
-  renderNearby();
+  if (cur()) renderGpsText();
 }, 60000);
-if (!window.PassengerCountAndroid && "serviceWorker" in navigator)
-  navigator.serviceWorker.register("./sw.js").catch(() => {});
-
 window.addEventListener("government-data-updated", () => {
   if (screen === "setup" && $("route").value.trim()) search();
 });
+if (!window.PassengerCountAndroid && "serviceWorker" in navigator)
+  navigator.serviceWorker.register("./sw.js").catch(() => {});

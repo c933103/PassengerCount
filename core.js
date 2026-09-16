@@ -1,3 +1,5 @@
+import { calculateOnboard, rowObserved } from "./survey.js";
+export { emptyRow, validPassengerCount } from "./survey.js";
 import { governmentServiceStatus, agencyStopName } from "./government.js";
 export const OPERATORS = {
   kmb: "KMB",
@@ -120,32 +122,9 @@ export function stopsFor(route, data) {
     };
   });
 }
-export const emptyRow = () => ({
-  time: "",
-  boarding: "",
-  alighting: "",
-  onboard: "",
-  notes: "",
-});
 const count = (v) => (v === "" || v == null ? null : Number(v));
 export function onboardValues(rows) {
-  const out = rows.map((r) => count(r.onboard)),
-    ref = out.findLastIndex((v) => v !== null && Number.isFinite(v));
-  if (ref < 0) return out;
-  let cur = out[ref];
-  for (let i = ref - 1; i >= 0; i--) {
-    cur -=
-      (count(rows[i + 1].boarding) || 0) - (count(rows[i + 1].alighting) || 0);
-    if (out[i] !== null) cur = out[i];
-    else out[i] = cur;
-  }
-  cur = out[ref];
-  for (let i = ref + 1; i < rows.length; i++) {
-    cur += (count(rows[i].boarding) || 0) - (count(rows[i].alighting) || 0);
-    if (out[i] !== null) cur = out[i];
-    else if (rows[i].boarding !== "" || rows[i].alighting !== "") out[i] = cur;
-  }
-  return out;
+  return calculateOnboard({ rows }).values;
 }
 export function distance(a, b) {
   const R = Math.PI / 180,
@@ -168,10 +147,11 @@ const csv = (v) => {
   return /[",\r\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
 };
 export function records(s) {
-  const values = onboardValues(s.rows);
+  const calculation = calculateOnboard(s),
+    values = calculation.values;
   let total = null;
   return s.rows.map((r, i) => {
-    const observed = Object.values(r).some((v) => v !== "");
+    const observed = rowObserved(r);
     if (total === null && (observed || values[i] !== null))
       total = values[i] ?? (count(r.boarding) || 0);
     else if (total !== null) total += count(r.boarding) || 0;
@@ -184,6 +164,8 @@ export function records(s) {
       total,
       observed,
       derived: r.onboard === "" && values[i] !== null,
+      countSource: calculation.sources[i],
+      estimated: calculation.estimated[i],
     };
   });
 }
@@ -214,6 +196,15 @@ export function makeCSV(s) {
         "Confirmed start sequence",
         s.startIndex == null ? "" : s.startIndex + 1,
       ],
+      ["Status", s.status || "in_progress"],
+      ["Completed at", s.completedAt || ""],
+      ["End stop", s.endIndex == null ? "" : s.endIndex + 1],
+      ["Known onboard before start", s.initialOnboard || ""],
+      ["Known onboard after end", s.finalOnboard || ""],
+      ["Start zero assumption", s.startsAtOrigin === true],
+      ["End zero assumption", s.endsAtTerminus !== false],
+      ["Calculation issues", JSON.stringify(calculateOnboard(s).issues)],
+      ["Route corrections", JSON.stringify(s.routeEdits || [])],
       ["Notes", s.notes],
       [],
       ["PASSENGER DATA"],
@@ -229,6 +220,11 @@ export function makeCSV(s) {
         "cumulative_boarding",
         "onboard_source",
         "notes",
+        "recorded",
+        "boarding_not_applicable",
+        "alighting_not_applicable",
+        "custom_stop",
+        "onboard_estimated",
       ],
     ];
   for (const x of records(s))
@@ -244,10 +240,11 @@ export function makeCSV(s) {
       x.total,
       x.derived ? "calculated" : x.onboard == null ? "" : "entered",
       x.notes,
+      x.recorded === true,
+      x.skipped?.boarding === true,
+      x.skipped?.alighting === true,
+      x.custom === true || x.modified === true,
+      x.estimated,
     ]);
   return "\uFEFF" + rows.map((r) => r.map(csv).join(",")).join("\r\n");
 }
-
-export const validPassengerCount = (value) =>
-  value === "" ||
-  (/^[0-9]+$/.test(value) && Number.isSafeInteger(Number(value)));

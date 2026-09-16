@@ -52,7 +52,7 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.1");
+        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.2");
         web.addJavascriptInterface(new DeviceStorage(), "PassengerCountAndroid");
         web.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -119,7 +119,7 @@ public final class MainActivity extends Activity {
             connection.setConnectTimeout(20000);
             connection.setReadTimeout(60000);
             connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("User-Agent", "PassengerCount/1.1");
+            connection.setRequestProperty("User-Agent", "PassengerCount/1.2");
             if (connection.getResponseCode() != 200) { connection.disconnect(); return missing(); }
             Map<String, String> headers = new HashMap<>();
             headers.put("Cache-Control", "no-store");
@@ -163,6 +163,10 @@ public final class MainActivity extends Activity {
             // commit(), not apply(): the next JS event only runs after this edit reaches disk.
             return allowed(key) && value != null && prefs.edit().putString(key, value).commit();
         }
+        @JavascriptInterface public void setLanguage(String language) {
+            if ("en".equals(language) || "yue-Hant-HK".equals(language))
+                prefs.edit().putString("language", language).commit();
+        }
         @JavascriptInterface public void saveCsv(String content, String filename) {
             runOnUiThread(() -> exportCsv(content, filename));
         }
@@ -202,7 +206,18 @@ public final class MainActivity extends Activity {
         } catch (IOException e) { toast("CSV could not be saved. Your survey is still in the app; try again."); }
         finally { pendingExport().delete(); }
     }
-    private void toast(String message) { Toast.makeText(this, message, Toast.LENGTH_LONG).show(); }
+    private void toast(String message) {
+        if (!"en".equals(getSharedPreferences("surveys", MODE_PRIVATE).getString("language", "yue-Hant-HK"))) {
+            switch (message) {
+                case "No browser available.": message = "未有可用的瀏覽器。"; break;
+                case "Finish or cancel the current export first.": message = "請先完成或取消目前的匯出。"; break;
+                case "Cannot open the file picker. Your survey is still saved in the app.": message = "未能開啟檔案選擇器。點算記錄仍保存在應用程式內。"; break;
+                case "CSV saved.": message = "已儲存 CSV。"; break;
+                case "CSV could not be saved. Your survey is still in the app; try again.": message = "未能儲存 CSV。點算記錄仍保存在應用程式內，請再試。"; break;
+            }
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
     @Override protected void onPause() { super.onPause(); if (web != null) web.onPause(); }
     @Override protected void onResume() { super.onResume(); if (web != null) web.onResume(); }
     @Override protected void onDestroy() {

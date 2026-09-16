@@ -4,26 +4,32 @@ An Android app and web app for bus passenger surveys.
 
 ## Use on Android
 
-1. Download **PassengerCount-1.1.apk** to your phone and open it.
+1. Download **PassengerCount-1.2.apk** to your phone and open it.
 2. If Android asks, allow this download source to install the app, then tap **Install**.
 3. Open **PassengerCount** from your home screen. Enter your name once, find a route, and choose a direction / variation.
-4. Allow location access to get a suggested starting stop. Confirm it or choose another stop. The app opens a compact screen with the selected stop, three count fields and a large 0–9 keypad.
+4. Allow location access to get a suggested starting stop. Confirm it or choose another stop. The app opens counting with a live map, selected stop, boarding / alighting fields and a large 0–9 keypad. Cantonese (Hong Kong, Traditional Chinese) is the default; the header switches to English and remembers your choice.
 
 No terminal, Python, npm or local server is needed to use the Android app. Requires Android 8 or newer and an up-to-date Android System WebView.
 
-The app bundles its interface and map library. Every edit, selected route, confirmed start and active stop is committed immediately to app-private device storage, so it survives Android stopping the app or discarding its WebView. **Finish / export → Save CSV** opens Android's file picker. Uninstalling the app or clearing its app data removes local surveys; exported CSV files are independent copies. Surveys in a browser are separate from those in the Android app.
+The app bundles its interface and map library. Every edit, selected route, confirmed start and active stop is committed immediately to app-private device storage, so it survives Android stopping the app or discarding its WebView. **Complete and save** marks the record completed and opens its passenger charts. No export or network connection is needed to keep a record. **Export CSV** is an optional independent copy and opens Android's file picker. Uninstalling the app or clearing its app data removes local surveys; exported CSV files are independent copies. Surveys in a browser are separate from those in the Android app.
 
 Government routes, stops and timetables are bundled, so route selection and counting work on the first launch offline. Internet is needed for map tiles, timetable refreshes and database uploads. The Android app refreshes government data in the background once the saved catalogue is 14 days old; **Time filter & government data → Update government data** also refreshes it manually. Downloads are processed in a worker so the counting screen stays responsive. Failed updates retain the bundled or saved government catalogue. GPS permission is optional, and start stops can always be chosen manually.
 
 ## Survey features
 
-- Remembered surveyor and saved surveys.
+- Remembered surveyor and a home screen listing draft, counting, paused, aborted and completed records. Pause or abort returns home without deleting observations; records can be resumed or reviewed.
 - Hong Kong time and published schedules prioritize route variants running or starting soon; other variants can be expanded. This is timetable guidance, not live bus tracking.
 - KMB, Long Win, Citybus, New Lantao Bus, MTR Bus, green minibuses, Discovery Bay, Park Island and cross-boundary coaches, from the Transport Department government GTFS feed.
 - GPS suggestions, manual starting stops, the map stop picker and the counting stop picker update the same active row. Confirming the start opens counting mode; saved surveys reopen in counting mode.
 - Passenger counts accept non-negative whole numbers only. The built-in keypad has digits, backspace and clear; hardware digits and valid numeric paste are supported. Letters, signs, decimals and exponent notation are rejected.
 - Street-level map with numbered, named stops, current location and location accuracy. It follows every GPS fix by default. Dragging the map, inspecting a selected stop or viewing the whole route pauses following; **Follow GPS** resumes it. GPS never silently changes a confirmed entry stop; **Use nearest stop** changes it explicitly.
-- **Backward calculation is intentional:** a known onboard count calculates unobserved earlier stops. Derived counts remain distinct from entered values.
+- Skip boarding or alighting independently when not applicable. **No passenger change** explicitly records both counts as zero, including at the final stop. Unobserved, skipped and recorded stops remain distinguishable.
+- Onboard is calculated rather than required on every stop. Optional known counts can anchor the trip immediately before the starting stop, after the ending stop, or after any individual stop. A trip starting at the route origin assumes an empty vehicle unless a known initial count is entered. Completing at the actual last stop assumes an empty vehicle there unless a known final count is entered. Both assumptions can be disabled for through services or split circular routes.
+- **Backward calculation is intentional:** a known onboard count calculates unobserved earlier stops. Unknown changes are temporarily treated as zero, with inferred values marked as estimates where that assumption affects the calculation. Without an anchor, absolute onboard counts remain unknown. Negative counts, incompatible manual counts and conflicting empty-endpoint assumptions are shown for correction; the app does not silently force totals to match.
+- Expand the full editable stop table at any time while counting. Select a numeric cell and use the keypad to correct it; time, notes and recorded status can also be edited. The live map and selected stop stay above the table.
+- Completed records are saved internally and show boarding / alighting bars and an onboard trend line. Unknown onboard values leave gaps in the line. Completed records remain editable with immediate autosave.
+- Add missing stops before or after any stop, optionally using current GPS coordinates. Edit incorrect stop names or locations. Corrections apply to the survey snapshot and retain existing counts and sequence alignment.
+- Join another government route section into the same survey. The app suggests matching suffix/prefix overlap and previews exactly which stops will be appended. Override the overlap or keep all stops for another lap. Later repeat visits to the same stop are retained; observations are never globally deduplicated. Joining clears the old final boundary and retains an explicitly known previous final count as an observation at that stop.
 - CSV export and the existing Supabase database upload.
 
 ## Government data and attribution
@@ -38,7 +44,7 @@ Regenerate the bundled catalogue with `node scripts/build-government-data.mjs [e
 
 ## Developer build
 
-The Android wrapper uses the platform WebView with packaged assets on a restricted HTTPS origin. It has no native third-party dependencies and requests only internet and foreground location permissions. Third-party pages open in a separate browser; the app blocks frames, remote scripts, file access and cleartext traffic. The JavaScript bridge only exposes the two survey storage keys and CSV export.
+The Android wrapper uses the platform WebView with packaged assets on a restricted HTTPS origin. It has no native third-party dependencies and requests only internet and foreground location permissions. Third-party pages open in a separate browser; the app blocks frames, remote scripts, file access and cleartext traffic. The JavaScript bridge exposes the two survey storage keys, a restricted language preference and CSV export.
 
 Install JDK 17, Android SDK Platform 35 and Build Tools 35.0.0. Keep the signing keystore outside this repository and retain it for future updates. Set these environment variables, then run `bash android/build.sh`:
 
@@ -56,7 +62,7 @@ For web development only, serve this directory with any static web server. Deplo
 
 ## Validation and device checklist
 
-The build checks the APK signature. Automated tests cover government feed conversion and timetables, stop synchronization, live map following and pause/resume, numeric input rejection, backward calculations, CSV export, storage failures and restoration into a fresh browser context. These tests do not replace Android device testing.
+The build checks the APK signature. Automated tests cover government feed conversion and timetables, stop synchronization, live map following, numeric input rejection, skipped fields, zero-change final stops, boundary deductions and inconsistencies, in-progress table editing, missing stops and overlapping circular sections, pause/abort/resume, completion and charts, both languages, CSV export, storage failures and restoration into a fresh browser context. These tests do not replace Android device testing.
 
 Before wider distribution, install on a phone and check precise/approximate/denied location, CSV save/cancel, screen rotation, keyboard/system bar insets, offline restart and force-stop recovery. No physical Android device or emulator was available during the initial build.
 

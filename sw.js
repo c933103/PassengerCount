@@ -1,9 +1,12 @@
-const C = "passenger-count-v4";
+const C = "passenger-count-v5";
 const F = [
   "./",
   "./index.html",
   "./app.js",
   "./core.js",
+  "./survey.js",
+  "./i18n.js",
+  "./charts.js",
   "./data.js",
   "./government.js",
   "./route-worker.js",
