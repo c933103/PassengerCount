@@ -9,8 +9,19 @@ const valid = (x) =>
   x?.source?.id === GOVERNMENT_SOURCE && x.routeList && x.stopList;
 const description = (x) =>
   `Transport Department government data · ${new Date(x.source.publishedAt || x.source.retrievedAt).toISOString().slice(0, 10)}`;
+// Service data uses Hong Kong time, regardless of the phone's timezone.
+export function mostRecentSunday(now = Date.now()) {
+  const hk = new Date(Number(now) + 8 * 3600000);
+  return Date.UTC(hk.getUTCFullYear(), hk.getUTCMonth(),
+    hk.getUTCDate() - hk.getUTCDay()) - 8 * 3600000;
+}
+export function needsRouteRefresh(retrievedAt, now = Date.now()) {
+  const updated = Date.parse(retrievedAt);
+  return !Number.isFinite(updated) || updated < mostRecentSunday(now);
+}
 function update() {
   if (updating) return updating;
+  globalThis.dispatchEvent(new Event("government-data-updating"));
   updating = new Promise((resolve, reject) => {
     const worker = new Worker("./route-worker.js", { type: "module" }),
       timer = setTimeout(() => {
@@ -32,6 +43,7 @@ function update() {
     worker.postMessage({ native: !!globalThis.PassengerCountAndroid });
   }).finally(() => {
     updating = null;
+    globalThis.dispatchEvent(new Event("government-data-update-finished"));
   });
   return updating;
 }
@@ -39,10 +51,11 @@ function refreshIfStale(value, status) {
   if (
     autoAttempted ||
     !globalThis.PassengerCountAndroid ||
-    Date.now() - Date.parse(value.source.retrievedAt) < 14 * 86400000
+    !needsRouteRefresh(value.source.retrievedAt)
   )
     return;
   autoAttempted = true;
+  status("Downloading government routes and timetables…");
   update()
     .then(async (fresh) => {
       if (!valid(fresh)) throw Error("Invalid government data");
@@ -59,13 +72,22 @@ function refreshIfStale(value, status) {
       ),
     );
 }
+export function checkRouteUpdates(status) {
+  // Returning to an already-running app is also an opening, including after
+  // the weekly cutoff or a failed offline attempt. Share any in-flight worker.
+  if (!updating) autoAttempted = false;
+  return routes(status);
+}
 export async function routes(status, force = false) {
   if (current && !force) {
     status(description(current));
     refreshIfStale(current, status);
     return current;
   }
-  if (pending) return pending;
+  if (pending) {
+    const value = await pending;
+    return force ? routes(status, true) : value;
+  }
   pending = (async () => {
     let cached;
     try {
@@ -94,6 +116,7 @@ export async function routes(status, force = false) {
       return (current = fallback);
     }
     try {
+      autoAttempted = true;
       status("Downloading government routes and timetables…");
       const fresh = await update();
       if (!valid(fresh)) throw Error("Invalid government data");

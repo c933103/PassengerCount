@@ -24,7 +24,7 @@ import {
 import { DEFAULT_LANGUAGE, translate } from "./i18n.js";
 import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
-import { routes } from "./data.js";
+import { routes, checkRouteUpdates } from "./data.js";
 import { uploadSurvey } from "./upload.js";
 const $ = (id) => document.getElementById(id);
 const state = load();
@@ -302,11 +302,15 @@ function openSurvey(id, mode) {
 }
 function dataStatus(raw) {
   const date = /\d{4}-\d{2}-\d{2}/.exec(raw)?.[0];
-  $("dataStatus").textContent = /Loading|Downloading/.test(raw)
+  const message = /Loading|Downloading/.test(raw)
     ? t("dataLoading")
-    : date
+    : /unavailable|Offline|failed|timed out/i.test(raw)
+      ? t("dataUnavailable")
+      : date
       ? t("governmentData", { date })
       : t("dataUnavailable");
+  $("dataStatus").textContent = message;
+  $("settingsDataStatus").textContent = message;
 }
 async function search(force = false) {
   const number = $("route").value.trim();
@@ -1166,14 +1170,24 @@ $("search").onsubmit = (e) => {
   search();
 };
 $("operator").onchange = () => search();
-$("refreshData").onclick = async () => {
-  $("refreshData").disabled = true;
-  try {
-    await search(true);
-  } finally {
-    $("refreshData").disabled = false;
-  }
+const updateButtons = (busy) => {
+  for (const id of ["refreshData", "settingsRefreshData"]) $(id).disabled = busy;
 };
+async function refreshGovernmentData() {
+  updateButtons(true);
+  try {
+    data = await routes(dataStatus, true);
+    if (screen === "setup" && $("route").value.trim()) await search();
+  } catch {
+    dataStatus("Update unavailable");
+  } finally {
+    updateButtons(false);
+  }
+}
+$("refreshData").onclick = refreshGovernmentData;
+$("settingsRefreshData").onclick = refreshGovernmentData;
+window.addEventListener("government-data-updating", () => updateButtons(true));
+window.addEventListener("government-data-update-finished", () => updateButtons(false));
 for (const f of ["date", "vehicle", "notes"])
   $(f).oninput = () => {
     cur()[f] = $(f).value;
@@ -1438,9 +1452,15 @@ try {
   if (result) exportResult(JSON.parse(result));
 } catch {}
 if (query.number) search();
+// Start the catalogue check on every launch, even on Home with no previous search.
+// The saved/bundled catalogue resolves immediately while refresh runs in a worker.
+else checkRouteUpdates(dataStatus).then((value) => { data = value; })
+  .catch(() => dataStatus("Update unavailable"));
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
+    checkRouteUpdates(dataStatus).then((value) => { data = value; })
+      .catch(() => dataStatus("Update unavailable"));
     if (data && matches.length) renderMatches();
     if (cur() && (screen === "count" || screen === "setup")) {
       setFollow(true);

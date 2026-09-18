@@ -54,7 +54,7 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.7");
+        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.8");
         web.addJavascriptInterface(new DeviceStorage(), "PassengerCountAndroid");
         web.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -121,7 +121,7 @@ public final class MainActivity extends Activity {
             connection.setConnectTimeout(20000);
             connection.setReadTimeout(60000);
             connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("User-Agent", "PassengerCount/1.7");
+            connection.setRequestProperty("User-Agent", "PassengerCount/1.8");
             if (connection.getResponseCode() != 200) { connection.disconnect(); return missing(); }
             Map<String, String> headers = new HashMap<>();
             headers.put("Cache-Control", "no-store");

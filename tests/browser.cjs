@@ -75,7 +75,7 @@ const data = {
     executablePath: process.env.CHROME_PATH || undefined,
     args: ["--no-sandbox"],
   });
-  async function open(seed = {}, width = 412, catalogue = data, time = "2026-09-15T06:10:00Z") {
+  async function open(seed = {}, width = 412, catalogue = data, time = "2026-09-15T06:10:00Z", workerFixture = null) {
     const context = await browser.newContext({
       viewport: { width, height: 850 },
       geolocation: { latitude: 22.301, longitude: 114.171, accuracy: 10 },
@@ -133,6 +133,17 @@ const data = {
         },
       };
     }, seed);
+    if (workerFixture) await page.addInitScript((fresh) => {
+      window.__workers = [];
+      window.Worker = class {
+        constructor(url) { this.url = url; }
+        postMessage(message) { this.message = message; window.__workers.push(this); }
+        terminate() { this.terminated = true; }
+      };
+      window.__finishUpdate = (fail = false) => window.__workers.at(-1).onmessage({
+        data: fail ? { error: "Offline" } : { data: fresh },
+      });
+    }, workerFixture);
     await page.clock.setFixedTime(new Date(time));
     await page.goto(base);
     await page.waitForFunction(
@@ -800,13 +811,84 @@ const data = {
   await page.locator("#resetExportDirectory").click();
   assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
 
+  // Launch on Home without a previous search starts the stale-data worker.
+  await context.close();
+  const stale = structuredClone(data), fresh = structuredClone(data);
+  stale.source.retrievedAt = "2026-09-12T15:59:59.999Z"; // Just before Sunday HK midnight.
+  fresh.source.retrievedAt = "2026-09-15T06:10:00Z";
+  fresh.source.publishedAt = "2026-09-01T00:00:00Z"; // Publication age must not trigger repeats.
+  ({ context, page } = await open({}, 360, stale, "2026-09-15T06:10:00Z", fresh));
+  await page.waitForFunction(() => window.__workers.length === 1);
+  assert.equal(await page.locator("#homeScreen").isVisible(), true);
+  assert.equal(await page.locator("#route").inputValue(), "");
+  assert.equal(await page.locator("#settingsRefreshData").isDisabled(), true);
+  await page.locator("#surveyor").fill("Background update surveyor");
+  await newTrip("0");
+  await key(7);
+  await flush();
+  const duringUpdate = structuredClone(current());
+  assert.equal(await page.evaluate(() => window.__workers.length), 1, "search while updating does not start another worker");
+  await page.evaluate(() => window.__finishUpdate());
+  await page.waitForFunction(async () => (await (await import("./storage.js")).cacheGet())?.data.source.retrievedAt === "2026-09-15T06:10:00Z");
+  await flush();
+  assert.equal(await page.locator("#countScreen").isVisible(), true);
+  assert.deepEqual(current().rows, duringUpdate.rows, "background data update preserves entered counts");
+  assert.deepEqual(current().stops, duringUpdate.stops, "background data update preserves stop snapshot");
+  await page.locator("#pause").click();
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector("#settingsDataStatus").textContent.includes("2026-09-01"));
+  assert.equal(await page.evaluate(() => window.__workers.length), 0, "successful cached update suppresses refresh on next launch even with old publication date");
+  await page.locator("#exportSettings summary").click();
+  await page.locator("#settingsRefreshData").click();
+  await page.waitForFunction(() => window.__workers.length === 1);
+  await page.evaluate(() => window.__finishUpdate());
+  await page.waitForFunction(() => !document.querySelector("#settingsRefreshData").disabled);
+  assert.equal(await page.evaluate(() => window.__workers.length), 1, "Settings can manually refresh current data");
+  // The pre-existing manual refresh in route setup remains usable too.
+  await page.locator("#new").click();
+  await page.locator("#refreshData").evaluate((e) => e.closest("details").open = true);
+  await page.locator("#refreshData").click();
+  await page.waitForFunction(() => window.__workers.length === 2);
+  await page.evaluate(() => window.__finishUpdate());
+  await page.waitForFunction(() => !document.querySelector("#refreshData").disabled);
+
+  // Failed launches retain data and retry on a subsequent launch, not each search.
+  await context.close();
+  ({ context, page } = await open({}, 360, stale, "2026-09-15T06:10:00Z", fresh));
+  await page.waitForFunction(() => window.__workers.length === 1);
+  await page.evaluate(() => window.__finishUpdate(true));
+  await page.waitForFunction(() => !document.querySelector("#settingsRefreshData").disabled);
+  assert.equal(await page.evaluate(async () => await (await import("./storage.js")).cacheGet()), undefined);
+  await newTrip("0");
+  assert.equal(await page.evaluate(() => window.__workers.length), 1);
+  await page.locator("#pause").click();
+  await page.reload();
+  await page.waitForFunction(() => window.__workers.length === 1);
+  await page.evaluate(() => window.__finishUpdate(true));
+
+  // Successful retrieval at Sunday 00:00 exactly is already current.
+  await context.close();
+  const boundaryData = structuredClone(stale);
+  boundaryData.source.retrievedAt = "2026-09-12T16:00:00Z";
+  ({ context, page } = await open({}, 360, boundaryData, "2026-09-15T06:10:00Z", fresh));
+  await page.waitForFunction(() => document.querySelector("#settingsDataStatus").textContent.includes("2026-09-12"));
+  assert.equal(await page.evaluate(() => window.__workers.length), 0);
+  await page.clock.setFixedTime(new Date("2026-09-20T00:00:00+08:00"));
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await page.waitForFunction(() => window.__workers.length === 1);
+  await page.evaluate(() => window.__finishUpdate(true));
+  await page.waitForFunction(() => !document.querySelector("#settingsRefreshData").disabled);
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await page.waitForFunction(() => window.__workers.length === 2);
+  await page.evaluate(() => window.__finishUpdate(true));
+
   assert.equal(
     requests.some((u) => /hkbus|routeFareList/.test(u)),
     false,
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, fixed 10-minute early tolerance overriding old preferences; GPS following on map/resume/foreground, completed-trip reopening and correction, responsive PNG charts, and remembered export folders with full-path/error feedback.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, fixed 10-minute early tolerance overriding old preferences; GPS following on map/resume/foreground, completed-trip reopening and correction, responsive PNG charts, and remembered export folders with full-path/error feedback; Sunday-cutoff launch refresh, usable counting during updates, persisted freshness, offline retry and manual updates in Settings/setup.",
   );
   await browser.close();
   server.close();

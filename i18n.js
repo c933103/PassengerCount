@@ -1,6 +1,7 @@
 export const DEFAULT_LANGUAGE = "yue-Hant-HK";
 export const messages = {
   en: {
+    weeklyDataHelp: "On launch, route data is refreshed in the background if its last successful update was before the most recent Sunday at 00:00 Hong Kong time. You can also update it here at any time.",
     settings: "Settings",
     exportFolder: "CSV and chart export folder",
     changeFolder: "Change folder",
@@ -218,6 +219,7 @@ export const messages = {
     operator_xb: "Cross-boundary coach",
   },
   "yue-Hant-HK": {
+    weeklyDataHelp: "每次開啟應用程式時，如果路線資料上次成功更新早於最近一個星期日香港時間凌晨零時，就會在背景自動更新。亦可隨時在這裏手動更新。",
     settings: "設定",
     exportFolder: "CSV 及圖表匯出資料夾",
     changeFolder: "更改資料夾",
