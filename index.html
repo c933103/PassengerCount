@@ -1,8 +1,497 @@
-+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#143b46"><title>Bus Passenger Counter</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="style.css"><script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script type="module" src="app.js"></script></head><body>
-<header><div><small>FIELD SURVEY</small><h1>Bus Passenger Counter</h1></div><span id="saveStatus">Loading…</span></header><main><div id="error" class="error" hidden></div>
-<section class="panel row"><label>Surveyor name<input id="surveyor" placeholder="Remembered on this browser"></label><label>Saved surveys<select id="saved"><option value="">New survey</option></select></label><button id="new" class="secondary">New survey</button></section>
-<section class="panel"><h2>Route & direction</h2><form id="search" class="row"><label>Route number<input id="route" required placeholder="e.g. 88X"></label><label>Operator<select id="operator"><option value="">All bus operators</option><option value="kmb">KMB / Long Win</option><option value="ctb">Citybus</option><option value="nlb">New Lantao Bus</option><option value="lrtfeeder">MTR Bus</option><option value="gmb">Green minibus</option></select></label><button>Find route</button></form><p id="dataStatus"></p><p id="clock"></p><div id="results"></div><details id="other" hidden><summary id="otherTitle"></summary><div id="otherResults"></div></details><details><summary>Time filter & data</summary><label>Upcoming departures<select id="upcoming"><option>15</option><option selected>30</option><option>60</option><option value="120">120 minutes</option></select></label><p>Uses Hong Kong time and published schedules. It does not confirm live operation.</p></details></section>
-<section id="survey" hidden><section class="panel"><small>CURRENT SURVEY</small><h2 id="selected"></h2><div class="row"><label>Date<input id="date" type="date"></label><label>Vehicle number<input id="vehicle"></label></div><label>General notes<textarea id="notes"></textarea></label><div class="row"><label>Starting stop<select id="start"></select></label><button id="confirm">Confirm start stop</button></div><p id="startStatus"></p></section>
-<div class="grid"><aside class="panel"><div class="spread"><h2>Check your stop</h2><button id="locate" class="secondary">Use GPS</button></div><p id="gps">Waiting for location…</p><div id="map"></div><div class="buttons"><button id="myLocation" class="secondary">My location</button><button id="selectedStop" class="secondary">Selected stop</button><button id="whole" class="secondary">Whole route</button></div><label>Entering data at<select id="active"></select></label><div class="buttons"><button id="prev" class="secondary">Previous</button><button id="next" class="secondary">Next stop</button></div><p>Blue: GPS. Orange: selected stop. Tap a labelled stop to select it.</p></aside>
-<section class="panel"><div class="spread"><h2>Passenger counts</h2><label class="check"><input id="all" type="checkbox">Show all stops</label></div><p>Enter one known onboard count to calculate earlier counts. Calculated values are marked auto.</p><div class="table"><table><thead><tr><th>Stop</th><th>Time</th><th>Boarding</th><th>Alighting</th><th>Onboard</th><th>Notes</th></tr></thead><tbody id="body"></tbody></table></div><div class="buttons mobile"><button id="entryPrev" class="secondary">Previous</button><button id="entryNext">Next stop</button></div></section></div>
-<section class="panel"><h2>Save a copy</h2><div class="buttons"><button id="csv">Download CSV</button><button id="upload" class="secondary">Upload to database</button><button id="both" class="secondary">Upload & download CSV</button></div><p id="uploadStatus"></p></section></section></main><footer>Route data: <a href="https://github.com/hkbus/hk-bus-crawling">HK Bus Crawling@2021</a>. Map © OpenStreetMap contributors.</footer></body></html>
+<!doctype html>
+<html lang="yue-Hant-HK">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#143b46" />
+    <title>巴士乘客點算</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="vendor/leaflet/leaflet.js"></script>
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1 data-i18n="app"></h1>
+      <div>
+        <select id="language" aria-label="Language">
+          <option value="yue-Hant-HK">廣東話（香港）</option>
+          <option value="en">English</option></select
+        ><span id="saveStatus" role="status"></span>
+      </div>
+    </header>
+    <main>
+      <div id="error" role="alert" class="warning" hidden></div>
+      <section id="homeScreen">
+        <details id="exportSettings" class="panel">
+          <summary data-i18n="settings"></summary>
+          <p data-i18n="weeklyDataHelp"></p>
+          <p id="settingsDataStatus" role="status"></p>
+          <button id="settingsRefreshData" data-i18n="refreshData"></button>
+          <p data-i18n="exportFolder"></p>
+          <p id="exportDirectory" class="savedPath"></p>
+          <div class="buttons">
+            <button id="chooseExportDirectory" data-i18n="changeFolder"></button>
+            <button id="resetExportDirectory" class="secondary" data-i18n="defaultFolder"></button>
+          </div>
+        </details>
+        <section class="panel row">
+          <label
+            ><span data-i18n="surveyor"></span
+            ><input id="surveyor" autocomplete="name" /></label
+          ><button id="new" data-i18n="newTrip"></button>
+        </section>
+        <div class="spread">
+          <h2 data-i18n="records"></h2>
+          <button
+            id="deleteRecords"
+            class="danger"
+            data-i18n="deleteRecords"
+          ></button>
+        </div>
+        <div id="recordSelection" class="buttons" hidden>
+          <span id="selectedRecordCount" role="status"></span
+          ><button id="selectionOkay" data-i18n="okay" disabled></button
+          ><button
+            id="cancelSelection"
+            class="secondary"
+            data-i18n="cancel"
+          ></button>
+        </div>
+        <div id="recordList"></div>
+      </section>
+      <section id="setupScreen" hidden>
+        <div class="spread">
+          <h2 data-i18n="newTrip"></h2>
+          <button id="setupHome" class="secondary" data-i18n="home"></button>
+        </div>
+        <section class="panel">
+          <form id="search" class="row">
+            <label
+              ><span data-i18n="routeNumber"></span
+              ><input
+                id="route"
+                required
+                placeholder="88X"
+                autocapitalize="characters" /></label
+            ><label
+              ><span data-i18n="operator"></span
+              ><select id="operator"></select></label
+            ><button data-i18n="find"></button>
+          </form>
+          <p id="dataStatus"></p>
+          <div id="results"></div>
+          <details id="other" hidden>
+            <summary id="otherTitle"></summary>
+            <div id="otherResults"></div>
+          </details>
+          <details>
+            <summary data-i18n="timeData"></summary>
+            <p id="clock"></p>
+            <p data-i18n="serviceWindowHelp"></p>
+            <button
+              id="refreshData"
+              class="secondary"
+              data-i18n="refreshData"
+            ></button>
+          </details>
+        </section>
+        <section id="tripSetup" class="panel" hidden>
+          <h2 id="selected"></h2>
+          <div class="row">
+            <label
+              ><span data-i18n="date"></span
+              ><input id="date" type="date" /></label
+            ><label
+              ><span data-i18n="vehicle"></span><input id="vehicle"
+            /></label>
+          </div>
+          <label
+            ><span data-i18n="notes"></span
+            ><textarea id="notes" rows="2"></textarea></label
+          ><label
+            ><span data-i18n="startStop"></span
+            ><select id="start"></select
+          ></label>
+          <p data-i18n="startHint"></p>
+          <div id="setupMapHost"></div>
+          <div class="buttons">
+            <button id="confirm" data-i18n="confirmStart"></button
+            ><button
+              id="resume"
+              class="secondary"
+              data-i18n="resume"
+              hidden
+            ></button>
+          </div>
+        </section>
+      </section>
+      <section id="countScreen" hidden>
+        <div class="countTop">
+          <span id="tripTitle"></span
+          ><button
+            id="settings"
+            class="secondary"
+            data-i18n="settings"
+          ></button>
+        </div>
+        <div id="countMapHost"></div>
+        <p id="rowStatus" class="status"></p>
+        <div id="countIssues" class="warning" role="status" hidden></div>
+        <details id="allStops">
+          <summary data-i18n="allStops"></summary>
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="enteringAt"></th>
+                  <th data-i18n="stopTime"></th>
+                  <th data-i18n="boarding"></th>
+                  <th data-i18n="alighting"></th>
+                  <th data-i18n="onboard"></th>
+                  <th data-i18n="rowState"></th>
+                  <th data-i18n="stopNotes"></th>
+                </tr>
+              </thead>
+              <tbody id="body"></tbody>
+            </table>
+          </div>
+        </details>
+        <details>
+          <summary data-i18n="details"></summary>
+          <label
+            ><span data-i18n="stopTime"></span
+            ><input id="stopTime" type="time" /></label
+          ><label
+            ><span data-i18n="stopNotes"></span><input id="stopNotes" /></label
+          ><button
+            id="recordStay"
+            class="secondary"
+            data-i18n="recordStay"
+          ></button
+          ><button
+            id="skipStop"
+            class="secondary"
+            data-i18n="skipStop"
+          ></button>
+        </details>
+        <details id="boundaries">
+          <summary data-i18n="knownCounts"></summary>
+          <label
+            ><span data-i18n="beforeStart"></span
+            ><input
+              id="initialOnboard"
+              inputmode="numeric"
+              pattern="[0-9]*" /></label
+          ><label class="check"
+            ><input id="startsAtOrigin" type="checkbox" /><span
+              data-i18n="startsEmpty"
+            ></span></label
+          ><label
+            ><span data-i18n="afterEnd"></span
+            ><input
+              id="finalOnboard"
+              inputmode="numeric"
+              pattern="[0-9]*" /></label
+          ><label class="check"
+            ><input id="endsAtTerminus" type="checkbox" /><span
+              data-i18n="endsEmpty"
+            ></span></label
+          ><label
+            ><span data-i18n="knownAtStop"></span
+            ><input id="knownOnboard" inputmode="numeric" pattern="[0-9]*"
+          /></label>
+          <p data-i18n="boundaryHelp"></p>
+          <p data-i18n="estimatedHelp"></p>
+        </details>
+        <details id="corrections">
+          <summary data-i18n="corrections"></summary>
+          <div class="buttons">
+            <button id="addStop" class="secondary" data-i18n="addStop"></button
+            ><button
+              id="editStop"
+              class="secondary"
+              data-i18n="editStop"
+            ></button
+            ><button
+              id="continueRoute"
+              class="secondary"
+              data-i18n="continueRoute"
+            ></button>
+          </div>
+        </details>
+        <section id="entryDock" aria-label="Passenger count entry">
+          <div class="dockStop">
+            <button id="prev" class="secondary" data-i18n-aria="previous">
+              ‹
+            </button>
+            <label class="stopPicker"
+              ><span data-i18n="enteringAt"></span
+              ><select id="active"></select
+            ></label>
+            <button id="next" class="secondary" data-i18n-aria="nextStop">
+              ›
+            </button>
+          </div>
+          <div class="countFields">
+            <label
+              ><span data-i18n="boarding"></span
+              ><input
+                id="boarding"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                readonly /><button
+                id="skipBoarding"
+                class="secondary small"
+                data-i18n="skip"
+              ></button></label
+            ><label
+              ><span data-i18n="alighting"></span
+              ><input
+                id="alighting"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                readonly /><button
+                id="skipAlighting"
+                class="secondary small"
+                data-i18n="skip"
+              ></button
+            ></label>
+          </div>
+          <div class="entrySummary">
+            <div class="onboardSummary">
+              <span data-i18n="onboard"></span>: <output id="onboard"></output>
+              <small id="onboardSource"></small>
+            </div>
+            <p id="keypadTarget" class="status" aria-live="polite"></p>
+          </div>
+          <div id="keypad" class="keypad">
+            <button data-key="1">1</button><button data-key="2">2</button
+            ><button data-key="3">3</button><button data-key="4">4</button
+            ><button data-key="5">5</button><button data-key="6">6</button
+            ><button data-key="7">7</button><button data-key="8">8</button
+            ><button data-key="9">9</button
+            ><button
+              data-key="clear"
+              class="secondary"
+              data-i18n="clear"
+            ></button
+            ><button data-key="0">0</button
+            ><button data-key="backspace" class="secondary" aria-label="Delete">
+              ⌫
+            </button>
+          </div>
+          <div class="buttons countButtons">
+            <button id="nextField" data-i18n="nextField"></button
+            ><button
+              id="noChange"
+              class="secondary"
+              data-i18n="noChange"
+            ></button
+            ><button id="recordNext" data-i18n="recordNext"></button>
+          </div>
+          <section
+            class="tripControls"
+            data-i18n-aria="tripActions"
+            aria-label="Trip controls"
+          >
+            <button id="complete" data-i18n="saveHome"></button>
+            <button
+              id="pause"
+              class="secondary"
+              data-i18n="pauseHome"
+              data-i18n-aria="pause"
+            ></button>
+            <button
+              id="abort"
+              class="secondary"
+              data-i18n="abortHome"
+              data-i18n-aria="abort"
+            ></button>
+            <button id="saveCompleted" data-i18n="saveHome" hidden></button>
+          </section>
+        </section>
+      </section>
+      <section id="recordScreen" hidden>
+        <div class="spread">
+          <h2 id="recordTitle"></h2>
+          <button id="recordHome" class="secondary" data-i18n="home"></button>
+        </div>
+        <p id="recordSummary"></p>
+        <p id="completedMessage" class="status"></p>
+        <div id="recordIssues" class="warning" hidden></div>
+        <h3 data-i18n="chart"></h3>
+        <div id="chart" class="chart"></div>
+        <p data-i18n="chartUnknown"></p>
+        <div class="buttons">
+          <button id="continueRecord" data-i18n="continueRecord"></button>
+          <button id="editRecord" data-i18n="editRecord"></button>
+          <button id="saveChart" class="secondary" data-i18n="saveChart"></button>
+          <button id="csv" class="secondary" data-i18n="export"></button
+          ><button id="upload" class="secondary" data-i18n="upload"></button>
+        </div>
+        <p id="uploadStatus"></p>
+        <p id="exportStatus" class="savedPath" role="status"></p>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="enteringAt"></th>
+                <th data-i18n="boarding"></th>
+                <th data-i18n="alighting"></th>
+                <th data-i18n="onboard"></th>
+                <th data-i18n="rowState"></th>
+              </tr>
+            </thead>
+            <tbody id="recordBody"></tbody>
+          </table>
+        </div>
+      </section>
+      <div id="mapParking" hidden>
+        <section id="mapPanel">
+          <div class="spread">
+            <span id="gps" role="status"></span
+            ><button
+              id="toggleMap"
+              class="secondary small"
+              data-i18n="hideMap"
+            ></button>
+          </div>
+          <div id="mapContents">
+            <div id="map"></div>
+            <div class="buttons mapButtons">
+              <button
+                id="useNearest"
+                class="secondary"
+                data-i18n="useNearest"
+                hidden
+              ></button>
+              <button
+                id="myLocation"
+                class="secondary"
+                data-i18n="follow"
+              ></button
+              ><button
+                id="selectedStop"
+                class="secondary"
+                data-i18n="selectedStop"
+              ></button
+              ><button
+                id="whole"
+                class="secondary"
+                data-i18n="wholeRoute"
+              ></button
+              ><button
+                id="locate"
+                class="secondary"
+                data-i18n="retryGps"
+              ></button>
+            </div>
+            <span id="mapMode" class="status"></span>
+          </div>
+        </section>
+      </div>
+      <dialog
+        id="deleteDialog"
+        aria-labelledby="deleteTitle"
+        aria-describedby="deleteHelp"
+      >
+        <h2 id="deleteTitle" data-i18n="deleteRecords"></h2>
+        <div id="deleteReview" tabindex="0" role="region" aria-labelledby="deleteTitle">
+          <p id="deleteHelp" data-i18n="deleteHelp"></p>
+          <ul id="deleteSummary"></ul>
+          <p id="deleteError" class="warning" role="alert" hidden></p>
+        </div>
+        <div class="buttons deleteActions">
+          <button
+            id="cancelDelete"
+            class="secondary"
+            data-i18n="cancel"
+            autofocus
+          ></button
+          ><button
+            id="confirmDelete"
+            class="danger"
+            data-i18n="deleteConfirm"
+          ></button>
+        </div>
+      </dialog>
+      <dialog id="stopDialog">
+        <form id="stopForm">
+          <h2 id="stopDialogTitle"></h2>
+          <label id="insertLabel"
+            ><span data-i18n="insertPosition"></span
+            ><select id="insertPosition"></select></label
+          ><label
+            ><span data-i18n="nameZh"></span><input id="stopNameZh" /></label
+          ><label
+            ><span data-i18n="nameEn"></span><input id="stopNameEn"
+          /></label>
+          <details>
+            <summary data-i18n="coordinates"></summary>
+            <label
+              ><span data-i18n="latitude"></span
+              ><input id="stopLat" inputmode="decimal" /></label
+            ><label
+              ><span data-i18n="longitude"></span
+              ><input id="stopLng" inputmode="decimal" /></label
+            ><button
+              type="button"
+              id="stopUseGps"
+              class="secondary"
+              data-i18n="useGps"
+            ></button>
+          </details>
+          <p id="stopFormError" class="warning" hidden></p>
+          <div class="buttons">
+            <button data-i18n="saveStop"></button
+            ><button
+              type="button"
+              id="cancelStop"
+              class="secondary"
+              data-i18n="cancel"
+            ></button>
+          </div>
+        </form>
+      </dialog>
+      <dialog id="sectionDialog">
+        <h2 data-i18n="continueRoute"></h2>
+        <form id="sectionSearch" class="row">
+          <label
+            ><span data-i18n="sectionRoute"></span
+            ><input id="sectionNumber" required /></label
+          ><button data-i18n="findSection"></button>
+        </form>
+        <label
+          ><span data-i18n="chooseSection"></span
+          ><select id="sectionChoice"></select></label
+        ><label
+          ><span data-i18n="overlap"></span
+          ><select id="sectionOverlap"></select
+        ></label>
+        <p id="sectionPreview"></p>
+        <ol id="sectionStops"></ol>
+        <p data-i18n="joinHelp"></p>
+        <div class="buttons">
+          <button id="joinSection" data-i18n="join" disabled></button
+          ><button
+            id="cancelSection"
+            class="secondary"
+            data-i18n="cancel"
+          ></button>
+        </div>
+      </dialog>
+    </main>
+    <footer>
+      <span data-i18n="dataCredit"></span>
+      <a
+        href="https://data.gov.hk/en/terms-and-conditions"
+        data-i18n="terms"
+      ></a>
+      <span data-i18n="mapCredit"></span>
+    </footer>
+  </body>
+</html>
