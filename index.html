@@ -29,6 +29,14 @@
           <p data-i18n="weeklyDataHelp"></p>
           <p id="settingsDataStatus" role="status"></p>
           <button id="settingsRefreshData" data-i18n="refreshData"></button>
+          <label><span data-i18n="vehicleProfiles"></span>
+            <textarea id="vehicleProfiles" rows="4" data-i18n-placeholder="vehicleProfilesPlaceholder"></textarea>
+          </label>
+          <p data-i18n="vehicleProfilesHelp"></p>
+          <label><span data-i18n="schoolHolidayRanges"></span>
+            <textarea id="schoolHolidayRanges" rows="3" data-i18n-placeholder="schoolHolidayRangesPlaceholder"></textarea>
+          </label>
+          <p data-i18n="schoolHolidayHelp"></p>
           <p data-i18n="exportFolder"></p>
           <p id="exportDirectory" class="savedPath"></p>
           <div class="buttons">
@@ -107,6 +115,8 @@
               ><span data-i18n="vehicle"></span><input id="vehicle"
             /></label>
           </div>
+          <p id="vehicleSetupInfo" class="status"></p>
+          <label><span data-i18n="weatherNow"></span><select id="weatherSetup"></select></label>
           <label
             ><span data-i18n="notes"></span
             ><textarea id="notes" rows="2"></textarea></label
@@ -293,6 +303,10 @@
             ></button
             ><button id="recordNext" data-i18n="recordNext"></button>
           </div>
+          <div class="buttons historyControls">
+            <button id="undo" class="secondary" data-i18n="undo"></button>
+            <button id="redo" class="secondary" data-i18n="redo"></button>
+          </div>
           <section
             class="tripControls"
             data-i18n-aria="tripActions"
@@ -321,6 +335,11 @@
           <button id="recordHome" class="secondary" data-i18n="home"></button>
         </div>
         <p id="recordSummary"></p>
+        <p id="recordMetrics" class="status"></p>
+        <label><span data-i18n="vehicle"></span><input id="vehicleRecord" /></label>
+        <p id="vehicleRecordInfo" class="status"></p>
+        <p id="environmentSummary" class="status"></p>
+        <p id="etaRecordSummary" class="status"></p>
         <p id="completedMessage" class="status"></p>
         <div id="recordIssues" class="warning" hidden></div>
         <h3 data-i18n="chart"></h3>
@@ -330,6 +349,7 @@
           <button id="continueRecord" data-i18n="continueRecord"></button>
           <button id="editRecord" data-i18n="editRecord"></button>
           <button id="saveChart" class="secondary" data-i18n="saveChart"></button>
+          <button id="gpx" class="secondary" data-i18n="exportGpx"></button>
           <button id="csv" class="secondary" data-i18n="export"></button
           ><button id="upload" class="secondary" data-i18n="upload"></button>
         </div>
