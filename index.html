@@ -231,6 +231,16 @@
             ></button>
           </div>
         </details>
+        <details id="fieldContext" class="panel">
+          <summary data-i18n="details"></summary>
+          <div class="row">
+            <label><span data-i18n="vehicle"></span><input id="vehicleCount" /></label>
+            <label><span data-i18n="weatherNow"></span><select id="weatherCount"></select></label>
+          </div>
+          <p id="vehicleCountInfo" class="status"></p>
+          <p id="etaStatus" class="status"></p>
+          <p id="observationTimestamp" class="status"></p>
+        </details>
         <section id="entryDock" aria-label="Passenger count entry">
           <div class="dockStop">
             <button id="prev" class="secondary" data-i18n-aria="previous">
