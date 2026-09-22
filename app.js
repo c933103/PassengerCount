@@ -826,7 +826,7 @@ function buildTable() {
     ])
       status.add(new Option(t(label), key));
     status.onchange = () => {
-      if (status.value === "recorded") recordStop(s, index, hkClock().time);
+      if (status.value === "recorded") recordStop(s, index, hkClock().time, false, hkTimestamp());
       else {
         row.recorded = false;
         row.unobserved = status.value === "skipped";
@@ -897,7 +897,7 @@ function setCount(index, field, value) {
   row.skipped ??= {};
   row.skipped[field] = false;
   row.unobserved = false;
-  if (value !== "" && !row.time) row.time = hkClock().time;
+  if (value !== "" && !row.time && cur().status !== "completed") row.time = hkClock().time;
   edit();
   renderCount();
   return true;
@@ -933,10 +933,12 @@ function recordOrFinish() {
 }
 function saveStop(advance = false, noChange = false) {
   const s = cur();
-  recordStop(s, s.activeIndex, hkClock().time, noChange);
-  s.rows[s.activeIndex].unobserved = false;
+  const recordedIndex = s.activeIndex;
+  recordStop(s, recordedIndex, hkClock().time, noChange, hkTimestamp());
+  s.rows[recordedIndex].unobserved = false;
   edit();
-  if (advance && s.activeIndex < s.stops.length - 1) active(s.activeIndex + 1);
+  captureEta(s, recordedIndex).catch(() => {});
+  if (advance && recordedIndex < s.stops.length - 1) active(recordedIndex + 1);
   else renderCount();
 }
 function pause(status) {
@@ -952,8 +954,9 @@ function pause(status) {
 function complete() {
   const s = cur();
   if (s.status !== "completed") {
-    recordStop(s, s.activeIndex, hkClock().time);
+    recordStop(s, s.activeIndex, hkClock().time, false, hkTimestamp());
     completeSurvey(s, s.activeIndex);
+    s.metrics = tripMetrics(s, data);
   }
   if (!persist()) {
     error(t("recordFailed"));
