@@ -135,12 +135,12 @@ function vehicleProfiles() {
 }
 function vehicleInfo(s = cur()) {
   if (!s?.vehicle) return "";
-  const match = matchVehicle(s.vehicle, vehicleProfiles(), operator(s.route.operator));
+  const match = matchVehicle(s.vehicle, vehicleProfiles(), s.route.operator);
   s.vehicleMatch = match;
   if (!match?.matched)
     return `${operator(s.route.operator)} · ${t("vehicleUnknown")}`;
   return t("vehicleMatched", {
-    operator: match.operator || operator(s.route.operator),
+    operator: match.operator ? operator(match.operator) : operator(s.route.operator),
     model: match.model || t("unknown"),
     seats: match.seats ?? t("unknown"),
     capacity: match.capacity ?? t("unknown"),
@@ -1487,11 +1487,42 @@ $("refreshData").onclick = refreshGovernmentData;
 $("settingsRefreshData").onclick = refreshGovernmentData;
 window.addEventListener("government-data-updating", () => updateButtons(true));
 window.addEventListener("government-data-update-finished", () => updateButtons(false));
+$("vehicleProfiles").oninput = () => {
+  state.vehicleProfilesText = $("vehicleProfiles").value;
+  persist();
+  if (cur()) {
+    $("vehicleSetupInfo").textContent = vehicleInfo(cur());
+    if ($("vehicleCountInfo")) $("vehicleCountInfo").textContent = vehicleInfo(cur());
+    if ($("vehicleRecordInfo")) $("vehicleRecordInfo").textContent = vehicleInfo(cur());
+  }
+};
+$("schoolHolidayRanges").oninput = () => {
+  state.schoolHolidayRangesText = $("schoolHolidayRanges").value;
+  persist();
+};
 for (const f of ["date", "vehicle", "notes"])
   $(f).oninput = () => {
     cur()[f] = $(f).value;
     edit();
+    if (f === "vehicle") $("vehicleSetupInfo").textContent = vehicleInfo(cur());
   };
+$("weatherSetup").onchange = () => changeWeather($("weatherSetup").value, true);
+$("weatherCount").onchange = () => changeWeather($("weatherCount").value);
+for (const id of ["vehicleCount", "vehicleRecord"])
+  $(id).oninput = () => {
+    const s = cur();
+    if (!s) return;
+    s.vehicle = $(id).value;
+    edit();
+    const info = vehicleInfo(s);
+    if ($("vehicleCountInfo")) $("vehicleCountInfo").textContent = info;
+    if ($("vehicleRecordInfo")) $("vehicleRecordInfo").textContent = info;
+    if (document.activeElement !== $("vehicle")) $("vehicle").value = s.vehicle;
+  };
+$("refreshEta").onclick = () => {
+  const s = cur();
+  if (s) captureEta(s, s.activeIndex).catch(() => {});
+};
 $("start").onchange = () => {
   if ($("start").value === "") {
     cur().pendingStart = null;
@@ -1510,6 +1541,7 @@ $("confirm").onclick = () => {
   s.completedAt = null;
   active(s.startIndex);
   edit();
+  captureStartEnvironment(s).catch(() => {});
   showScreen("count");
 };
 $("resume").onclick = () => {
