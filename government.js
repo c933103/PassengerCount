@@ -103,6 +103,7 @@ export function normalizeGovernment(files, translated = {}, meta = {}) {
     stopList[s.stop_id] = {
       name: { en: s.stop_name, zh: zhStops.get(s.stop_id) || "" },
       location: { lat, lng },
+      zone: s.zone_id || "",
     };
   }
   const routeInfo = new Map(
@@ -178,6 +179,32 @@ export function normalizeGovernment(files, translated = {}, meta = {}) {
     };
     calendars[c.service_id].exceptions[c.date] = Number(c.exception_type);
   }
+  // Government GTFS fare tables are optional in old cached catalogues.
+  // Keep stop-to-stop/sectional fare rules by government route_id.
+  const fareAttributes = new Map();
+  if (files["fare_attributes.txt"])
+    for (const f of csvRows(files["fare_attributes.txt"])) {
+      const price = Number(f.price);
+      if (f.fare_id && Number.isFinite(price))
+        fareAttributes.set(f.fare_id, {
+          price,
+          currency: f.currency_type || "HKD",
+          agency: f.agency_id || "",
+        });
+    }
+  const fares = {};
+  if (files["fare_rules.txt"])
+    for (const rule of csvRows(files["fare_rules.txt"])) {
+      const fare = fareAttributes.get(rule.fare_id);
+      if (!fare || !rule.route_id) continue;
+      (fares[rule.route_id] ??= []).push({
+        origin: rule.origin_id || "",
+        destination: rule.destination_id || "",
+        price: fare.price,
+        currency: fare.currency,
+        agency: fare.agency,
+      });
+    }
   const groups = new Map(),
     routeList = {};
   for (const t of trips.values()) {
@@ -254,6 +281,7 @@ export function normalizeGovernment(files, translated = {}, meta = {}) {
       publishedAt: meta.publishedAt || null,
     },
     routeList,
+    fares,
     stopList: Object.fromEntries(
       Object.entries(stopList).filter(([id]) => used.has(id)),
     ),
