@@ -27,8 +27,15 @@ jobs:
           SIGNING_KEY_PASSWORD: validation123
           SIGNING_KEY_ALIAS: passengercount
         run: bash android/build.sh
+      - name: Include signing utility for local production re-sign
+        run: |
+          mkdir -p android/build/signing-tools/lib
+          cp "$ANDROID_HOME/build-tools/35.0.0/apksigner" android/build/signing-tools/
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" android/build/signing-tools/lib/
       - uses: actions/upload-artifact@v4
         with:
           name: PassengerCount-1.9-validation
-          path: android/build/PassengerCount.apk
+          path: |
+            android/build/PassengerCount.apk
+            android/build/signing-tools
           if-no-files-found: error
