@@ -897,7 +897,6 @@ function setCount(index, field, value) {
   row.skipped ??= {};
   row.skipped[field] = false;
   row.unobserved = false;
-  if (value !== "" && !row.time && cur().status !== "completed") row.time = hkClock().time;
   edit();
   renderCount();
   return true;
