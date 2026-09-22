@@ -270,13 +270,28 @@ function persist() {
     return false;
   }
 }
-function edit() {
+function edit(recordHistory = true) {
   const s = cur();
   if (s) {
+    if (recordHistory && historyId === s.id && historyCurrent) {
+      const before = JSON.stringify(historyCurrent);
+      const after = JSON.stringify(s);
+      if (before !== after) {
+        undoStack.push(historyCurrent);
+        if (undoStack.length > 100) undoStack.shift();
+        redoStack = [];
+      }
+    }
     s.updatedAt = new Date().toISOString();
     if (s.upload?.done) delete s.upload;
   }
-  persist();
+  const saved = persist();
+  if (s) {
+    historyId = s.id;
+    historyCurrent = clone(s);
+  }
+  updateHistoryButtons();
+  return saved;
 }
 function setLanguage(language) {
   state.language = language;
@@ -289,6 +304,9 @@ function setLanguage(language) {
   document
     .querySelectorAll("[data-i18n-aria]")
     .forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+  document
+    .querySelectorAll("[data-i18n-placeholder]")
+    .forEach((el) => el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder)));
   $("entryDock").setAttribute("aria-label", t("countEntry"));
   window.PassengerCountAndroid?.setLanguage?.(language);
   const chosen = $("operator").value;
@@ -308,6 +326,10 @@ function setLanguage(language) {
   }
   setFollow(followGps);
   refreshExportSettings();
+  if ($("vehicleProfiles")) $("vehicleProfiles").value = state.vehicleProfilesText || "";
+  if ($("schoolHolidayRanges")) $("schoolHolidayRanges").value = state.schoolHolidayRangesText || "";
+  fillWeather($("weatherSetup"));
+  fillWeather($("weatherCount"));
   $("toggleMap").textContent = t(
     $("mapContents").hidden ? "showMap" : "hideMap",
   );
