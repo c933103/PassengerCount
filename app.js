@@ -720,14 +720,17 @@ function renderCount() {
       target.index === s.activeIndex && target.field === field,
     );
   }
-  const onboard = result.values[s.activeIndex];
+  const displayIndex = row.recorded ? s.activeIndex : s.activeIndex - 1;
+  const onboard = displayIndex >= 0 ? result.values[displayIndex] : result.initial;
   $("onboard").textContent = onboard ?? t("unknown");
   $("onboardSource").textContent =
     onboard === null
       ? ""
-      : row.onboard !== ""
-        ? ""
-        : t(result.estimated[s.activeIndex] ? "estimate" : "auto");
+      : !row.recorded
+        ? t("previousStopCount")
+        : row.onboard !== ""
+          ? ""
+          : t(result.estimated[s.activeIndex] ? "estimate" : "auto");
   $("keypadTarget").textContent = t(target.field);
   $("prev").disabled = s.activeIndex === 0;
   $("next").disabled = s.activeIndex === s.stops.length - 1;
@@ -754,8 +757,16 @@ function renderCount() {
     ["knownOnboard", row.onboard],
   ])
     if (document.activeElement !== $(id)) $(id).value = value;
+  if (document.activeElement !== $("vehicleCount")) $("vehicleCount").value = s.vehicle || "";
+  $("vehicleCountInfo").textContent = vehicleInfo(s);
+  $("weatherCount").value = s.weatherEmoji || "";
+  $("etaStatus").textContent = etaStatusText(s);
+  $("observationTimestamp").textContent = row.observedAt
+    ? t("observedAt", { time: row.observedAt })
+    : "";
   $("startsAtOrigin").checked = s.startsAtOrigin;
   $("endsAtTerminus").checked = s.endsAtTerminus;
+  updateHistoryButtons();
   showIssues($("countIssues"), result);
   updateTable(result);
   const completed = s.status === "completed";
