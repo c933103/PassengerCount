@@ -27,15 +27,21 @@ export function migrateSurvey(s) {
   s.startsAtOrigin ??= s.startIndex === 0;
   s.endsAtTerminus ??= true;
   s.routeEdits ??= [];
+  s.track ??= [];
+  s.weatherHistory ??= [];
+  s.etaSnapshots ??= [];
+  s.calendarContext ??= null;
+  s.vehicleMatch ??= null;
   s.rows.forEach((r) => {
     r.skipped ??= {};
+    r.observedAt ??= null;
     r.recorded ??= ["time", "boarding", "alighting", "onboard", "notes"].some(
       (k) => r[k] !== "" && r[k] != null,
     );
   });
   return s;
 }
-export function recordStop(s, index, time, noChange = false) {
+export function recordStop(s, index, time, noChange = false, observedAt = null) {
   const row = s.rows[index];
   if (!row) throw Error("Invalid stop");
   row.skipped ??= {};
@@ -49,6 +55,7 @@ export function recordStop(s, index, time, noChange = false) {
       if (row[f] === "") row.skipped[f] = true;
   row.recorded = true;
   if (!row.time) row.time = time;
+  if (!row.observedAt && observedAt) row.observedAt = observedAt;
 }
 export function skipField(s, index, field) {
   const r = s.rows[index];
