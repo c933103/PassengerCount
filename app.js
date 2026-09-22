@@ -26,9 +26,24 @@ import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes, checkRouteUpdates } from "./data.js";
 import { uploadSurvey } from "./upload.js";
+import {
+  hkTimestamp,
+  makeGpx,
+  parseVehicleProfiles,
+  matchVehicle,
+  tripMetrics,
+  projectMomentum,
+} from "./fieldkit.js";
+import {
+  fetchCalendarContext,
+  fetchWeatherSnapshot,
+  fetchEtaEvidence,
+} from "./live.js";
 const $ = (id) => document.getElementById(id);
 const state = load();
 state.language ??= DEFAULT_LANGUAGE;
+state.vehicleProfilesText ??= "";
+state.schoolHolidayRangesText ??= "";
 state.surveys.forEach(migrateSurvey);
 let data,
   matches = [],
@@ -44,8 +59,12 @@ let data,
   stopEditIndex = null,
   sectionOptions = [],
   sectionStops = [],
-  uploadBusy = false;
+  uploadBusy = false,
+  lastGpsFix = null,
+  momentumTimer = null;
 let deleteMode = false;
+let undoStack = [], redoStack = [], historyCurrent = null, historyId = null;
+const WEATHER = ["", "☀️", "🌤️", "☁️", "🌧️", "⛈️", "🌫️", "💨", "🌡️", "❄️"];
 const selectedRecordIds = new Set();
 let pendingDeleteIds = [];
 const cur = () => state.surveys.find((s) => s.id === state.currentId);
