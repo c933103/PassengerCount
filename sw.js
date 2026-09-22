@@ -1,4 +1,4 @@
-const C = "passenger-count-v11";
+const C = "passenger-count-v12";
 const F = [
   "./",
   "./index.html",
@@ -9,6 +9,8 @@ const F = [
   "./charts.js",
   "./data.js",
   "./government.js",
+  "./fieldkit.js",
+  "./live.js",
   "./route-worker.js",
   "./data/government-routes.json.gz",
   "./vendor/fflate/fflate.js",
