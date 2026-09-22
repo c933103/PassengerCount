@@ -969,6 +969,7 @@ function complete() {
 function renderRecord() {
   const s = cur();
   if (!s) return;
+  syncNativeTrack(s);
   $("continueRecord").hidden = s.status !== "completed";
   const result = calculateOnboard(s);
   $("recordTitle").textContent = `${s.route.route} · ${t(s.status)}`;
@@ -976,6 +977,22 @@ function renderRecord() {
     n: s.rows.filter((r) => r.recorded).length,
     date: s.date,
   });
+  $("recordMetrics").textContent = metricsText(s);
+  if (document.activeElement !== $("vehicleRecord")) $("vehicleRecord").value = s.vehicle || "";
+  $("vehicleRecordInfo").textContent = vehicleInfo(s);
+  const weatherEvents = s.weatherHistory || [];
+  const changes = weatherEvents.filter((x) => x.kind === "change").length;
+  const calendarBits = [
+    s.calendarContext?.publicHoliday ? "public holiday" : "",
+    s.calendarContext?.schoolHoliday?.known ? s.calendarContext.schoolHoliday.name : "school holiday unknown",
+    s.calendarContext?.festival?.name || "",
+  ].filter(Boolean).join(" · ") || t("unknown");
+  $("environmentSummary").textContent = t("environmentCaptured", {
+    calendar: calendarBits,
+    weather: weatherEvents.filter((x) => x.snapshot).length,
+    changes,
+  });
+  $("etaRecordSummary").textContent = etaStatusText(s);
   $("completedMessage").textContent =
     s.status === "completed" ? t("completedSaved") : t("pauseHelp");
   $("uploadStatus").textContent = s.upload?.done ? t("uploaded") : "";
@@ -1019,10 +1036,11 @@ function setFollow(value) {
 function centerMap() {
   if (!map) return;
   const selected = cur()?.stops[cur()?.activeIndex];
+  const zoom = map.getZoom() || 18;
   if (followGps && position)
-    map.setView([position.lat, position.lng], 18, { animate: false });
+    map.setView([position.lat, position.lng], zoom, { animate: false });
   else if (!position && validLocation(selected))
-    map.setView([selected.lat, selected.lng], 18, { animate: false });
+    map.setView([selected.lat, selected.lng], zoom, { animate: false });
 }
 function setupMap() {
   const s = cur();
@@ -1083,7 +1101,7 @@ function updateGps() {
     map.gps.setLatLng(latlng);
     map.accuracy.setLatLng(latlng).setRadius(position.accuracy);
   }
-  if (followGps) map.setView(latlng, 18, { animate: false });
+  if (followGps) map.setView(latlng, map.getZoom() || 18, { animate: false });
 }
 function locate(restart = false) {
   if (!navigator.geolocation) {
