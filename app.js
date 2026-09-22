@@ -81,6 +81,180 @@ const operator = (co) =>
     ? OPERATORS[co] || co
     : t("operator_" + co);
 const validLocation = (x) => Number.isFinite(x?.lat) && Number.isFinite(x?.lng);
+const clone = (value) => JSON.parse(JSON.stringify(value));
+function schoolHolidayRanges() {
+  return String(state.schoolHolidayRangesText || "").split(/\r?\n/).map((line) => {
+    const [range = "", name = ""] = line.split("|").map((x) => x.trim());
+    const [start = "", end = ""] = range.split("..").map((x) => x.trim());
+    return /^\d{4}-\d{2}-\d{2}$/.test(start) && /^\d{4}-\d{2}-\d{2}$/.test(end)
+      ? { start, end, name } : null;
+  }).filter(Boolean);
+}
+function updateHistoryButtons() {
+  if (!$("undo") || !$("redo")) return;
+  $("undo").disabled = !undoStack.length;
+  $("redo").disabled = !redoStack.length;
+}
+function resetHistory() {
+  const s = cur();
+  historyId = s?.id || null;
+  historyCurrent = s ? clone(s) : null;
+  undoStack = [];
+  redoStack = [];
+  updateHistoryButtons();
+}
+function restoreHistory(snapshot, targetStack) {
+  const s = cur();
+  if (!s || !snapshot) return;
+  const index = state.surveys.findIndex((x) => x.id === s.id);
+  if (index < 0) return;
+  targetStack.push(clone(s));
+  state.surveys[index] = clone(snapshot);
+  state.currentId = snapshot.id;
+  historyId = snapshot.id;
+  historyCurrent = clone(snapshot);
+  persist();
+  buildStopOptions();
+  buildTable();
+  renderSetup();
+  renderCount();
+  if (screen === "record") renderRecord();
+  if (map) setupMap();
+  updateHistoryButtons();
+}
+function undo() {
+  if (!undoStack.length) return;
+  restoreHistory(undoStack.pop(), redoStack);
+}
+function redo() {
+  if (!redoStack.length) return;
+  restoreHistory(redoStack.pop(), undoStack);
+}
+function vehicleProfiles() {
+  return parseVehicleProfiles(state.vehicleProfilesText);
+}
+function vehicleInfo(s = cur()) {
+  if (!s?.vehicle) return "";
+  const match = matchVehicle(s.vehicle, vehicleProfiles(), operator(s.route.operator));
+  s.vehicleMatch = match;
+  if (!match?.matched)
+    return `${operator(s.route.operator)} · ${t("vehicleUnknown")}`;
+  return t("vehicleMatched", {
+    operator: match.operator || operator(s.route.operator),
+    model: match.model || t("unknown"),
+    seats: match.seats ?? t("unknown"),
+    capacity: match.capacity ?? t("unknown"),
+  });
+}
+function fillWeather(select) {
+  if (!select || select.options.length) return;
+  WEATHER.forEach((emoji) => select.add(new Option(emoji || "—", emoji)));
+}
+function appendTrackPoint(s, p) {
+  if (!s || s.status !== "in_progress" || !Number.isFinite(p?.lat) || !Number.isFinite(p?.lng)) return;
+  s.track ??= [];
+  const point = {
+    lat: p.lat,
+    lng: p.lng,
+    accuracy: Number.isFinite(p.accuracy) ? p.accuracy : null,
+    speed: Number.isFinite(p.speed) ? p.speed : null,
+    heading: Number.isFinite(p.heading) ? p.heading : null,
+    source: p.source || "gps",
+    time: p.time || hkTimestamp(new Date(p.timestamp || Date.now())),
+  };
+  const last = s.track.at(-1);
+  if (last && last.time === point.time && Math.abs(last.lat - point.lat) < 1e-7 && Math.abs(last.lng - point.lng) < 1e-7) return;
+  s.track.push(point);
+  if (s.track.length > 20000) s.track.splice(0, s.track.length - 20000);
+}
+function syncNativeTrack(s = cur()) {
+  if (!s || !window.PassengerCountAndroid?.getTrack) return;
+  try {
+    const raw = window.PassengerCountAndroid.getTrack(s.id);
+    if (!raw) return;
+    const points = JSON.parse(raw);
+    if (!Array.isArray(points)) return;
+    for (const p of points) appendTrackPoint(s, p);
+    persist();
+  } catch {}
+}
+async function captureStartEnvironment(s) {
+  const id = s.id;
+  const [calendar, weather] = await Promise.allSettled([
+    fetchCalendarContext(s.date, schoolHolidayRanges()),
+    fetchWeatherSnapshot(state.language),
+  ]);
+  const targetSurvey = state.surveys.find((x) => x.id === id);
+  if (!targetSurvey) return;
+  if (calendar.status === "fulfilled") targetSurvey.calendarContext = calendar.value;
+  if (weather.status === "fulfilled") {
+    targetSurvey.weatherHistory ??= [];
+    targetSurvey.weatherHistory.push({
+      at: hkTimestamp(),
+      stopIndex: targetSurvey.startIndex,
+      emoji: targetSurvey.weatherEmoji || "",
+      kind: "start",
+      snapshot: weather.value,
+    });
+  }
+  persist();
+  if (cur()?.id === id) renderCount();
+}
+async function captureEta(s, index) {
+  const id = s.id;
+  const evidence = await fetchEtaEvidence(s, index);
+  const targetSurvey = state.surveys.find((x) => x.id === id);
+  if (!targetSurvey) return;
+  targetSurvey.etaSnapshots ??= [];
+  targetSurvey.etaSnapshots.push(evidence);
+  if (targetSurvey.etaSnapshots.length > 200) targetSurvey.etaSnapshots.splice(0, targetSurvey.etaSnapshots.length - 200);
+  persist();
+  if (cur()?.id === id) {
+    renderCount();
+    if (screen === "record") renderRecord();
+  }
+}
+async function changeWeather(emoji, setupOnly = false) {
+  const s = cur();
+  if (!s) return;
+  s.weatherEmoji = emoji;
+  if (setupOnly || s.status !== "in_progress") {
+    edit();
+    renderSetup();
+    return;
+  }
+  const event = { at: hkTimestamp(), stopIndex: s.activeIndex, emoji, kind: "change", snapshot: null };
+  s.weatherHistory ??= [];
+  s.weatherHistory.push(event);
+  edit();
+  renderCount();
+  try {
+    event.snapshot = await fetchWeatherSnapshot(state.language);
+    persist();
+  } catch {}
+}
+function etaStatusText(s = cur()) {
+  const latest = s?.etaSnapshots?.at(-1);
+  if (!latest) return "";
+  const available = latest.results?.filter((x) => x.available) || [];
+  if (!available.length) return t("etaUnavailable");
+  const headway = available.find((x) => Number.isFinite(x.candidateHeadwayMinutes))?.candidateHeadwayMinutes;
+  return t("etaEvidence", {
+    n: available.length,
+    headway: Number.isFinite(headway) ? headway : "—",
+  });
+}
+function metricsText(s = cur()) {
+  if (!s) return "";
+  const m = data ? tripMetrics(s, data) : (s.metrics || tripMetrics(s, null));
+  s.metrics = m;
+  const fare = m.fare == null ? t("unknown") : `HK${m.fare.toFixed(2)}`;
+  return t(m.unpriced ? "metricsPartial" : "metrics", {
+    served: m.served,
+    fare,
+    n: m.unpriced,
+  });
+}
 function error(message = "") {
   $("error").textContent = message;
   $("error").hidden = !message;
