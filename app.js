@@ -1572,6 +1572,8 @@ $("keypad").onclick = (e) => {
   if (key) enterKey(key);
 };
 $("nextField").onclick = advanceField;
+$("undo").onclick = undo;
+$("redo").onclick = redo;
 for (const [f, id] of [
   ["boarding", "skipBoarding"],
   ["alighting", "skipAlighting"],
