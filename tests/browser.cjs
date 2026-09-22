@@ -96,6 +96,24 @@ const data = {
         contentType: "application/octet-stream",
       }),
     );
+    await context.route("https://www.1823.gov.hk/common/ical/en.json", (r) =>
+      r.fulfill({ body: JSON.stringify({ date: "20260915", name: "fixture public holiday" }), contentType: "application/json" }),
+    );
+    await context.route("https://data.weather.gov.hk/weatherAPI/opendata/lunardate.php**", (r) =>
+      r.fulfill({ body: JSON.stringify({ date: "2026-09-15", lunarDate: "八月十五" }), contentType: "application/json" }),
+    );
+    await context.route("https://data.weather.gov.hk/weatherAPI/opendata/weather.php**", (r) =>
+      r.fulfill({ body: JSON.stringify({ fixture: true }), contentType: "application/json" }),
+    );
+    await context.route("https://rt.data.gov.hk/**", (r) =>
+      r.fulfill({ body: JSON.stringify({ data: [
+        { route: "1", eta: "2026-09-15T14:15:00+08:00", eta_seq: 1 },
+        { route: "1", eta: "2026-09-15T14:25:00+08:00", eta_seq: 2 },
+      ] }), contentType: "application/json" }),
+    );
+    await context.route("https://data.etabus.gov.hk/**", (r) =>
+      r.fulfill({ body: JSON.stringify({ data: [] }), contentType: "application/json" }),
+    );
     await context.route("https://tile.openstreetmap.org/**", (r) => r.abort());
     const page = await context.newPage();
     page.on("pageerror", (e) => errors.push(String(e)));
@@ -131,6 +149,15 @@ const data = {
           window.captureDisk("exportDirectory", null);
           window.dispatchEvent(new Event("export-directory-changed"));
         },
+        startTracking: (id) => {
+          native.trackingId = id;
+          window.captureDisk("trackingId", id);
+        },
+        stopTracking: (id) => {
+          if (native.trackingId === id) delete native.trackingId;
+          window.captureDisk("trackingId", native.trackingId || null);
+        },
+        getTrack: () => JSON.stringify(native.track || []),
       };
     }, seed);
     if (workerFixture) await page.addInitScript((fresh) => {
