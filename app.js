@@ -509,6 +509,7 @@ function openSurvey(id, mode) {
   target = { index: s.activeIndex || 0, field: "boarding" };
   replaceOnDigit = true;
   nearestIndex = null;
+  resetHistory();
   if (mode === "resume" && s.startIndex != null) {
     s.status = "in_progress";
     s.completedAt = null;
@@ -593,6 +594,12 @@ function selectRoute(route) {
       date: hkClock().date,
       vehicle: "",
       notes: "",
+      weatherEmoji: "",
+      weatherHistory: [],
+      etaSnapshots: [],
+      track: [],
+      calendarContext: null,
+      vehicleMatch: null,
       surveyor: $("surveyor").value || loadSurveyor(),
       startIndex: null,
       pendingStart: null,
@@ -606,6 +613,7 @@ function selectRoute(route) {
   target = { index: 0, field: "boarding" };
   followGps = true;
   nearestIndex = null;
+  resetHistory();
   buildTable();
   renderSetup();
   showScreen("setup");
@@ -619,6 +627,8 @@ function renderSetup() {
   $("selected").textContent =
     `${operator(s.route.operator)} ${s.route.route} · ${name({ name: s.route.orig })} → ${name({ name: s.route.dest })}`;
   for (const field of ["date", "vehicle", "notes"]) $(field).value = s[field];
+  $("weatherSetup").value = s.weatherEmoji || "";
+  $("vehicleSetupInfo").textContent = vehicleInfo(s);
   buildStopOptions();
   $("resume").hidden = s.startIndex == null;
   $("confirm").disabled = s.pendingStart == null;
