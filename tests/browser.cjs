@@ -100,10 +100,12 @@ const data = {
       }),
     );
     await context.route("https://www.1823.gov.hk/common/ical/en.json", (r) =>
-      r.fulfill({ body: JSON.stringify({ date: "20260915", name: "fixture public holiday" }), contentType: "application/json" }),
+      r.fulfill({ body: JSON.stringify({ vcalendar: [{ vevent: [
+        { dtstart: ["20260915"], summary: "fixture public holiday" },
+      ] }] }), contentType: "application/json" }),
     );
     await context.route("https://data.weather.gov.hk/weatherAPI/opendata/lunardate.php**", (r) =>
-      r.fulfill({ body: JSON.stringify({ date: "2026-09-15", lunarDate: "八月十五" }), contentType: "application/json" }),
+      r.fulfill({ body: JSON.stringify({ LunarYear: "丙午年，馬", LunarDate: "八月十五" }), contentType: "application/json" }),
     );
     await context.route("https://data.weather.gov.hk/weatherAPI/opendata/weather.php**", (r) =>
       r.fulfill({ body: JSON.stringify({ fixture: true }), contentType: "application/json" }),
