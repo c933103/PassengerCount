@@ -1116,12 +1116,28 @@ function locate(restart = false) {
         lat: p.coords.latitude,
         lng: p.coords.longitude,
         accuracy: p.coords.accuracy,
+        speed: p.coords.speed,
+        heading: p.coords.heading,
         timestamp: p.timestamp,
+        time: hkTimestamp(new Date(p.timestamp || Date.now())),
+        source: "gps",
       };
+      lastGpsFix = { ...position };
+      appendTrackPoint(cur(), position);
+      persist();
       updateGps();
       suggest();
     },
     (e) => {
+      const estimated = e.code === 1 ? null : projectMomentum(lastGpsFix);
+      if (estimated) {
+        position = { ...estimated, time: hkTimestamp(new Date(estimated.timestamp)) };
+        appendTrackPoint(cur(), position);
+        persist();
+        updateGps();
+        suggest();
+        return;
+      }
       position = null;
       nearestIndex = null;
       $("gps").textContent = t(e.code === 1 ? "gpsDenied" : "gpsUnavailable");
@@ -1166,7 +1182,7 @@ function renderGpsText() {
     nearestIndex !== null &&
     Boolean(s.stops[nearestIndex]);
   if (fresh)
-    $("gps").textContent = t("gpsFix", {
+    $("gps").textContent = t(position.source === "estimated" ? "gpsEstimated" : "gpsFix", {
       accuracy: Math.round(position.accuracy),
       stop: stopLabel(s.stops[nearestIndex], nearestIndex),
     });
