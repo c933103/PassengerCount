@@ -43,8 +43,13 @@ export function renderChart(container, s, t, stopName) {
     svg.append(make("text", { x: legendX + 13, y: 51, "font-size": 11, fill: "#18343c" }, t(field)));
   }
   svg.append(make("title", {}, t("chartLegend")));
-  for (let i = 0; i <= 4; i++) {
-    const value = min + ((max - min) * i) / 4;
+  const tickSteps = Math.min(4, Math.max(1, max - min));
+  const ticks = [...new Set(
+    Array.from({ length: tickSteps + 1 }, (_, i) =>
+      Math.round(min + ((max - min) * i) / tickSteps),
+    ),
+  )];
+  for (const value of ticks) {
     svg.append(
       make("line", {
         x1: left,
@@ -62,7 +67,7 @@ export function renderChart(container, s, t, stopName) {
           "font-size": 11,
           fill: "#526b70",
         },
-        Number.isInteger(value) ? value : value.toFixed(1),
+        value,
       ),
     );
   }
