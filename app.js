@@ -178,6 +178,14 @@ function syncNativeTrack(s = cur()) {
     persist();
   } catch {}
 }
+function startNativeTracking(s = cur()) {
+  if (!s || s.status !== "in_progress") return;
+  window.PassengerCountAndroid?.startTracking?.(s.id);
+}
+function stopNativeTracking(s = cur()) {
+  if (s) syncNativeTrack(s);
+  window.PassengerCountAndroid?.stopTracking?.(s?.id || "");
+}
 async function captureStartEnvironment(s) {
   const id = s.id;
   const [calendar, weather] = await Promise.allSettled([
@@ -352,6 +360,8 @@ function showScreen(next) {
     $(key + "Screen").hidden = key !== next;
   const s = cur();
   if (s) s.screen = next;
+  if (s?.status === "in_progress") startNativeTracking(s);
+  else if (s) stopNativeTracking(s);
   const host =
     next === "count" && s
       ? $("countMapHost")
@@ -388,6 +398,7 @@ function showScreen(next) {
   window.scrollTo(0, 0);
 }
 function goHome() {
+  stopNativeTracking(cur());
   state.currentId = null;
   showScreen("home");
 }
@@ -1372,6 +1383,22 @@ function download() {
   browserDownload(href, filename);
   setTimeout(() => URL.revokeObjectURL(href), 5000);
 }
+function downloadGpx() {
+  const s = cur();
+  if (!s) return;
+  syncNativeTrack(s);
+  const gpx = makeGpx(s), filename = exportFilename("gpx");
+  $("exportStatus").textContent = t("exporting");
+  if (window.PassengerCountAndroid?.saveGpx) {
+    window.PassengerCountAndroid.saveGpx(gpx, filename);
+    return;
+  }
+  const href = URL.createObjectURL(
+    new Blob([gpx], { type: "application/gpx+xml" }),
+  );
+  browserDownload(href, filename);
+  setTimeout(() => URL.revokeObjectURL(href), 5000);
+}
 async function saveChart() {
   $("saveChart").disabled = true;
   $("exportStatus").textContent = t("exporting");
@@ -1611,6 +1638,7 @@ $("continueRecord").onclick = () => {
     error(t("continueConflict"));
   }
 };
+$("gpx").onclick = downloadGpx;
 $("csv").onclick = download;
 $("saveChart").onclick = saveChart;
 $("chooseExportDirectory").onclick = () => window.PassengerCountAndroid?.chooseExportDirectory();
