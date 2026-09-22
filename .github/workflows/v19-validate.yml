@@ -1,0 +1,34 @@
+name: Validate Android v1.9
+on:
+  push:
+    branches: [feat/android-app]
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - name: Generate ephemeral validation signing key
+        run: |
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/passengercount-validation.jks" -storepass validation123 -keypass validation123 -alias passengercount -keyalg RSA -keysize 2048 -validity 30 -dname "CN=PassengerCount validation"
+      - name: Build Android APK
+        env:
+          SIGNING_KEYSTORE: ${{ runner.temp }}/passengercount-validation.jks
+          SIGNING_STORE_PASSWORD: validation123
+          SIGNING_KEY_PASSWORD: validation123
+          SIGNING_KEY_ALIAS: passengercount
+        run: bash android/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PassengerCount-1.9-validation
+          path: android/build/PassengerCount.apk
+          if-no-files-found: error
