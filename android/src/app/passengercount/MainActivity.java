@@ -121,7 +121,7 @@ public final class MainActivity extends Activity {
             connection.setConnectTimeout(20000);
             connection.setReadTimeout(60000);
             connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("User-Agent", "PassengerCount/1.8");
+            connection.setRequestProperty("User-Agent", "PassengerCount/1.9");
             if (connection.getResponseCode() != 200) { connection.disconnect(); return missing(); }
             Map<String, String> headers = new HashMap<>();
             headers.put("Cache-Control", "no-store");
@@ -183,6 +183,17 @@ public final class MainActivity extends Activity {
                     if (content == null || content.length() > 10_000_000 || !filename.endsWith(".csv"))
                         throw new IOException("Invalid CSV");
                     exportResult(true, new ExportStorage(MainActivity.this).save(content.getBytes(StandardCharsets.UTF_8), filename, "text/csv"));
+                } catch (Exception e) { exportResult(false, ""); }
+            });
+        }
+        @JavascriptInterface public void saveGpx(String content, String filename) {
+            queueExport(() -> {
+                try {
+                    if (content == null || content.length() > 20_000_000 || !filename.endsWith(".gpx")
+                            || !content.startsWith("<?xml"))
+                        throw new IOException("Invalid GPX");
+                    exportResult(true, new ExportStorage(MainActivity.this).save(
+                        content.getBytes(StandardCharsets.UTF_8), filename, "application/gpx+xml"));
                 } catch (Exception e) { exportResult(false, ""); }
             });
         }
