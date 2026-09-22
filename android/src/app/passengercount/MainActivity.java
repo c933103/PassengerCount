@@ -54,7 +54,6 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " PassengerCount/1.8");
         web.addJavascriptInterface(new DeviceStorage(), "PassengerCountAndroid");
         web.setWebViewClient(new WebViewClient() {
             @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
@@ -76,7 +75,8 @@ public final class MainActivity extends Activity {
                     headers.put("X-Content-Type-Options", "nosniff");
                     headers.put("Content-Security-Policy", "default-src 'self'; script-src 'self'; "
                         + "style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; "
-                        + "connect-src 'self' https://static.data.gov.hk "
+                        + "connect-src 'self' https://static.data.gov.hk https://data.weather.gov.hk "
+                        + "https://www.1823.gov.hk https://data.etabus.gov.hk https://rt.data.gov.hk "
                         + "https://jirzkyvwfpbblvyivikw.supabase.co; frame-src 'none'; object-src 'none'; "
                         + "base-uri 'none'; form-action 'none'");
                     return new WebResourceResponse(mime, "UTF-8", 200, "OK", headers, body);
@@ -159,6 +159,7 @@ public final class MainActivity extends Activity {
         if (code == LOCATION && locationCallback != null) {
             locationCallback.invoke(locationOrigin, hasLocation(), false);
             locationCallback = null;
+            if (hasLocation()) startPendingTrack();
         }
     }
 
@@ -203,6 +204,47 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public String getExportResult() { return getSharedPreferences("exports", MODE_PRIVATE).getString("result", null); }
         @JavascriptInterface public void chooseExportDirectory() { runOnUiThread(() -> chooseDirectory()); }
         @JavascriptInterface public void resetExportDirectory() { runOnUiThread(() -> storeDirectory(null)); }
+        @JavascriptInterface public void startTracking(String surveyId) {
+            String id = TrackService.safeId(surveyId);
+            if (id.isEmpty()) return;
+            getSharedPreferences("tracking", MODE_PRIVATE).edit().putString("pending_id", id).commit();
+            runOnUiThread(() -> startPendingTrack());
+        }
+        @JavascriptInterface public void stopTracking(String surveyId) {
+            String id = TrackService.safeId(surveyId);
+            runOnUiThread(() -> {
+                SharedPreferences tracking = getSharedPreferences("tracking", MODE_PRIVATE);
+                if (id.equals(tracking.getString("pending_id", ""))) tracking.edit().remove("pending_id").commit();
+                Intent stop = new Intent(MainActivity.this, TrackService.class).setAction(TrackService.ACTION_STOP);
+                stopService(stop);
+            });
+        }
+        @JavascriptInterface public String getTrack(String surveyId) {
+            String id = TrackService.safeId(surveyId);
+            org.json.JSONArray points = new org.json.JSONArray();
+            if (id.isEmpty()) return points.toString();
+            File file = TrackService.trackFile(MainActivity.this, id);
+            if (!file.isFile()) return points.toString();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(file), StandardCharsets.UTF_8))) {
+                String line;
+                int count = 0;
+                while ((line = reader.readLine()) != null && count++ < 20000) {
+                    try { points.put(new org.json.JSONObject(line)); }
+                    catch (org.json.JSONException ignored) {}
+                }
+            } catch (IOException ignored) {}
+            return points.toString();
+        }
+    }
+    private void startPendingTrack() {
+        String id = getSharedPreferences("tracking", MODE_PRIVATE).getString("pending_id", "");
+        if (id.isEmpty() || !hasLocation()) return;
+        Intent intent = new Intent(this, TrackService.class)
+            .setAction(TrackService.ACTION_START)
+            .putExtra(TrackService.EXTRA_ID, id);
+        if (Build.VERSION.SDK_INT >= 26) startForegroundService(intent);
+        else startService(intent);
     }
     private void queueExport(Runnable task) {
         runOnUiThread(() -> {
