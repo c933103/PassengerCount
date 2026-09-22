@@ -1,4 +1,5 @@
 import { calculateOnboard, rowObserved } from "./survey.js";
+import { tripMetrics } from "./fieldkit.js";
 export { emptyRow, validPassengerCount } from "./survey.js";
 import {
   governmentServiceStatus,
@@ -130,6 +131,7 @@ export function stopsFor(route, data) {
           : s.name,
       lat: s.location?.lat,
       lng: s.location?.lng,
+      zone: s.zone || "",
     };
   });
 }
@@ -187,6 +189,10 @@ export function makeCSV(s) {
       ["Surveyor Name", s.surveyor],
       ["Date", s.date],
       ["Vehicle Number", s.vehicle],
+      ["Vehicle match", JSON.stringify(s.vehicleMatch || null)],
+      ["Calendar context", JSON.stringify(s.calendarContext || null)],
+      ["Weather history", JSON.stringify(s.weatherHistory || [])],
+      ["ETA snapshots", JSON.stringify(s.etaSnapshots || [])],
       ["Route", r.route],
       ["Operator", OPERATORS[r.operator]],
       ["Direction", r.direction],
@@ -216,6 +222,8 @@ export function makeCSV(s) {
       ["End zero assumption", s.endsAtTerminus !== false],
       ["Calculation issues", JSON.stringify(calculateOnboard(s).issues)],
       ["Route corrections", JSON.stringify(s.routeEdits || [])],
+      ["Trip metrics", JSON.stringify(tripMetrics(s, s.catalogueSnapshot || null))],
+      ["Track points", Array.isArray(s.track) ? s.track.length : 0],
       ["Notes", s.notes],
       [],
       ["PASSENGER DATA"],
@@ -225,6 +233,7 @@ export function makeCSV(s) {
         "stop_tc",
         "stop_en",
         "time",
+        "observed_at_hkt",
         "boarding",
         "alighting",
         "onboard",
@@ -245,6 +254,7 @@ export function makeCSV(s) {
       x.name.zh,
       x.name.en,
       x.time,
+      x.observedAt || "",
       x.boarding,
       x.alighting,
       x.onboard,
