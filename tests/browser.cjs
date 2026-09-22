@@ -365,6 +365,11 @@ const data = {
   await page.setViewportSize({ width: 412, height: 850 });
   await checkDock();
   await key(3);
+  assert.equal(await page.locator("#boarding").inputValue(), "3");
+  await page.locator("#undo").click();
+  assert.equal(await page.locator("#boarding").inputValue(), "", "undo restores the prior passenger entry");
+  await page.locator("#redo").click();
+  assert.equal(await page.locator("#boarding").inputValue(), "3", "redo reapplies the passenger entry");
   await page.keyboard.type("e.-+abc");
   assert.equal(await page.locator("#boarding").inputValue(), "3");
   await page.locator("#boarding").evaluate((e) => {
