@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
 const disk = {},
   errors = [],
   requests = [];
-let exported, exportedPng, browser;
+let exported, exportedGpx, exportedPng, browser;
 const route = (ids, dest) => ({
   route: "1",
   agency: "NLB",
@@ -90,6 +90,9 @@ const data = {
     await context.exposeBinding("capturePNG", (_, base64, name) => {
       exportedPng = { base64, name };
     });
+    await context.exposeBinding("captureGPX", (_, gpx, name) => {
+      exportedGpx = { gpx, name };
+    });
     await context.route("**/data/government-routes.json.gz", (r) =>
       r.fulfill({
         body: require("zlib").gzipSync(JSON.stringify(catalogue)),
@@ -137,6 +140,7 @@ const data = {
         },
         saveCsv: (csv, name) => { window.captureCSV(csv, name); finishExport(name); },
         savePng: (base64, name) => { window.capturePNG(base64, name); finishExport(name); },
+        saveGpx: (gpx, name) => { window.captureGPX(gpx, name); finishExport(name); },
         getExportDirectory: () => native.exportDirectory || defaultFolder,
         getExportResult: () => native.exportResult || null,
         chooseExportDirectory: () => {
@@ -259,6 +263,8 @@ const data = {
   await page.locator("#selectedStop").click();
   assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "false");
   await page.locator("#confirm").click();
+  await flush();
+  assert.equal(disk.trackingId, current().id, "native foreground tracking starts with an active survey");
   assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "counting starts with GPS following even after inspecting setup map");
   await page.waitForFunction(() => Math.abs(window.__map.getCenter().lat - 22.302) < 0.00001);
   assert.equal(await page.locator("#setupScreen").isVisible(), false);
@@ -377,6 +383,7 @@ const data = {
   assert.equal(await page.locator("#active").inputValue(), "1");
   await flush();
   assert.equal(current().rows[0].skipped.alighting, true);
+  assert.match(current().rows[0].observedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+08:00$/, "recorded stops keep a full Hong Kong timestamp");
   await page.locator("#noChange").click();
   assert.equal(await page.locator("#active").inputValue(), "2");
   await page.locator("#noChange").click();
@@ -411,6 +418,17 @@ const data = {
   await page.waitForFunction(
     () => Math.abs(window.__map.getCenter().lat - 22.304) < 0.00001,
   );
+  await page.evaluate(() => window.__map.setZoom(17));
+  await context.setGeolocation({
+    latitude: 22.305,
+    longitude: 114.175,
+    accuracy: 8,
+  });
+  await page.waitForFunction(
+    () => Math.abs(window.__map.getCenter().lat - 22.305) < 0.00001,
+  );
+  assert.equal(await page.evaluate(() => window.__map.getZoom()), 17, "GPS follow preserves the user's zoom level");
+  assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true");
   assert.equal(await page.locator(".leaflet-tooltip").count(), 3);
   await finishAndReview("recordNext");
   await flush();
@@ -482,9 +500,13 @@ const data = {
   await page.locator("#whole").click();
   assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "false");
   await page.locator("#pause").click();
+  await flush();
+  assert.equal(disk.trackingId, null, "pausing stops native foreground tracking");
   assert.equal(await page.locator("#homeScreen").isVisible(), true);
   assert.match(await page.locator("#recordList").textContent(), /Paused/);
   await page.locator("#recordList button").first().click();
+  await flush();
+  assert.equal(disk.trackingId, current().id, "resuming restarts native foreground tracking");
   assert.equal(await page.locator("#allStops").evaluate((e) => e.open), true);
   assert.equal(await page.locator("#active").inputValue(), "5");
   assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "resume restores GPS following");
@@ -496,10 +518,17 @@ const data = {
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
   assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "foregrounding restores GPS following");
   await page.locator("#abort").click();
+  await flush();
+  assert.equal(disk.trackingId, null, "aborting stops native foreground tracking");
   assert.match(await page.locator("#recordList").textContent(), /Aborted/);
   await page.locator("#recordList button").first().click();
   await finishAndReview();
   assert.equal(await page.locator("#recordIssues").isVisible(), false);
+  await page.locator("#gpx").click();
+  await flush();
+  assert.match(exportedGpx.name, /\.gpx$/);
+  assert.match(exportedGpx.gpx, /<trkpt /);
+  assert.match(exportedGpx.gpx, /<time>\d{4}-\d{2}-\d{2}T/);
   await page.locator("#csv").click();
   await flush();
   assert.match(exported.csv, /Status,completed/);
@@ -772,10 +801,14 @@ const data = {
   assert.deepEqual(current().rows, reopening.rows);
   assert.equal(await page.locator("#active").inputValue(), "1");
   if (!await page.locator("#allStops").evaluate((e) => e.open)) await page.locator("#allStops summary").click();
+  const preservedTime = current().rows[0].time;
+  const preservedObservedAt = current().rows[0].observedAt;
   await page.locator('#body tr[data-i="0"] input[data-field="boarding"]').click();
   await key(9);
   await flush();
   assert.equal(current().rows[0].boarding, "9");
+  assert.equal(current().rows[0].time, preservedTime, "later table correction does not replace stop time");
+  assert.equal(current().rows[0].observedAt, preservedObservedAt, "later table correction does not replace full observation timestamp");
   await page.locator("#active").selectOption("1");
   await page.locator("#noChange").click();
   await finishAndReview();
@@ -803,6 +836,9 @@ const data = {
   await page.locator("#recordScreen").waitFor();
   assert.equal(await page.locator('#chart rect[data-series="boarding"]').count(), 80);
   assert.ok(await page.locator("#chart").evaluate((e) => e.scrollWidth <= e.clientWidth), "80 stops fit the screen");
+  assert.equal(await page.locator("#chart text").evaluateAll((nodes) =>
+    nodes.some((n) => /^-?\d+\.\d+$/.test(n.textContent.trim()))), false,
+    "passenger chart labels are integers only");
   await page.locator("#saveChart").click();
   await flush();
   assert.match(exportedPng.name, /\.png$/);
