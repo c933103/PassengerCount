@@ -554,7 +554,8 @@ const data = {
   await key(2);
   await page.locator("#boundaries summary").click();
   await page.locator("#initialOnboard").fill("4");
-  assert.equal(await page.locator("#onboard").textContent(), "6");
+  assert.equal(await page.locator("#onboard").textContent(), "4", "unrecorded stop shows the onboard count through the previous stop");
+  assert.match(await page.locator("#onboardSource").textContent(), /上一站|previous/i);
   await page.locator("#initialOnboard").fill("2e1");
   assert.equal(await page.locator("#initialOnboard").inputValue(), "4");
   await page.locator("#boundaries summary").click();
@@ -568,7 +569,7 @@ const data = {
   assert.equal(await page.locator("#countScreen").isVisible(), true);
   assert.equal(await page.locator("#active").inputValue(), "1");
   assert.equal(await page.locator("#boarding").inputValue(), "2");
-  assert.equal(await page.locator("#onboard").textContent(), "6");
+  assert.equal(await page.locator("#onboard").textContent(), "4", "previous-stop onboard semantics survive reload");
   assert.equal(
     await page.locator("#surveyor").inputValue(),
     "Android surveyor",
