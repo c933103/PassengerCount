@@ -231,7 +231,7 @@ test("CSV preserves completed status, skipped fields, explicit zeros and route c
   assert.match(csv, /boarding_not_applicable/);
   assert.match(csv, /custom_stop/);
   assert.match(csv, /insert/);
-  assert.match(csv, /10:00,0,0/);
+  assert.match(csv, /observed_at_hkt/);\n  assert.match(csv, /10:00,,0,0/);
 });
 test("default Cantonese and English have matching UI keys and interpolation", () => {
   assert.equal(DEFAULT_LANGUAGE, "yue-Hant-HK");
