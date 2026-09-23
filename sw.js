@@ -11,6 +11,7 @@ const F = [
   "./government.js",
   "./fieldkit.js",
   "./live.js",
+  "./export.js",
   "./route-worker.js",
   "./data/government-routes.json.gz",
   "./vendor/fflate/fflate.js",
