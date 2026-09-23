@@ -219,7 +219,7 @@ test("a new lap can retain every stop and append clears the obsolete final bound
   assert.equal(s.endIndex, null);
   assert.equal(s.status, "in_progress");
 });
-test("CSV preserves completed status, skipped fields, explicit zeros and route corrections", () => {
+test("CSV preserves tabular survey fields without embedding structured route corrections", () => {
   const s = survey();
   recordStop(s, 0, "10:00", true);
   skipField(s, 1, "boarding");
@@ -230,7 +230,7 @@ test("CSV preserves completed status, skipped fields, explicit zeros and route c
   assert.match(csv, /Status,completed/);
   assert.match(csv, /boarding_not_applicable/);
   assert.match(csv, /custom_stop/);
-  assert.match(csv, /insert/);
+  assert.doesNotMatch(csv, /insert|routeEdits|Weather history|ETA snapshots|Calendar context/);
   assert.match(csv, /observed_at_hkt/);
   assert.match(csv, /10:00,,0,0/);
 });
