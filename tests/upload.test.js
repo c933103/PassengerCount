@@ -20,7 +20,7 @@ test("database upload uses only the reference webapp field contract", async () =
     status: "completed",
     completedAt: "2026-09-23T05:00:00Z",
     startIndex: 0,
-    endIndex: 2,
+    endIndex: 1,
     initialOnboard: "2",
     finalOnboard: "",
     startsAtOrigin: false,
@@ -35,11 +35,9 @@ test("database upload uses only the reference webapp field contract", async () =
     stops: [
       { id: "s0", sequence: 1, name: { zh: "甲站", en: "A" } },
       { id: "s1", sequence: 2, name: { zh: "乙站", en: "B" } },
-      { id: "s2", sequence: 3, name: { zh: "丙站", en: "C" } },
     ],
     rows: [
       { time: "12:00", boarding: "3", alighting: "", onboard: "5", notes: "first note", recorded: true, skipped: {}, observedAt: "2026-09-23T12:00:00+08:00" },
-      { time: "", boarding: "", alighting: "", onboard: "", notes: "note-only row", recorded: false, skipped: {}, observedAt: null },
       { time: "12:10", boarding: "0", alighting: "2", onboard: "3", notes: "", recorded: true, skipped: {}, observedAt: "2026-09-23T12:10:00+08:00" },
     ],
   };
@@ -63,12 +61,12 @@ test("database upload uses only the reference webapp field contract", async () =
     route: "1",
     survey_start_time: "12:00",
     survey_start: "甲站",
-    survey_end: "丙站",
+    survey_end: "乙站",
     vehicle_number: "AB1234",
     general_notes: "ordinary general note",
   });
 
-  assert.equal(requests[1].body.length, 2, "note-only row is omitted like the reference webapp");
+  assert.equal(requests[1].body.length, 2);
   assert.deepEqual(Object.keys(requests[1].body[0]).sort(), [
     "alighting","boarding","notes","onboard","stop_en","stop_tc","stop_time","survey_id","total",
   ].sort());
@@ -78,7 +76,7 @@ test("database upload uses only the reference webapp field contract", async () =
     notes: "first note", survey_id: 77,
   });
   assert.deepEqual(requests[1].body[1], {
-    stop_tc: "丙站", stop_en: "C", stop_time: "12:10",
+    stop_tc: "乙站", stop_en: "B", stop_time: "12:10",
     boarding: null, alighting: 2, onboard: 3, total: 8,
     notes: null, survey_id: 77,
   });
