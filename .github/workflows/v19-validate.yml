@@ -37,5 +37,6 @@ jobs:
           name: PassengerCount-1.10-validation
           path: |
             android/build/PassengerCount.apk
+            android/build/aligned.apk
             android/build/signing-tools
           if-no-files-found: error
