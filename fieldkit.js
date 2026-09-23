@@ -52,14 +52,19 @@ export function makeGpx(s) {
   const body = points
     .filter((p) => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)) && p.time)
     .map((p) => {
-      const comment = [
-        p.source || "gps",
-        Number.isFinite(Number(p.accuracy)) ? `accuracy=${Math.round(Number(p.accuracy))}m` : "",
-      ].filter(Boolean).join("; ");
-      return `<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lng).toFixed(7)}"><time>${escapeXml(p.time)}</time>${comment ? `<cmt>${escapeXml(comment)}</cmt>` : ""}</trkpt>`;
+      const extensions = [];
+      if (Number.isFinite(Number(p.accuracy)))
+        extensions.push(`<pc:accuracy_m>${Number(p.accuracy)}</pc:accuracy_m>`);
+      if (Number.isFinite(Number(p.speed)))
+        extensions.push(`<pc:speed_mps>${Number(p.speed)}</pc:speed_mps>`);
+      if (Number.isFinite(Number(p.heading)))
+        extensions.push(`<pc:heading_deg>${Number(p.heading)}</pc:heading_deg>`);
+      if (p.source)
+        extensions.push(`<pc:source>${escapeXml(p.source)}</pc:source>`);
+      return `<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lng).toFixed(7)}"><time>${escapeXml(p.time)}</time>${extensions.length ? `<extensions>${extensions.join("")}</extensions>` : ""}</trkpt>`;
     })
     .join("");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="PassengerCount" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${escapeXml(title)}</name></metadata><trk><name>${escapeXml(title)}</name><trkseg>${body}</trkseg></trk></gpx>\n`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="PassengerCount" xmlns="http://www.topografix.com/GPX/1/1" xmlns:pc="https://passengercount.app/gpx/1"><metadata><name>${escapeXml(title)}</name></metadata><trk><name>${escapeXml(title)}</name><trkseg>${body}</trkseg></trk></gpx>\n`;
 }
 
 export function parseVehicleProfiles(text) {
