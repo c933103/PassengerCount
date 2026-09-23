@@ -11,7 +11,7 @@ PLATFORM="$ANDROID_HOME/platforms/android-35/android.jar"
 BUILD="$ROOT/android/build"
 rm -rf "$BUILD"
 mkdir -p "$BUILD/assets/www" "$BUILD/classes" "$BUILD/dex"
-for file in index.html app.js core.js survey.js i18n.js charts.js data.js government.js fieldkit.js live.js route-worker.js storage.js upload.js supabase-config.js style.css manifest.json icon-192.png icon-512.png; do
+for file in index.html app.js core.js survey.js i18n.js charts.js data.js government.js fieldkit.js live.js export.js route-worker.js storage.js upload.js supabase-config.js style.css manifest.json icon-192.png icon-512.png; do
     cp "$ROOT/$file" "$BUILD/assets/www/"
 done
 cp -R "$ROOT/vendor" "$ROOT/data" "$BUILD/assets/www/"
