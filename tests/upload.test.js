@@ -83,3 +83,47 @@ test("database upload uses only the reference webapp field contract", async () =
   const raw = requests.map((r) => JSON.stringify(r.body)).join("\n");
   assert.doesNotMatch(raw, /PassengerCount|local-secret-id|secret-variant|vehicleMatch|calendarContext|weatherHistory|etaSnapshots|observedAt/);
 });
+
+
+test("database survey start stays at the configured mid-route start even when earlier onboard values are derived", async () => {
+  const requests = [];
+  const original = global.fetch;
+  global.fetch = async (url, options) => {
+    requests.push({ url: String(url), body: JSON.parse(options.body) });
+    if (String(url).endsWith("/surveys"))
+      return new Response(JSON.stringify([{ id: 88 }]), { status: 201, headers: { "content-type": "application/json" } });
+    return new Response("", { status: 201 });
+  };
+  const s = {
+    id: "mid-route",
+    surveyor: "Tester",
+    date: "2026-09-23",
+    vehicle: "",
+    notes: "",
+    status: "in_progress",
+    startIndex: 1,
+    initialOnboard: "5",
+    finalOnboard: "",
+    startsAtOrigin: false,
+    endsAtTerminus: false,
+    route: { route: "1", operator: "kmb" },
+    stops: [
+      { id: "s0", sequence: 1, name: { zh: "甲站", en: "A" } },
+      { id: "s1", sequence: 2, name: { zh: "乙站", en: "B" } },
+      { id: "s2", sequence: 3, name: { zh: "丙站", en: "C" } },
+    ],
+    rows: [
+      { time: "", boarding: "", alighting: "", onboard: "", notes: "", recorded: false, skipped: {} },
+      { time: "12:00", boarding: "2", alighting: "0", onboard: "", notes: "", recorded: true, skipped: {} },
+      { time: "", boarding: "", alighting: "", onboard: "", notes: "", recorded: false, skipped: {} },
+    ],
+  };
+  try {
+    await uploadSurvey(s, () => {});
+  } finally {
+    global.fetch = original;
+  }
+  assert.equal(requests[0].body[0].survey_start, "乙站");
+  assert.equal(requests[0].body[0].survey_start_time, "12:00");
+  assert.equal(requests[1].body[0].stop_tc, "甲站", "a derived earlier passenger log does not redefine survey start");
+});
