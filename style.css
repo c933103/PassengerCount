@@ -1,1 +1,774 @@
-:root{font:16px system-ui;color:#18343c;background:#f0f4f3;--a:#146858}*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1500px;margin:auto;padding:18px}header,.spread{display:flex;justify-content:space-between;align-items:center}h1{margin:0;font-size:clamp(1.45rem,3vw,2rem)}h2{font-size:1.15rem;margin:0 0 12px}small{color:var(--a);font-weight:750;letter-spacing:.13em}.panel{background:#fff;border:1px solid #d4e0dc;border-radius:12px;padding:18px;margin-bottom:15px}.row,.buttons{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.row label{flex:1 1 220px}label{display:grid;gap:5px;font-size:.88rem;font-weight:650}input,select,textarea,button{font:inherit;min-height:44px;border-radius:6px}input,select,textarea{border:1px solid #a9bdb6;padding:9px;width:100%;min-width:0}button{border:0;background:var(--a);color:white;font-weight:650;padding:9px 14px}.secondary{background:#edf4f1;color:#215548;border:1px solid #bed0c9}.error{padding:12px;background:#fff0e8;color:#843611;border:1px solid #d28963;border-radius:6px}.route{width:100%;text-align:left;background:#f4f8f6;color:#18343c;border:1px solid #cadbd4;margin:6px 0}.route span{display:block;font-size:.82rem;font-weight:400}.active{color:var(--a)!important;font-weight:700!important}.unknown{color:#80591b!important}.grid{display:grid;grid-template-columns:minmax(310px,.8fr) minmax(0,1.5fr);gap:15px;align-items:start}.grid aside{position:sticky;top:10px}#map{height:390px;border:1px solid #bdccc7;border-radius:7px;margin:10px 0}.stopIcon{border-radius:50%;background:var(--a);color:white;text-align:center;font:bold 11px/24px system-ui;border:2px solid white}.stopIcon.selected{background:#b75b12}.leaflet-tooltip{white-space:normal;max-width:180px}.table{overflow:auto}table{width:100%;border-collapse:collapse;font-size:.84rem}th{background:#edf3f0;text-align:left;padding:8px}td{padding:7px 4px;border-bottom:1px solid #dce5e0}td input[type=number]{width:75px}td input[type=time]{width:115px}.selectedRow{background:#fff3dc}.derived{background:#eff5f2}.check{display:flex;align-items:center}.check input{width:20px;min-height:20px}.mobile{display:none}p,footer{color:#526b70;font-size:.84rem;line-height:1.45}a{color:var(--a)}[hidden]{display:none!important}@media(max-width:720px){header,main,footer{padding:11px}.grid{display:block}.grid aside{position:static}#map{height:340px}.mobile{display:flex}table,tbody,tr,td{display:block}thead{display:none}tr{padding:10px 0;border-bottom:1px solid #ccd9d4}td{border:0}td input,td input[type=number],td input[type=time]{width:100%}body:not(.showAll) #body tr:not(.selectedRow){display:none}}
+:root {
+  font:
+    16px system-ui,
+    sans-serif;
+  color: #18343c;
+  background: #f0f4f3;
+  --a: #146858;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header,
+main,
+footer {
+  max-width: 1000px;
+  margin: auto;
+  padding: 12px;
+}
+header,
+.spread,
+.countTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+header h1 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+header > div {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+#language {
+  width: auto;
+  font-size: 0.8rem;
+  min-height: 35px;
+  padding: 5px;
+}
+#saveStatus {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+h2 {
+  font-size: 1.15rem;
+}
+h3 {
+  font-size: 1rem;
+}
+.panel,
+.recordCard {
+  background: white;
+  border: 1px solid #d4e0dc;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+}
+.recordCard h3 {
+  margin: 0 0 8px;
+}
+.row,
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+}
+.row label {
+  flex: 1 1 160px;
+}
+label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 650;
+  margin: 8px 0;
+}
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  min-height: 44px;
+  border-radius: 7px;
+}
+input,
+select,
+textarea {
+  border: 1px solid #a9bdb6;
+  padding: 8px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  background: white;
+  color: inherit;
+}
+button {
+  border: 0;
+  background: var(--a);
+  color: white;
+  font-weight: 650;
+  padding: 9px 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.secondary {
+  background: #e4eee9;
+  color: #215548;
+  border: 1px solid #b8cec4;
+}
+.small {
+  font-size: 0.75rem;
+  min-height: 32px;
+  padding: 5px 8px;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #d97820;
+  outline-offset: 2px;
+}
+.warning {
+  padding: 10px;
+  background: #fff0e8;
+  color: #843611;
+  border: 1px solid #d28963;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  margin: 8px 0;
+}
+.warning ul {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+.route {
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  color: #18343c;
+  border: 1px solid #cadbd4;
+  margin: 6px 0;
+}
+.route span {
+  display: block;
+  font-size: 0.79rem;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.status,
+small {
+  font-size: 0.76rem;
+  color: #526b70;
+}
+.active {
+  color: var(--a);
+  font-weight: 700;
+}
+.unknown {
+  color: #80591b;
+}
+summary {
+  cursor: pointer;
+  padding: 12px 0;
+  font-size: 0.87rem;
+  font-weight: 650;
+}
+details {
+  border-bottom: 1px solid #d0ddd7;
+}
+details[open] {
+  padding-bottom: 10px;
+}
+.check {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+}
+.check input {
+  width: 20px;
+  min-height: 20px;
+  margin-top: 2px;
+}
+p,
+footer {
+  color: #526b70;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+a {
+  color: var(--a);
+}
+[hidden] {
+  display: none !important;
+}
+#countScreen {
+  max-width: 850px;
+  margin: auto;
+}
+.countTop {
+  font-size: 0.83rem;
+  margin-bottom: 6px;
+}
+.countTop button {
+  font-size: 0.8rem;
+  min-height: 36px;
+}
+.stopPicker {
+  font-size: 0.78rem;
+  margin: 8px 0;
+}
+.stopPicker select {
+  font-size: 1rem;
+  font-weight: 700;
+  background: #fff3dc;
+  border-color: #ce954e;
+}
+.stopActions {
+  display: flex;
+  gap: 8px;
+}
+.stopActions button {
+  font-size: 0.8rem;
+  flex: 1;
+}
+#rowStatus {
+  margin: 5px 0;
+}
+.countFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 560px;
+  margin: 10px auto 0;
+}
+.countFields label {
+  text-align: center;
+  margin: 0;
+}
+.countFields input {
+  height: 60px;
+  font-size: 2rem;
+  font-weight: 650;
+  text-align: center;
+  caret-color: transparent;
+}
+.selectedField {
+  border: 2px solid var(--a) !important;
+  box-shadow: 0 0 0 1px var(--a);
+  background: #f4fbf7 !important;
+}
+.derived {
+  color: #627870;
+  background: #eff5f2;
+}
+.onboardSummary {
+  text-align: center;
+  font-size: 0.95rem;
+  margin: 10px 0;
+}
+.onboardSummary output {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  max-width: 560px;
+  margin: auto;
+}
+.keypad button {
+  min-height: 50px;
+  font-size: 1.4rem;
+  background: #fff;
+  color: #18343c;
+  border: 1px solid #bdd0c6;
+  border-bottom: 3px solid #9fb9ac;
+}
+.keypad button:active {
+  background: #d4e8df;
+}
+.keypad button.secondary {
+  font-size: 0.9rem;
+  background: #e4eee9;
+}
+#keypadTarget {
+  max-width: 560px;
+  margin: 5px auto;
+}
+.countButtons {
+  justify-content: center;
+  margin: 10px 0;
+}
+.countButtons button {
+  flex: 1;
+  max-width: 250px;
+}
+.tripControls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.tripControls p {
+  width: 100%;
+  margin: 0;
+}
+#mapPanel {
+  background: #fff;
+  border: 1px solid #d4e0dc;
+  border-radius: 9px;
+  padding: 8px;
+  margin: 8px 0;
+}
+#gps {
+  font-size: 0.72rem;
+}
+#map {
+  height: 200px;
+  border-radius: 7px;
+  margin: 6px 0;
+  isolation: isolate;
+}
+.mapButtons {
+  gap: 5px;
+}
+.mapButtons button {
+  font-size: 0.7rem;
+  min-height: 30px;
+  padding: 5px 7px;
+}
+.stopIcon {
+  border-radius: 50%;
+  background: var(--a);
+  color: white;
+  text-align: center;
+  font: bold 11px/24px system-ui;
+  border: 2px solid white;
+}
+.stopIcon.selected {
+  background: #b75b12;
+}
+.leaflet-tooltip {
+  white-space: normal;
+  min-width: 110px;
+  max-width: 190px;
+}
+.table,
+.chart {
+  overflow: auto;
+  max-width: 100%;
+  background: white;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+td,
+th {
+  padding: 6px;
+  border-bottom: 1px solid #d2dfd8;
+  text-align: left;
+}
+th {
+  background: #e9f1ed;
+  white-space: nowrap;
+}
+#body td:first-child {
+  min-width: 145px;
+}
+#body input {
+  font-size: 0.86rem;
+  min-height: 38px;
+  padding: 6px;
+}
+#body input[data-field="boarding"],
+#body input[data-field="alighting"],
+#body input[data-field="onboard"] {
+  width: 65px;
+  text-align: center;
+}
+#body input[type="time"] {
+  width: 115px;
+}
+#body input[data-field="notes"] {
+  width: 135px;
+}
+.selectedRow {
+  background: #fff3dc;
+}
+td button.stopLink {
+  padding: 0;
+  background: transparent;
+  color: var(--a);
+  font-size: 0.78rem;
+  text-align: left;
+}
+td select {
+  width: 105px;
+  font-size: 0.75rem;
+}
+td small {
+  display: block;
+  font-size: 0.65rem;
+}
+.legend {
+  display: flex;
+  gap: 15px;
+  font-size: 0.85rem;
+  margin: 8px 0;
+}
+.boardLegend {
+  color: #16836b;
+}
+.alightLegend {
+  color: #b16417;
+}
+.onboardLegend {
+  color: #3152b5;
+}
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+.savedPath {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+#myLocation[aria-pressed="true"] {
+  background: var(--a);
+  color: white;
+}
+dialog {
+  border: 1px solid #b6cac0;
+  border-radius: 12px;
+  padding: 20px;
+  width: min(94vw, 620px);
+  max-height: 90dvh;
+  overflow: auto;
+  background: #f7faf8;
+  color: #18343c;
+}
+dialog::backdrop {
+  background: #16362e70;
+}
+#sectionStops {
+  font-size: 0.85rem;
+  max-height: 180px;
+  overflow: auto;
+  padding-left: 25px;
+}
+footer {
+  font-size: 0.68rem;
+}
+body[data-screen="count"] footer {
+  display: none;
+}
+@media (max-width: 500px) {
+  header,
+  main {
+    padding: 9px;
+  }
+  header h1 {
+    font-size: 1rem;
+  }
+  #saveStatus {
+    font-size: 0.65rem;
+  }
+  #map {
+    height: 165px;
+  }
+  .countButtons button {
+    font-size: 0.8rem;
+    padding: 9px 6px;
+  }
+  .keypad button {
+    min-height: 45px;
+  }
+  .countFields input {
+    height: 52px;
+  }
+  #mapPanel {
+    padding: 6px;
+  }
+  #recordBody td:first-child {
+    min-width: 125px;
+  }
+}
+
+#allStops .table {
+  max-height: min(42vh, 420px);
+}
+#allStops th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.danger {
+  background: #fff1ed;
+  border: 1px solid #cc8e7d;
+  color: #982f1b;
+}
+#confirmDelete {
+  background: #982f1b;
+  color: white;
+}
+#deleteSummary {
+  font-weight: 650;
+  color: #18343c;
+}
+/* Reserve the panel's measured height so every table row can scroll above it. */
+html:has(body[data-screen="count"]) {
+  scroll-padding-bottom: calc(var(--entry-dock-height, 420px) + 12px);
+}
+body[data-screen="count"] main {
+  padding-bottom: calc(var(--entry-dock-height, 420px) + 24px);
+}
+#entryDock {
+  position: fixed;
+  z-index: 800;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 850px);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: #f0f4f3;
+  border: 1px solid #b3c9bf;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -4px 16px #18343c24;
+  display: grid;
+  grid-template-areas: "stop" "fields" "summary" "keypad" "actions" "trip";
+  gap: 5px;
+}
+.dockStop {
+  grid-area: stop;
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+#entryDock .stopPicker {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  gap: 1px;
+}
+#entryDock .stopPicker span {
+  font-size: 0.7rem;
+}
+#entryDock .stopPicker select {
+  min-height: 40px;
+  height: 40px;
+  padding: 6px;
+}
+.dockStop button {
+  min-width: 38px;
+  min-height: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 1.5rem;
+}
+#entryDock .countFields {
+  grid-area: fields;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  gap: 10px;
+}
+#entryDock .countFields label {
+  gap: 2px;
+  font-size: 0.78rem;
+}
+#entryDock .countFields input {
+  min-height: 42px;
+  height: 42px;
+  padding: 2px;
+  font-size: 1.7rem;
+}
+#entryDock .countFields button {
+  min-height: 28px;
+  padding: 3px 6px;
+}
+.entrySummary {
+  grid-area: summary;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+#entryDock .onboardSummary {
+  margin: 0;
+  font-size: 0.8rem;
+}
+#entryDock .onboardSummary output {
+  font-size: 1.15rem;
+}
+#entryDock #keypadTarget {
+  margin: 0;
+  font-weight: 650;
+}
+#entryDock .keypad {
+  grid-area: keypad;
+  max-width: none;
+  width: 100%;
+  gap: 5px;
+}
+#entryDock .keypad button {
+  min-height: 42px;
+  padding: 4px;
+  font-size: 1.3rem;
+}
+#entryDock .keypad button.secondary {
+  font-size: 0.8rem;
+}
+#entryDock .countButtons {
+  grid-area: actions;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 0;
+}
+#entryDock .countButtons button {
+  max-width: none;
+  min-height: 40px;
+  padding: 5px;
+  font-size: 0.78rem;
+}
+@media (max-height: 600px) {
+  #entryDock {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "stop stop" "fields keypad" "summary keypad" "actions actions" "trip trip";
+    gap: 4px 10px;
+  }
+  #entryDock .keypad button {
+    min-height: 32px;
+    padding: 2px;
+    font-size: 1.1rem;
+  }
+  #entryDock .countFields input {
+    min-height: 36px;
+    height: 36px;
+  }
+  #entryDock .countButtons button {
+    min-height: 34px;
+  }
+  #entryDock .entrySummary {
+    flex-wrap: wrap;
+    gap: 0 8px;
+  }
+}
+
+#recordSelection {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 1000px);
+  z-index: 800;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  background: #f0f4f3;
+  border-top: 1px solid #b6cac0;
+  align-items: center;
+}
+body.selectingRecords main {
+  padding-bottom: calc(var(--selection-height, 100px) + 24px);
+}
+html:has(body.selectingRecords) {
+  scroll-padding-bottom: calc(var(--selection-height, 100px) + 12px);
+}
+#selectedRecordCount {
+  flex: 1;
+  font-size: 0.85rem;
+}
+.recordSelect {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  cursor: pointer;
+}
+.recordSelect input {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  accent-color: var(--a);
+}
+.recordSelect div {
+  min-width: 0;
+}
+.recordSelect h3 {
+  overflow-wrap: anywhere;
+}
+#deleteSummary {
+  padding-left: 22px;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+#deleteSummary li {
+  margin: 10px 0;
+}
+#deleteDialog {
+  padding: 12px;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+#deleteDialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#deleteTitle {
+  flex: none;
+  margin: 0;
+}
+#deleteReview {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+#deleteHelp {
+  margin-top: 0;
+  font-size: 0.85rem;
+}
+#deleteDialog .deleteActions {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #b6cac0;
+  padding-top: 10px;
+}
+
+#entryDock .tripControls {
+  grid-area: trip;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding-top: 6px;
+  border-top: 1px solid #b3c9bf;
+}
+#entryDock .tripControls button {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 5px;
+  font-size: 0.75rem;
+}
+@media (max-height: 600px) {
+  #entryDock .tripControls {
+    margin-top: 0;
+    padding-top: 4px;
+  }
+  #entryDock .tripControls button {
+    min-height: 34px;
+  }
+}
