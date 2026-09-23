@@ -32,7 +32,10 @@ test("GPX export keeps timestamped fixes and marks estimated fixes", () => {
   });
   assert.match(xml, /<gpx version="1.1"/);
   assert.match(xml, /2026-09-22T12:00:00\+08:00/);
-  assert.match(xml, /<pc:accuracy_m>40<\\/pc:accuracy_m>/);\n  assert.match(xml, /<pc:speed_mps>12.5<\\/pc:speed_mps>/);\n  assert.match(xml, /<pc:heading_deg>91<\\/pc:heading_deg>/);\n  assert.match(xml, /<pc:source>estimated<\\/pc:source>/);
+  assert.match(xml, /<pc:accuracy_m>40<\/pc:accuracy_m>/);
+  assert.match(xml, /<pc:speed_mps>12.5<\/pc:speed_mps>/);
+  assert.match(xml, /<pc:heading_deg>91<\/pc:heading_deg>/);
+  assert.match(xml, /<pc:source>estimated<\/pc:source>/);
   assert.equal((xml.match(/<trkpt /g) || []).length, 2);
 });
 
