@@ -144,3 +144,27 @@ test("ETA evidence prefetches the current and downstream stops without claiming 
     assert.match(e.note, /not identified/i);
   } finally { global.fetch = original; }
 });
+
+
+test("GPX omits unknown optional numeric measurements instead of turning null into zero", () => {
+  const xml = makeGpx({
+    route: { route: "1" },
+    date: "2026-09-23",
+    track: [
+      {
+        lat: 22.3,
+        lng: 114.17,
+        time: "2026-09-23T12:00:00+08:00",
+        accuracy: null,
+        speed: null,
+        heading: null,
+        source: "gps",
+      },
+    ],
+  });
+  assert.match(xml, /<trkpt /);
+  assert.doesNotMatch(xml, /<pc:accuracy_m>/);
+  assert.doesNotMatch(xml, /<pc:speed_mps>/);
+  assert.doesNotMatch(xml, /<pc:heading_deg>/);
+  assert.match(xml, /<pc:source>gps<\/pc:source>/);
+});
