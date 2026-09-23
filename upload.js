@@ -33,9 +33,10 @@ export async function uploadSurvey(s, save) {
 
   const source = records(s);
   const passengerLogs = [];
+  const configuredStart = source[s.startIndex];
   let cumulativeBoarding = null,
-    surveyStartTime = null,
-    surveyStart = null,
+    surveyStartTime = configuredStart?.time || null,
+    surveyStart = s.stops[s.startIndex]?.name?.zh || null,
     surveyEnd = null,
     first = true;
 
@@ -50,8 +51,6 @@ export async function uploadSurvey(s, save) {
     if (!(time || boarding > 0 || alighting > 0 || onboard > 0)) continue;
 
     if (first) {
-      surveyStartTime = time || null;
-      surveyStart = x.name.zh || null;
       cumulativeBoarding = onboard || 0;
       first = false;
     }
