@@ -50,14 +50,20 @@ export function makeGpx(s) {
   const points = Array.isArray(s?.track) ? s.track : [];
   const title = `${s?.route?.route || "trip"} ${s?.date || ""}`.trim();
   const body = points
-    .filter((p) => Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng)) && p.time)
+    .filter((p) =>
+      p?.lat != null &&
+      p?.lng != null &&
+      Number.isFinite(Number(p.lat)) &&
+      Number.isFinite(Number(p.lng)) &&
+      p.time,
+    )
     .map((p) => {
       const extensions = [];
-      if (Number.isFinite(Number(p.accuracy)))
+      if (p.accuracy != null && p.accuracy !== "" && Number.isFinite(Number(p.accuracy)))
         extensions.push(`<pc:accuracy_m>${Number(p.accuracy)}</pc:accuracy_m>`);
-      if (Number.isFinite(Number(p.speed)))
+      if (p.speed != null && p.speed !== "" && Number.isFinite(Number(p.speed)))
         extensions.push(`<pc:speed_mps>${Number(p.speed)}</pc:speed_mps>`);
-      if (Number.isFinite(Number(p.heading)))
+      if (p.heading != null && p.heading !== "" && Number.isFinite(Number(p.heading)))
         extensions.push(`<pc:heading_deg>${Number(p.heading)}</pc:heading_deg>`);
       if (p.source)
         extensions.push(`<pc:source>${escapeXml(p.source)}</pc:source>`);
