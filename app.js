@@ -26,6 +26,7 @@ import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes, checkRouteUpdates } from "./data.js";
 import { uploadSurvey } from "./upload.js";
+import { makeExportBundle } from "./export.js";
 import {
   hkTimestamp,
   makeGpx,
@@ -1371,17 +1372,44 @@ function browserDownload(href, filename) {
   $("exportStatus").classList.remove("warning");
   $("exportStatus").textContent = t("downloadStarted");
 }
-function download() {
-  if (!cur()) return;
-  const csv = makeCSV(cur()), filename = exportFilename("csv");
+async function download() {
+  const s = cur();
+  if (!s) return;
+  syncNativeTrack(s);
+  $("csv").disabled = true;
   $("exportStatus").textContent = t("exporting");
-  if (window.PassengerCountAndroid) {
-    window.PassengerCountAndroid.saveCsv(csv, filename);
-    return;
+  try {
+    let png = "";
+    try { png = await chartPng($("chart")); } catch {}
+    const bundle = makeExportBundle(s, data, png);
+    if (window.PassengerCountAndroid?.saveBundle) {
+      window.PassengerCountAndroid.saveBundle(
+        bundle.folder,
+        bundle.base,
+        bundle.csv,
+        bundle.json,
+        bundle.gpx,
+        bundle.pngBase64,
+      );
+      return;
+    }
+
+    const urls = [];
+    const downloadText = (content, extension, mime) => {
+      const href = URL.createObjectURL(new Blob([content], { type: mime }));
+      urls.push(href);
+      browserDownload(href, `${bundle.base}.${extension}`);
+    };
+    downloadText(bundle.csv, "csv", "text/csv;charset=utf-8");
+    downloadText(bundle.json, "json", "application/json");
+    downloadText(bundle.gpx, "gpx", "application/gpx+xml");
+    if (png) browserDownload(png, `${bundle.base}.png`);
+    setTimeout(() => urls.forEach((x) => URL.revokeObjectURL(x)), 5000);
+  } catch {
+    exportResult({ ok: false });
+  } finally {
+    $("csv").disabled = false;
   }
-  const href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-  browserDownload(href, filename);
-  setTimeout(() => URL.revokeObjectURL(href), 5000);
 }
 function downloadGpx() {
   const s = cur();

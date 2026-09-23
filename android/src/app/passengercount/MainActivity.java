@@ -211,6 +211,34 @@ public final class MainActivity extends Activity {
                 } catch (Exception e) { exportResult(false, ""); }
             });
         }
+        @JavascriptInterface public void saveBundle(
+                String folder, String base, String csv, String json, String gpx, String pngBase64) {
+            queueExport(() -> {
+                try {
+                    if (folder == null || base == null || csv == null || json == null || gpx == null)
+                        throw new IOException("Invalid export bundle");
+                    if (csv.length() > 10_000_000 || json.length() > 30_000_000 || gpx.length() > 30_000_000)
+                        throw new IOException("Export bundle too large");
+                    byte[] png = new byte[0];
+                    if (pngBase64 != null && !pngBase64.isEmpty()) {
+                        if (pngBase64.length() > 20_000_000) throw new IOException("Invalid image");
+                        png = android.util.Base64.decode(pngBase64, android.util.Base64.DEFAULT);
+                        byte[] signature = {(byte)137, 80, 78, 71, 13, 10, 26, 10};
+                        if (png.length < signature.length) throw new IOException("Invalid PNG");
+                        for (int i = 0; i < signature.length; i++)
+                            if (png[i] != signature[i]) throw new IOException("Invalid PNG");
+                    }
+                    String path = new ExportStorage(MainActivity.this).saveBundle(
+                        folder,
+                        base,
+                        csv.getBytes(StandardCharsets.UTF_8),
+                        json.getBytes(StandardCharsets.UTF_8),
+                        gpx.getBytes(StandardCharsets.UTF_8),
+                        png);
+                    exportResult(true, path);
+                } catch (Exception e) { exportResult(false, ""); }
+            });
+        }
         @JavascriptInterface public String getExportDirectory() { return new ExportStorage(MainActivity.this).directory(); }
         @JavascriptInterface public String getExportResult() { return getSharedPreferences("exports", MODE_PRIVATE).getString("result", null); }
         @JavascriptInterface public void chooseExportDirectory() { runOnUiThread(() -> chooseDirectory()); }

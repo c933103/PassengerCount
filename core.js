@@ -184,46 +184,25 @@ export function records(s) {
 }
 export function makeCSV(s) {
   const r = s.route,
+    weekday = s.date
+      ? new Date(`${s.date}T00:00:00Z`).toLocaleDateString("en", {
+          weekday: "long",
+          timeZone: "UTC",
+        })
+      : "",
     rows = [
       ["SURVEY INFORMATION"],
       ["Surveyor Name", s.surveyor],
       ["Date", s.date],
+      ["Day of Week", weekday],
       ["Vehicle Number", s.vehicle],
-      ["Vehicle match", JSON.stringify(s.vehicleMatch || null)],
-      ["Calendar context", JSON.stringify(s.calendarContext || null)],
-      ["Weather history", JSON.stringify(s.weatherHistory || [])],
-      ["ETA snapshots", JSON.stringify(s.etaSnapshots || [])],
       ["Route", r.route],
-      ["Operator", OPERATORS[r.operator]],
+      ["Operator", OPERATORS[r.operator] || r.operator],
       ["Direction", r.direction],
       ["Variant", r.key],
-      [
-        "Route data source",
-        r.source === "hk-td-gtfs-v1"
-          ? "Transport Department / DATA.GOV.HK (https://data.gov.hk/en-data/dataset/hk-td-tis_11-pt-headway-en)"
-          : "Legacy saved survey",
-      ],
-      [
-        "Route data attribution",
-        r.source === "hk-td-gtfs-v1"
-          ? "Route, stop and timetable data © Government of the Hong Kong SAR; reuse terms: https://data.gov.hk/en/terms-and-conditions"
-          : "Original survey stop snapshot",
-      ],
-      [
-        "Confirmed start sequence",
-        s.startIndex == null ? "" : s.startIndex + 1,
-      ],
       ["Status", s.status || "in_progress"],
-      ["Completed at", s.completedAt || ""],
-      ["End stop", s.endIndex == null ? "" : s.endIndex + 1],
-      ["Known onboard before start", s.initialOnboard || ""],
-      ["Known onboard after end", s.finalOnboard || ""],
-      ["Start zero assumption", s.startsAtOrigin === true],
-      ["End zero assumption", s.endsAtTerminus !== false],
-      ["Calculation issues", JSON.stringify(calculateOnboard(s).issues)],
-      ["Route corrections", JSON.stringify(s.routeEdits || [])],
-      ["Trip metrics", JSON.stringify(tripMetrics(s, s.catalogueSnapshot || null))],
-      ["Track points", Array.isArray(s.track) ? s.track.length : 0],
+      ["Start Stop Sequence", s.startIndex == null ? "" : s.startIndex + 1],
+      ["End Stop Sequence", s.endIndex == null ? "" : s.endIndex + 1],
       ["Notes", s.notes],
       [],
       ["PASSENGER DATA"],

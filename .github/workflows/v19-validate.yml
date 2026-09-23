@@ -1,7 +1,7 @@
-name: Validate Android v1.9
+name: Validate Android v1.10
 on:
   push:
-    branches: [feat/android-app]
+    branches: [feat/android-app, fix/reference-upload-export-bundle]
   workflow_dispatch:
 jobs:
   validate:
@@ -34,8 +34,9 @@ jobs:
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" android/build/signing-tools/lib/
       - uses: actions/upload-artifact@v4
         with:
-          name: PassengerCount-1.9-validation
+          name: PassengerCount-1.10-validation
           path: |
             android/build/PassengerCount.apk
+            android/build/aligned.apk
             android/build/signing-tools
           if-no-files-found: error
