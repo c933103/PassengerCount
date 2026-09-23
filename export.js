@@ -14,7 +14,7 @@ function safePart(value, fallback = "trip") {
 }
 
 export function exportBase(s, now = new Date()) {
-  const stamp = now.toISOString().replace(/[-:]/g, "").replace(/\..*$/, "Z");
+  const stamp = now.toISOString().replace(/[-:.]/g, "");
   return [
     "bus",
     safePart(s?.route?.route, "route"),
