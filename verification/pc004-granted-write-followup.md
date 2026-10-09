@@ -36,9 +36,10 @@ This is host-fixture evidence, not an emulator or physical-device reproduction.
   completion, the next page reads the final result normally.
 - Notifications read the current state on UI delivery, so an old queued completion
   cannot unlock controls for a newer write. Repeated completion events are safe.
-- Busy state is never persisted. A recoverable failure fallback is committed before
-  submitting any export; process death therefore leaves retry feedback rather than
-  a permanently pending state or the previous export's success.
+- Busy state is never persisted. This revision initially committed a recoverable
+  failure fallback before submission. The subsequent final-result persistence
+  review identified that the public write may have completed before a crash;
+  the next follow-up replaces that pre-write marker with outcome uncertainty.
 - Failed fallback persistence or rejected executor submission cannot start a file
   or leave the process gate busy. PNG encoding also holds the controls until its
   native completion; late native events cannot unlock an unfinished encoder.
@@ -72,3 +73,11 @@ no local browser or installed-Android pass is claimed. Initial-head CI was green
 but the revised head requires fresh full browser/APK CI and Codex re-review.
 The permission/lifecycle cases are simulations; real Android dialogs, framework
 lifecycle behavior and physical provider/file I/O remain separate validation.
+
+## Subsequent result-persistence boundary
+
+The initial granted-write correction passed full CI at `a5b9961a68`, but Codex
+identified a valid final-result commit failure boundary. It is not the final
+accepted head. [The result-persistence follow-up](pc004-result-persistence-followup.md)
+records the correction and latest verification, including conservative folder-check
+feedback rather than retry-safe failure once file mutation may have started.

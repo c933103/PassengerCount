@@ -55,6 +55,18 @@ module.exports = async function exportPermissionRecovery({ open, sample, getExpo
         assert.deepEqual(retained.rows, survey.rows, 'completion and later explicit export preserve the original survey');
       } finally { await resumedContext.close(); }
     }
+    const beforeUncertain = getExports();
+    const { context: uncertainContext, page: uncertain } = await open({ ...seed, exportResult: '{"uncertain":true}' }, 360);
+    try {
+      await uncertain.locator('#recordScreen').waitFor();
+      const text = await uncertain.locator('#exportStatus').textContent();
+      assert.match(text, language === 'en' ? /A file may already be saved.*Check the export folder before exporting again/ : /檔案可能已儲存.*再次匯出前.*檢查匯出資料夾/);
+      assert.doesNotMatch(text, /Export failed|匯出失敗/);
+      assert.equal(await uncertain.locator('#exportStatus').evaluate(el => el.classList.contains('warning')), true);
+      assert.deepEqual(getExports(), beforeUncertain, 'uncertain completion never starts another export automatically');
+      const retained = await uncertain.evaluate(() => JSON.parse(window.PassengerCountAndroid.get('passenger-count:workspace:v2')).surveys[0]);
+      assert.deepEqual(retained.rows, survey.rows, 'uncertain outcome leaves saved survey intact');
+    } finally { await uncertainContext.close(); }
   }
-  console.log('PASS: PC-004 restored export-failure feedback in English/Cantonese, retained surveys, no automatic export, in-flight controls/completion delivery and explicit retry (simulated native bridge).');
+  console.log('PASS: PC-004 restored export-failure feedback in English/Cantonese, retained surveys, no automatic export, in-flight controls/completion delivery, uncertain-result folder-check guidance and explicit retry (simulated native bridge).');
 };

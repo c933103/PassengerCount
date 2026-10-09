@@ -9,6 +9,7 @@ public final class MainActivity extends Activity {
     /* PRODUCTION_METHODS */
 
     static final String FAILURE = "{\"ok\":false,\"path\":\"\"}";
+    static final String UNCERTAIN = "{\"uncertain\":true}";
     static final String SUCCESS = "{\"ok\":true,\"path\":\"earlier.csv\"}";
     static int assertions, failures;
     String tree;
@@ -30,7 +31,7 @@ public final class MainActivity extends Activity {
         check(name.equals("exports"), "export flow never changes saved-survey preferences");
         return disk;
     }
-    void exportResult(boolean ok, String path) { reports++; storeExportResult(ok ? SUCCESS : FAILURE); }
+    void exportResult(boolean ok, String path) { reports++; storeExportResult(ok ? SUCCESS : FAILURE, ok); }
     final List<String> events = Collections.synchronizedList(new ArrayList<>());
     void emit(String event, String json) { if (!destroyed) events.add(json); }
     boolean hasLocation() { return false; }
@@ -151,7 +152,7 @@ public final class MainActivity extends Activity {
                         replacement = new MainActivity(disk); replacement.granted = true;
                         a.onDestroy(); // Stale teardown must not detach the replacement's observer.
                         check("{\"pending\":true}".equals(replacement.result()), "second recreation still sees process-owned write");
-                        check(FAILURE.equals(disk.getString("result", null)) && !new ExportSession().busy(), "fresh process would read durable retry fallback, not a stuck busy flag");
+                        check(UNCERTAIN.equals(disk.getString("result", null)) && !new ExportSession().busy(), "fresh process would read check-folder uncertainty, not retry or a stuck busy flag");
                         release.countDown();
                         check(a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS), "old executor finishes submitted work");
                         String expected = succeeds ? SUCCESS : FAILURE;
@@ -229,6 +230,38 @@ public final class MainActivity extends Activity {
                     check("{\"pending\":true}".equals(a.events.get(a.events.size() - 1)), "delayed event reads current pending state on delivery");
                 } finally { release.countDown(); a.drain(); a.onDestroy(); }
             });
+            scenario(label + "failed post-grant uncertainty commit prevents file mutation", () -> {
+                SharedPreferences disk = previousSuccess(); MainActivity a = new MainActivity(disk);
+                try {
+                    a.queue("A"); disk.fail = true; a.reply(a.requestedCode, true); a.drain();
+                    check(a.saved.isEmpty() && !exportSession.busy(), "no task starts when uncertainty cannot be persisted");
+                    check(FAILURE.equals(a.result()), "known no-write failure remains retry-safe in current process");
+                    check(FAILURE.equals(disk.restart().getString("result", null)), "initial no-write marker remains durable");
+                } finally { a.onDestroy(); }
+            });
+            for (boolean fileSaved : new boolean[]{true, false}) {
+                scenario(label + "failed final result commit after " + (fileSaved ? "successful" : "failed") + " write", () -> {
+                    SharedPreferences disk = previousSuccess(); MainActivity a = new MainActivity(disk);
+                    a.queueExport(() -> {
+                        if (fileSaved) a.saved.add("A");
+                        disk.fail = true;
+                        a.exportResult(fileSaved, "A.csv");
+                    });
+                    a.reply(a.requestedCode, true); a.drain(); int old = a.requestedCode;
+                    try {
+                        check((fileSaved ? UNCERTAIN : FAILURE).equals(a.result()), "current page never treats unconfirmed saved file as retry-safe failure");
+                        check(UNCERTAIN.equals(disk.restart().getString("result", null)), "process restart keeps possible output distinct from retry-safe failure");
+                        check(a.saved.size() == (fileSaved ? 1 : 0), "original file mutation occurs at most once");
+                    } finally { a.onDestroy(); }
+                    MainActivity b = new MainActivity(disk.restart()); b.granted = true;
+                    try {
+                        b.reply(old, true); b.reply(old, true); b.drain();
+                        check(UNCERTAIN.equals(b.result()) && b.saved.isEmpty(), "recreated process neither replays nor hides uncertain outcome");
+                        b.queue("explicit export after folder check"); b.drain();
+                        check(b.saved.equals(Arrays.asList("explicit export after folder check")), "a later explicit action works after outcome inspection");
+                    } finally { b.onDestroy(); }
+                });
+            }
             scenario(label + "repeated taps retain original pending request", () -> {
                 MainActivity a = new MainActivity(previousSuccess());
                 try {
@@ -324,6 +357,10 @@ public final class MainActivity extends Activity {
             final Map<String, Object> changes = new HashMap<>();
             Editor putString(String key, String value) { changes.put(key, value); return this; }
             Editor putInt(String key, int value) { changes.put(key, value); return this; }
+            void apply() {
+                values.putAll(changes);
+                if (!fail) durable.putAll(changes);
+            }
             boolean commit() {
                 values.putAll(changes);
                 if (fail) return false;

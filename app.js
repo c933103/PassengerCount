@@ -1362,8 +1362,9 @@ function updateExportControls() {
 function exportResult(result, reveal = false) {
   nativeExportPending = result.pending === true;
   updateExportControls();
-  $("exportStatus").textContent = nativeExportPending ? t("exporting") : result.ok
-    ? t("exportSaved", { path: result.path }) : t("exportFailed");
+  $("exportStatus").textContent = nativeExportPending ? t("exporting")
+    : result.uncertain ? t("exportUncertain")
+    : result.ok ? t("exportSaved", { path: result.path }) : t("exportFailed");
   $("exportStatus").classList.toggle("warning", !result.ok && !nativeExportPending);
   if (reveal && screen === "record") $("exportStatus").scrollIntoView({ block: "nearest" });
 }

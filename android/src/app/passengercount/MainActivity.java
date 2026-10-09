@@ -324,10 +324,10 @@ public final class MainActivity extends Activity {
     }
     private void executeExport(Runnable task) {
         if (!exportSession.begin()) { emitExportState(); return; }
-        // Busy is process-local. A terminated process must recover to retry,
-        // never to an old success or a permanently persisted pending state.
+        // A crash may land after the public file is written but before its final
+        // result is committed. Persist uncertainty, never a promise of no file.
         if (!getSharedPreferences("exports", MODE_PRIVATE).edit()
-                .putString("result", "{\"ok\":false,\"path\":\"\"}").commit()) {
+                .putString("result", "{\"uncertain\":true}").commit()) {
             exportResult(false, "");
             exportSession.finish();
             return;
@@ -355,8 +355,14 @@ public final class MainActivity extends Activity {
             if (json != null) emit("export-result", json);
         });
     }
-    private void storeExportResult(String json) {
-        getSharedPreferences("exports", MODE_PRIVATE).edit().putString("result", json).commit();
+    private void storeExportResult(String json, boolean success) {
+        SharedPreferences prefs = getSharedPreferences("exports", MODE_PRIVATE);
+        if (!prefs.edit().putString("result", json).commit()) {
+            // commit() can update memory even when its durable write fails. Keep
+            // both the live page and a restart conservative about the outcome.
+            // A submitted write already has the uncertain marker on disk.
+            prefs.edit().putString("result", success ? "{\"uncertain\":true}" : json).apply();
+        }
         // A submitted write can finish after its Activity dies. The process-owned
         // session notifies the current Activity only after the write settles.
         if (!exportSession.busy()) emitExportState();
@@ -365,7 +371,7 @@ public final class MainActivity extends Activity {
         try {
             org.json.JSONObject result = new org.json.JSONObject();
             result.put("ok", ok); result.put("path", path);
-            storeExportResult(result.toString());
+            storeExportResult(result.toString(), ok);
         } catch (org.json.JSONException ignored) {}
     }
     private void emit(String event, String json) {

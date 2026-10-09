@@ -90,3 +90,7 @@ Codex identified a valid additional Activity-lifecycle gap after permission gran
 while the file write is still running. The initial head `ab63f23243` passed CI but
 is not an accepted final head. [The follow-up report](pc004-granted-write-followup.md)
 records the reproduction, correction and expanded final-candidate coverage.
+
+The latest [result-persistence follow-up](pc004-result-persistence-followup.md)
+also distinguishes retry-safe permission interruption from an uncertain output
+once writing may have started, including failed final commits and process restart.

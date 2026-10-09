@@ -36,3 +36,11 @@ test('late native completion cannot unlock an unfinished PNG encoder', () => {
   vm.runInContext('updateExportControls()', f.context);
   for (const id of ['csv', 'gpx', 'saveChart']) assert.equal(f.elements[id].disabled, false);
 });
+
+
+test('uncertain saved-file outcome asks for a folder check before another export', () => {
+  const f = fixture(); f.result({ uncertain: true });
+  assert.equal(f.elements.exportStatus.textContent, 'exportUncertain');
+  assert.equal(f.elements.exportStatus.classList.warning, true);
+  for (const id of ['csv', 'gpx', 'saveChart']) assert.equal(f.elements[id].disabled, false);
+});
