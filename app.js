@@ -61,6 +61,8 @@ let data,
   sectionOptions = [],
   sectionStops = [],
   uploadBusy = false,
+  nativeExportPending = false,
+  chartExportPending = false,
   lastGpsFix = null,
   momentumTimer = null;
 let deleteMode = false;
@@ -1353,10 +1355,17 @@ function exportFilename(extension) {
   const s = cur(), stamp = new Date().toISOString().replace(/[:.]/g, "-");
   return `bus-${s.route.route}-${s.date}-${s.id.slice(0, 8)}-${stamp}.${extension}`;
 }
+function updateExportControls() {
+  for (const id of ["csv", "gpx", "saveChart"])
+    $(id).disabled = nativeExportPending || chartExportPending;
+}
 function exportResult(result, reveal = false) {
-  $("exportStatus").textContent = result.ok
-    ? t("exportSaved", { path: result.path }) : t("exportFailed");
-  $("exportStatus").classList.toggle("warning", !result.ok);
+  nativeExportPending = result.pending === true;
+  updateExportControls();
+  $("exportStatus").textContent = nativeExportPending ? t("exporting")
+    : result.uncertain ? t("exportUncertain")
+    : result.ok ? t("exportSaved", { path: result.path }) : t("exportFailed");
+  $("exportStatus").classList.toggle("warning", !result.ok && !nativeExportPending);
   if (reveal && screen === "record") $("exportStatus").scrollIntoView({ block: "nearest" });
 }
 function refreshExportSettings() {
@@ -1378,6 +1387,7 @@ function download() {
   const csv = makeCSV(cur()), filename = exportFilename("csv");
   $("exportStatus").textContent = t("exporting");
   if (window.PassengerCountAndroid) {
+    exportResult({ pending: true });
     window.PassengerCountAndroid.saveCsv(csv, filename);
     return;
   }
@@ -1392,6 +1402,7 @@ function downloadGpx() {
   const gpx = makeGpx(s), filename = exportFilename("gpx");
   $("exportStatus").textContent = t("exporting");
   if (window.PassengerCountAndroid?.saveGpx) {
+    exportResult({ pending: true });
     window.PassengerCountAndroid.saveGpx(gpx, filename);
     return;
   }
@@ -1402,18 +1413,22 @@ function downloadGpx() {
   setTimeout(() => URL.revokeObjectURL(href), 5000);
 }
 async function saveChart() {
-  $("saveChart").disabled = true;
+  chartExportPending = true;
+  updateExportControls();
   $("exportStatus").textContent = t("exporting");
   try {
     // Keep the filename tied to the chart captured before image decoding yields.
     const filename = exportFilename("png"), png = await chartPng($("chart"));
-    if (window.PassengerCountAndroid?.savePng)
+    if (window.PassengerCountAndroid?.savePng) {
+      nativeExportPending = true;
+      updateExportControls();
       window.PassengerCountAndroid.savePng(png.split(",")[1], filename);
-    else browserDownload(png, filename);
+    } else browserDownload(png, filename);
   } catch {
     exportResult({ ok: false });
   } finally {
-    $("saveChart").disabled = false;
+    chartExportPending = false;
+    updateExportControls();
   }
 }
 async function upload() {
