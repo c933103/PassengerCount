@@ -94,3 +94,7 @@ records the reproduction, correction and expanded final-candidate coverage.
 The latest [result-persistence follow-up](pc004-result-persistence-followup.md)
 also distinguishes retry-safe permission interruption from an uncertain output
 once writing may have started, including failed final commits and process restart.
+
+The [visible-observer transition matrix](pc004-observer-transition-matrix.md)
+records the subsequent stacked-Activity review correction and the latest systematic
+resume/destroy/completion, permission-owner and process-restart coverage.

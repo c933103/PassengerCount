@@ -27,6 +27,8 @@ const methods = [
   'public void onRequestPermissionsResult(',
   'private void queueExport(',
   'protected void onDestroy()',
+  'protected void onResume()',
+  'protected void onPause()',
   'public String getExportResult()',
   'private void executeExport(',
   'private String currentExportResult()',

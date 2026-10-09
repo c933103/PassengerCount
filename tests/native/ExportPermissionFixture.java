@@ -19,7 +19,7 @@ public final class MainActivity extends Activity {
     final List<String> saved = Collections.synchronizedList(new ArrayList<>());
     final List<Runnable> ui = new ArrayList<>();
     boolean deferUi;
-    MainActivity(SharedPreferences disk) { this.disk = disk; exportSession.attach(exportChanged); }
+    MainActivity(SharedPreferences disk) { this.disk = disk; onResume(); }
     void runOnUiThread(Runnable task) { if (deferUi) ui.add(task); else task.run(); }
     int checkSelfPermission(String permission) { return granted ? 0 : -1; }
     void requestPermissions(String[] permissions, int code) {
@@ -51,6 +51,15 @@ public final class MainActivity extends Activity {
     static void scenario(String name, Scenario task) {
         try { task.run(); System.out.println("PASS " + name); }
         catch (Throwable error) { failures++; System.out.println("FAIL " + name + ": " + error); }
+    }
+    static void simulateProcessLoss() throws Exception {
+        // A process restart creates fresh static state. Keep the fixture's
+        // durable preference snapshot but reset the actual session to its defaults.
+        ExportSession fresh = new ExportSession();
+        for (java.lang.reflect.Field field : ExportSession.class.getDeclaredFields()) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) continue;
+            field.setAccessible(true); field.set(exportSession, field.get(fresh));
+        }
     }
     static SharedPreferences previousSuccess() {
         SharedPreferences disk = new SharedPreferences();
@@ -104,6 +113,7 @@ public final class MainActivity extends Activity {
                 SharedPreferences disk = previousSuccess();
                 MainActivity a = new MainActivity(disk);
                 a.queue("A"); int old = a.requestedCode;
+                simulateProcessLoss();
                 MainActivity b = new MainActivity(disk.restart());
                 try {
                     check(FAILURE.equals(b.result()), "failure fallback committed before permission prompt");
@@ -262,6 +272,93 @@ public final class MainActivity extends Activity {
                     } finally { b.onDestroy(); }
                 });
             }
+            String[][] eventOrders = {
+                {"resume", "destroy", "finish"}, {"resume", "finish", "destroy"},
+                {"destroy", "resume", "finish"}, {"destroy", "finish", "resume"},
+                {"finish", "resume", "destroy"}, {"finish", "destroy", "resume"},
+            };
+            for (boolean returnToOlder : new boolean[]{true, false}) for (String[] order : eventOrders) {
+                scenario(label + "two-Activity matrix target=" + (returnToOlder ? "older" : "newer") + " order=" + Arrays.toString(order), () -> {
+                    SharedPreferences disk = previousSuccess(); MainActivity a = new MainActivity(disk);
+                    java.util.concurrent.CountDownLatch started = new java.util.concurrent.CountDownLatch(1);
+                    java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+                    a.queueExport(() -> {
+                        started.countDown();
+                        try { release.await(); } catch (InterruptedException e) { throw new AssertionError(e); }
+                        a.saved.add("original"); a.exportResult(true, "original.csv");
+                    });
+                    int oldCode = a.requestedCode; a.reply(oldCode, true); a.onPause();
+                    MainActivity b = new MainActivity(disk); b.granted = true;
+                    MainActivity target = returnToOlder ? a : b, stale = returnToOlder ? b : a;
+                    try {
+                        check(started.await(5, java.util.concurrent.TimeUnit.SECONDS), "write held with two alive Activities");
+                        target.events.clear();
+                        for (String event : order) {
+                            if (event.equals("resume")) { target.onResume(); target.onResume(); }
+                            else if (event.equals("destroy")) { stale.onPause(); stale.onDestroy(); }
+                            else {
+                                release.countDown();
+                                if (a.exports.isShutdown()) check(a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS), "destroyed writer settles");
+                                else a.drain();
+                            }
+                        }
+                        check(target.events.contains(SUCCESS), "last eligible resumed Activity receives completion or resume snapshot");
+                        check(SUCCESS.equals(target.result()) && SUCCESS.equals(target.result()), "repeated result acknowledgement is not destructive");
+                        target.reply(oldCode, true); target.reply(oldCode, true); target.drain();
+                        check(a.saved.equals(Arrays.asList("original")) && b.saved.isEmpty(), "stale permission owner cannot duplicate original write");
+                        target.events.clear(); stale.onPause(); stale.onDestroy(); stale.onResume();
+                        target.queue("later explicit"); target.drain();
+                        check(target.events.contains(SUCCESS), "stale teardown/resume cannot steal eligible observer for next result");
+                        check(target.saved.contains("later explicit"), "target can export again after its acknowledged result");
+                    } finally {
+                        release.countDown();
+                        if (a.exports.isShutdown()) a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS); else a.drain();
+                        a.onDestroy(); b.onDestroy();
+                    }
+                });
+            }
+            scenario(label + "resume while original permission prompt is pending stays pending", () -> {
+                MainActivity a = new MainActivity(previousSuccess());
+                try {
+                    a.queue("A"); a.onResume(); a.onResume();
+                    check("{\"pending\":true}".equals(a.result()), "live permission waiter must not show its restart-only failure marker");
+                    check(a.events.contains("{\"pending\":true}"), "resume snapshot retains pending feedback");
+                    check(a.prompts == 1 && a.saved.isEmpty(), "resume does not repeat permission request or write");
+                    a.reply(a.requestedCode, false);
+                    check(FAILURE.equals(a.result()), "denial still exits pending state");
+                } finally { a.onDestroy(); }
+            });
+            for (String resolution : new String[]{"grant", "deny", "destroy"}) {
+                scenario(label + "two alive Activities during permission wait: " + resolution, () -> {
+                    SharedPreferences disk = previousSuccess(); MainActivity a = new MainActivity(disk);
+                    a.queue("A"); int old = a.requestedCode; a.onPause();
+                    MainActivity b = new MainActivity(disk);
+                    try {
+                        check("{\"pending\":true}".equals(b.result()), "second Activity sees the existing live permission request");
+                        b.queue("unexpected duplicate B");
+                        check(b.prompts == 0 && b.saved.isEmpty(), "second Activity cannot replace or duplicate pending permission work");
+                        if (resolution.equals("destroy")) {
+                            a.onDestroy();
+                            check(FAILURE.equals(b.result()) && b.events.contains(FAILURE), "destroying waiter delivers retry-safe cancellation to visible Activity");
+                            b.queue("explicit B"); int next = b.requestedCode;
+                            b.reply(old, true); b.drain();
+                            check(b.saved.isEmpty(), "old permission reply cannot consume the replacement request");
+                            b.reply(next, true); b.drain();
+                            check(b.saved.equals(Arrays.asList("explicit B")), "visible Activity can explicitly retry cancelled wait");
+                        } else if (resolution.equals("deny")) {
+                            a.reply(old, false); a.drain();
+                            check(a.saved.isEmpty() && b.saved.isEmpty(), "denied owner performs no writes");
+                            check(FAILURE.equals(b.result()) && b.events.contains(FAILURE), "denial refreshes the currently resumed page");
+                            b.queue("explicit B after denial"); b.reply(b.requestedCode, true); b.drain();
+                            check(b.saved.equals(Arrays.asList("explicit B after denial")), "denied reservation is released for a later request");
+                        } else {
+                            a.reply(old, true); a.drain();
+                            check(a.saved.equals(Arrays.asList("A")) && b.saved.isEmpty(), "only original permission owner exports");
+                            check(b.events.contains(SUCCESS), "result goes to the currently resumed Activity");
+                        }
+                    } finally { a.onDestroy(); b.onDestroy(); }
+                });
+            }
             scenario(label + "repeated taps retain original pending request", () -> {
                 MainActivity a = new MainActivity(previousSuccess());
                 try {
@@ -338,7 +435,7 @@ public final class MainActivity extends Activity {
         String tree() { return activity.tree; }
     }
     static final class WebView {
-        void removeJavascriptInterface(String name) {} void destroy() {}
+        void removeJavascriptInterface(String name) {} void destroy() {} void onResume() {} void onPause() {}
     }
     static final class GeolocationPermissions {
         interface Callback { void invoke(String origin, boolean allowed, boolean retain); }
@@ -373,4 +470,6 @@ class Activity {
     static final int MODE_PRIVATE = 0;
     public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {}
     protected void onDestroy() {}
+    protected void onResume() {}
+    protected void onPause() {}
 }

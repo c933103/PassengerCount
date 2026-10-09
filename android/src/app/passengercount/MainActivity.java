@@ -26,7 +26,7 @@ public final class MainActivity extends Activity {
     private final java.util.concurrent.ExecutorService exports = java.util.concurrent.Executors.newSingleThreadExecutor();
     private static final ExportSession exportSession = new ExportSession();
     private final Runnable exportChanged = this::emitExportState;
-    private Runnable pendingLegacyExport;
+    private volatile Runnable pendingLegacyExport;
     private int pendingLegacyPermission = -1;
     private boolean destroyed;
     private boolean choosingDirectory;
@@ -36,7 +36,6 @@ public final class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        exportSession.attach(exportChanged);
         createWebView();
     }
 
@@ -163,7 +162,10 @@ public final class MainActivity extends Activity {
             pendingLegacyPermission = -1;
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 executeExport(task);
-            else exportResult(false, "");
+            else {
+                exportSession.cancelPermission(exportChanged);
+                exportResult(false, "");
+            }
         }
         if (code == LOCATION && locationCallback != null) {
             locationCallback.invoke(locationOrigin, hasLocation(), false);
@@ -303,12 +305,14 @@ public final class MainActivity extends Activity {
                     exportResult(false, ""); return;
                 }
                 int code = previous + 1;
+                if (!exportSession.waitForPermission(exportChanged)) { emitExportState(); return; }
                 // Keep only a recoverable failure on disk, never the export bytes.
                 // If the Activity/process disappears while permission is pending,
                 // getExportResult() tells the reloaded page to retry its saved trip.
                 // Do not emit yet: the current page is still waiting for permission.
                 if (!prefs.edit().putInt("legacyPermissionRequest", code)
                         .putString("result", "{\"ok\":false,\"path\":\"\"}").commit()) {
+                    exportSession.cancelPermission(exportChanged);
                     exportResult(false, ""); return;
                 }
                 pendingLegacyExport = task;
@@ -317,13 +321,14 @@ public final class MainActivity extends Activity {
                 catch (RuntimeException e) {
                     pendingLegacyExport = null;
                     pendingLegacyPermission = -1;
+                    exportSession.cancelPermission(exportChanged);
                     exportResult(false, "");
                 }
             } else executeExport(task);
         });
     }
     private void executeExport(Runnable task) {
-        if (!exportSession.begin()) { emitExportState(); return; }
+        if (!exportSession.begin(exportChanged)) { emitExportState(); return; }
         // A crash may land after the public file is written but before its final
         // result is committed. Persist uncertainty, never a promise of no file.
         if (!getSharedPreferences("exports", MODE_PRIVATE).edit()
@@ -344,7 +349,7 @@ public final class MainActivity extends Activity {
         }
     }
     private String currentExportResult() {
-        return exportSession.busy() ? "{\"pending\":true}"
+        return exportSession.busy() || pendingLegacyExport != null ? "{\"pending\":true}"
             : getSharedPreferences("exports", MODE_PRIVATE).getString("result", null);
     }
     private void emitExportState() {
@@ -365,7 +370,7 @@ public final class MainActivity extends Activity {
         }
         // A submitted write can finish after its Activity dies. The process-owned
         // session notifies the current Activity only after the write settles.
-        if (!exportSession.busy()) emitExportState();
+        if (!exportSession.busy()) exportSession.changed();
     }
     private void exportResult(boolean ok, String path) {
         try {
@@ -428,13 +433,26 @@ public final class MainActivity extends Activity {
         }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-    @Override protected void onPause() { super.onPause(); if (web != null) web.onPause(); }
-    @Override protected void onResume() { super.onResume(); if (web != null) web.onResume(); }
+    @Override protected void onPause() {
+        exportSession.detach(exportChanged);
+        super.onPause();
+        if (web != null) web.onPause();
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        if (destroyed) return;
+        exportSession.attach(exportChanged);
+        if (web != null) web.onResume();
+        // A live older Activity can return after a newer one is dismissed, or
+        // after the write finished with no visible observer. Refresh both cases.
+        emitExportState();
+    }
     @Override protected void onDestroy() {
         destroyed = true;
         exportSession.detach(exportChanged);
         pendingLegacyExport = null;
         pendingLegacyPermission = -1;
+        if (exportSession.cancelPermission(exportChanged)) exportSession.changed();
         if (locationCallback != null) locationCallback.invoke(locationOrigin, false, false);
         if (web != null) { web.removeJavascriptInterface("PassengerCountAndroid"); web.destroy(); }
         web = null;
