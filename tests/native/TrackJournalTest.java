@@ -19,6 +19,8 @@ public final class TrackJournalTest {
             TrackJournal.Page page = TrackJournal.read(a.toFile(), "");
             check(page.entries.size() == 2 && !page.more, "initial full read");
             check(page.entries.get(0).json.equals(first), "UTF-8 byte offsets");
+            check(page.entries.get(0).offset == 0, "first absolute occurrence offset");
+            check(page.entries.get(1).offset == (first + "\n").getBytes(StandardCharsets.UTF_8).length, "UTF-8 absolute occurrence ordering");
             String cursor = page.cursor;
             check(TrackJournal.read(a.toFile(), cursor).entries.isEmpty(), "same cursor reads no duplicates");
             check(Arrays.equals(original, Files.readAllBytes(a)), "read preserves journal bytes");

@@ -12,7 +12,10 @@ final class TrackJournal {
     static final int MAX_LINE_BYTES = 65536;
     static final class Entry {
         final String json, legacyId;
-        Entry(String json, String legacyId) { this.json = json; this.legacyId = legacyId; }
+        final long offset;
+        Entry(String json, String legacyId, long offset) {
+            this.json = json; this.legacyId = legacyId; this.offset = offset;
+        }
     }
     static final class Page {
         final List<Entry> entries = new ArrayList<>();
@@ -61,7 +64,7 @@ final class TrackJournal {
                 if (bytes == null) break;
                 long end = file.getFilePointer();
                 String hash = digest(bytes);
-                page.entries.add(new Entry(new String(bytes, StandardCharsets.UTF_8), "legacy:" + start + ":" + hash));
+                page.entries.add(new Entry(new String(bytes, StandardCharsets.UTF_8), "legacy:" + start + ":" + hash, start));
                 page.cursor = end + ":" + start + ":" + hash;
             }
             page.more = page.entries.size() == PAGE_RECORDS && file.getFilePointer() < file.length();

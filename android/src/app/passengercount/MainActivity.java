@@ -241,6 +241,7 @@ public final class MainActivity extends Activity {
                         org.json.JSONObject point = new org.json.JSONObject(entry.json);
                         if (!(point.opt("nativeId") instanceof String) || point.optString("nativeId").isEmpty())
                             point.put("nativeId", entry.legacyId);
+                        point.put("nativeOrder", entry.offset);
                         points.put(point);
                     } catch (org.json.JSONException ignored) {}
                 }

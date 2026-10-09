@@ -61,3 +61,24 @@ PC-001 is unchanged: import still only accepts `in_progress` surveys, and native
 stop/drain acknowledgement plus late pause/abort/complete reconciliation remains
 separate. This patch does not claim to repair already-corrupted historical tracks,
 validate physical-device background tracking, or complete PR #3 acceptance.
+
+## Review correction: equal-time retention boundary
+
+Codex's [review finding](https://github.com/c933103/PassengerCount/pull/4#discussion_r4226812014)
+was reproduced on `938bc05`: with 20,003 journal records and the first six sharing
+a timestamp, invalidating the cursor changed retained IDs `3..20002` to include
+`0..2` instead of `3..5`. Stable time sort alone did not preserve journal order.
+
+The bridge now supplies each row's absolute byte offset as an occurrence-order
+tie-breaker. Import persists that order and refreshes it when a known ID is read
+again. Full-array old bridges use their array index. The retention cap is applied
+after timestamp and journal-occurrence ordering, so replayed evicted equal-time
+records cannot displace later occurrences. Untagged foreground ties retain their
+own stable order after the identified native cohort.
+
+The added 20,003-row invalidated-cursor regression fails on `938bc05` and passes
+with this correction. Updated local results: **69/69 Node tests and 97 native
+assertions passed**, with JavaScript syntax and whitespace checks also passing.
+The initial head's complete browser/APK CI passed (runs 37886815283 and
+37886803291), but the changed head requires fresh CI and Codex review; earlier
+success is not final-head acceptance.

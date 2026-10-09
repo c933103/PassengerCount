@@ -13,7 +13,7 @@ function bridge(journals, size = 256) {
     calls.push({ id, cursor });
     const points = journals[id];
     const start = Number(cursor || 0), end = Math.min(points.length, start + size);
-    return JSON.stringify({ points: points.slice(start, end), cursor: String(end), more: end < points.length });
+    return JSON.stringify({ points: points.slice(start, end).map((p, i) => ({ ...p, nativeOrder: start + i })), cursor: String(end), more: end < points.length });
   } };
 }
 test("repeated View/export imports and cold restart keep A,B exactly once", () => {
@@ -100,4 +100,17 @@ test("invalid input does not consume cursor and PC-001 remains separately scoped
   assert.equal(s.nativeTrackCursor, undefined);
   s.status = "completed";
   importNativeTrack(s, { getTrackPage: () => assert.fail("PC-001 lifecycle not changed") }, () => true);
+});
+test("cursor replay preserves journal occurrence order across equal-time cap boundary", () => {
+  const points = Array.from({ length: 20003 }, (_, i) => point(String(i), i, {
+    nativeOrder: i,
+    ...(i < 6 ? { time: "2026-10-09T00:00:00Z" } : { time: new Date(Date.parse("2026-10-09T00:00:01Z") + i * 1000).toISOString() }),
+  }));
+  const s = survey(), reader = bridge({ one: points });
+  importNativeTrack(s, reader, () => true);
+  const expected = s.track.map((p) => p.nativeId);
+  assert.deepEqual(expected, points.slice(3).map((p) => p.nativeId));
+  delete s.nativeTrackCursor; // Simulate missing/invalidated anchor after restart.
+  importNativeTrack(s, reader, () => true);
+  assert.deepEqual(s.track.map((p) => p.nativeId), expected);
 });

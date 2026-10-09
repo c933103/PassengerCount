@@ -170,7 +170,7 @@ const data = {
           window.__trackReads.push({ id, cursor });
           const points = window.__nativeJournals[id] || native.track || [];
           const start = Number(cursor || 0), end = Math.min(start + 2, points.length);
-          return JSON.stringify({ points: points.slice(start, end), cursor: String(end), more: end < points.length });
+          return JSON.stringify({ points: points.slice(start, end).map((p, i) => ({ ...p, nativeOrder: start + i })), cursor: String(end), more: end < points.length });
         },
       };
     }, seed);

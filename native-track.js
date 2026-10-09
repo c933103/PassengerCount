@@ -20,7 +20,7 @@ function normalize(p) {
 // Match old/foreground points once by the entire stored measurement when upgrading.
 export function mergeNativeTrack(track, points) {
   const merged = (track || []).map((p) => ({ ...p }));
-  const seen = new Set(merged.map((p) => p.nativeId).filter(Boolean));
+  const seen = new Map(merged.filter((p) => p.nativeId).map((p) => [p.nativeId, p]));
   const unclaimed = new Map();
   for (const p of merged) {
     if (p.nativeId) continue;
@@ -29,7 +29,7 @@ export function mergeNativeTrack(track, points) {
     unclaimed.get(key).push(p);
   }
   const occurrences = new Map();
-  for (const raw of points) {
+  for (const [index, raw] of points.entries()) {
     const p = normalize(raw);
     if (!p) continue;
     const key = measurementKey(p);
@@ -38,15 +38,27 @@ export function mergeNativeTrack(track, points) {
     // Compatibility for an older APK's full-snapshot getTrack bridge.
     p.nativeId = typeof raw.nativeId === "string" && raw.nativeId
       ? raw.nativeId : `legacy:${key}:${n}`;
-    if (seen.has(p.nativeId)) continue;
-    seen.add(p.nativeId);
+    // New bridge pages supply an absolute byte offset; old full snapshots use
+    // their array index. Time alone cannot order same-time journal occurrences.
+    p.nativeOrder = Number.isSafeInteger(raw.nativeOrder) && raw.nativeOrder >= 0
+      ? raw.nativeOrder : index;
+    const known = seen.get(p.nativeId);
+    if (known) {
+      known.nativeOrder = p.nativeOrder;
+      continue;
+    }
     const existing = unclaimed.get(key)?.shift();
-    if (existing) existing.nativeId = p.nativeId;
-    else merged.push(p);
+    if (existing) {
+      existing.nativeId = p.nativeId;
+      existing.nativeOrder = p.nativeOrder;
+    } else merged.push(p);
+    seen.set(p.nativeId, existing || p);
   }
   // A foreground fix may already be newer than the background journal tail.
-  // Stable sorting retains every distinct same-time native record.
-  merged.sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+  // Use journal order for equal-time native points, including evicted points
+  // replayed after cursor invalidation. Untagged foreground ties stay after them.
+  merged.sort((a, b) => (Date.parse(a.time) - Date.parse(b.time)) ||
+    ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity)));
   return merged.slice(-LIMIT);
 }
 
