@@ -26,6 +26,7 @@ import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes, checkRouteUpdates } from "./data.js";
 import { uploadSurvey } from "./upload.js";
+import { importNativeTrack } from "./native-track.js";
 import {
   hkTimestamp,
   makeGpx,
@@ -168,15 +169,8 @@ function appendTrackPoint(s, p) {
   if (s.track.length > 20000) s.track.splice(0, s.track.length - 20000);
 }
 function syncNativeTrack(s = cur()) {
-  if (!s || !window.PassengerCountAndroid?.getTrack) return;
-  try {
-    const raw = window.PassengerCountAndroid.getTrack(s.id);
-    if (!raw) return;
-    const points = JSON.parse(raw);
-    if (!Array.isArray(points)) return;
-    for (const p of points) appendTrackPoint(s, p);
-    persist();
-  } catch {}
+  try { importNativeTrack(s, window.PassengerCountAndroid, persist); }
+  catch {}
 }
 function startNativeTracking(s = cur()) {
   if (!s || s.status !== "in_progress") return;
