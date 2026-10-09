@@ -12,13 +12,47 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import org.json.JSONObject;
 
-public final class TrackService extends Service implements LocationListener {
+public final class TrackService extends Service {
     static final String ACTION_START = "app.passengercount.START_TRACK";
     static final String ACTION_STOP = "app.passengercount.STOP_TRACK";
     static final String EXTRA_ID = "survey_id";
+    static final String EXTRA_TOKEN = "session_token";
     private static final String CHANNEL = "passengercount_track";
     private LocationManager manager;
-    private String surveyId;
+    private LocationListener listener;
+    private TrackSession.Request recording;
+    private static TrackSession session;
+    private static TrackService running;
+
+    static synchronized TrackSession session(Context context) {
+        if (session == null) {
+            final SharedPreferences prefs = context.getApplicationContext()
+                .getSharedPreferences("tracking", MODE_PRIVATE);
+            session = new TrackSession(new TrackSession.Store() {
+                public TrackSession.Request read() {
+                    return new TrackSession.Request(prefs.getString("pending_id", ""),
+                        prefs.getString(EXTRA_TOKEN, ""));
+                }
+                public boolean write(TrackSession.Request request) {
+                    SharedPreferences.Editor edit = prefs.edit().remove("active_id");
+                    if (request.valid()) edit.putString("pending_id", request.id)
+                        .putString(EXTRA_TOKEN, request.token);
+                    else edit.remove("pending_id").remove(EXTRA_TOKEN);
+                    return edit.commit();
+                }
+            });
+        }
+        return session;
+    }
+
+    // Called on the main thread only after the synchronous append barrier.
+    static void finishStop() {
+        TrackService service = running;
+        if (service == null || session(service).request().valid()) return;
+        service.recording = null;
+        try { service.manager.removeUpdates(service.listener); } catch (Exception ignored) {}
+        service.stopSelf();
+    }
 
     static String safeId(String id) {
         return id == null ? "" : id.replaceAll("[^A-Za-z0-9_-]", "");
@@ -29,6 +63,7 @@ public final class TrackService extends Service implements LocationListener {
 
     @Override public void onCreate() {
         super.onCreate();
+        running = this;
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel(
@@ -40,20 +75,23 @@ public final class TrackService extends Service implements LocationListener {
     }
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
+        TrackSession control = session(this);
         if (intent != null && ACTION_STOP.equals(intent.getAction())) {
-            getSharedPreferences("tracking", MODE_PRIVATE).edit().remove("active_id").commit();
-            stopSelf();
-            return START_NOT_STICKY;
+            control.stop(safeId(intent.getStringExtra(EXTRA_ID)));
+            finishStop();
+            return control.request().valid() ? START_STICKY : START_NOT_STICKY;
         }
-        String requested = intent == null ? null : intent.getStringExtra(EXTRA_ID);
-        if (requested == null)
-            requested = getSharedPreferences("tracking", MODE_PRIVATE).getString("active_id", null);
-        surveyId = safeId(requested);
-        if (surveyId.isEmpty() || !hasLocation()) {
-            stopSelf();
-            return START_NOT_STICKY;
+        TrackSession.Request requested = intent == null ? control.request()
+            : new TrackSession.Request(safeId(intent.getStringExtra(EXTRA_ID)),
+                intent.getStringExtra(EXTRA_TOKEN));
+        // Queued starts and permission replies must match the current durable
+        // intent, including its generation after stop/restart of the same ID.
+        if (!hasLocation()) { recording = null; stopSelf(startId); return START_NOT_STICKY; }
+        if (!control.accepts(requested)) {
+            if (!control.request().valid()) { recording = null; stopSelf(startId); }
+            return control.request().valid() ? START_STICKY : START_NOT_STICKY;
         }
-        getSharedPreferences("tracking", MODE_PRIVATE).edit().putString("active_id", surveyId).commit();
+        recording = requested;
         startForeground(19, notification());
         beginUpdates();
         return START_STICKY;
@@ -66,15 +104,22 @@ public final class TrackService extends Service implements LocationListener {
 
     @SuppressWarnings("MissingPermission")
     private void beginUpdates() {
-        manager.removeUpdates(this);
+        if (listener != null) manager.removeUpdates(listener);
         if (!hasLocation()) return;
+        final TrackSession.Request target = recording;
+        listener = new LocationListener() {
+            @Override public void onLocationChanged(Location location) { recordLocation(target, location); }
+            @Override public void onProviderEnabled(String provider) {}
+            @Override public void onProviderDisabled(String provider) {}
+            @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
+        };
         try {
             if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 2f, this, Looper.getMainLooper());
+                manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 2f, listener, Looper.getMainLooper());
         } catch (Exception ignored) {}
         try {
             if (manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-                manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5f, this, Looper.getMainLooper());
+                manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5f, listener, Looper.getMainLooper());
         } catch (Exception ignored) {}
     }
 
@@ -95,8 +140,8 @@ public final class TrackService extends Service implements LocationListener {
             .build();
     }
 
-    @Override public void onLocationChanged(Location location) {
-        if (surveyId == null || surveyId.isEmpty()) return;
+    private void recordLocation(TrackSession.Request target, Location location) {
+        session(this).append(target, () -> {
         try {
             JSONObject p = new JSONObject();
             p.put("nativeId", java.util.UUID.randomUUID().toString());
@@ -110,19 +155,18 @@ public final class TrackService extends Service implements LocationListener {
             p.put("time", ZonedDateTime.ofInstant(Instant.ofEpochMilli(measured),
                 ZoneId.of("Asia/Hong_Kong")).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
             p.put("source", "gps");
-            try (FileOutputStream out = new FileOutputStream(trackFile(this, surveyId), true)) {
+            try (FileOutputStream out = new FileOutputStream(trackFile(this, target.id), true)) {
                 out.write((p.toString() + "\n").getBytes(StandardCharsets.UTF_8));
                 out.getFD().sync();
             }
         } catch (Exception ignored) {}
+        });
     }
 
-    @Override public void onProviderEnabled(String provider) {}
-    @Override public void onProviderDisabled(String provider) {}
-    @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
-
     @Override public void onDestroy() {
-        try { manager.removeUpdates(this); } catch (Exception ignored) {}
+        if (running == this) running = null;
+        recording = null;
+        try { manager.removeUpdates(listener); } catch (Exception ignored) {}
         super.onDestroy();
     }
 

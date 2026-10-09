@@ -8,3 +8,7 @@ java com.sun.tools.javac.Main -encoding UTF-8 -source 8 -target 8 -d "$BUILD" \
   "$ROOT/android/src/app/passengercount/TrackJournal.java" \
   "$ROOT/tests/native/TrackJournalTest.java"
 java -cp "$BUILD" app.passengercount.TrackJournalTest
+java com.sun.tools.javac.Main -encoding UTF-8 -source 8 -target 8 -d "$BUILD" \
+  "$ROOT/android/src/app/passengercount/TrackSession.java" \
+  "$ROOT/tests/native/TrackSessionTest.java"
+java -cp "$BUILD" app.passengercount.TrackSessionTest

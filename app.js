@@ -169,16 +169,24 @@ function appendTrackPoint(s, p) {
   if (s.track.length > 20000) s.track.splice(0, s.track.length - 20000);
 }
 function syncNativeTrack(s = cur()) {
-  try { importNativeTrack(s, window.PassengerCountAndroid, persist); }
-  catch {}
+  try { return importNativeTrack(s, window.PassengerCountAndroid, persist); }
+  catch { return false; }
 }
 function startNativeTracking(s = cur()) {
   if (!s || s.status !== "in_progress") return;
   window.PassengerCountAndroid?.startTracking?.(s.id);
 }
 function stopNativeTracking(s = cur()) {
-  if (s) syncNativeTrack(s);
-  window.PassengerCountAndroid?.stopTracking?.(s?.id || "");
+  const native = window.PassengerCountAndroid;
+  try {
+    if (native?.stopTrackingAndDrain) {
+      if (!native.stopTrackingAndDrain(s?.id || "")) return false;
+    } else native?.stopTracking?.(s?.id || ""); // Older APK: best-effort stop.
+    return syncNativeTrack(s);
+  } catch { return false; }
+}
+function reconcileSavedNativeTracks() {
+  for (const s of state.surveys) syncNativeTrack(s);
 }
 async function captureStartEnvironment(s) {
   const id = s.id;
@@ -354,8 +362,8 @@ function showScreen(next) {
     $(key + "Screen").hidden = key !== next;
   const s = cur();
   if (s) s.screen = next;
-  if (s?.status === "in_progress") startNativeTracking(s);
-  else if (s) stopNativeTracking(s);
+  if (next !== "home" && s?.status === "in_progress") startNativeTracking(s);
+  else if (!stopNativeTracking(s)) error(t("recordFailed"));
   const host =
     next === "count" && s
       ? $("countMapHost")
@@ -392,7 +400,7 @@ function showScreen(next) {
   window.scrollTo(0, 0);
 }
 function goHome() {
-  stopNativeTracking(cur());
+  if (!stopNativeTracking(cur())) { error(t("recordFailed")); return; }
   state.currentId = null;
   showScreen("home");
 }
@@ -950,23 +958,23 @@ function pause(status) {
   s.status = status;
   s.updatedAt = new Date().toISOString();
   s[status === "aborted" ? "abortedAt" : "pausedAt"] = s.updatedAt;
-  if (persist()) {
+  if (stopNativeTracking(s) && persist()) {
     error();
     goHome();
-  }
+  } else error(t("recordFailed"));
 }
 function complete() {
   const s = cur();
   if (s.status !== "completed") {
     recordStop(s, s.activeIndex, hkClock().time, false, hkTimestamp());
     completeSurvey(s, s.activeIndex);
-    s.metrics = tripMetrics(s, data);
   }
-  if (!persist()) {
+  if (!stopNativeTracking(s) || !persist()) {
     error(t("recordFailed"));
     renderCount();
     return;
   }
+  s.metrics = tripMetrics(s, data);
   error();
   goHome();
 }
@@ -1380,7 +1388,7 @@ function download() {
 function downloadGpx() {
   const s = cur();
   if (!s) return;
-  syncNativeTrack(s);
+  if (!syncNativeTrack(s)) { exportResult({ ok: false }); return; }
   const gpx = makeGpx(s), filename = exportFilename("gpx");
   $("exportStatus").textContent = t("exporting");
   if (window.PassengerCountAndroid?.saveGpx) {
@@ -1775,6 +1783,7 @@ if (cur()) {
           : "home",
   );
 } else showScreen("home");
+reconcileSavedNativeTracks();
 try {
   const result = window.PassengerCountAndroid?.getExportResult?.();
   if (result) exportResult(JSON.parse(result));
@@ -1787,6 +1796,7 @@ else checkRouteUpdates(dataStatus).then((value) => { data = value; })
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
+    reconcileSavedNativeTracks();
     checkRouteUpdates(dataStatus).then((value) => { data = value; })
       .catch(() => dataStatus("Update unavailable"));
     if (data && matches.length) renderMatches();
