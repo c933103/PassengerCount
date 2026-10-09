@@ -904,6 +904,9 @@ const data = {
   await page.locator("#resetExportDirectory").click();
   assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
 
+  // Hold actual image decoding across navigation for standalone PNG exports.
+  await require("./png-export-browser.cjs")({ open, sample });
+
   // Launch on Home without a previous search starts the stale-data worker.
   await context.close();
   const stale = structuredClone(data), fresh = structuredClone(data);
