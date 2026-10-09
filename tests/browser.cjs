@@ -904,6 +904,11 @@ const data = {
   await page.locator("#resetExportDirectory").click();
   assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
 
+  // Persisted legacy-permission interruption is shown on the reloaded page.
+  await require("./export-permission-browser.cjs")({
+    open, sample, getExports: () => ({ exported, exportedGpx, exportedPng }),
+  });
+
   // Hold actual image decoding across navigation for standalone PNG exports.
   await require("./png-export-browser.cjs")({ open, sample });
 
