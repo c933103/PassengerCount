@@ -94,12 +94,10 @@ test("older APK full snapshots are idempotent and keep duplicate occurrence coun
   for (let i = 0; i < 3; i++) importNativeTrack(s, reader, () => true);
   assert.equal(s.track.length, 3);
 });
-test("invalid input does not consume cursor and PC-001 remains separately scoped", () => {
+test("invalid input does not consume cursor", () => {
   const s = survey();
   importNativeTrack(s, { getTrackPage: () => "{}" }, () => assert.fail());
   assert.equal(s.nativeTrackCursor, undefined);
-  s.status = "completed";
-  importNativeTrack(s, { getTrackPage: () => assert.fail("PC-001 lifecycle not changed") }, () => true);
 });
 test("cursor replay preserves journal occurrence order across equal-time cap boundary", () => {
   const points = Array.from({ length: 20003 }, (_, i) => point(String(i), i, {
@@ -113,4 +111,28 @@ test("cursor replay preserves journal occurrence order across equal-time cap bou
   delete s.nativeTrackCursor; // Simulate missing/invalidated anchor after restart.
   importNativeTrack(s, reader, () => true);
   assert.deepEqual(s.track.map((p) => p.nativeId), expected);
+});
+
+for (const status of ["paused", "aborted", "completed"]) {
+  test(`${status} records reconcile native tails without restarting recording`, () => {
+    const s = { ...survey(), status }, journal = [point("A"), point("B", 1)];
+    const reader = { ...bridge({ one: journal }, 1), startTracking: () => assert.fail("read must not start") };
+    let saved;
+    assert.equal(importNativeTrack(s, reader, () => { saved = JSON.stringify(s); return true; }), true);
+    assert.equal(s.status, status);
+    assert.deepEqual(s.track.map(p => p.nativeId), ["A", "B"]);
+    const restarted = JSON.parse(saved);
+    journal.push(point("C", 2));
+    importNativeTrack(restarted, reader, () => true);
+    assert.deepEqual(restarted.track.map(p => p.nativeId), ["A", "B", "C"]);
+    assert.equal((makeGpx(restarted).match(/<trkpt /g) || []).length, 3);
+  });
+}
+test("failed final drain keeps its cursor retryable and reports failure", () => {
+  const s = { ...survey(), status: "completed" }, reader = bridge({ one: [point("A")] });
+  assert.equal(importNativeTrack(s, reader, () => false), false);
+  assert.equal(s.nativeTrackCursor, undefined);
+  assert.deepEqual(s.track, []);
+  assert.equal(importNativeTrack(s, reader, () => true), true);
+  assert.equal(s.track[0].nativeId, "A");
 });

@@ -217,18 +217,19 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public void resetExportDirectory() { runOnUiThread(() -> storeDirectory(null)); }
         @JavascriptInterface public void startTracking(String surveyId) {
             String id = TrackService.safeId(surveyId);
-            if (id.isEmpty()) return;
-            getSharedPreferences("tracking", MODE_PRIVATE).edit().putString("pending_id", id).commit();
+            if (id.isEmpty() || TrackService.session(MainActivity.this).start(id) == null) return;
             runOnUiThread(() -> startPendingTrack());
         }
-        @JavascriptInterface public void stopTracking(String surveyId) {
+        @JavascriptInterface public boolean stopTrackingAndDrain(String surveyId) {
             String id = TrackService.safeId(surveyId);
-            runOnUiThread(() -> {
-                SharedPreferences tracking = getSharedPreferences("tracking", MODE_PRIVATE);
-                if (id.equals(tracking.getString("pending_id", ""))) tracking.edit().remove("pending_id").commit();
-                Intent stop = new Intent(MainActivity.this, TrackService.class).setAction(TrackService.ACTION_STOP);
-                stopService(stop);
-            });
+            // append() holds the same lock through fsync. Returning true means
+            // all accepted writes finished and no later callback can append.
+            boolean stopped = TrackService.session(MainActivity.this).stop(id);
+            if (stopped) runOnUiThread(TrackService::finishStop);
+            return stopped;
+        }
+        @JavascriptInterface public void stopTracking(String surveyId) {
+            stopTrackingAndDrain(surveyId);
         }
         @JavascriptInterface public String getTrackPage(String surveyId, String cursor) {
             String id = TrackService.safeId(surveyId);
@@ -271,11 +272,12 @@ public final class MainActivity extends Activity {
         }
     }
     private void startPendingTrack() {
-        String id = getSharedPreferences("tracking", MODE_PRIVATE).getString("pending_id", "");
-        if (id.isEmpty() || !hasLocation()) return;
+        TrackSession.Request request = TrackService.session(this).request();
+        if (!request.valid() || !hasLocation()) return;
         Intent intent = new Intent(this, TrackService.class)
             .setAction(TrackService.ACTION_START)
-            .putExtra(TrackService.EXTRA_ID, id);
+            .putExtra(TrackService.EXTRA_ID, request.id)
+            .putExtra(TrackService.EXTRA_TOKEN, request.token);
         if (Build.VERSION.SDK_INT >= 26) startForegroundService(intent);
         else startService(intent);
     }

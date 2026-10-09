@@ -63,18 +63,19 @@ export function mergeNativeTrack(track, points) {
 }
 
 export function importNativeTrack(s, bridge, persist) {
-  // PC-001 (stop/drain and non-active lifecycle reconciliation) is separate.
-  if (!s || s.status !== "in_progress" || !bridge) return;
+  // Reconciliation reads existing evidence; it never starts recording. Saved
+  // paused/aborted/completed records can still have an unconsumed native tail.
+  if (!s || !bridge) return true;
   const paged = typeof bridge.getTrackPage === "function";
-  if (!paged && typeof bridge.getTrack !== "function") return;
+  if (!paged && typeof bridge.getTrack !== "function") return true;
   for (;;) {
     const previousTrack = s.track;
     const previousCursor = s.nativeTrackCursor;
     const raw = paged ? bridge.getTrackPage(s.id, previousCursor || "") : bridge.getTrack(s.id);
-    if (!raw) return;
+    if (!raw) return false;
     const page = JSON.parse(raw);
     const points = paged ? page.points : page;
-    if (!Array.isArray(points) || (paged && typeof page.cursor !== "string")) return;
+    if (!Array.isArray(points) || (paged && typeof page.cursor !== "string")) return false;
     s.track = mergeNativeTrack(s.track, points);
     if (paged) s.nativeTrackCursor = page.cursor;
     // Track and cursor belong to the same durable workspace write. Never ack
@@ -88,6 +89,8 @@ export function importNativeTrack(s, bridge, persist) {
         else s.nativeTrackCursor = previousCursor;
       }
     }
-    if (!saved || !paged || !page.more || page.cursor === previousCursor) return;
+    if (!saved) return false;
+    if (!paged || !page.more) return true;
+    if (page.cursor === previousCursor) return false;
   }
 }
