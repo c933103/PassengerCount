@@ -99,6 +99,7 @@ public final class TrackService extends Service implements LocationListener {
         if (surveyId == null || surveyId.isEmpty()) return;
         try {
             JSONObject p = new JSONObject();
+            p.put("nativeId", java.util.UUID.randomUUID().toString());
             p.put("lat", location.getLatitude());
             p.put("lng", location.getLongitude());
             p.put("accuracy", location.hasAccuracy() ? location.getAccuracy() : JSONObject.NULL);

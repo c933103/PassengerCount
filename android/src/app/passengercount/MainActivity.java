@@ -230,6 +230,27 @@ public final class MainActivity extends Activity {
                 stopService(stop);
             });
         }
+        @JavascriptInterface public String getTrackPage(String surveyId, String cursor) {
+            String id = TrackService.safeId(surveyId);
+            if (id.isEmpty()) return "";
+            try {
+                TrackJournal.Page page = TrackJournal.read(TrackService.trackFile(MainActivity.this, id), cursor);
+                org.json.JSONArray points = new org.json.JSONArray();
+                for (TrackJournal.Entry entry : page.entries) {
+                    try {
+                        org.json.JSONObject point = new org.json.JSONObject(entry.json);
+                        if (!(point.opt("nativeId") instanceof String) || point.optString("nativeId").isEmpty())
+                            point.put("nativeId", entry.legacyId);
+                        points.put(point);
+                    } catch (org.json.JSONException ignored) {}
+                }
+                org.json.JSONObject result = new org.json.JSONObject();
+                result.put("points", points);
+                result.put("cursor", page.cursor);
+                result.put("more", page.more);
+                return result.toString();
+            } catch (Exception ignored) { return ""; }
+        }
         @JavascriptInterface public String getTrack(String surveyId) {
             String id = TrackService.safeId(surveyId);
             org.json.JSONArray points = new org.json.JSONArray();

@@ -1,8 +1,9 @@
-const C = "passenger-count-v12";
+const C = "passenger-count-v12-native-track-v1";
 const F = [
   "./",
   "./index.html",
   "./app.js",
+  "./native-track.js",
   "./core.js",
   "./survey.js",
   "./i18n.js",
