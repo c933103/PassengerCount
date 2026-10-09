@@ -11,15 +11,14 @@ export function hkDate(now = new Date()) {
 
 export function projectMomentum(fix, now = Date.now()) {
   if (!fix || fix.source === "estimated") return null;
-  const age = Math.max(0, now - Number(fix.timestamp || 0));
-  const speed = Number(fix.speed);
-  const heading = Number(fix.heading);
+  const { speed, heading, timestamp } = fix;
+  // Geolocation uses null for unknown motion. Coercion would invent true north.
+  if (![speed, heading, timestamp, now].every(Number.isFinite)) return null;
+  const age = now - timestamp;
   if (
     age < 12000 ||
     age > 120000 ||
-    !Number.isFinite(speed) ||
-    speed < 0.5 ||
-    !Number.isFinite(heading)
+    speed < 0.5
   ) return null;
   const distance = Math.min(speed, 45) * age / 1000;
   const bearing = heading * Math.PI / 180;
