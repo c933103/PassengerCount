@@ -1004,7 +1004,7 @@ const data = {
   assert.equal((exportedGpx.gpx.match(/<trkpt /g) || []).length, 4);
   await context.close();
   // PC-001: exercise the actual pause/abort/complete, cold-recovery and export UI.
-  for (const [status, button] of [["paused", "pause"], ["aborted", "abort"], ["completed", "saveCompleted"]]) {
+  for (const [status, button] of [["paused", "pause"], ["aborted", "abort"], ["completed", "complete"]]) {
     const trip = structuredClone(nativeTrackTemplate);
     trip.id = `lifecycle-${status}`;
     trip.status = "in_progress";

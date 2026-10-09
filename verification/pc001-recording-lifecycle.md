@@ -83,3 +83,13 @@ remain required. Physical Android background tracking, OS process/service
 scheduling, permission UI, screen-off behavior and device-level storage failure
 remain device-validation obligations; the controlled gate and browser fixtures do
 not establish those outcomes. PR #3 remains a distinct open integration.
+
+## Initial CI fixture correction
+
+[Run 37890674110](https://github.com/c933103/PassengerCount/actions/runs/37890674110)
+on `e3e4bc6` passed Node/native checks, then the new completion UI fixture tried
+`saveCompleted`, the hidden control for editing an already-completed record,
+while its seed was still `in_progress`. It timed out before APK build/signing.
+The fixture now clicks the actual active-survey `complete` control. This corrects
+the test route; it does not change production behavior or claim the skipped APK
+steps passed. Fresh final-head CI/review are still required.
