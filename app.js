@@ -1405,7 +1405,8 @@ async function saveChart() {
   $("saveChart").disabled = true;
   $("exportStatus").textContent = t("exporting");
   try {
-    const png = await chartPng($("chart")), filename = exportFilename("png");
+    // Keep the filename tied to the chart captured before image decoding yields.
+    const filename = exportFilename("png"), png = await chartPng($("chart"));
     if (window.PassengerCountAndroid?.savePng)
       window.PassengerCountAndroid.savePng(png.split(",")[1], filename);
     else browserDownload(png, filename);
