@@ -24,6 +24,8 @@ public final class MainActivity extends Activity {
     // into a later request, so a delayed/duplicate permission result is harmless.
     private static final int FIRST_LEGACY_STORAGE = 1024, LAST_LEGACY_STORAGE = 65535;
     private final java.util.concurrent.ExecutorService exports = java.util.concurrent.Executors.newSingleThreadExecutor();
+    private static final ExportSession exportSession = new ExportSession();
+    private final Runnable exportChanged = this::emitExportState;
     private Runnable pendingLegacyExport;
     private int pendingLegacyPermission = -1;
     private boolean destroyed;
@@ -34,6 +36,7 @@ public final class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        exportSession.attach(exportChanged);
         createWebView();
     }
 
@@ -159,7 +162,7 @@ public final class MainActivity extends Activity {
             pendingLegacyExport = null;
             pendingLegacyPermission = -1;
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                exports.execute(task);
+                executeExport(task);
             else exportResult(false, "");
         }
         if (code == LOCATION && locationCallback != null) {
@@ -218,7 +221,7 @@ public final class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public String getExportDirectory() { return new ExportStorage(MainActivity.this).directory(); }
-        @JavascriptInterface public String getExportResult() { return getSharedPreferences("exports", MODE_PRIVATE).getString("result", null); }
+        @JavascriptInterface public String getExportResult() { return currentExportResult(); }
         @JavascriptInterface public void chooseExportDirectory() { runOnUiThread(() -> chooseDirectory()); }
         @JavascriptInterface public void resetExportDirectory() { runOnUiThread(() -> storeDirectory(null)); }
         @JavascriptInterface public void startTracking(String surveyId) {
@@ -290,6 +293,7 @@ public final class MainActivity extends Activity {
     private void queueExport(Runnable task) {
         runOnUiThread(() -> {
             if (destroyed) return;
+            if (exportSession.busy()) { emitExportState(); return; }
             if (Build.VERSION.SDK_INT < 29 && new ExportStorage(this).tree() == null &&
                     checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (pendingLegacyExport != null) { exportResult(false, ""); return; }
@@ -315,16 +319,53 @@ public final class MainActivity extends Activity {
                     pendingLegacyPermission = -1;
                     exportResult(false, "");
                 }
-            } else exports.execute(task);
+            } else executeExport(task);
         });
+    }
+    private void executeExport(Runnable task) {
+        if (!exportSession.begin()) { emitExportState(); return; }
+        // Busy is process-local. A terminated process must recover to retry,
+        // never to an old success or a permanently persisted pending state.
+        if (!getSharedPreferences("exports", MODE_PRIVATE).edit()
+                .putString("result", "{\"ok\":false,\"path\":\"\"}").commit()) {
+            exportResult(false, "");
+            exportSession.finish();
+            return;
+        }
+        emitExportState();
+        try {
+            exports.execute(() -> {
+                try { task.run(); }
+                finally { exportSession.finish(); }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException e) {
+            exportResult(false, "");
+            exportSession.finish();
+        }
+    }
+    private String currentExportResult() {
+        return exportSession.busy() ? "{\"pending\":true}"
+            : getSharedPreferences("exports", MODE_PRIVATE).getString("result", null);
+    }
+    private void emitExportState() {
+        runOnUiThread(() -> {
+            // Read on delivery, not on the finishing worker: a queued old result
+            // must not unlock controls for a newer write that has since begun.
+            String json = currentExportResult();
+            if (json != null) emit("export-result", json);
+        });
+    }
+    private void storeExportResult(String json) {
+        getSharedPreferences("exports", MODE_PRIVATE).edit().putString("result", json).commit();
+        // A submitted write can finish after its Activity dies. The process-owned
+        // session notifies the current Activity only after the write settles.
+        if (!exportSession.busy()) emitExportState();
     }
     private void exportResult(boolean ok, String path) {
         try {
             org.json.JSONObject result = new org.json.JSONObject();
             result.put("ok", ok); result.put("path", path);
-            String json = result.toString();
-            getSharedPreferences("exports", MODE_PRIVATE).edit().putString("result", json).commit();
-            emit("export-result", json);
+            storeExportResult(result.toString());
         } catch (org.json.JSONException ignored) {}
     }
     private void emit(String event, String json) {
@@ -385,6 +426,7 @@ public final class MainActivity extends Activity {
     @Override protected void onResume() { super.onResume(); if (web != null) web.onResume(); }
     @Override protected void onDestroy() {
         destroyed = true;
+        exportSession.detach(exportChanged);
         pendingLegacyExport = null;
         pendingLegacyPermission = -1;
         if (locationCallback != null) locationCallback.invoke(locationOrigin, false, false);

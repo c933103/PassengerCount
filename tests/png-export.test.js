@@ -6,7 +6,7 @@ import vm from "node:vm";
 // Run the actual app handlers and chart encoder with a controlled Image.decode.
 const app = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
 const chart = fs.readFileSync(new URL("../charts.js", import.meta.url), "utf8");
-const handlers = ["exportFilename", "saveChart"].map(name => {
+const handlers = ["updateExportControls", "exportFilename", "saveChart"].map(name => {
   const match = app.match(new RegExp(`(?:async )?function ${name}\\([^]*?\\n\\}`));
   assert.ok(match, `actual ${name} handler exists`);
   return match[0];
@@ -21,18 +21,23 @@ function fixture(native = false) {
   const svg = identity => ({ identity, viewBox: { baseVal: { width: 320, height: 320 } } });
   let selectedSvg = svg("chart-A");
   const elements = {
+    csv: { disabled: false }, gpx: { disabled: false },
     saveChart: { disabled: false }, exportStatus: { textContent: "" },
     chart: { querySelector: () => selectedSvg },
   };
   const pending = [], downloads = [], failures = [];
   const context = vm.createContext({
+    nativeExportPending: false, chartExportPending: false,
     $: id => elements[id], cur: () => current, t: value => value,
     Date: class extends Date { constructor() { super(now); } },
     window: { PassengerCountAndroid: native ? {
-      savePng: (bytes, filename) => downloads.push({ bytes, filename }),
+      savePng: (bytes, filename) => {
+        downloads.push({ bytes, filename });
+        context.nativeExportPending = false; // Simulated native completion.
+      },
     } : undefined },
     browserDownload: (png, filename) => downloads.push({ bytes: png.split(",")[1], filename }),
-    exportResult: result => failures.push(result.ok),
+    exportResult: result => { failures.push(result.ok); context.nativeExportPending = false; },
     Image: class { decode() { return new Promise((resolve, reject) => pending.push({ resolve, reject })); } },
     XMLSerializer: class { serializeToString(node) { return node.identity; } },
     document: { createElement(tag) {

@@ -28,6 +28,10 @@ const methods = [
   'private void queueExport(',
   'protected void onDestroy()',
   'public String getExportResult()',
+  'private void executeExport(',
+  'private String currentExportResult()',
+  'private void emitExportState()',
+  'private void storeExportResult(',
 ].map(method).join('\n');
 const fixture = fs.readFileSync(path.join(root, 'tests/native/ExportPermissionFixture.java'), 'utf8')
   .replace('/* PRODUCTION_FIELDS */', fields)
@@ -42,5 +46,5 @@ try {
     return result.status === 0;
   }
   if (run('java', ['com.sun.tools.javac.Main', '-encoding', 'UTF-8', '-source', '8', '-target', '8', '-d', build,
-      path.join(build, 'MainActivity.java')])) run('java', ['-cp', build, 'app.passengercount.MainActivity']);
+      path.join(build, 'MainActivity.java'), path.join(root, 'android/src/app/passengercount/ExportSession.java')])) run('java', ['-cp', build, 'app.passengercount.MainActivity']);
 } finally { fs.rmSync(build, { recursive: true, force: true }); }

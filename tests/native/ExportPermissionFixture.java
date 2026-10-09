@@ -18,7 +18,7 @@ public final class MainActivity extends Activity {
     final List<String> saved = Collections.synchronizedList(new ArrayList<>());
     final List<Runnable> ui = new ArrayList<>();
     boolean deferUi;
-    MainActivity(SharedPreferences disk) { this.disk = disk; }
+    MainActivity(SharedPreferences disk) { this.disk = disk; exportSession.attach(exportChanged); }
     void runOnUiThread(Runnable task) { if (deferUi) ui.add(task); else task.run(); }
     int checkSelfPermission(String permission) { return granted ? 0 : -1; }
     void requestPermissions(String[] permissions, int code) {
@@ -30,7 +30,9 @@ public final class MainActivity extends Activity {
         check(name.equals("exports"), "export flow never changes saved-survey preferences");
         return disk;
     }
-    void exportResult(boolean ok, String path) { reports++; disk.edit().putString("result", ok ? SUCCESS : FAILURE).commit(); }
+    void exportResult(boolean ok, String path) { reports++; storeExportResult(ok ? SUCCESS : FAILURE); }
+    final List<String> events = Collections.synchronizedList(new ArrayList<>());
+    void emit(String event, String json) { if (!destroyed) events.add(json); }
     boolean hasLocation() { return false; }
     void startPendingTrack() { throw new AssertionError("export must not start location tracking"); }
     void queue(String name) { queueExport(() -> { saved.add(name); exportResult(true, name); }); }
@@ -123,6 +125,109 @@ public final class MainActivity extends Activity {
                         check(restored.prompts == 0 && restored.saved.isEmpty(), "restoring does not replay old export or prompt");
                     } finally { restored.onDestroy(); }
                 }
+            });
+            for (boolean succeeds : new boolean[]{true, false}) {
+                scenario(label + "granted in-flight write survives recreation with " + (succeeds ? "success" : "failure"), () -> {
+                    SharedPreferences disk = previousSuccess();
+                    MainActivity a = new MainActivity(disk);
+                    java.util.concurrent.CountDownLatch started = new java.util.concurrent.CountDownLatch(1);
+                    java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+                    MainActivity replacement = null;
+                    a.queueExport(() -> {
+                        started.countDown();
+                        try { release.await(); } catch (InterruptedException e) { throw new AssertionError(e); }
+                        if (succeeds) a.saved.add("A");
+                        a.exportResult(succeeds, "A.csv");
+                    });
+                    a.reply(a.requestedCode, true);
+                    try {
+                        check(started.await(5, java.util.concurrent.TimeUnit.SECONDS), "write held after grant");
+                        a.onDestroy();
+                        MainActivity b = new MainActivity(disk); b.granted = true;
+                        check("{\"pending\":true}".equals(b.result()), "replacement sees pending write, not retry/failure");
+                        b.queue("unexpected B"); b.drain();
+                        check(b.saved.isEmpty(), "replacement cannot submit a duplicate while old write runs");
+                        b.onDestroy();
+                        replacement = new MainActivity(disk); replacement.granted = true;
+                        a.onDestroy(); // Stale teardown must not detach the replacement's observer.
+                        check("{\"pending\":true}".equals(replacement.result()), "second recreation still sees process-owned write");
+                        check(FAILURE.equals(disk.getString("result", null)) && !new ExportSession().busy(), "fresh process would read durable retry fallback, not a stuck busy flag");
+                        release.countDown();
+                        check(a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS), "old executor finishes submitted work");
+                        String expected = succeeds ? SUCCESS : FAILURE;
+                        check(expected.equals(replacement.result()), "replacement reads final result");
+                        check(replacement.events.contains(expected), "completion is emitted to replacement page without another reload");
+                        check(a.saved.size() == (succeeds ? 1 : 0), "old task writes at most once");
+                        replacement.queue("explicit C"); replacement.drain();
+                        check(replacement.saved.equals(Arrays.asList("explicit C")), "later explicit export accepted after old result settles");
+                    } finally {
+                        release.countDown(); a.onDestroy();
+                        a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
+                        if (replacement != null) replacement.onDestroy();
+                    }
+                });
+            }
+            scenario(label + "replacement subscribing after completion reads final result", () -> {
+                SharedPreferences disk = previousSuccess();
+                MainActivity a = new MainActivity(disk);
+                java.util.concurrent.CountDownLatch started = new java.util.concurrent.CountDownLatch(1);
+                java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+                a.queueExport(() -> {
+                    started.countDown();
+                    try { release.await(); } catch (InterruptedException e) { throw new AssertionError(e); }
+                    a.saved.add("A"); a.exportResult(true, "A.csv");
+                });
+                a.reply(a.requestedCode, true);
+                try {
+                    check(started.await(5, java.util.concurrent.TimeUnit.SECONDS), "delayed write starts");
+                    a.onDestroy(); release.countDown();
+                    check(a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS), "write settles with no observer");
+                    MainActivity b = new MainActivity(disk); b.granted = true;
+                    try {
+                        check(SUCCESS.equals(b.result()), "late subscriber reads durable completion rather than stuck pending");
+                        b.reply(a.requestedCode, true); b.reply(a.requestedCode, true); b.drain();
+                        check(a.saved.equals(Arrays.asList("A")) && b.saved.isEmpty(), "duplicate old callbacks cannot rerun completed work");
+                        b.queue("B"); b.drain();
+                        check(b.saved.equals(Arrays.asList("B")), "late subscriber can explicitly export again");
+                    } finally { b.onDestroy(); }
+                } finally { release.countDown(); a.onDestroy(); a.exports.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS); }
+            });
+            scenario(label + "rejected executor cannot leave process busy forever", () -> {
+                MainActivity a = new MainActivity(previousSuccess()); a.granted = true;
+                a.exports.shutdown();
+                try {
+                    a.queue("A");
+                    check(FAILURE.equals(a.result()) && !exportSession.busy(), "rejected submission clears busy and reports failure");
+                } finally { a.onDestroy(); }
+                MainActivity b = new MainActivity(previousSuccess()); b.granted = true;
+                try { b.queue("B"); b.drain(); check(b.saved.equals(Arrays.asList("B")), "next Activity can export after rejection"); }
+                finally { b.onDestroy(); }
+            });
+            scenario(label + "already-granted write requires durable recovery before submission", () -> {
+                SharedPreferences disk = previousSuccess(); disk.fail = true;
+                MainActivity a = new MainActivity(disk); a.granted = true;
+                try {
+                    a.queue("A"); a.drain();
+                    check(a.saved.isEmpty() && !exportSession.busy() && FAILURE.equals(a.result()), "failed pre-write commit does not start a file or leave pending");
+                } finally { a.onDestroy(); }
+            });
+            scenario(label + "queued completion cannot unlock a newer in-flight write", () -> {
+                MainActivity a = new MainActivity(previousSuccess()); a.granted = true;
+                java.util.concurrent.CountDownLatch started = new java.util.concurrent.CountDownLatch(1);
+                java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+                a.deferUi = true;
+                a.emitExportState(); // Capture a completion notification awaiting UI delivery.
+                a.deferUi = false;
+                a.queueExport(() -> {
+                    started.countDown();
+                    try { release.await(); } catch (InterruptedException e) { throw new AssertionError(e); }
+                    a.exportResult(true, "new.csv");
+                });
+                try {
+                    check(started.await(5, java.util.concurrent.TimeUnit.SECONDS), "new write held before old UI delivery");
+                    a.ui.forEach(Runnable::run);
+                    check("{\"pending\":true}".equals(a.events.get(a.events.size() - 1)), "delayed event reads current pending state on delivery");
+                } finally { release.countDown(); a.drain(); a.onDestroy(); }
             });
             scenario(label + "repeated taps retain original pending request", () -> {
                 MainActivity a = new MainActivity(previousSuccess());

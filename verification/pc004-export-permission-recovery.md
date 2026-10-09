@@ -46,8 +46,10 @@ fail recoverably rather than wrapping; an already granted permission, SAF folder
 or API 29+ default folder does not use this counter.
 
 CSV, PNG and GPX keep their existing shared queue and encoding/storage behavior.
-No location permission behavior, SAF grant, public-storage writer, web asset or
-service-worker cache is changed. No real device permission/settings were changed.
+Location permission behavior, SAF grants and public-storage writers are unchanged.
+The initial candidate changed no web assets. The subsequent granted-write review
+fix adds pending-state UI handling and service-worker v16; see the linked follow-up
+below. No real device permission/settings were changed.
 
 ## Candidate checks, 9 October 2026
 
@@ -81,3 +83,10 @@ exact PR head, including browser tests and APK compile/signature validation.
 Android framework lifecycle dispatch, an actual permission dialog, OEM behavior
 and physical public-storage/provider I/O still need separately authorized device
 validation; host/API-labelled fixtures do not establish those runtime outcomes.
+
+## Granted-write review follow-up
+
+Codex identified a valid additional Activity-lifecycle gap after permission grant
+while the file write is still running. The initial head `ab63f23243` passed CI but
+is not an accepted final head. [The follow-up report](pc004-granted-write-followup.md)
+records the reproduction, correction and expanded final-candidate coverage.
