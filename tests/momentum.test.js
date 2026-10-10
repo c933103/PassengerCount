@@ -118,7 +118,10 @@ test("GPS outage with heading zero appends a labelled estimate and permission de
   assert.equal(f.survey.track[1].source, "estimated");
   assert.equal(f.survey.track[1].heading, 0);
   assert.ok(f.survey.track[1].lat > fix.lat);
-  assert.match(makeGpx(f.survey), /estimated; accuracy=125m/);
+  const gpx = makeGpx(f.survey);
+  assert.match(gpx, /<pc:accuracy_m>125<\/pc:accuracy_m>/);
+  assert.match(gpx, /<pc:source>estimated<\/pc:source>/);
+  assert.match(gpx, /<pc:heading_deg>0<\/pc:heading_deg>/);
   const denied = locationFixture();
   denied.success(0);
   denied.failure(1);

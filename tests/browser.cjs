@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
 const disk = {},
   errors = [],
   requests = [];
-let exported, exportedGpx, exportedPng, browser;
+let exported, exportedBundle, exportedGpx, exportedPng, browser;
 const route = (ids, dest) => ({
   route: "1",
   agency: "NLB",
@@ -86,6 +86,9 @@ const data = {
     });
     await context.exposeBinding("captureCSV", (_, csv, name) => {
       exported = { csv, name };
+    });
+    await context.exposeBinding("captureBundle", (_, bundle) => {
+      exportedBundle = bundle;
     });
     await context.exposeBinding("capturePNG", (_, base64, name) => {
       exportedPng = { base64, name };
@@ -146,6 +149,10 @@ const data = {
         saveCsv: (csv, name) => { window.captureCSV(csv, name); finishExport(name); },
         savePng: (base64, name) => { window.capturePNG(base64, name); finishExport(name); },
         saveGpx: (gpx, name) => { window.captureGPX(gpx, name); finishExport(name); },
+        saveBundle: (folder, base, csv, json, gpx, pngBase64) => {
+          window.captureBundle({ folder, base, csv, json, gpx, pngBase64 });
+          finishExport(folder);
+        },
         getExportDirectory: () => native.exportDirectory || defaultFolder,
         getExportResult: () => native.exportResult || null,
         chooseExportDirectory: () => {
@@ -559,11 +566,18 @@ const data = {
   assert.match(exportedGpx.gpx, /<trkpt /);
   assert.match(exportedGpx.gpx, /<time>\d{4}-\d{2}-\d{2}T/);
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
-  assert.match(exported.csv, /Status,completed/);
-  assert.match(exported.csv, /Android surveyor/);
-  assert.match(exported.csv, /custom_stop/);
-  assert.match(exported.name, /\.csv$/);
+  assert.match(exportedBundle.csv, /Status,completed/);
+  assert.match(exportedBundle.csv, /Android surveyor/);
+  assert.match(exportedBundle.csv, /custom_stop/);
+  assert.doesNotMatch(exportedBundle.csv, /Weather history|ETA snapshots|Calendar context|Track points/);
+  assert.equal(exportedBundle.folder, exportedBundle.base);
+  assert.match(exportedBundle.base, /^bus-1-/);
+  const bundleRecord = JSON.parse(exportedBundle.json);
+  assert.ok(Array.isArray(bundleRecord.survey.weatherHistory));
+  assert.ok(Array.isArray(bundleRecord.survey.etaSnapshots));
+  assert.match(exportedBundle.gpx, /<trkpt /);
   await page.locator("#language").selectOption("yue-Hant-HK");
   if (process.env.SCREENSHOT_PATH)
     await page.screenshot({
@@ -876,10 +890,12 @@ const data = {
   assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/Download\/PaxCountRecord\/.*\.png/);
   if (process.env.SCREENSHOT_PATH) fs.writeFileSync(process.env.SCREENSHOT_PATH.replace(".png", "-chart.png"), Buffer.from(exportedPng.base64, "base64"));
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
-  assert.match(await page.locator("#exportStatus").textContent(), /\.csv/);
+  assert.match(await page.locator("#exportStatus").textContent(), /PaxCountRecord[\\/]+bus-1-/);
   await page.evaluate(() => window.__failExport = true);
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
   assert.match(await page.locator("#exportStatus").textContent(), /Export failed/);
   assert.equal(current().status, "completed");
@@ -898,19 +914,21 @@ const data = {
   assert.equal(await page.locator("#exportDirectory").textContent(), "/storage/emulated/0/PaxCountRecord", "folder survives cold restart");
   await page.locator("#recordList button").first().click();
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
-  assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/PaxCountRecord\/.*\.csv/);
+  assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/PaxCountRecord\/bus-1-/);
   await page.locator("#recordHome").click();
   await page.locator("#resetExportDirectory").click();
   assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
 
   // Persisted legacy-permission interruption is shown on the reloaded page.
   await require("./export-permission-browser.cjs")({
-    open, sample, getExports: () => ({ exported, exportedGpx, exportedPng }),
+    open, sample, getExports: () => ({ exported, exportedBundle, exportedGpx, exportedPng }),
   });
 
   // Hold actual image decoding across navigation for standalone PNG exports.
   await require("./png-export-browser.cjs")({ open, sample });
+  await require("./bundle-export-browser.cjs")({ open, sample });
 
   // Launch on Home without a previous search starts the stale-data worker.
   await context.close();

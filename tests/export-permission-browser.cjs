@@ -23,8 +23,8 @@ module.exports = async function exportPermissionRecovery({ open, sample, getExpo
       assert.equal(retained.id, survey.id);
       assert.deepEqual(retained.rows, survey.rows, 'interrupted export preserves saved observations');
       await page.locator('#csv').click();
-      await page.waitForFunction(() => /\.csv/.test(document.querySelector('#exportStatus').textContent));
-      assert.match(await page.locator('#exportStatus').textContent(), /Download\/PaxCountRecord\/.*\.csv/);
+      await page.waitForFunction(() => /PaxCountRecord\/bus-/.test(document.querySelector('#exportStatus').textContent));
+      assert.match(await page.locator('#exportStatus').textContent(), /Download\/PaxCountRecord\/bus-[^/]+$/);
       assert.equal((await readSurvey()).id, retained.id);
       assert.deepEqual((await readSurvey()).rows, retained.rows, 'explicit retry preserves the survey');
     } finally { await context.close(); }
@@ -50,7 +50,7 @@ module.exports = async function exportPermissionRecovery({ open, sample, getExpo
         if (ok) assert.match(await resumed.locator('#exportStatus').textContent(), /original\.csv/);
         else assert.match(await resumed.locator('#exportStatus').textContent(), language === 'en' ? /Export failed/ : /匯出失敗/);
         await resumed.locator('#csv').click();
-        await resumed.waitForFunction(() => /bus-.*\.csv/.test(document.querySelector('#exportStatus').textContent));
+        await resumed.waitForFunction(() => /PaxCountRecord\/bus-/.test(document.querySelector('#exportStatus').textContent));
         const retained = await resumed.evaluate(() => JSON.parse(window.PassengerCountAndroid.get('passenger-count:workspace:v2')).surveys[0]);
         assert.deepEqual(retained.rows, survey.rows, 'completion and later explicit export preserve the original survey');
       } finally { await resumedContext.close(); }

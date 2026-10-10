@@ -39,6 +39,7 @@ function fixture({ failStop = false, failSave = false } = {}) {
   const context = vm.createContext({ state, cur: () => state.surveys.find(s => s.id === state.currentId),
     window: { PassengerCountAndroid: bridge }, importNativeTrack, recordStop, completeSurvey,
     hkClock, hkTimestamp, tripMetrics, makeGpx, data: null,
+    nativeExportPending: false, chartExportPending: false,
     persist: () => { calls.push("save"); if (failSave) return false; durable = JSON.stringify(state); return true; },
     error: value => { error = value; }, t: value => value, renderCount() {},
     showScreen(screen) { state.screen = screen; durable = JSON.stringify(state); },

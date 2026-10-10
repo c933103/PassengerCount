@@ -1,0 +1,96 @@
+{
+  "base_commit": "c71de6bbf28f1cba676fee9c332917625b64e8a5",
+  "base_tree": "ef4d22f0d3bff575f68bb3207b08a007cddba687",
+  "review_thread": "https://github.com/c933103/PassengerCount/pull/3#discussion_r4235905298",
+  "checks": [
+    {
+      "path": "android/src/app/passengercount/ExportSession.java",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackService.java",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackSession.java",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackJournal.java",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "native-track.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "export.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "core.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "upload.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "fieldkit.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": ".github/workflows/v19-validate.yml",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "android/build.sh",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "android/AndroidManifest.xml",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "sw.js",
+      "comparison": "byte-identical to published and CI-validated c71de6b",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/MainActivity.java",
+      "comparison": "published source plus typed exportFailure mapper and four bridge catch delegations only; lifecycle/queue/session/result persistence methods identical",
+      "passed": true
+    }
+  ],
+  "tests": {
+    "node": 126,
+    "track_journal_assertions": 97,
+    "track_session_assertions": 26,
+    "export_lifecycle_assertions": 1148,
+    "export_lifecycle_scenarios": 84,
+    "production_writer_assertions": 928,
+    "negative_control": "published writer fails new uncertain-outcome oracle as expected"
+  },
+  "gates": {
+    "browser_and_apk_ci": "pending on corrected revision; previous c71de6b green runs do not validate changed native code",
+    "installed_provider_validation": "not run",
+    "production_signing": "not performed"
+  }
+}

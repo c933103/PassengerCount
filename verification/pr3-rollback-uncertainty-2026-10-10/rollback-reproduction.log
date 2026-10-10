@@ -1,0 +1,5 @@
+Published c71de6b before correction:
+failure=IOException; retained rows=3; retained written companions=2; delete calls=3
+
+Corrected production writer, same injected provider:
+failure=UncertainExportException; retained rows=3; retained written companions=2; delete calls=3

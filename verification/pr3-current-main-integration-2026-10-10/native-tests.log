@@ -1,0 +1,105 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> test:native
+> bash scripts/test-native-track.sh
+
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+4 warnings
+TrackJournal: 97 assertions passed (12 fixture scenarios)
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+4 warnings
+TrackSessionTest: 26 assertions passed
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+4 warnings
+PASS API 26 grant consumes accepted export exactly once
+PASS API 26 denial is recoverable and later request rejects stale callback
+PASS API 26 recreation reports failure and never revives old payload
+PASS API 26 process loss without destroy has durable failure and unique retry code
+PASS API 26 repeated restoration and result delivery stay recoverable
+PASS API 26 granted in-flight write survives recreation with success
+PASS API 26 granted in-flight write survives recreation with failure
+PASS API 26 replacement subscribing after completion reads final result
+PASS API 26 rejected executor cannot leave process busy forever
+PASS API 26 already-granted write requires durable recovery before submission
+PASS API 26 queued completion cannot unlock a newer in-flight write
+PASS API 26 failed post-grant uncertainty commit prevents file mutation
+PASS API 26 failed final result commit after successful write
+PASS API 26 failed final result commit after failed write
+PASS API 26 two-Activity matrix target=older order=[resume, destroy, finish]
+PASS API 26 two-Activity matrix target=older order=[resume, finish, destroy]
+PASS API 26 two-Activity matrix target=older order=[destroy, resume, finish]
+PASS API 26 two-Activity matrix target=older order=[destroy, finish, resume]
+PASS API 26 two-Activity matrix target=older order=[finish, resume, destroy]
+PASS API 26 two-Activity matrix target=older order=[finish, destroy, resume]
+PASS API 26 two-Activity matrix target=newer order=[resume, destroy, finish]
+PASS API 26 two-Activity matrix target=newer order=[resume, finish, destroy]
+PASS API 26 two-Activity matrix target=newer order=[destroy, resume, finish]
+PASS API 26 two-Activity matrix target=newer order=[destroy, finish, resume]
+PASS API 26 two-Activity matrix target=newer order=[finish, resume, destroy]
+PASS API 26 two-Activity matrix target=newer order=[finish, destroy, resume]
+PASS API 26 resume while original permission prompt is pending stays pending
+PASS API 26 two alive Activities during permission wait: grant
+PASS API 26 two alive Activities during permission wait: deny
+PASS API 26 two alive Activities during permission wait: destroy
+PASS API 26 repeated taps retain original pending request
+PASS API 26 failed durable marker never opens permission prompt
+PASS API 26 permission API error clears request for retry
+PASS API 26 request code exhaustion fails safely without code reuse
+PASS API 26 queued UI callback after destroy cannot launch prompt
+PASS API 26 already granted keeps immediate export path
+PASS API 26 SAF keeps immediate export path
+PASS API 28 grant consumes accepted export exactly once
+PASS API 28 denial is recoverable and later request rejects stale callback
+PASS API 28 recreation reports failure and never revives old payload
+PASS API 28 process loss without destroy has durable failure and unique retry code
+PASS API 28 repeated restoration and result delivery stay recoverable
+PASS API 28 granted in-flight write survives recreation with success
+PASS API 28 granted in-flight write survives recreation with failure
+PASS API 28 replacement subscribing after completion reads final result
+PASS API 28 rejected executor cannot leave process busy forever
+PASS API 28 already-granted write requires durable recovery before submission
+PASS API 28 queued completion cannot unlock a newer in-flight write
+PASS API 28 failed post-grant uncertainty commit prevents file mutation
+PASS API 28 failed final result commit after successful write
+PASS API 28 failed final result commit after failed write
+PASS API 28 two-Activity matrix target=older order=[resume, destroy, finish]
+PASS API 28 two-Activity matrix target=older order=[resume, finish, destroy]
+PASS API 28 two-Activity matrix target=older order=[destroy, resume, finish]
+PASS API 28 two-Activity matrix target=older order=[destroy, finish, resume]
+PASS API 28 two-Activity matrix target=older order=[finish, resume, destroy]
+PASS API 28 two-Activity matrix target=older order=[finish, destroy, resume]
+PASS API 28 two-Activity matrix target=newer order=[resume, destroy, finish]
+PASS API 28 two-Activity matrix target=newer order=[resume, finish, destroy]
+PASS API 28 two-Activity matrix target=newer order=[destroy, resume, finish]
+PASS API 28 two-Activity matrix target=newer order=[destroy, finish, resume]
+PASS API 28 two-Activity matrix target=newer order=[finish, resume, destroy]
+PASS API 28 two-Activity matrix target=newer order=[finish, destroy, resume]
+PASS API 28 resume while original permission prompt is pending stays pending
+PASS API 28 two alive Activities during permission wait: grant
+PASS API 28 two alive Activities during permission wait: deny
+PASS API 28 two alive Activities during permission wait: destroy
+PASS API 28 repeated taps retain original pending request
+PASS API 28 failed durable marker never opens permission prompt
+PASS API 28 permission API error clears request for retry
+PASS API 28 request code exhaustion fails safely without code reuse
+PASS API 28 queued UI callback after destroy cannot launch prompt
+PASS API 28 already granted keeps immediate export path
+PASS API 28 SAF keeps immediate export path
+PASS API 29 default folder never requests legacy permission
+PASS API 35 default folder never requests legacy permission
+1028 assertions; 0 failing scenarios
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+4 warnings
+ExportStorage: 486 assertions passed (production writer, host files and simulated providers; no installed-device claim)

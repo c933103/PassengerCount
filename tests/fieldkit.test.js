@@ -27,12 +27,15 @@ test("GPX export keeps timestamped fixes and marks estimated fixes", () => {
     date: "2026-09-22",
     track: [
       { lat: 22.3, lng: 114.17, time: "2026-09-22T12:00:00+08:00", accuracy: 8, source: "gps" },
-      { lat: 22.301, lng: 114.171, time: "2026-09-22T12:00:10+08:00", accuracy: 40, source: "estimated" },
+      { lat: 22.301, lng: 114.171, time: "2026-09-22T12:00:10+08:00", accuracy: 40, speed: 12.5, heading: 91, source: "estimated" },
     ],
   });
   assert.match(xml, /<gpx version="1.1"/);
   assert.match(xml, /2026-09-22T12:00:00\+08:00/);
-  assert.match(xml, /estimated; accuracy=40m/);
+  assert.match(xml, /<pc:accuracy_m>40<\/pc:accuracy_m>/);
+  assert.match(xml, /<pc:speed_mps>12.5<\/pc:speed_mps>/);
+  assert.match(xml, /<pc:heading_deg>91<\/pc:heading_deg>/);
+  assert.match(xml, /<pc:source>estimated<\/pc:source>/);
   assert.equal((xml.match(/<trkpt /g) || []).length, 2);
 });
 
@@ -140,4 +143,28 @@ test("ETA evidence prefetches the current and downstream stops without claiming 
     assert.equal(e.results[0].confirmedSurveyedBus, false);
     assert.match(e.note, /not identified/i);
   } finally { global.fetch = original; }
+});
+
+
+test("GPX omits unknown optional numeric measurements instead of turning null into zero", () => {
+  const xml = makeGpx({
+    route: { route: "1" },
+    date: "2026-09-23",
+    track: [
+      {
+        lat: 22.3,
+        lng: 114.17,
+        time: "2026-09-23T12:00:00+08:00",
+        accuracy: null,
+        speed: null,
+        heading: null,
+        source: "gps",
+      },
+    ],
+  });
+  assert.match(xml, /<trkpt /);
+  assert.doesNotMatch(xml, /<pc:accuracy_m>/);
+  assert.doesNotMatch(xml, /<pc:speed_mps>/);
+  assert.doesNotMatch(xml, /<pc:heading_deg>/);
+  assert.match(xml, /<pc:source>gps<\/pc:source>/);
 });
