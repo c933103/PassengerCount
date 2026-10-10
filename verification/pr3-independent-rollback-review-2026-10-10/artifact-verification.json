@@ -1,0 +1,50 @@
+{
+  "head": "f01e88f9f4033ac48625fc7182a9cf7682613698",
+  "tree": "084d92eadd79bf1eaf503c30f8740ba6105b1830",
+  "run_id": 38015692374,
+  "artifact_id": 11655916503,
+  "artifact_sha256": "52794b16affba9ffb9d1a95b44dd14527288d45f15d8ed93d4da4e45c8f2d68d",
+  "apk_sha256": "44778bad7f182c7b411b796fa532f11aa1d62ad3339a4aea8e35df613a6b4f38",
+  "unsigned_aligned_apk_sha256": "6736265d34d9f5129e44098e36be3202e191280166bc96e6bc7e324afe448e23",
+  "manifest": {
+    "versionCode": 11,
+    "versionName": "1.10",
+    "compileSdkVersion": 35,
+    "compileSdkVersionCodename": "15",
+    "package": "app.passengercount",
+    "platformBuildVersionCode": 35,
+    "platformBuildVersionName": 15
+  },
+  "reviewed_assets": {
+    "app.js": {
+      "sha256": "fa7afd75b3ae871b8bdbad064abe6790ec9c0688b8f439dfca142720cb058c72",
+      "matches_reviewed_source": true
+    },
+    "native-track.js": {
+      "sha256": "255f549ff440a48f44f363ad84f67702225b3522e87c3a8b4c3db863f0baeac7",
+      "matches_reviewed_source": true
+    },
+    "export.js": {
+      "sha256": "5a92fa81e61dd8618169f3b5426c75b6064d1590aca3a07896541f6fcd458dc6",
+      "matches_reviewed_source": true
+    },
+    "core.js": {
+      "sha256": "82bd82aba0d6b06b9d0b8b0a26902ceca99aa0ec5b5156e8b35067b448d0968f",
+      "matches_reviewed_source": true
+    },
+    "fieldkit.js": {
+      "sha256": "e011c1c25f54ead45f347dcee16b2a37bedc1019cf47c8fa5fcd2c323b97a931",
+      "matches_reviewed_source": true
+    },
+    "upload.js": {
+      "sha256": "fdb6602aea995e6e8fefb815f1cf6f35803227154a8d036cd688124372472177",
+      "matches_reviewed_source": true
+    }
+  },
+  "native_dex_uncertain_exception_and_mapper_present": true,
+  "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nSigner #1 certificate DN: CN=PassengerCount validation\nSigner #1 certificate SHA-256 digest: cdb8a2dfb1fcdecbe7f1d8b34f98a1662baf768e8cd7f7954832c141993f31bf\nSigner #1 certificate SHA-1 digest: 01622a0debb4a7288af3ed311235feb99cf966a3\nSigner #1 certificate MD5 digest: c57df2bf3f4fbd9a375e32350c53dc6e\nSigner #1 key algorithm: RSA\nSigner #1 key size (bits): 2048\nSigner #1 public key SHA-256 digest: 4f45341e680d2199fd27761e44712fc48550a9f062a875c1cd1e85a5b2baf96b\nSigner #1 public key SHA-1 digest: 2fd759621890a15fbd78d16bbe11210858fe2a07\nSigner #1 public key MD5 digest: adcce5ba2c203d80df7465fb4aa445ef\n",
+  "production_release": false,
+  "installed_device_test": false,
+  "github_reported_artifact_digest": "sha256:52794b16affba9ffb9d1a95b44dd14527288d45f15d8ed93d4da4e45c8f2d68d",
+  "artifact_digest_matches_github": true
+}
