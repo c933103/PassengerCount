@@ -1,0 +1,20 @@
+2026-10-10T02:14:40.4190234Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +1b7cb84c094bc4616d0255d4844cec80ed1accc8:refs/remotes/origin/main
+2026-10-10T02:14:41.0793205Z  * [new ref]         1b7cb84c094bc4616d0255d4844cec80ed1accc8 -> origin/main
+2026-10-10T02:14:41.1109287Z 1b7cb84c094bc4616d0255d4844cec80ed1accc8
+2026-10-10T02:14:46.2673219Z # tests 126
+2026-10-10T02:14:46.2674273Z # pass 126
+2026-10-10T02:14:46.2674701Z # fail 0
+2026-10-10T02:14:49.4685208Z TrackJournal: 97 assertions passed (12 fixture scenarios)
+2026-10-10T02:14:50.2929872Z TrackSessionTest: 26 assertions passed
+2026-10-10T02:14:51.5809527Z 1148 assertions; 0 failing scenarios
+2026-10-10T02:14:52.5432120Z ExportStorage: 928 assertions passed (production writer, host files and simulated providers; no installed-device claim)
+2026-10-10T02:15:39.2300804Z PASS: PC-004 restored export-failure feedback in English/Cantonese, retained surveys, no automatic export, in-flight controls/completion delivery, uncertain-result folder-check guidance and explicit retry (simulated native bridge).
+2026-10-10T02:15:41.2314203Z PASS: PC-003 real PNG decoding across record/Home navigation, frozen filenames and bytes, repeated clicks, decode failure and retry (native bridge and browser downloads).
+2026-10-10T02:15:43.6311109Z PASS: PR3 bundle actual PNG/JSON/CSV/GPX identity across navigation/edits, frozen time, all repeated controls, late native result, failed journal persistence, optional PNG failure, uncertain outcome and explicit retry.
+2026-10-10T02:15:48.2856108Z PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, fixed 10-minute early tolerance overriding old preferences; GPS following on map/resume/foreground, completed-trip reopening and correction, responsive PNG charts, and remembered export folders with full-path/error feedback; Sunday-cutoff launch refresh, usable counting during updates, persisted freshness, offline retry and manual updates in Settings/setup; native journal repeated View/GPX export, same-time evidence, foreground overlap and cold-restart cursor recovery; acknowledged pause/abort/complete tail drains, stopped-record recovery/export and explicit completed-record continuation.
+2026-10-10T02:15:59.5205956Z Verifies
+2026-10-10T02:15:59.5206430Z Verified using v1 scheme (JAR signing): false
+2026-10-10T02:15:59.5206960Z Verified using v2 scheme (APK Signature Scheme v2): true
+2026-10-10T02:15:59.5207463Z Verified using v3 scheme (APK Signature Scheme v3): true
+2026-10-10T02:15:59.5210854Z Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+2026-10-10T02:15:59.5211768Z Verified using v4 scheme (APK Signature Scheme v4): false

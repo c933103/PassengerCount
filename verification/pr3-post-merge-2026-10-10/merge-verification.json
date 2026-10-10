@@ -1,0 +1,27 @@
+{
+  "main": "1b7cb84c094bc4616d0255d4844cec80ed1accc8",
+  "commit": "1b7cb84c094bc4616d0255d4844cec80ed1accc8",
+  "tree": "084d92eadd79bf1eaf503c30f8740ba6105b1830",
+  "parents": [
+    "2ac807eeef3a282f7570e495cfd21a5f50e814fe",
+    "f01e88f9f4033ac48625fc7182a9cf7682613698"
+  ],
+  "run": 38016236410,
+  "job": 114107008296,
+  "threads": [
+    {
+      "id": "PRRT_kwDOUbe-Vs6lCMoh",
+      "is_resolved": true
+    },
+    {
+      "id": "PRRT_kwDOUbe-Vs6lCMoj",
+      "is_resolved": true
+    },
+    {
+      "id": "PRRT_kwDOUbe-Vs6q_yiF",
+      "is_resolved": true
+    }
+  ],
+  "ci_conclusion": "success",
+  "all_review_threads_resolved": true
+}

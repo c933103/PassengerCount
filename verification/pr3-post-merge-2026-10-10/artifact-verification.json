@@ -1,0 +1,188 @@
+{
+  "head": "1b7cb84c094bc4616d0255d4844cec80ed1accc8",
+  "tree": "084d92eadd79bf1eaf503c30f8740ba6105b1830",
+  "run_id": 38016236410,
+  "artifact_id": 11656980988,
+  "artifact_sha256": "fddff9321256aa0ca1cd1abed4eb4eadfbdec80309c889617771d715a4d0e2e9",
+  "apk_sha256": "2353dc207e84387455f49f574d2c4ca0cbacac02a766469be38aed7284b5f850",
+  "unsigned_aligned_apk_sha256": "0a5a42b07b260cac930cd9b87ca6fc1e825abc31cd35cc30fef3b949bcaa32c1",
+  "manifest": {
+    "versionCode": 11,
+    "versionName": "1.10",
+    "compileSdkVersion": 35,
+    "compileSdkVersionCodename": "15",
+    "package": "app.passengercount",
+    "platformBuildVersionCode": 35,
+    "platformBuildVersionName": 15
+  },
+  "manifest_binary_identical_to_independently_parsed_pr_artifact": true,
+  "reviewed_assets": {
+    "app.js": {
+      "sha256": "fa7afd75b3ae871b8bdbad064abe6790ec9c0688b8f439dfca142720cb058c72",
+      "matches_reviewed_source": true
+    },
+    "charts.js": {
+      "sha256": "fadb89ffd0e3b6336473aa61ed1e8089fe46a81562458c45662597d017688306",
+      "matches_reviewed_source": true
+    },
+    "core.js": {
+      "sha256": "82bd82aba0d6b06b9d0b8b0a26902ceca99aa0ec5b5156e8b35067b448d0968f",
+      "matches_reviewed_source": true
+    },
+    "data.js": {
+      "sha256": "3fa28b436a41204509685fa41bf2c61309c72a80d6a67a583030361901da865c",
+      "matches_reviewed_source": true
+    },
+    "data/government-routes.json.gz": {
+      "sha256": "a3e7d90f8989bb06ea592d9e763a8c3228e9d24b195e5dae902f40e82c12f54d",
+      "matches_reviewed_source": true
+    },
+    "export.js": {
+      "sha256": "5a92fa81e61dd8618169f3b5426c75b6064d1590aca3a07896541f6fcd458dc6",
+      "matches_reviewed_source": true
+    },
+    "fieldkit.js": {
+      "sha256": "e011c1c25f54ead45f347dcee16b2a37bedc1019cf47c8fa5fcd2c323b97a931",
+      "matches_reviewed_source": true
+    },
+    "government.js": {
+      "sha256": "7e26905fa98f5adb62c0837118c08c973c29239a5b78d4a2c204a9da4c727b81",
+      "matches_reviewed_source": true
+    },
+    "i18n.js": {
+      "sha256": "c37a6f33bda584e296762565bf493a20cc8a0f114c15ba699ebd630f4a39b6af",
+      "matches_reviewed_source": true
+    },
+    "icon-192.png": {
+      "sha256": "f5daca0e2236f0e88e2ad3dcd88f4a2be695490bde321e147c7f360ae1105956",
+      "matches_reviewed_source": true
+    },
+    "icon-512.png": {
+      "sha256": "7ba38184bdf43cf601d1d48687d9be1ffd79cb42188f5c9ed5b9f3a3fd3a2b0c",
+      "matches_reviewed_source": true
+    },
+    "index.html": {
+      "sha256": "c8594ddb14ae6cbe1d74d1e554dcf9c73015df9b39f34df2ddffb0b38093d313",
+      "matches_reviewed_source": true
+    },
+    "live.js": {
+      "sha256": "298e2821cff83ac4020b21f251aa3db9a6cdcf552b29d92ac2144cc4e4e45e9e",
+      "matches_reviewed_source": true
+    },
+    "manifest.json": {
+      "sha256": "155d435437d7f055e6e2077d852fb96cba4ebe730d859b6c4db5ea85e5100626",
+      "matches_reviewed_source": true
+    },
+    "native-track.js": {
+      "sha256": "255f549ff440a48f44f363ad84f67702225b3522e87c3a8b4c3db863f0baeac7",
+      "matches_reviewed_source": true
+    },
+    "route-worker.js": {
+      "sha256": "a0e5f0a0114a2e5645ae7b6df97a3a36a2d551e5cd51b8ab7fc48c8f3263f24e",
+      "matches_reviewed_source": true
+    },
+    "storage.js": {
+      "sha256": "a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9",
+      "matches_reviewed_source": true
+    },
+    "style.css": {
+      "sha256": "5a571d2440a6360c2eec44a4f6c3ccb61972c1c14dc27bb508cfbeddfa7039fd",
+      "matches_reviewed_source": true
+    },
+    "supabase-config.js": {
+      "sha256": "c3fb872888129813a6228dbed43f13271cc8b4a2a4faf4ce519173c2a252502f",
+      "matches_reviewed_source": true
+    },
+    "survey.js": {
+      "sha256": "ce012112474f10b03bcc67c6b7875e6a38f69d5a2b38efa9e03b9508753fafbb",
+      "matches_reviewed_source": true
+    },
+    "upload.js": {
+      "sha256": "fdb6602aea995e6e8fefb815f1cf6f35803227154a8d036cd688124372472177",
+      "matches_reviewed_source": true
+    },
+    "vendor/fflate/LICENSE": {
+      "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551",
+      "matches_reviewed_source": true
+    },
+    "vendor/fflate/fflate.js": {
+      "sha256": "b7ca4450b19559a1d50eb381adcee94b82449674be4cd17789d9beba7e6122a1",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/LICENSE": {
+      "sha256": "53e8dc25862014e4324741ca18fbe3611e11d42ef69f59f86ea8c5389647d4cb",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/images/layers-2x.png": {
+      "sha256": "066daca850d8ffbef007af00b06eac0015728dee279c51f3cb6c716df7c42edf",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/images/layers.png": {
+      "sha256": "1dbbe9d028e292f36fcba8f8b3a28d5e8932754fc2215b9ac69e4cdecf5107c6",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/images/marker-icon-2x.png": {
+      "sha256": "00179c4c1ee830d3a108412ae0d294f55776cfeb085c60129a39aa6fc4ae2528",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/images/marker-icon.png": {
+      "sha256": "574c3a5cca85f4114085b6841596d62f00d7c892c7b03f28cbfa301deb1dc437",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/images/marker-shadow.png": {
+      "sha256": "264f5c640339f042dd729062cfc04c17f8ea0f29882b538e3848ed8f10edb4da",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/leaflet.css": {
+      "sha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6",
+      "matches_reviewed_source": true
+    },
+    "vendor/leaflet/leaflet.js": {
+      "sha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+      "matches_reviewed_source": true
+    }
+  },
+  "native_dex_identical_to_reviewed_pr_artifact": true,
+  "all_non_signature_entries_identical_to_reviewed_pr_artifact": [
+    "AndroidManifest.xml",
+    "res/drawable/ic_launcher.xml",
+    "resources.arsc",
+    "assets/www/app.js",
+    "assets/www/charts.js",
+    "assets/www/core.js",
+    "assets/www/data.js",
+    "assets/www/data/government-routes.json.gz",
+    "assets/www/export.js",
+    "assets/www/fieldkit.js",
+    "assets/www/government.js",
+    "assets/www/i18n.js",
+    "assets/www/icon-192.png",
+    "assets/www/icon-512.png",
+    "assets/www/index.html",
+    "assets/www/live.js",
+    "assets/www/manifest.json",
+    "assets/www/native-track.js",
+    "assets/www/route-worker.js",
+    "assets/www/storage.js",
+    "assets/www/style.css",
+    "assets/www/supabase-config.js",
+    "assets/www/survey.js",
+    "assets/www/upload.js",
+    "assets/www/vendor/fflate/LICENSE",
+    "assets/www/vendor/fflate/fflate.js",
+    "assets/www/vendor/leaflet/LICENSE",
+    "assets/www/vendor/leaflet/images/layers-2x.png",
+    "assets/www/vendor/leaflet/images/layers.png",
+    "assets/www/vendor/leaflet/images/marker-icon-2x.png",
+    "assets/www/vendor/leaflet/images/marker-icon.png",
+    "assets/www/vendor/leaflet/images/marker-shadow.png",
+    "assets/www/vendor/leaflet/leaflet.css",
+    "assets/www/vendor/leaflet/leaflet.js",
+    "classes.dex"
+  ],
+  "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nSigner #1 certificate DN: CN=PassengerCount validation\nSigner #1 certificate SHA-256 digest: ca689c9ff4895dc90977f0dcbe8c1f4824b8767831994ced814f0c5c8a2d095b\nSigner #1 certificate SHA-1 digest: b9e4e71d3fd308b1ef40b75ce7c33957e3784244\nSigner #1 certificate MD5 digest: f944bd51c2695ab7c1953c0880433477\nSigner #1 key algorithm: RSA\nSigner #1 key size (bits): 2048\nSigner #1 public key SHA-256 digest: 2ab83a6c5c0cdd699a68476ddcd649d4076563ca953cd35ea390177504de9fb1\nSigner #1 public key SHA-1 digest: 5af0fb8a08e3ea93cd3f3458a621e54824328cc1\nSigner #1 public key MD5 digest: ed4dadecdad5b8686a052375fd031aee\n",
+  "production_release": false,
+  "installed_device_test": false,
+  "github_reported_artifact_digest": "sha256:fddff9321256aa0ca1cd1abed4eb4eadfbdec80309c889617771d715a4d0e2e9",
+  "artifact_digest_matches_github": true
+}
