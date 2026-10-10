@@ -1,0 +1,70 @@
+{
+  "head": "fd3bf7dcbb2139d87476e7ae323b06768890ad65",
+  "tree": "084d92eadd79bf1eaf503c30f8740ba6105b1830",
+  "parents": [
+    "c71de6bbf28f1cba676fee9c332917625b64e8a5"
+  ],
+  "manifest_paths": 15,
+  "manifest_mismatches": [],
+  "manifest_changed_paths_match": true,
+  "manifest_frozen_identity_match": true,
+  "author_status": "?? node_modules",
+  "preservation_checks": [
+    {
+      "path": "android/src/app/passengercount/ExportSession.java",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackService.java",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackSession.java",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackJournal.java",
+      "passed": true
+    },
+    {
+      "path": "native-track.js",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "passed": true
+    },
+    {
+      "path": "export.js",
+      "passed": true
+    },
+    {
+      "path": "core.js",
+      "passed": true
+    },
+    {
+      "path": "upload.js",
+      "passed": true
+    },
+    {
+      "path": "fieldkit.js",
+      "passed": true
+    },
+    {
+      "path": ".github/workflows/v19-validate.yml",
+      "passed": true
+    },
+    {
+      "path": "android/build.sh",
+      "passed": true
+    },
+    {
+      "path": "android/AndroidManifest.xml",
+      "passed": true
+    },
+    {
+      "path": "sw.js",
+      "passed": true
+    }
+  ]
+}
