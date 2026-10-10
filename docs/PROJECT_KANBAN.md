@@ -2,7 +2,9 @@
 
 Parent: [private cross-project master](https://github.com/c933103/something-priv-maybe/issues/1) (access restricted).
 
-Snapshot: 10 October 2026, 04:01 UTC / 12:01 UTC+08. Main: `fb48d501b2d2bb260808c622cccbe57699184afb`. Release 1.11 / code 12 remains held.
+Discussion and dated evidence: [project-board PR11](https://github.com/c933103/PassengerCount/pull/11).
+
+Updated: 10 October 2026, 05:05 UTC / 13:05 UTC+08. Main: `fb48d501b2d2bb260808c622cccbe57699184afb`. Release 1.11 / code 12 remains held.
 
 ## Brief and product decisions
 Provide a reliable Android/web bus passenger-survey workflow: set-and-forget recording, time-aware route variants, GPS suggestions with manual overrides, usable numeric input and table/map, correct onboard totals, pause/abort/resume, durable autosave, and last-stop Save & return home.
@@ -24,12 +26,13 @@ Repository Issues are disabled. This Markdown board is the durable repository tr
 - [ ] **PC-PRODUCT: reconcile remaining feature requirements.** Next: compare the requested field-survey workflow with current main and verified outcomes, and open a separate bounded correction PR for each supported gap. Product baseline: [README](../README.md); delivered feature records: [PR1](https://github.com/c933103/PassengerCount/pull/1), [PR2](https://github.com/c933103/PassengerCount/pull/2), [PR3](https://github.com/c933103/PassengerCount/pull/3). An existing implementation is not evidence that every real-device case is accepted.
 
 ## Ready
-No additional source change is declared ready by this tracker. The immediate next steps are the current candidate's CI/review checks and release acceptance below.
+No additional source change is declared ready by this tracker. The immediate next steps are the current candidate's runner prerequisite, installed validation and review/release acceptance below.
 
 ## In progress
-- [ ] **PC-DURABILITY: verify current upload-receipt/lifecycle candidate.** [Draft PR10](https://github.com/c933103/PassengerCount/pull/10), exact head `d39c9201ba3494919c2343106c65c850b6b72f82`, reviewed source tree `3022a48e1185901085bb9d77e672b61eac295429`, based on main `fb48d501`. Next: inspect unchanged automatic CI, browser workflow, Android build/artifact and current review results; retain current-data versus submitted-receipt semantics through editing and Undo/Redo. Local evidence in PR10: 258 Node tests, 119 focused upload cases and native host checks passed. Local browser did not reach page load; host shims are not device tests. No live backend request or release is part of that validation claim.
+The installed-validation candidate is blocked below; runner-prerequisite proposal work remains tracked privately.
 
 ## Blocked
+- [ ] **PC-DURABILITY: complete installed validation and current review.** [Draft PR10](https://github.com/c933103/PassengerCount/pull/10), exact head `153df48d5b3dc3f41a8fbc6ec342a9c0b4234d56`, tree `4353a60633aa8e526a797ccada9ee16e5d3fcc92`, remains based on main `fb48d501`. Production Java, manifest and application modules are unchanged from validated `ac6c8237`; the newer changes are the test-only harness. [Run 38024845688 and exact receipt](https://github.com/c933103/PassengerCount/pull/10#issuecomment-6093877056) passed 263 Node tests, native host regressions, browser checks, production APK build and test-instrumentation compilation. The installed API35 step stopped at the existing-access KVM preflight before emulator creation or any test phase; the run is failed/blocked, not an installed pass. The check does not distinguish a missing device from inaccessible permissions. Next: establish an approved, supported runner prerequisite, verify all exact-head installed phases and obtain acceptable current-head review; Codex review remains quota-blocked. No permission change, live backend test or release is claimed. Physical-device, power-loss, API26 and original-signer acceptance remain separate.
 - [ ] **PC-RELEASE-1.11: publish a verified upgrade.** Next: accept and integrate required corrections, verify exact merged-source CI and packaged assets, rebuild with the original signing identity, check package/version/source/signature, then complete authorized publication. Dependencies: [PR10](https://github.com/c933103/PassengerCount/pull/10); version preparation: [PR9](https://github.com/c933103/PassengerCount/pull/9). The earlier original-signer candidate is historical preparation and does not establish release publication. Restricted review details remain in the designated private record.
 
 ## Done
