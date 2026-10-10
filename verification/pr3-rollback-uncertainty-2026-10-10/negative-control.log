@@ -1,0 +1,10 @@
+Expected behavioral failure against published c71de6bbf28f1cba676fee9c332917625b64e8a5 ExportStorage (exit 1).
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+4 warnings
+Exception in thread "main" java.lang.AssertionError: incomplete MediaStore cleanup must remain uncertain: API 29, publish=false, file=1, delete=1, throws=false
+	at app.passengercount.ExportStorageTest.check(ExportStorageTest.java:20)
+	at app.passengercount.ExportStorageTest.incompleteRollbackControls(ExportStorageTest.java:151)
+	at app.passengercount.ExportStorageTest.main(ExportStorageTest.java:241)

@@ -272,6 +272,30 @@ public final class MainActivity extends Activity {
                     } finally { b.onDestroy(); }
                 });
             }
+            for (boolean uncertain : new boolean[]{true, false}) for (boolean failResult : new boolean[]{true, false}) {
+                scenario(label + "writer rollback outcome uncertain=" + uncertain + " resultCommitFails=" + failResult, () -> {
+                    SharedPreferences disk = previousSuccess(); MainActivity a = new MainActivity(disk); a.granted = true;
+                    a.queueExport(() -> {
+                        if (uncertain) a.saved.add("partial companion");
+                        disk.fail = failResult;
+                        a.exportFailure(uncertain ? new ExportStorage.UncertainExportException(new java.io.IOException("cleanup failed"))
+                            : new java.io.IOException("rollback confirmed"));
+                    });
+                    a.drain();
+                    try {
+                        check((uncertain ? UNCERTAIN : FAILURE).equals(a.result()), "actual outcome mapper preserves check-folder versus retry-safe guidance");
+                        check(!exportSession.busy(), "failure settles export controls");
+                        check((uncertain || failResult ? UNCERTAIN : FAILURE).equals(disk.restart().getString("result", null)), "restart never downgrades unknown output to retry-safe failure");
+                        check(a.saved.size() == (uncertain ? 1 : 0), "outcome mapping never retries the write");
+                    } finally { a.onDestroy(); }
+                    MainActivity b = new MainActivity(disk.restart()); b.granted = true;
+                    try {
+                        check(b.saved.isEmpty(), "recreation does not replay partial output");
+                        b.queue("explicit export after folder check"); b.drain();
+                        check(b.saved.equals(Arrays.asList("explicit export after folder check")), "explicit user retry remains possible");
+                    } finally { b.onDestroy(); }
+                });
+            }
             String[][] eventOrders = {
                 {"resume", "destroy", "finish"}, {"resume", "finish", "destroy"},
                 {"destroy", "resume", "finish"}, {"destroy", "finish", "resume"},
@@ -430,6 +454,9 @@ public final class MainActivity extends Activity {
     } }
     static final class PackageManager { static final int PERMISSION_GRANTED = 0; }
     static final class ExportStorage {
+        static final class UncertainExportException extends java.io.IOException {
+            UncertainExportException(Throwable cause) { super(cause); }
+        }
         final MainActivity activity;
         ExportStorage(MainActivity activity) { this.activity = activity; }
         String tree() { return activity.tree; }

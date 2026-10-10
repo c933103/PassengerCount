@@ -194,7 +194,7 @@ public final class MainActivity extends Activity {
                     if (content == null || content.length() > 10_000_000 || !filename.endsWith(".csv"))
                         throw new IOException("Invalid CSV");
                     exportResult(true, new ExportStorage(MainActivity.this).save(content.getBytes(StandardCharsets.UTF_8), filename, "text/csv"));
-                } catch (Exception e) { exportResult(false, ""); }
+                } catch (Exception e) { exportFailure(e); }
             });
         }
         @JavascriptInterface public void saveGpx(String content, String filename) {
@@ -205,7 +205,7 @@ public final class MainActivity extends Activity {
                         throw new IOException("Invalid GPX");
                     exportResult(true, new ExportStorage(MainActivity.this).save(
                         content.getBytes(StandardCharsets.UTF_8), filename, "application/gpx+xml"));
-                } catch (Exception e) { exportResult(false, ""); }
+                } catch (Exception e) { exportFailure(e); }
             });
         }
         @JavascriptInterface public void savePng(String base64, String filename) {
@@ -219,7 +219,7 @@ public final class MainActivity extends Activity {
                     for (int i = 0; i < signature.length; i++)
                         if (bytes[i] != signature[i]) throw new IOException("Invalid PNG");
                     exportResult(true, new ExportStorage(MainActivity.this).save(bytes, filename, "image/png"));
-                } catch (Exception e) { exportResult(false, ""); }
+                } catch (Exception e) { exportFailure(e); }
             });
         }
         @JavascriptInterface public void saveBundle(
@@ -247,7 +247,7 @@ public final class MainActivity extends Activity {
                         gpx.getBytes(StandardCharsets.UTF_8),
                         png);
                     exportResult(true, path);
-                } catch (Exception e) { exportResult(false, ""); }
+                } catch (Exception e) { exportFailure(e); }
             });
         }
         @JavascriptInterface public String getExportDirectory() { return new ExportStorage(MainActivity.this).directory(); }
@@ -399,6 +399,11 @@ public final class MainActivity extends Activity {
         // A submitted write can finish after its Activity dies. The process-owned
         // session notifies the current Activity only after the write settles.
         if (!exportSession.busy()) exportSession.changed();
+    }
+    private void exportFailure(Exception failure) {
+        if (failure instanceof ExportStorage.UncertainExportException)
+            storeExportResult("{\"uncertain\":true}", true);
+        else exportResult(false, "");
     }
     private void exportResult(boolean ok, String path) {
         try {

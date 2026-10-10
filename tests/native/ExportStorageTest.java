@@ -125,9 +125,126 @@ public class ExportStorageTest {
         }
     }
 
+    private static boolean uncertain(IOException failure) {
+        // Keep the oracle source-compatible with frozen pre-fix writers so the
+        // negative control fails on behavior, rather than a missing Java type.
+        return failure.getClass().getSimpleName().equals("UncertainExportException");
+    }
+
+    private static void incompleteRollbackControls() throws Exception {
+        for (int api : new int[]{29, 35}) {
+            Build.VERSION.SDK_INT = api;
+            for (boolean publishFailure : new boolean[]{false, true}) {
+                for (int fail = 1; fail <= 4; fail++) {
+                    for (boolean throwsDelete : new boolean[]{false, true}) {
+                        for (int deleteAt = 1; deleteAt <= fail; deleteAt++) {
+                            Context context = context();
+                            if (publishFailure) context.resolver.failPublish = fail;
+                            else context.resolver.failOpen = fail;
+                            context.resolver.failDelete = throwsDelete;
+                            context.resolver.zeroDelete = !throwsDelete;
+                            context.resolver.failDeleteAt = deleteAt;
+                            try {
+                                saveBundle(new ExportStorage(context), "partial", true);
+                                throw new AssertionError("injected partial write was accepted");
+                            } catch (IOException failure) {
+                                check(uncertain(failure), "incomplete MediaStore cleanup must remain uncertain: API " + api
+                                    + ", publish=" + publishFailure + ", file=" + fail + ", delete=" + deleteAt + ", throws=" + throwsDelete);
+                            }
+                            check(context.resolver.entries.size() == 1, "one unconfirmed row remains");
+                            check(context.resolver.bytes.size() == (publishFailure || deleteAt > 1 ? 1 : 0), "retained companion bytes agree with failure position");
+                            check(context.resolver.deletes == fail, "rollback attempts all other companions after one cleanup failure");
+                            check(context.resolver.opens == fail, "failed bundle is never automatically replayed");
+                        }
+                    }
+                }
+            }
+            for (boolean tree : new boolean[]{false, true}) for (boolean throwsDelete : new boolean[]{false, true}) {
+                Context context = context();
+                ExportStorage storage = new ExportStorage(context);
+                if (tree) storage.setTree("content://tree/root");
+                context.resolver.failOpen = 1;
+                context.resolver.failDelete = throwsDelete;
+                context.resolver.zeroDelete = !throwsDelete;
+                try {
+                    storage.save(data("standalone"), "trip.gpx", "application/gpx+xml");
+                    throw new AssertionError("standalone write failure missing");
+                } catch (IOException failure) {
+                    check(uncertain(failure), "standalone failed cleanup retains uncertain outcome for MediaStore/SAF");
+                }
+                check(context.resolver.entries.size() == 1, "unconfirmed standalone document remains");
+            }
+            for (boolean throwsDelete : new boolean[]{false, true}) {
+                Context context = context();
+                ExportStorage storage = new ExportStorage(context); storage.setTree("content://tree/root");
+                context.resolver.failOpen = 3;
+                context.resolver.failDelete = throwsDelete;
+                context.resolver.zeroDelete = !throwsDelete;
+                context.resolver.failDeleteAt = 1;
+                try {
+                    saveBundle(storage, "partial-tree", true);
+                    throw new AssertionError("SAF write failure missing");
+                } catch (IOException failure) {
+                    check(uncertain(failure), "failed SAF directory rollback is uncertain");
+                }
+                check(context.resolver.bytes.size() == 2, "partial SAF companions remain");
+                check(context.resolver.deletes == 1, "directory deletion outcome is checked");
+            }
+        }
+    }
+
+    private static final class CleanupFile extends File {
+        boolean deleteResult = true, throwDelete = false, listed = true, throwPath = false;
+        int deleteCalls;
+        CleanupFile[] children;
+        CleanupFile(String path, CleanupFile... children) { super(path); this.children = children; }
+        @Override public String getPath() {
+            if (throwPath) throw new SecurityException("controlled legacy write denial");
+            return super.getPath();
+        }
+        @Override public boolean isDirectory() { return children.length > 0 || !listed; }
+        @Override public File[] listFiles() { return listed ? children : null; }
+        @Override public boolean delete() {
+            deleteCalls++;
+            if (throwDelete) throw new SecurityException("controlled legacy cleanup denial");
+            return deleteResult;
+        }
+    }
+
+    private static void legacyCleanupControls() throws Exception {
+        java.lang.reflect.Method remove = ExportStorage.class.getDeclaredMethod("deleteRecursively", File.class);
+        remove.setAccessible(true);
+        for (boolean throwsDelete : new boolean[]{false, true}) {
+            CleanupFile blocked = new CleanupFile("blocked"); blocked.deleteResult = false; blocked.throwDelete = throwsDelete;
+            CleanupFile other = new CleanupFile("other"), directory = new CleanupFile("directory", blocked, other);
+            check(Boolean.FALSE.equals(remove.invoke(null, directory)), "legacy recursive cleanup cannot confirm failed child deletion");
+            check(blocked.deleteCalls == 1 && other.deleteCalls == 1 && directory.deleteCalls == 1, "legacy rollback still tries remaining children and directory");
+        }
+        CleanupFile unreadable = new CleanupFile("unreadable"); unreadable.listed = false;
+        check(Boolean.FALSE.equals(remove.invoke(null, unreadable)), "unreadable legacy directory cannot confirm cleanup");
+        CleanupFile clean = new CleanupFile("directory", new CleanupFile("child"));
+        check(Boolean.TRUE.equals(remove.invoke(null, clean)), "confirmed legacy cleanup stays retry-safe");
+        java.lang.reflect.Method write = ExportStorage.class.getDeclaredMethod("writeFile", File.class, byte[].class);
+        write.setAccessible(true);
+        for (boolean cleanupSucceeds : new boolean[]{false, true}) for (boolean securityFailure : new boolean[]{false, true}) {
+            CleanupFile missing = new CleanupFile(new File(Files.createTempDirectory("write-rollback-").toFile(), "missing-parent/file").getPath());
+            missing.deleteResult = cleanupSucceeds; missing.throwPath = securityFailure;
+            try {
+                write.invoke(null, missing, data("never-written"));
+                throw new AssertionError("missing parent must prevent file write");
+            } catch (java.lang.reflect.InvocationTargetException failure) {
+                Throwable cause = failure.getCause();
+                check(cause instanceof IOException || cause instanceof SecurityException, "legacy write failure is preserved");
+                check((cause instanceof IOException && uncertain((IOException) cause)) != cleanupSucceeds, "legacy write distinguishes confirmed and incomplete rollback");
+            }
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         bundleControls();
         standaloneMetadataControls();
+        incompleteRollbackControls();
+        legacyCleanupControls();
         System.out.println("ExportStorage: " + assertions + " assertions passed (production writer, host files and simulated providers; no installed-device claim)");
     }
 }

@@ -17,7 +17,8 @@ public class ContentResolver {
     public int next = 0, opens = 0, failOpen = -1, failPublish = -1, publishes = 0;
     public int queries = 0, deletes = 0;
     public String metadataFailure = "none";
-    public boolean failDelete = false;
+    public boolean failDelete = false, zeroDelete = false;
+    public int failDeleteAt = -1;
 
     public Uri insert(Uri collection, ContentValues values) {
         Uri uri = Uri.parse("content://provider/" + (++next));
@@ -43,7 +44,10 @@ public class ContentResolver {
 
     public int delete(Uri uri, String where, String[] args) {
         deletes++;
-        if (failDelete) throw new SecurityException("controlled revoked permission");
+        if (failDeleteAt < 0 || deletes == failDeleteAt) {
+            if (zeroDelete) return 0;
+            if (failDelete) throw new SecurityException("controlled revoked permission");
+        }
         List<Uri> children = new ArrayList<>();
         for (Map.Entry<Uri, ContentValues> entry : entries.entrySet())
             if (uri.toString().equals(entry.getValue().get("parent"))) children.add(entry.getKey());

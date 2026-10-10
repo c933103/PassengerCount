@@ -18,6 +18,11 @@ import java.util.List;
 
 /** Public exports, with an optional persistently authorised document tree. */
 final class ExportStorage {
+    /** A fresh output may remain; callers must retain check-folder guidance. */
+    static final class UncertainExportException extends IOException {
+        UncertainExportException(Throwable cause) { super("Export rollback could not be confirmed", cause); }
+    }
+
     private final Context context;
     private final SharedPreferences prefs;
 
@@ -66,7 +71,7 @@ final class ExportStorage {
                 write(file, bytes);
                 return documentPath(file, false);
             } catch (IOException | RuntimeException e) {
-                try { DocumentsContract.deleteDocument(context.getContentResolver(), file); } catch (Exception ignored) {}
+                if (!deleteDocument(file)) throw new UncertainExportException(e);
                 throw e;
             }
         }
@@ -116,8 +121,11 @@ final class ExportStorage {
                 }
                 return new File(defaultDirectory(), folder).getAbsolutePath();
             } catch (IOException | RuntimeException e) {
-                for (Uri uri : created)
-                    try { context.getContentResolver().delete(uri, null, null); } catch (Exception ignored) {}
+                boolean cleaned = true;
+                for (Uri uri : created) cleaned = deleteMedia(uri) && cleaned;
+                if (!cleaned) throw new UncertainExportException(e);
+                // A failed current-file cleanup is not in `created`; keep its
+                // uncertain exception even if earlier companions were removed.
                 throw e;
             }
         }
@@ -135,7 +143,10 @@ final class ExportStorage {
             }
             return directory.getAbsolutePath();
         } catch (IOException | RuntimeException e) {
-            deleteRecursively(directory);
+            if (!deleteRecursively(directory)) throw new UncertainExportException(e);
+            // The whole fresh directory is gone, including any child whose
+            // first cleanup attempt failed. That confirmed rollback is retry-safe.
+            if (e instanceof UncertainExportException) throw new IOException("Cannot save export bundle", e);
             throw e;
         }
     }
@@ -163,7 +174,7 @@ final class ExportStorage {
             }
             return documentPath(directory, false);
         } catch (IOException | RuntimeException e) {
-            try { DocumentsContract.deleteDocument(context.getContentResolver(), directory); } catch (Exception ignored) {}
+            if (!deleteDocument(directory)) throw new UncertainExportException(e);
             throw e;
         }
     }
@@ -204,7 +215,7 @@ final class ExportStorage {
                 throw new IOException("Cannot publish export");
             return file;
         } catch (IOException | RuntimeException e) {
-            try { context.getContentResolver().delete(file, null, null); } catch (Exception ignored) {}
+            if (!deleteMedia(file)) throw new UncertainExportException(e);
             throw e;
         }
     }
@@ -224,8 +235,10 @@ final class ExportStorage {
         try (FileOutputStream output = new FileOutputStream(file)) {
             output.write(bytes);
             output.getFD().sync();
-        } catch (IOException e) {
-            file.delete();
+        } catch (IOException | RuntimeException e) {
+            boolean cleaned;
+            try { cleaned = file.delete(); } catch (RuntimeException ignored) { cleaned = false; }
+            if (!cleaned) throw new UncertainExportException(e);
             throw e;
         }
     }
@@ -238,11 +251,25 @@ final class ExportStorage {
         }
     }
 
-    private static void deleteRecursively(File file) {
-        if (file.isDirectory()) {
-            File[] children = file.listFiles();
-            if (children != null) for (File child : children) deleteRecursively(child);
-        }
-        file.delete();
+    private boolean deleteMedia(Uri file) {
+        try { return context.getContentResolver().delete(file, null, null) == 1; }
+        catch (Exception ignored) { return false; }
+    }
+
+    private boolean deleteDocument(Uri file) {
+        try { return DocumentsContract.deleteDocument(context.getContentResolver(), file); }
+        catch (Exception ignored) { return false; }
+    }
+
+    private static boolean deleteRecursively(File file) {
+        try {
+            boolean cleaned = true;
+            if (file.isDirectory()) {
+                File[] children = file.listFiles();
+                if (children == null) return false;
+                for (File child : children) cleaned = deleteRecursively(child) && cleaned;
+            }
+            return file.delete() && cleaned;
+        } catch (RuntimeException ignored) { return false; }
     }
 }

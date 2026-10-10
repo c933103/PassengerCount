@@ -1,5 +1,7 @@
 # PR #3 current-main integration review, 10 October 2026
 
+Historical evidence for published integration `c71de6bbf28f1cba676fee9c332917625b64e8a5`, tree `ef4d22f0d3bff575f68bb3207b08a007cddba687`. The later rollback-uncertainty correction and its current verification are recorded in [the follow-up report](../pr3-rollback-uncertainty-2026-10-10/README.md).
+
 ## Scope and exact inputs
 
 - Repository: c933103/PassengerCount, existing PR #3 (`fix/reference-upload-export-bundle`).

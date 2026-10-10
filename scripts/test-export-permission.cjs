@@ -34,6 +34,7 @@ const methods = [
   'private String currentExportResult()',
   'private void emitExportState()',
   'private void storeExportResult(',
+  'private void exportFailure(',
 ].map(method).join('\n');
 const fixture = fs.readFileSync(path.join(root, 'tests/native/ExportPermissionFixture.java'), 'utf8')
   .replace('/* PRODUCTION_FIELDS */', fields)
