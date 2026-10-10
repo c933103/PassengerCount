@@ -60,15 +60,24 @@ public final class MainActivity extends Context {
             check(TrackService.session(a).start("A") == null, "restart cannot resurrect deleted trip");
             check(records(a.directory, "B") == 1, "restart cleanup preserves unrelated journal");
         }
-        for (String phase : new String[]{"mark", "stop", "sync", "close"}) {
+        for (String phase : new String[]{"mark", "stop", "open", "stat", "not-directory", "sync", "close"}) {
             for (boolean throwing : new boolean[]{false, true}) {
                 MainActivity a = fresh(); DeviceStorage bridge = a.new DeviceStorage();
                 seed(a.directory, "A"); seed(a.directory, "B");
                 TrackSession.Request old = TrackService.session(a).start("A");
                 a.prefs.fail = phase; a.prefs.throwing = throwing;
+                android.system.Os.failOpen = phase.equals("open");
+                android.system.Os.failStat = phase.equals("stat");
+                android.system.Os.notDirectory = phase.equals("not-directory");
                 android.system.Os.failSync = phase.equals("sync");
                 android.system.Os.failClose = phase.equals("close");
+                int syncsBefore = android.system.Os.syncs, closesBefore = android.system.Os.closes;
                 check(!bridge.deleteTrack("A"), "failed " + phase + " is never acknowledged");
+                check(android.system.Os.openDescriptors() == 0, "opened descriptor is closed after " + phase);
+                if (phase.equals("open") || phase.equals("stat") || phase.equals("not-directory"))
+                    check(android.system.Os.syncs == syncsBefore, "cannot sync an unchecked descriptor after " + phase);
+                if (phase.equals("stat") || phase.equals("not-directory"))
+                    check(android.system.Os.closes == closesBefore + 1, "failed descriptor validation still closes once");
                 check(records(a.directory, "B") == 1, "failure preserves unrelated journal");
                 if (phase.equals("mark") || phase.equals("stop")) check(records(a.directory, "A") == 1, "pre-cleanup failure preserves bytes");
                 if (!phase.equals("mark")) {
@@ -77,9 +86,12 @@ public final class MainActivity extends Context {
                 }
                 // Failed preference commits mutate memory in Android; retry must
                 // commit the tombstone again, rather than trusting memory alone.
-                a = a.restart(); a.prefs.fail = ""; android.system.Os.failSync = false; android.system.Os.failClose = false;
+                a = a.restart(); a.prefs.fail = "";
+                android.system.Os.failOpen = false; android.system.Os.failStat = false; android.system.Os.notDirectory = false;
+                android.system.Os.failSync = false; android.system.Os.failClose = false;
                 bridge = a.new DeviceStorage();
                 check(bridge.deleteTrack("A"), "restart retry completes " + phase);
+                check(android.system.Os.openDescriptors() == 0, "successful retry closes directory descriptor");
                 check(records(a.directory, "A") == 0, "retry removes journal bytes");
                 check(TrackService.session(a).start("A") == null, "retry tombstone guards future starts");
             }

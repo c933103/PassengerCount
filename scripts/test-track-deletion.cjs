@@ -21,22 +21,33 @@ try {
     .replace('/* SERVICE_METHODS */', ['public int onStartCommand(', 'static synchronized TrackSession session(', 'static void finishStop(', 'static String safeId(', 'static File trackFile(', 'static boolean isDeleted(', 'static boolean deleteTrack('].map(x => method(service, x)).join('\n'));
   const sources = [write('MainActivity.java', fixture)];
   sources.push(write('android/system/ErrnoException.java', 'package android.system; public class ErrnoException extends Exception {}'));
-  sources.push(write('android/system/OsConstants.java', 'package android.system; public class OsConstants { public static final int O_RDONLY=0, O_DIRECTORY=1; }'));
+  // Match public SDK names; an invented O_DIRECTORY stub hid an Android build error.
+  sources.push(write('android/system/OsConstants.java', 'package android.system; public class OsConstants { public static final int O_RDONLY=0; public static boolean S_ISDIR(int mode) { return (mode & 0170000) == 0040000; } }'));
+  sources.push(write('android/system/StructStat.java', 'package android.system; public class StructStat { public final int st_mode; public StructStat(int mode) { st_mode=mode; } }'));
   sources.push(write('android/system/Os.java', `package android.system;
     import java.io.*; import java.nio.channels.*; import java.nio.file.*; import java.util.*;
     public class Os {
-      public static boolean failSync, failClose;
-      public static int syncs;
+      public static boolean failOpen, failStat, notDirectory, failSync, failClose;
+      public static int syncs, closes;
       private static final Map<FileDescriptor,FileChannel> channels = new HashMap<>();
+      private static final Map<FileDescriptor,Integer> modes = new HashMap<>();
+      public static int openDescriptors() { return channels.size(); }
       public static FileDescriptor open(String p, int flags, int mode) throws ErrnoException {
-        try { FileDescriptor fd = new FileDescriptor(); channels.put(fd, FileChannel.open(Paths.get(p), StandardOpenOption.READ)); return fd; }
+        if (flags != OsConstants.O_RDONLY) throw new AssertionError("unexpected public open flags");
+        if (failOpen) throw new ErrnoException();
+        try { FileDescriptor fd = new FileDescriptor(); channels.put(fd, FileChannel.open(Paths.get(p), StandardOpenOption.READ)); modes.put(fd, Files.isDirectory(Paths.get(p)) ? 0040000 : 0100000); return fd; }
         catch (IOException e) { throw new ErrnoException(); }
+      }
+      public static StructStat fstat(FileDescriptor fd) throws ErrnoException {
+        if (failStat) throw new ErrnoException();
+        return new StructStat(notDirectory ? 0100000 : modes.get(fd));
       }
       public static void fsync(FileDescriptor fd) throws ErrnoException {
         syncs++; if (failSync) throw new ErrnoException();
         try { channels.get(fd).force(true); } catch (IOException e) { throw new ErrnoException(); }
       }
       public static void close(FileDescriptor fd) throws ErrnoException {
+        closes++; modes.remove(fd);
         try { channels.remove(fd).close(); if (failClose) throw new ErrnoException(); } catch (IOException e) { throw new ErrnoException(); }
       }
     }`));

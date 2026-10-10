@@ -80,7 +80,11 @@ public final class TrackService extends Service {
                 java.io.FileDescriptor descriptor = null;
                 try {
                     descriptor = android.system.Os.open(directory.getPath(),
-                        android.system.OsConstants.O_RDONLY | android.system.OsConstants.O_DIRECTORY, 0);
+                        android.system.OsConstants.O_RDONLY, 0);
+                    // O_DIRECTORY is not exposed by the Android public SDK.
+                    // Check the opened descriptor, not a separately resolved path.
+                    if (!android.system.OsConstants.S_ISDIR(android.system.Os.fstat(descriptor).st_mode))
+                        throw new IOException("Journal parent is not a directory");
                     android.system.Os.fsync(descriptor);
                 } catch (android.system.ErrnoException e) { throw new IOException(e); }
                 finally {
