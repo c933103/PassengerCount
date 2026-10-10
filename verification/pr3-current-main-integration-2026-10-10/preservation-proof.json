@@ -1,0 +1,222 @@
+{
+  "repository": "c933103/PassengerCount",
+  "main": "2ac807eeef3a282f7570e495cfd21a5f50e814fe",
+  "pr3_original_head": "b9fe113aed0a1c6786b7aa5aeb5e9ce1389ae0d5",
+  "expected_parents": [
+    "b9fe113aed0a1c6786b7aa5aeb5e9ce1389ae0d5",
+    "2ac807eeef3a282f7570e495cfd21a5f50e814fe"
+  ],
+  "current_main_tree": "5bfde90ab7f9fdfd10ad5e3b77f40564e3e21998",
+  "source_checks": [
+    {
+      "path": "native-track.js",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/ExportSession.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackJournal.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackService.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackSession.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "survey.js",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "charts.js",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "package.json",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "package-lock.json",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "scripts/test-native-track.sh",
+      "comparison": "current-main native runner unchanged, with additive production ExportStorage regression invocation",
+      "passed": true
+    },
+    {
+      "path": "scripts/test-export-permission.cjs",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/native/ExportPermissionFixture.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/native/TrackJournalTest.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/native/TrackSessionTest.java",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/native-track.test.js",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/export-pending.test.js",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/png-export.test.js",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "tests/png-export-browser.cjs",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/MainActivity.java",
+      "comparison": "byte-identical to current main after removing the additive saveBundle bridge; saveBundle uses queueExport",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "syncNativeTrack",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "stopNativeTracking",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "startNativeTracking",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "pause",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "complete",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "goHome",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "reconcileSavedNativeTracks",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "updateExportControls",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "exportResult",
+      "comparison": "byte-identical to current main",
+      "passed": true
+    },
+    {
+      "path": "app.js",
+      "method": "saveChart",
+      "comparison": "current-main identity behavior unchanged; only additive shared pending guard",
+      "passed": true
+    },
+    {
+      "path": "fieldkit.js",
+      "method": "projectMomentum",
+      "comparison": "byte-identical to current main PC005",
+      "passed": true
+    },
+    {
+      "path": "fieldkit.js",
+      "method": "makeGpx",
+      "comparison": "byte-identical to reviewed PR head, including null-measurement correction",
+      "passed": true
+    },
+    {
+      "path": "upload.js",
+      "comparison": "byte-identical to prior PR head",
+      "passed": true
+    },
+    {
+      "path": "export.js",
+      "comparison": "original PR serializer plus optional-chart finalization from serialized JSON; original snapshot inputs/time remain frozen",
+      "passed": true
+    },
+    {
+      "path": "android/src/app/passengercount/ExportStorage.java",
+      "comparison": "original PR writer plus isolated saveMedia post-publication metadata fallback; write/publish/cleanup routines unchanged",
+      "passed": true
+    },
+    {
+      "path": "android/AndroidManifest.xml",
+      "comparison": "byte-identical to prior PR head",
+      "passed": true
+    },
+    {
+      "path": "tests/upload.test.js",
+      "comparison": "byte-identical to prior PR head",
+      "passed": true
+    }
+  ],
+  "release_target": {
+    "versionName": "1.10",
+    "versionCode": 11,
+    "new_signing_credentials": false
+  },
+  "verification_limits": [
+    "No Android SDK is present in this execution workspace.",
+    "Local Chromium launch fails socket() EPERM before browser tests, including the permitted escalated attempt.",
+    "No full browser, Android APK, signature, installed filesystem/provider or production release pass is claimed for this integration revision."
+  ],
+  "corrected_review_findings": {
+    "reviewed_commit": "cda454248aab7f6ddd617a97ec696725794e1cf3",
+    "P2": "Friendly-path query/cursor failures after MediaStore publication return the known URI; no retry-safe failure is reported with a completed output.",
+    "P3": "files.chart is null without PNG bytes; only chart availability is finalized from frozen serialized JSON.",
+    "writer_assertions_passed": 486,
+    "node_tests_passed": 126,
+    "frozen_source_negative_control": "failed as expected on controlled post-write query exception"
+  }
+}

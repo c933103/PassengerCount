@@ -173,9 +173,16 @@ final class ExportStorage {
         try (Cursor cursor = context.getContentResolver().query(file,
                 new String[]{MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.RELATIVE_PATH},
                 null, null, null)) {
-            if (cursor != null && cursor.moveToFirst())
-                return new File(Environment.getExternalStorageDirectory(),
-                    cursor.getString(1) + cursor.getString(0)).getAbsolutePath();
+            if (cursor != null && cursor.moveToFirst()) {
+                String relativePath = cursor.getString(1), displayName = cursor.getString(0);
+                if (relativePath != null && displayName != null)
+                    return new File(Environment.getExternalStorageDirectory(),
+                        relativePath + displayName).getAbsolutePath();
+            }
+        } catch (RuntimeException ignored) {
+            // Publication already succeeded. Friendly-path metadata is optional:
+            // query/cursor failure must not turn a saved file into a retry-safe
+            // failure or encourage another write. Keep the known content URI.
         }
         return file.toString();
     }

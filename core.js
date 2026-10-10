@@ -200,6 +200,18 @@ export function makeCSV(s) {
       ["Operator", OPERATORS[r.operator] || r.operator],
       ["Direction", r.direction],
       ["Variant", r.key],
+      [
+        "Route data source",
+        r.source === "hk-td-gtfs-v1"
+          ? "Transport Department / DATA.GOV.HK (https://data.gov.hk/en-data/dataset/hk-td-tis_11-pt-headway-en)"
+          : "Legacy saved survey",
+      ],
+      [
+        "Route data attribution",
+        r.source === "hk-td-gtfs-v1"
+          ? "Route, stop and timetable data © Government of the Hong Kong SAR; reuse terms: https://data.gov.hk/en/terms-and-conditions"
+          : "Original survey stop snapshot",
+      ],
       ["Status", s.status || "in_progress"],
       ["Start Stop Sequence", s.startIndex == null ? "" : s.startIndex + 1],
       ["End Stop Sequence", s.endIndex == null ? "" : s.endIndex + 1],

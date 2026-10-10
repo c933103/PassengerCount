@@ -1,0 +1,13 @@
+Expected negative control: frozen cda454248aab7f6ddd617a97ec696725794e1cf3 production ExportStorage.java fails the new metadata-success oracle (exit 1).
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+4 warnings
+Exception in thread "main" java.lang.IllegalStateException: controlled post-write query failure
+	at android.content.ContentResolver.failMetadata(ContentResolver.java:58)
+	at android.content.ContentResolver.query(ContentResolver.java:66)
+	at app.passengercount.ExportStorage.saveMedia(passengercount-frozen-ExportStorage.java:173)
+	at app.passengercount.ExportStorage.save(passengercount-frozen-ExportStorage.java:74)
+	at app.passengercount.ExportStorageTest.standaloneMetadataControls(ExportStorageTest.java:100)
+	at app.passengercount.ExportStorageTest.main(ExportStorageTest.java:130)

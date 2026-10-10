@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { makeExportBundle } from "../export.js";
+import { makeExportBundle, withBundleChart } from "../export.js";
 
 const survey = {
   id: "12345678-abcd",
@@ -70,4 +70,32 @@ test("trip bundle separates tabular, structured, geographic and chart data", () 
   assert.match(bundle.gpx, /<pc:heading_deg>91<\/pc:heading_deg>/);
   assert.match(bundle.gpx, /<pc:source>gps<\/pc:source>/);
   assert.equal(bundle.pngBase64, "iVBORw0KGgo=");
+});
+
+
+test("tabular export retains government source attribution and reuse terms", () => {
+  const bundle = makeExportBundle(structuredClone(survey));
+  assert.match(bundle.csv, /Route data source,Transport Department \/ DATA.GOV.HK/);
+  assert.match(bundle.csv, /Route data attribution,"Route.*Government of the Hong Kong SAR/);
+  assert.match(bundle.csv, /https:\/\/data.gov.hk\/en\/terms-and-conditions/);
+});
+
+
+test("optional chart metadata is finalized without reopening the frozen survey", () => {
+  const live = structuredClone(survey);
+  const snapshot = makeExportBundle(live, null, "", new Date("2026-10-10T01:30:00Z"));
+  assert.equal(JSON.parse(snapshot.json).files.chart, null);
+  live.id = "new-survey";
+  live.rows[0].boarding = "999";
+  for (const png of ["", "data:image/png;base64,", "data:image/png;base64,iVBORw0KGgo="]) {
+    const result = withBundleChart(snapshot, png);
+    const record = JSON.parse(result.json), original = JSON.parse(snapshot.json);
+    assert.equal(record.files.chart, result.pngBase64 ? `${snapshot.base}.png` : null);
+    assert.deepEqual(record.survey, original.survey);
+    assert.equal(record.exportedAt, original.exportedAt);
+    assert.equal(result.csv, snapshot.csv);
+    assert.equal(result.gpx, snapshot.gpx);
+    assert.equal(result.base, snapshot.base);
+    assert.equal(JSON.parse(snapshot.json).files.chart, null, "chart finalization does not mutate the frozen snapshot");
+  }
 });

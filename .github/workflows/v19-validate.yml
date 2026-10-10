@@ -1,7 +1,9 @@
 name: Validate Android v1.10
 on:
   push:
-    branches: [feat/android-app, fix/reference-upload-export-bundle]
+    branches: [feat/android-app, main, fix/native-track-replay, fix/reference-upload-export-bundle]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 jobs:
   validate:
@@ -15,6 +17,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npm run test:native
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - name: Generate ephemeral validation signing key

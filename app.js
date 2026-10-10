@@ -5,7 +5,6 @@ import {
   variants,
   stopsFor,
   nearestStops,
-  makeCSV,
   validPassengerCount,
 } from "./core.js";
 import {
@@ -26,7 +25,8 @@ import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes, checkRouteUpdates } from "./data.js";
 import { uploadSurvey } from "./upload.js";
-import { makeExportBundle } from "./export.js";
+import { makeExportBundle, withBundleChart } from "./export.js";
+import { importNativeTrack } from "./native-track.js";
 import {
   hkTimestamp,
   makeGpx,
@@ -61,6 +61,8 @@ let data,
   sectionOptions = [],
   sectionStops = [],
   uploadBusy = false,
+  nativeExportPending = false,
+  chartExportPending = false,
   lastGpsFix = null,
   momentumTimer = null;
 let deleteMode = false;
@@ -169,23 +171,24 @@ function appendTrackPoint(s, p) {
   if (s.track.length > 20000) s.track.splice(0, s.track.length - 20000);
 }
 function syncNativeTrack(s = cur()) {
-  if (!s || !window.PassengerCountAndroid?.getTrack) return;
-  try {
-    const raw = window.PassengerCountAndroid.getTrack(s.id);
-    if (!raw) return;
-    const points = JSON.parse(raw);
-    if (!Array.isArray(points)) return;
-    for (const p of points) appendTrackPoint(s, p);
-    persist();
-  } catch {}
+  try { return importNativeTrack(s, window.PassengerCountAndroid, persist); }
+  catch { return false; }
 }
 function startNativeTracking(s = cur()) {
   if (!s || s.status !== "in_progress") return;
   window.PassengerCountAndroid?.startTracking?.(s.id);
 }
 function stopNativeTracking(s = cur()) {
-  if (s) syncNativeTrack(s);
-  window.PassengerCountAndroid?.stopTracking?.(s?.id || "");
+  const native = window.PassengerCountAndroid;
+  try {
+    if (native?.stopTrackingAndDrain) {
+      if (!native.stopTrackingAndDrain(s?.id || "")) return false;
+    } else native?.stopTracking?.(s?.id || ""); // Older APK: best-effort stop.
+    return syncNativeTrack(s);
+  } catch { return false; }
+}
+function reconcileSavedNativeTracks() {
+  for (const s of state.surveys) syncNativeTrack(s);
 }
 async function captureStartEnvironment(s) {
   const id = s.id;
@@ -361,8 +364,8 @@ function showScreen(next) {
     $(key + "Screen").hidden = key !== next;
   const s = cur();
   if (s) s.screen = next;
-  if (s?.status === "in_progress") startNativeTracking(s);
-  else if (s) stopNativeTracking(s);
+  if (next !== "home" && s?.status === "in_progress") startNativeTracking(s);
+  else if (!stopNativeTracking(s)) error(t("recordFailed"));
   const host =
     next === "count" && s
       ? $("countMapHost")
@@ -399,7 +402,7 @@ function showScreen(next) {
   window.scrollTo(0, 0);
 }
 function goHome() {
-  stopNativeTracking(cur());
+  if (!stopNativeTracking(cur())) { error(t("recordFailed")); return; }
   state.currentId = null;
   showScreen("home");
 }
@@ -957,23 +960,23 @@ function pause(status) {
   s.status = status;
   s.updatedAt = new Date().toISOString();
   s[status === "aborted" ? "abortedAt" : "pausedAt"] = s.updatedAt;
-  if (persist()) {
+  if (stopNativeTracking(s) && persist()) {
     error();
     goHome();
-  }
+  } else error(t("recordFailed"));
 }
 function complete() {
   const s = cur();
   if (s.status !== "completed") {
     recordStop(s, s.activeIndex, hkClock().time, false, hkTimestamp());
     completeSurvey(s, s.activeIndex);
-    s.metrics = tripMetrics(s, data);
   }
-  if (!persist()) {
+  if (!stopNativeTracking(s) || !persist()) {
     error(t("recordFailed"));
     renderCount();
     return;
   }
+  s.metrics = tripMetrics(s, data);
   error();
   goHome();
 }
@@ -1352,10 +1355,17 @@ function exportFilename(extension) {
   const s = cur(), stamp = new Date().toISOString().replace(/[:.]/g, "-");
   return `bus-${s.route.route}-${s.date}-${s.id.slice(0, 8)}-${stamp}.${extension}`;
 }
+function updateExportControls() {
+  for (const id of ["csv", "gpx", "saveChart"])
+    $(id).disabled = nativeExportPending || chartExportPending;
+}
 function exportResult(result, reveal = false) {
-  $("exportStatus").textContent = result.ok
-    ? t("exportSaved", { path: result.path }) : t("exportFailed");
-  $("exportStatus").classList.toggle("warning", !result.ok);
+  nativeExportPending = result.pending === true;
+  updateExportControls();
+  $("exportStatus").textContent = nativeExportPending ? t("exporting")
+    : result.uncertain ? t("exportUncertain")
+    : result.ok ? t("exportSaved", { path: result.path }) : t("exportFailed");
+  $("exportStatus").classList.toggle("warning", !result.ok && !nativeExportPending);
   if (reveal && screen === "record") $("exportStatus").scrollIntoView({ block: "nearest" });
 }
 function refreshExportSettings() {
@@ -1373,16 +1383,22 @@ function browserDownload(href, filename) {
   $("exportStatus").textContent = t("downloadStarted");
 }
 async function download() {
+  if (nativeExportPending || chartExportPending) return;
   const s = cur();
   if (!s) return;
-  syncNativeTrack(s);
-  $("csv").disabled = true;
+  if (!syncNativeTrack(s)) { exportResult({ ok: false }); return; }
+  chartExportPending = true;
+  updateExportControls();
   $("exportStatus").textContent = t("exporting");
   try {
+    // Serialize the acknowledged survey, metadata, identity and time before the
+    // PNG decoder yields. Later edits or navigation cannot mix bundle records.
+    const snapshot = makeExportBundle(s, data, "", new Date());
     let png = "";
     try { png = await chartPng($("chart")); } catch {}
-    const bundle = makeExportBundle(s, data, png);
+    const bundle = withBundleChart(snapshot, png);
     if (window.PassengerCountAndroid?.saveBundle) {
+      exportResult({ pending: true });
       window.PassengerCountAndroid.saveBundle(
         bundle.folder,
         bundle.base,
@@ -1408,16 +1424,19 @@ async function download() {
   } catch {
     exportResult({ ok: false });
   } finally {
-    $("csv").disabled = false;
+    chartExportPending = false;
+    updateExportControls();
   }
 }
 function downloadGpx() {
+  if (nativeExportPending || chartExportPending) return;
   const s = cur();
   if (!s) return;
-  syncNativeTrack(s);
+  if (!syncNativeTrack(s)) { exportResult({ ok: false }); return; }
   const gpx = makeGpx(s), filename = exportFilename("gpx");
   $("exportStatus").textContent = t("exporting");
   if (window.PassengerCountAndroid?.saveGpx) {
+    exportResult({ pending: true });
     window.PassengerCountAndroid.saveGpx(gpx, filename);
     return;
   }
@@ -1428,17 +1447,23 @@ function downloadGpx() {
   setTimeout(() => URL.revokeObjectURL(href), 5000);
 }
 async function saveChart() {
-  $("saveChart").disabled = true;
+  if (nativeExportPending || chartExportPending) return;
+  chartExportPending = true;
+  updateExportControls();
   $("exportStatus").textContent = t("exporting");
   try {
-    const png = await chartPng($("chart")), filename = exportFilename("png");
-    if (window.PassengerCountAndroid?.savePng)
+    // Keep the filename tied to the chart captured before image decoding yields.
+    const filename = exportFilename("png"), png = await chartPng($("chart"));
+    if (window.PassengerCountAndroid?.savePng) {
+      nativeExportPending = true;
+      updateExportControls();
       window.PassengerCountAndroid.savePng(png.split(",")[1], filename);
-    else browserDownload(png, filename);
+    } else browserDownload(png, filename);
   } catch {
     exportResult({ ok: false });
   } finally {
-    $("saveChart").disabled = false;
+    chartExportPending = false;
+    updateExportControls();
   }
 }
 async function upload() {
@@ -1809,6 +1834,7 @@ if (cur()) {
           : "home",
   );
 } else showScreen("home");
+reconcileSavedNativeTracks();
 try {
   const result = window.PassengerCountAndroid?.getExportResult?.();
   if (result) exportResult(JSON.parse(result));
@@ -1821,6 +1847,7 @@ else checkRouteUpdates(dataStatus).then((value) => { data = value; })
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
+    reconcileSavedNativeTracks();
     checkRouteUpdates(dataStatus).then((value) => { data = value; })
       .catch(() => dataStatus("Update unavailable"));
     if (data && matches.length) renderMatches();

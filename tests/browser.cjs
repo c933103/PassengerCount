@@ -128,6 +128,9 @@ const data = {
     page.on("request", (r) => requests.push(r.url()));
     await page.addInitScript((seed) => {
       const native = { ...seed };
+      window.__nativeJournals = seed.nativeJournals || {};
+      window.__trackReads = [];
+      window.__trackStarts = [];
       const defaultFolder = "/storage/emulated/0/Download/PaxCountRecord";
       const finishExport = (name) => {
         const result = { ok: !window.__failExport, path: `${native.exportDirectory || defaultFolder}/${name}` };
@@ -163,14 +166,32 @@ const data = {
           window.dispatchEvent(new Event("export-directory-changed"));
         },
         startTracking: (id) => {
+          window.__trackStarts.push(id);
           native.trackingId = id;
           window.captureDisk("trackingId", id);
+        },
+        stopTrackingAndDrain: (id) => {
+          if (window.__failTrackStop) return false;
+          // A last accepted native append finishes before the acknowledgement.
+          if (id && window.__stopTail) {
+            (window.__nativeJournals[id] ??= []).push(window.__stopTail);
+            window.__stopTail = null;
+          }
+          if (!id || native.trackingId === id) delete native.trackingId;
+          window.captureDisk("trackingId", native.trackingId || null);
+          return true;
         },
         stopTracking: (id) => {
           if (native.trackingId === id) delete native.trackingId;
           window.captureDisk("trackingId", native.trackingId || null);
         },
         getTrack: () => JSON.stringify(native.track || []),
+        getTrackPage: (id, cursor) => {
+          window.__trackReads.push({ id, cursor });
+          const points = window.__nativeJournals[id] || native.track || [];
+          const start = Number(cursor || 0), end = Math.min(start + 2, points.length);
+          return JSON.stringify({ points: points.slice(start, end).map((p, i) => ({ ...p, nativeOrder: start + i })), cursor: String(end), more: end < points.length });
+        },
       };
     }, seed);
     if (workerFixture) await page.addInitScript((fresh) => {
@@ -274,6 +295,7 @@ const data = {
   await page.locator("#confirm").click();
   await flush();
   assert.equal(disk.trackingId, current().id, "native foreground tracking starts with an active survey");
+  const nativeTrackTemplate = structuredClone(current());
   assert.equal(await page.locator("#myLocation").getAttribute("aria-pressed"), "true", "counting starts with GPS following even after inspecting setup map");
   await page.waitForFunction(() => Math.abs(window.__map.getCenter().lat - 22.302) < 0.00001);
   assert.equal(await page.locator("#setupScreen").isVisible(), false);
@@ -544,6 +566,7 @@ const data = {
   assert.match(exportedGpx.gpx, /<trkpt /);
   assert.match(exportedGpx.gpx, /<time>\d{4}-\d{2}-\d{2}T/);
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
   assert.match(exportedBundle.csv, /Status,completed/);
   assert.match(exportedBundle.csv, /Android surveyor/);
@@ -867,10 +890,12 @@ const data = {
   assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/Download\/PaxCountRecord\/.*\.png/);
   if (process.env.SCREENSHOT_PATH) fs.writeFileSync(process.env.SCREENSHOT_PATH.replace(".png", "-chart.png"), Buffer.from(exportedPng.base64, "base64"));
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
   assert.match(await page.locator("#exportStatus").textContent(), /PaxCountRecord[\\/]+bus-1-/);
   await page.evaluate(() => window.__failExport = true);
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
   assert.match(await page.locator("#exportStatus").textContent(), /Export failed/);
   assert.equal(current().status, "completed");
@@ -889,11 +914,21 @@ const data = {
   assert.equal(await page.locator("#exportDirectory").textContent(), "/storage/emulated/0/PaxCountRecord", "folder survives cold restart");
   await page.locator("#recordList button").first().click();
   await page.locator("#csv").click();
+  await page.waitForFunction(() => !document.querySelector("#csv").disabled);
   await flush();
   assert.match(await page.locator("#exportStatus").textContent(), /\/storage\/emulated\/0\/PaxCountRecord\/bus-1-/);
   await page.locator("#recordHome").click();
   await page.locator("#resetExportDirectory").click();
   assert.match(await page.locator("#exportDirectory").textContent(), /Download\/PaxCountRecord/);
+
+  // Persisted legacy-permission interruption is shown on the reloaded page.
+  await require("./export-permission-browser.cjs")({
+    open, sample, getExports: () => ({ exported, exportedBundle, exportedGpx, exportedPng }),
+  });
+
+  // Hold actual image decoding across navigation for standalone PNG exports.
+  await require("./png-export-browser.cjs")({ open, sample });
+  await require("./bundle-export-browser.cjs")({ open, sample });
 
   // Launch on Home without a previous search starts the stale-data worker.
   await context.close();
@@ -951,7 +986,88 @@ const data = {
   await page.evaluate(() => window.__finishUpdate(true));
 
   // Successful retrieval at Sunday 00:00 exactly is already current.
+  // PC-002: real View/export handlers repeatedly reconcile the native journal.
+  const trackState = saved();
+  const trackTrip = structuredClone(nativeTrackTemplate);
+  trackState.surveys = [trackTrip];
+  const trackId = trackTrip.id;
+  const journal = [
+    { nativeId: "fixture-A", lat: 22.3, lng: 114.17, time: "2026-09-15T14:00:00+08:00", accuracy: 5, speed: 2, heading: 30, source: "gps" },
+    { nativeId: "fixture-B", lat: 22.301, lng: 114.171, time: "2026-09-15T14:00:01+08:00", accuracy: 5, speed: 2, heading: 30, source: "gps" },
+    { nativeId: "fixture-C", lat: 22.301, lng: 114.171, time: "2026-09-15T14:00:01+08:00", accuracy: 7, speed: 3, heading: 40, source: "gps" },
+  ];
+  const { nativeId: ignoredId, ...foreground } = journal[0];
+  trackTrip.track = [foreground];
+  trackTrip.status = "in_progress";
+  delete trackTrip.nativeTrackCursor;
+  trackState.screen = "home";
+  trackState.currentId = null;
+  const trackSeed = { ...disk, "passenger-count:workspace:v2": JSON.stringify(trackState), nativeJournals: { [trackId]: journal } };
   await context.close();
+  ({ context, page } = await open(trackSeed));
+  for (let i = 0; i < 3; i++) {
+    await page.locator(`.recordCard[data-id="${trackId}"] button`).nth(1).click();
+    await page.locator("#gpx").click();
+    await flush();
+    assert.deepEqual(current().track.map((p) => p.nativeId), journal.map((p) => p.nativeId));
+    assert.equal((exportedGpx.gpx.match(/<trkpt /g) || []).length, 3, "repeated View/export cannot replay journal");
+    await page.locator("#recordHome").click();
+  }
+  const restartSeed = { ...disk, nativeJournals: { [trackId]: journal } };
+  await context.close();
+  ({ context, page } = await open(restartSeed));
+  await page.locator(`.recordCard[data-id="${trackId}"] button`).nth(1).click();
+  await page.locator("#gpx").click();
+  await flush();
+  assert.equal(current().track.length, 3, "fresh browser context keeps persisted native cursor");
+  assert.equal((await page.evaluate(() => window.__trackReads))[0].cursor, "3");
+  await page.evaluate(({ id, next }) => window.__nativeJournals[id].push(next), {
+    id: trackId, next: { ...journal[1], nativeId: "fixture-D", time: "2026-09-15T14:00:02+08:00" },
+  });
+  await page.locator("#gpx").click();
+  await flush();
+  assert.equal(current().track.length, 4, "new background tail remains importable after restart");
+  assert.equal((exportedGpx.gpx.match(/<trkpt /g) || []).length, 4);
+  await context.close();
+  // PC-001: exercise the actual pause/abort/complete, cold-recovery and export UI.
+  for (const [status, button] of [["paused", "pause"], ["aborted", "abort"], ["completed", "complete"]]) {
+    const trip = structuredClone(nativeTrackTemplate);
+    trip.id = `lifecycle-${status}`;
+    trip.status = "in_progress";
+    trip.track = [];
+    delete trip.nativeTrackCursor;
+    const lifecycleState = { ...trackState, surveys: [trip], currentId: trip.id, screen: "count" };
+    ({ context, page } = await open({ ...disk, "passenger-count:workspace:v2": JSON.stringify(lifecycleState),
+      nativeJournals: { [trip.id]: [journal[0]] } }));
+    await page.evaluate(tail => { window.__stopTail = tail; }, journal[1]);
+    await page.locator(`#${button}`).click();
+    await flush();
+    assert.equal(await page.locator("#homeScreen").isVisible(), true);
+    assert.equal(saved().surveys[0].status, status);
+    assert.deepEqual(saved().surveys[0].track.filter(p => p.nativeId).map(p => p.nativeId), ["fixture-A", "fixture-B"]);
+    assert.equal(disk.trackingId, null, `${status} acknowledgement stops native intent`);
+    const coldSeed = { ...disk, trackingId: trip.id, nativeJournals: { [trip.id]: journal } };
+    await context.close();
+    ({ context, page } = await open(coldSeed));
+    // A journal tail from before upgrading/recovery remains readable while stopped.
+    const viewIndex = status === "completed" ? 0 : 1;
+    await page.locator(`.recordCard[data-id="${trip.id}"] button`).nth(viewIndex).click();
+    await page.locator("#gpx").click();
+    await flush();
+    assert.equal(current().status, status);
+    assert.deepEqual(current().track.filter(p => p.nativeId).map(p => p.nativeId), ["fixture-A", "fixture-B", "fixture-C"]);
+    assert.equal((exportedGpx.gpx.match(/<trkpt /g) || []).length, current().track.length);
+    assert.deepEqual(await page.evaluate(() => window.__trackStarts), [], "View/export/recovery cannot restart recording");
+    assert.equal(disk.trackingId, null, "Home cancels an orphan native session on cold restart");
+    if (status === "completed") {
+      await page.locator("#continueRecord").click();
+      await flush();
+      assert.equal(current().status, "in_progress");
+      assert.equal(disk.trackingId, trip.id, "explicit Continue recording restarts the same survey");
+      assert.deepEqual(current().track.filter(p => p.nativeId).map(p => p.nativeId), ["fixture-A", "fixture-B", "fixture-C"]);
+    }
+    await context.close();
+  }
   const boundaryData = structuredClone(stale);
   boundaryData.source.retrievedAt = "2026-09-12T16:00:00Z";
   ({ context, page } = await open({}, 360, boundaryData, "2026-09-15T06:10:00Z", fresh));
@@ -972,7 +1088,7 @@ const data = {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, fixed 10-minute early tolerance overriding old preferences; GPS following on map/resume/foreground, completed-trip reopening and correction, responsive PNG charts, and remembered export folders with full-path/error feedback; Sunday-cutoff launch refresh, usable counting during updates, persisted freshness, offline retry and manual updates in Settings/setup.",
+    "PASS: Cantonese/English, GPS synchronization and map following, numeric-only entry, skipped fields, zero-change last stop, derived counts and conflict warnings, editable table, custom stops, overlapping circular sections, pause/abort/resume, completed records/charts/CSV, autosave and cold-context recovery, bottom-pinned entry in portrait/landscape, and bulk record selection/confirmation/cancellation/storage failure/recovery, the inclusive 14:10 service window, final-stop save/home transition and pinned trip exit controls; 80-trip deletion with fixed actions and enlarged text, actual bundled N8 at 05:32, fixed 10-minute early tolerance overriding old preferences; GPS following on map/resume/foreground, completed-trip reopening and correction, responsive PNG charts, and remembered export folders with full-path/error feedback; Sunday-cutoff launch refresh, usable counting during updates, persisted freshness, offline retry and manual updates in Settings/setup; native journal repeated View/GPX export, same-time evidence, foreground overlap and cold-restart cursor recovery; acknowledged pause/abort/complete tail drains, stopped-record recovery/export and explicit completed-record continuation.",
   );
   await browser.close();
   server.close();

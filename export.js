@@ -36,7 +36,7 @@ export function recordObject(s, data, base, now = new Date()) {
       passengerTable: `${base}.csv`,
       structuredRecord: `${base}.json`,
       track: `${base}.gpx`,
-      chart: `${base}.png`,
+      chart: null,
     },
     track: {
       file: `${base}.gpx`,
@@ -50,16 +50,23 @@ export function makeRecordJson(s, data, base, now = new Date()) {
   return JSON.stringify(recordObject(s, data, base, now), null, 2) + "\n";
 }
 
+// Attach only chart availability to an already-serialized snapshot. Never read
+// the live survey or catalogue again after the asynchronous encoder returns.
+export function withBundleChart(bundle, pngDataUrl = "") {
+  const pngBase64 = typeof pngDataUrl === "string" && pngDataUrl.includes(",")
+    ? pngDataUrl.slice(pngDataUrl.indexOf(",") + 1) : "";
+  const record = JSON.parse(bundle.json);
+  record.files.chart = pngBase64 ? `${bundle.base}.png` : null;
+  return { ...bundle, json: JSON.stringify(record, null, 2) + "\n", pngBase64 };
+}
+
 export function makeExportBundle(s, data, pngDataUrl = "", now = new Date()) {
   const base = exportBase(s, now);
-  return {
+  return withBundleChart({
     folder: base,
     base,
     csv: makeCSV(s),
     json: makeRecordJson(s, data, base, now),
     gpx: makeGpx(s),
-    pngBase64: typeof pngDataUrl === "string" && pngDataUrl.includes(",")
-      ? pngDataUrl.slice(pngDataUrl.indexOf(",") + 1)
-      : "",
-  };
+  }, pngDataUrl);
 }
