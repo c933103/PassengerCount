@@ -33,6 +33,7 @@ public final class TrackService extends Service {
                     return new TrackSession.Request(prefs.getString("pending_id", ""),
                         prefs.getString(EXTRA_TOKEN, ""));
                 }
+                public boolean blocked(String id) { return prefs.getBoolean("deleted:" + id, false); }
                 public boolean write(TrackSession.Request request) {
                     SharedPreferences.Editor edit = prefs.edit().remove("active_id");
                     if (request.valid()) edit.putString("pending_id", request.id)
@@ -48,7 +49,9 @@ public final class TrackService extends Service {
     // Called on the main thread only after the synchronous append barrier.
     static void finishStop() {
         TrackService service = running;
-        if (service == null || session(service).request().valid()) return;
+        if (service == null) return;
+        TrackSession control = session(service);
+        if (control.accepts(control.request())) return;
         service.recording = null;
         try { service.manager.removeUpdates(service.listener); } catch (Exception ignored) {}
         service.stopSelf();
@@ -59,6 +62,35 @@ public final class TrackService extends Service {
     }
     static File trackFile(Context context, String id) {
         return new File(context.getFilesDir(), "track-" + safeId(id) + ".jsonl");
+    }
+
+    static boolean isDeleted(Context context, String id) {
+        return context.getApplicationContext().getSharedPreferences("tracking", MODE_PRIVATE)
+            .getBoolean("deleted:" + id, false);
+    }
+    static boolean deleteTrack(Context context, String id) {
+        final SharedPreferences prefs = context.getApplicationContext()
+            .getSharedPreferences("tracking", MODE_PRIVATE);
+        return TrackDeletion.delete(context.getFilesDir(), id, session(context), new TrackDeletion.Storage() {
+            public boolean mark(String selected) {
+                return prefs.edit().putBoolean("deleted:" + selected, true).commit();
+            }
+            public boolean remove(File file) { return file.delete(); }
+            public void syncDirectory(File directory) throws IOException {
+                java.io.FileDescriptor descriptor = null;
+                try {
+                    descriptor = android.system.Os.open(directory.getPath(),
+                        android.system.OsConstants.O_RDONLY | android.system.OsConstants.O_DIRECTORY, 0);
+                    android.system.Os.fsync(descriptor);
+                } catch (android.system.ErrnoException e) { throw new IOException(e); }
+                finally {
+                    if (descriptor != null) {
+                        try { android.system.Os.close(descriptor); }
+                        catch (android.system.ErrnoException e) { throw new IOException(e); }
+                    }
+                }
+            }
+        });
     }
 
     @Override public void onCreate() {
@@ -76,20 +108,21 @@ public final class TrackService extends Service {
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         TrackSession control = session(this);
-        if (intent != null && ACTION_STOP.equals(intent.getAction())) {
-            control.stop(safeId(intent.getStringExtra(EXTRA_ID)));
-            finishStop();
-            return control.request().valid() ? START_STICKY : START_NOT_STICKY;
-        }
-        TrackSession.Request requested = intent == null ? control.request()
+        boolean stopping = intent != null && ACTION_STOP.equals(intent.getAction());
+        if (stopping) control.stop(safeId(intent.getStringExtra(EXTRA_ID)));
+        TrackSession.Request requested = intent == null || stopping ? control.request()
             : new TrackSession.Request(safeId(intent.getStringExtra(EXTRA_ID)),
                 intent.getStringExtra(EXTRA_TOKEN));
-        // Queued starts and permission replies must match the current durable
-        // intent, including its generation after stop/restart of the same ID.
         if (!hasLocation()) { recording = null; stopSelf(startId); return START_NOT_STICKY; }
+        // A stale start/stop may coexist with a newer accepted trip. Continue
+        // only that durable current session, including establishing foreground
+        // state after process restart; a tombstoned request is never sticky.
+        if (!control.accepts(requested)) requested = control.request();
         if (!control.accepts(requested)) {
-            if (!control.request().valid()) { recording = null; stopSelf(startId); }
-            return control.request().valid() ? START_STICKY : START_NOT_STICKY;
+            recording = null;
+            finishStop();
+            stopSelf(startId);
+            return START_NOT_STICKY;
         }
         recording = requested;
         startForeground(19, notification());

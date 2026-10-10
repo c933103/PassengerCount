@@ -54,7 +54,7 @@ function fixture({ native = true, failSave = false, throwBridge = false } = {}) 
     URL: { createObjectURL: blob => { const id = `blob:${blobs.size}`; blobs.set(id, blob); return id; }, revokeObjectURL() {} },
     Blob, setTimeout() {}, browserDownload: (url, name) => downloads.push({ url, name }),
   });
-  vm.runInContext(`${encoder}\n${methods}`, context);
+  vm.runInContext(`const deleting = () => false;\n${encoder}\n${methods}`, context);
   return {
     elements, pending, bundles, singles, downloads, blobs, original, catalogue, context,
     start: () => vm.runInContext('download()', context),

@@ -12,12 +12,14 @@ final class TrackSession {
     interface Store {
         Request read();
         boolean write(Request request);
+        default boolean blocked(String id) { return false; }
     }
     private final Store store;
     TrackSession(Store store) { this.store = store; }
 
     synchronized Request request() { return store.read(); }
     synchronized Request start(String id) {
+        if (store.blocked(id)) return null;
         Request previous = store.read();
         if (previous.valid() && previous.id.equals(id)) return previous;
         Request next = new Request(id, UUID.randomUUID().toString());
@@ -25,7 +27,7 @@ final class TrackSession {
     }
     synchronized boolean accepts(Request request) {
         Request wanted = store.read();
-        return request != null && request.valid() && wanted.valid()
+        return request != null && request.valid() && !store.blocked(request.id) && wanted.valid()
             && wanted.id.equals(request.id) && wanted.token.equals(request.token);
     }
     synchronized boolean stop(String id) {

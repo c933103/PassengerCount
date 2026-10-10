@@ -129,6 +129,7 @@ const data = {
     await page.addInitScript((seed) => {
       const native = { ...seed };
       window.__nativeJournals = seed.nativeJournals || {};
+      window.__failTrackDelete = seed.failTrackDelete;
       window.__trackReads = [];
       window.__trackStarts = [];
       const defaultFolder = "/storage/emulated/0/Download/PaxCountRecord";
@@ -164,6 +165,14 @@ const data = {
           delete native.exportDirectory;
           window.captureDisk("exportDirectory", null);
           window.dispatchEvent(new Event("export-directory-changed"));
+        },
+        deleteTrack: (id) => {
+          if (window.__failTrackDelete === id || window.__failTrackStop) return false;
+          if (native.trackingId === id) delete native.trackingId;
+          delete window.__nativeJournals[id];
+          window.captureDisk("nativeJournals", window.__nativeJournals);
+          window.captureDisk("trackingId", native.trackingId || null);
+          return true;
         },
         startTracking: (id) => {
           window.__trackStarts.push(id);
@@ -1068,6 +1077,80 @@ const data = {
     }
     await context.close();
   }
+  // A partial native cleanup is visible and retryable after a cold restart.
+  const cleanupState = structuredClone(trackState);
+  cleanupState.language = "en";
+  cleanupState.currentId = null;
+  cleanupState.screen = "home";
+  cleanupState.surveys = ["delete-A", "delete-B", "keep-C"].map(id => ({
+    ...structuredClone(trackTrip), id, status: "completed", track: [], nativeTrackCursor: "",
+  }));
+  const cleanupSeed = { "passenger-count:workspace:v2": JSON.stringify(cleanupState),
+    failTrackDelete: "delete-B", nativeJournals: Object.fromEntries(cleanupState.surveys.map(s => [s.id, [journal[0]]])) };
+  ({ context, page } = await open(cleanupSeed));
+  await page.locator("#deleteRecords").click();
+  for (const id of ["delete-A", "delete-B"])
+    await page.locator(`input[data-record-id="${id}"]`).check();
+  await page.locator("#selectionOkay").click();
+  await page.locator("#confirmDelete").click();
+  await flush();
+  assert.match(await page.locator("#deleteError").textContent(), /incomplete.*already be removed/i);
+  assert.equal(saved().surveys.length, 3);
+  assert.deepEqual(saved().deletingIds, ["delete-A", "delete-B"]);
+  assert.deepEqual(await page.evaluate(() => Object.keys(window.__nativeJournals).sort()), ["delete-B", "keep-C"]);
+  await page.locator("#cancelDelete").click();
+  await page.locator("#cancelSelection").click();
+  assert.equal(await page.getByRole("button", { name: "Retry deletion", exact: true }).count(), 2);
+  const interruptedCleanup = { ...disk, failTrackDelete: "delete-B" };
+  await context.close();
+  ({ context, page } = await open(interruptedCleanup));
+  await flush();
+  assert.deepEqual(saved().deletingIds, ["delete-A", "delete-B"]);
+  assert.equal(await page.evaluate(() => window.__trackReads.some(x => x.id.startsWith("delete-"))), false);
+  await page.evaluate(() => { window.__failTrackDelete = undefined; });
+  await page.getByRole("button", { name: "Retry deletion", exact: true }).first().click();
+  await flush();
+  assert.deepEqual(saved().surveys.map(s => s.id), ["keep-C"]);
+  assert.deepEqual(saved().deletingIds, []);
+  assert.deepEqual(await page.evaluate(() => Object.keys(window.__nativeJournals)), ["keep-C"]);
+  const completedCleanup = { ...disk };
+  await context.close();
+  ({ context, page } = await open(completedCleanup));
+  await flush();
+  assert.equal(await page.locator(".recordCard").count(), 1);
+  assert.deepEqual(saved().surveys.map(s => s.id), ["keep-C"]);
+  await context.close();
+  // A completed receipt survives an ordinary edit and cannot silently insert
+  // another database copy when the owner presses Upload after a cold restart.
+  const receiptTrip = { ...structuredClone(trackTrip), id: "receipt-A", status: "completed", activeIndex: 0 };
+  receiptTrip.rows[0].boarding = "1";
+  receiptTrip.rows[0].recorded = true;
+  const { uploadPayloadKey } = await import(require("url").pathToFileURL(path.join(root, "upload.js")));
+  receiptTrip.upload = { id: 77, done: true, uncertain: false, payloadKey: uploadPayloadKey(receiptTrip) };
+  const receiptBytes = JSON.stringify(receiptTrip.upload);
+  const receiptState = { ...structuredClone(trackState), language: "en", currentId: receiptTrip.id,
+    screen: "record", surveys: [receiptTrip] };
+  ({ context, page } = await open({ "passenger-count:workspace:v2": JSON.stringify(receiptState) }));
+  assert.match(await page.locator("#uploadStatus").textContent(), /^Uploaded/);
+  await page.locator("#editRecord").click();
+  await page.locator('#body tr[data-i="0"] input[data-field="boarding"]').click();
+  await key(9); await flush();
+  assert.equal(current().rows[0].boarding, "9");
+  assert.equal(JSON.stringify(current().upload), receiptBytes);
+  const editedReceiptSeed = { ...disk };
+  await context.close();
+  ({ context, page } = await open(editedReceiptSeed));
+  const duplicatePosts = [];
+  await context.route("**/rest/v1/**", route => {
+    duplicatePosts.push(route.request().url());
+    return route.fulfill({ body: "[]", status: 201, contentType: "application/json" });
+  });
+  assert.match(await page.locator("#uploadStatus").textContent(), /earlier version.*changes have not been uploaded/i);
+  await page.locator("#upload").click(); await flush();
+  assert.deepEqual(duplicatePosts, []);
+  assert.equal(JSON.stringify(current().upload), receiptBytes);
+  assert.equal(current().upload.id, 77);
+  await context.close();
   const boundaryData = structuredClone(stale);
   boundaryData.source.retrievedAt = "2026-09-12T16:00:00Z";
   ({ context, page } = await open({}, 360, boundaryData, "2026-09-15T06:10:00Z", fresh));

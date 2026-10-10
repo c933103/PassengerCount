@@ -24,9 +24,10 @@ import { DEFAULT_LANGUAGE, translate } from "./i18n.js";
 import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes, checkRouteUpdates } from "./data.js";
-import { uploadSurvey } from "./upload.js";
+import { uploadSurvey, uploadReceiptStatus } from "./upload.js";
 import { makeExportBundle, withBundleChart } from "./export.js";
 import { importNativeTrack } from "./native-track.js";
+import { deleteRecords } from "./record-deletion.js";
 import {
   hkTimestamp,
   makeGpx,
@@ -70,7 +71,8 @@ let undoStack = [], redoStack = [], historyCurrent = null, historyId = null;
 const WEATHER = ["", "☀️", "🌤️", "☁️", "🌧️", "⛈️", "🌫️", "💨", "🌡️", "❄️"];
 const selectedRecordIds = new Set();
 let pendingDeleteIds = [];
-const cur = () => state.surveys.find((s) => s.id === state.currentId);
+const deleting = (id) => state.deletingIds?.includes(id) === true;
+const cur = () => state.surveys.find((s) => s.id === state.currentId && !deleting(s.id));
 const t = (key, values) => translate(state.language, key, values);
 const name = (stop) =>
   stop?.name?.[state.language === "en" ? "en" : "zh"] ||
@@ -102,21 +104,31 @@ function resetHistory() {
   const s = cur();
   historyId = s?.id || null;
   historyCurrent = s ? clone(s) : null;
+  if (historyCurrent) delete historyCurrent.upload;
   undoStack = [];
   redoStack = [];
   updateHistoryButtons();
 }
 function restoreHistory(snapshot, targetStack) {
   const s = cur();
-  if (!s || !snapshot) return;
-  const index = state.surveys.findIndex((x) => x.id === s.id);
-  if (index < 0) return;
-  targetStack.push(clone(s));
-  state.surveys[index] = clone(snapshot);
-  state.currentId = snapshot.id;
-  historyId = snapshot.id;
-  historyCurrent = clone(snapshot);
+  if (!s || !snapshot || snapshot.id !== s.id) return;
+  if (!state.surveys.includes(s)) return;
+  const previous = clone(s);
+  delete previous.upload;
+  targetStack.push(previous);
+  const restored = clone(snapshot);
+  // Upload receipts/uncertainty are lifecycle state, never editable history.
+  // Keep the live object identity so an in-flight upload still checkpoints the
+  // survey that persist() actually serializes after Undo or Redo.
+  delete restored.upload;
+  for (const key of Object.keys(s)) if (key !== "upload") delete s[key];
+  Object.assign(s, restored);
+  state.currentId = s.id;
+  historyId = s.id;
+  historyCurrent = clone(s);
+  delete historyCurrent.upload;
   persist();
+  renderUploadStatus(s);
   buildStopOptions();
   buildTable();
   renderSetup();
@@ -171,11 +183,12 @@ function appendTrackPoint(s, p) {
   if (s.track.length > 20000) s.track.splice(0, s.track.length - 20000);
 }
 function syncNativeTrack(s = cur()) {
+  if (s && deleting(s.id)) return false;
   try { return importNativeTrack(s, window.PassengerCountAndroid, persist); }
   catch { return false; }
 }
 function startNativeTracking(s = cur()) {
-  if (!s || s.status !== "in_progress") return;
+  if (!s || deleting(s.id) || s.status !== "in_progress") return;
   window.PassengerCountAndroid?.startTracking?.(s.id);
 }
 function stopNativeTracking(s = cur()) {
@@ -287,7 +300,9 @@ function edit(recordHistory = true) {
   if (s) {
     if (recordHistory && historyId === s.id && historyCurrent) {
       const before = JSON.stringify(historyCurrent);
-      const after = JSON.stringify(s);
+      const editable = clone(s);
+      delete editable.upload;
+      const after = JSON.stringify(editable);
       if (before !== after) {
         undoStack.push(historyCurrent);
         if (undoStack.length > 100) undoStack.shift();
@@ -295,12 +310,13 @@ function edit(recordHistory = true) {
       }
     }
     s.updatedAt = new Date().toISOString();
-    if (s.upload?.done) delete s.upload;
   }
   const saved = persist();
   if (s) {
+    renderUploadStatus(s);
     historyId = s.id;
     historyCurrent = clone(s);
+    delete historyCurrent.upload;
   }
   updateHistoryButtons();
   return saved;
@@ -440,10 +456,20 @@ function renderHome() {
     open.textContent = t(s.status === "completed" ? "view" : "resume");
     open.onclick = () =>
       openSurvey(s.id, s.status === "completed" ? "record" : "resume");
+    if (deleting(s.id)) {
+      detail.textContent += ` · ${t("deletePending")}`;
+      open.textContent = t("retryDelete");
+      open.onclick = () => {
+        pendingDeleteIds = [...state.deletingIds];
+        $("deleteDialog").showModal();
+        confirmDelete();
+      };
+    }
     buttons.append(open);
     if (s.status !== "completed") {
       const review = document.createElement("button");
       review.className = "secondary";
+      review.disabled = deleting(s.id);
       review.textContent = t("view");
       review.onclick = () => openSurvey(s.id, "record");
       buttons.append(review);
@@ -491,33 +517,36 @@ function requestDelete() {
   $("deleteReview").scrollTop = 0;
 }
 function confirmDelete() {
-  const ids = new Set(pendingDeleteIds);
-  if (!state.surveys.some((s) => ids.has(s.id))) return;
-  const next = {
-    ...state,
-    surveys: state.surveys.filter((s) => !ids.has(s.id)),
-  };
-  if (ids.has(next.currentId)) {
-    next.currentId = null;
-    next.screen = "home";
-  }
-  // Commit the whole selection together; a failed write retains every record.
   try {
-    save(next);
+    deleteRecords(state, pendingDeleteIds, window.PassengerCountAndroid, save);
   } catch {
-    $("deleteError").textContent = t("deleteFailed");
+    $("deleteError").textContent = t(state.deletingIds?.length ? "deleteIncomplete" : "deleteFailed");
     $("deleteError").hidden = false;
     $("deleteError").scrollIntoView({ block: "nearest" });
+    renderHome();
     return;
   }
-  Object.assign(state, next);
   deleteMode = false;
   selectedRecordIds.clear();
   pendingDeleteIds = [];
   $("deleteDialog").close();
   showScreen("home");
 }
+function resumePendingDeletion() {
+  if (!state.deletingIds?.length) return;
+  const ids = new Set(state.deletingIds);
+  try {
+    deleteRecords(state, [], window.PassengerCountAndroid, save);
+    for (const id of ids) selectedRecordIds.delete(id);
+    pendingDeleteIds = pendingDeleteIds.filter(id => !ids.has(id));
+    if (!pendingDeleteIds.length && $("deleteDialog").open) $("deleteDialog").close();
+    if ($("error").textContent === t("deleteIncomplete")) error("");
+    if (screen === "home") renderHome();
+  } catch { error(t("deleteIncomplete")); }
+}
+
 function openSurvey(id, mode) {
+  if (deleting(id)) return;
   state.currentId = id;
   const s = cur();
   if (!s) return;
@@ -1009,7 +1038,7 @@ function renderRecord() {
   $("etaRecordSummary").textContent = etaStatusText(s);
   $("completedMessage").textContent =
     s.status === "completed" ? t("completedSaved") : t("pauseHelp");
-  $("uploadStatus").textContent = s.upload?.done ? t("uploaded") : "";
+  renderUploadStatus(s);
   showIssues($("recordIssues"), result);
   renderChart($("chart"), s, t, name);
   $("recordBody").replaceChildren();
@@ -1466,17 +1495,28 @@ async function saveChart() {
     updateExportControls();
   }
 }
+function renderUploadStatus(s = cur()) {
+  const key = { current: "uploaded", changed: "uploadedEarlier", unknown: "uploadedUnverified", uncertain: "uploadUncertain" }[uploadReceiptStatus(s)];
+  $("uploadStatus").textContent = key ? t(key) : "";
+}
 async function upload() {
   const s = cur();
-  if (uploadBusy) return;
+  if (uploadBusy || !s) return;
+  if (s.upload?.done || s.upload?.uncertain) { renderUploadStatus(s); return; }
   if (!s.rows.some(rowObserved)) return error(t("noObservations"));
   uploadBusy = true;
   $("upload").disabled = true;
   try {
     $("uploadStatus").textContent = t("uploading");
-    await uploadSurvey(s, persist);
-    $("uploadStatus").textContent = t("uploaded");
+    await uploadSurvey(s, () => {
+      // A successful save of a different/current workspace is not an upload
+      // checkpoint for a removed, pending-deletion or replaced survey object.
+      if (!state.surveys.includes(s) || deleting(s.id)) return false;
+      return persist();
+    });
+    if (cur() === s) renderUploadStatus(s);
   } catch {
+    if (cur() === s) renderUploadStatus(s);
     error(t("uploadError"));
   } finally {
     uploadBusy = false;
@@ -1816,6 +1856,7 @@ new ResizeObserver(() => {
     `${Math.ceil($("recordSelection").getBoundingClientRect().height)}px`,
   );
 }).observe($("recordSelection"));
+resumePendingDeletion();
 const query = state.search || {};
 const initialScreen = state.screen || cur()?.screen;
 $("route").value = query.number || "";
@@ -1847,6 +1888,7 @@ else checkRouteUpdates(dataStatus).then((value) => { data = value; })
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
+    resumePendingDeletion();
     reconcileSavedNativeTracks();
     checkRouteUpdates(dataStatus).then((value) => { data = value; })
       .catch(() => dataStatus("Update unavailable"));
