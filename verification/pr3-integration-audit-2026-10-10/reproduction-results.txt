@@ -1,0 +1,3 @@
+REPRODUCED: failed acknowledged journal drain still calls native saveBundle.
+REPRODUCED: mutating selected survey while chart decoder waits produces B JSON/name with A chart.
+REPRODUCED: CSV control re-enabled immediately after native enqueue, before a native result.
