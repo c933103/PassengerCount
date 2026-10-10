@@ -1,5 +1,7 @@
 # PassengerCount
 
+[Project brief and kanban](docs/PROJECT_KANBAN.md) tracks current work, next actions and linked PR evidence.
+
 An Android app and web app for bus passenger surveys.
 
 ## Use on Android
