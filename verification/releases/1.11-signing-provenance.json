@@ -1,0 +1,17 @@
+{
+  "package": "app.passengercount",
+  "delivered_version": "1.10",
+  "delivered_code": 11,
+  "delivered_apk_sha256": "35be9119d6ad3506b23ed4f7ae9c6b6b6942e30b891e00b961c9bab01f467e19",
+  "certificate_sha256": "ce0a702a8515a3e5cfa03ba55ce2bd6279eb060cebcab9ac9aa4a4614a8667c8",
+  "retained_key_certificate_matches_delivered_apk": true,
+  "private_signing_material_transmitted": false,
+  "candidate_version": "1.11",
+  "candidate_version_code": 12,
+  "source_base": "1b7cb84c094bc4616d0255d4844cec80ed1accc8",
+  "checked_at_utc": "2026-10-10T02:24:22Z",
+  "github_releases_found": 0,
+  "github_tag_refs_found": 0,
+  "highest_delivered_library_version": "1.10",
+  "candidate_release_verified": false
+}
