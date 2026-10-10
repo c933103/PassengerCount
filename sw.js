@@ -1,9 +1,10 @@
-const C = "passenger-count-v17-trip-export-bundle";
+const C = "passenger-count-v18-durable-record-lifecycle";
 const F = [
   "./",
   "./index.html",
   "./app.js",
   "./native-track.js",
+  "./record-deletion.js",
   "./core.js",
   "./survey.js",
   "./i18n.js",

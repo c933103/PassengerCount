@@ -255,8 +255,8 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public void chooseExportDirectory() { runOnUiThread(() -> chooseDirectory()); }
         @JavascriptInterface public void resetExportDirectory() { runOnUiThread(() -> storeDirectory(null)); }
         @JavascriptInterface public void startTracking(String surveyId) {
-            String id = TrackService.safeId(surveyId);
-            if (id.isEmpty() || TrackService.session(MainActivity.this).start(id) == null) return;
+            String id = surveyId;
+            if (!TrackDeletion.validId(id) || TrackService.isDeleted(MainActivity.this, id) || TrackService.session(MainActivity.this).start(id) == null) return;
             runOnUiThread(() -> startPendingTrack());
         }
         @JavascriptInterface public boolean stopTrackingAndDrain(String surveyId) {
@@ -270,49 +270,60 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public void stopTracking(String surveyId) {
             stopTrackingAndDrain(surveyId);
         }
+        @JavascriptInterface public boolean deleteTrack(String surveyId) {
+            boolean deleted = TrackService.deleteTrack(MainActivity.this, surveyId);
+            runOnUiThread(TrackService::finishStop);
+            return deleted;
+        }
         @JavascriptInterface public String getTrackPage(String surveyId, String cursor) {
-            String id = TrackService.safeId(surveyId);
-            if (id.isEmpty()) return "";
-            try {
-                TrackJournal.Page page = TrackJournal.read(TrackService.trackFile(MainActivity.this, id), cursor);
-                org.json.JSONArray points = new org.json.JSONArray();
-                for (TrackJournal.Entry entry : page.entries) {
-                    try {
-                        org.json.JSONObject point = new org.json.JSONObject(entry.json);
-                        if (!(point.opt("nativeId") instanceof String) || point.optString("nativeId").isEmpty())
-                            point.put("nativeId", entry.legacyId);
-                        point.put("nativeOrder", entry.offset);
-                        points.put(point);
-                    } catch (org.json.JSONException ignored) {}
-                }
-                org.json.JSONObject result = new org.json.JSONObject();
-                result.put("points", points);
-                result.put("cursor", page.cursor);
-                result.put("more", page.more);
-                return result.toString();
-            } catch (Exception ignored) { return ""; }
+            synchronized (TrackService.session(MainActivity.this)) {
+                String id = surveyId;
+                if (!TrackDeletion.validId(id)) return "";
+                if (TrackService.isDeleted(MainActivity.this, id))
+                    return "{\"points\":[],\"cursor\":\"\",\"more\":false}";
+                try {
+                    TrackJournal.Page page = TrackJournal.read(TrackService.trackFile(MainActivity.this, id), cursor);
+                    org.json.JSONArray points = new org.json.JSONArray();
+                    for (TrackJournal.Entry entry : page.entries) {
+                        try {
+                            org.json.JSONObject point = new org.json.JSONObject(entry.json);
+                            if (!(point.opt("nativeId") instanceof String) || point.optString("nativeId").isEmpty())
+                                point.put("nativeId", entry.legacyId);
+                            point.put("nativeOrder", entry.offset);
+                            points.put(point);
+                        } catch (org.json.JSONException ignored) {}
+                    }
+                    org.json.JSONObject result = new org.json.JSONObject();
+                    result.put("points", points);
+                    result.put("cursor", page.cursor);
+                    result.put("more", page.more);
+                    return result.toString();
+                } catch (Exception ignored) { return ""; }
+            }
         }
         @JavascriptInterface public String getTrack(String surveyId) {
-            String id = TrackService.safeId(surveyId);
-            org.json.JSONArray points = new org.json.JSONArray();
-            if (id.isEmpty()) return points.toString();
-            File file = TrackService.trackFile(MainActivity.this, id);
-            if (!file.isFile()) return points.toString();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file), StandardCharsets.UTF_8))) {
-                String line;
-                int count = 0;
-                while ((line = reader.readLine()) != null && count++ < 20000) {
-                    try { points.put(new org.json.JSONObject(line)); }
-                    catch (org.json.JSONException ignored) {}
-                }
-            } catch (IOException ignored) {}
-            return points.toString();
+            synchronized (TrackService.session(MainActivity.this)) {
+                String id = surveyId;
+                org.json.JSONArray points = new org.json.JSONArray();
+                if (!TrackDeletion.validId(id) || TrackService.isDeleted(MainActivity.this, id)) return points.toString();
+                File file = TrackService.trackFile(MainActivity.this, id);
+                if (!file.isFile()) return points.toString();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                        new FileInputStream(file), StandardCharsets.UTF_8))) {
+                    String line;
+                    int count = 0;
+                    while ((line = reader.readLine()) != null && count++ < 20000) {
+                        try { points.put(new org.json.JSONObject(line)); }
+                        catch (org.json.JSONException ignored) {}
+                    }
+                } catch (IOException ignored) {}
+                return points.toString();
+            }
         }
     }
     private void startPendingTrack() {
         TrackSession.Request request = TrackService.session(this).request();
-        if (!request.valid() || !hasLocation()) return;
+        if (!TrackService.session(this).accepts(request) || !hasLocation()) return;
         Intent intent = new Intent(this, TrackService.class)
             .setAction(TrackService.ACTION_START)
             .putExtra(TrackService.EXTRA_ID, request.id)

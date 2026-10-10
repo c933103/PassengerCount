@@ -30,6 +30,23 @@ jobs:
           SIGNING_KEY_PASSWORD: validation123
           SIGNING_KEY_ALIAS: passengercount
         run: bash android/build.sh
+      - name: Build test-only Android lifecycle instrumentation
+        env:
+          SIGNING_KEYSTORE: ${{ runner.temp }}/passengercount-validation.jks
+          SIGNING_STORE_PASSWORD: validation123
+          SIGNING_KEY_PASSWORD: validation123
+          SIGNING_KEY_ALIAS: passengercount
+        run: bash scripts/build-android-tests.sh
+      - name: Validate installed journal lifecycle on API35
+        timeout-minutes: 12
+        run: bash scripts/test-android-installed.sh
+      - name: Preserve installed lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PassengerCount-API35-lifecycle-${{ github.sha }}
+          path: android/build/lifecycle-evidence
+          if-no-files-found: warn
       - name: Include signing utility for local production re-sign
         run: |
           mkdir -p android/build/signing-tools/lib
