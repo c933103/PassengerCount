@@ -18,3 +18,4 @@ node "$ROOT/scripts/test-export-permission.cjs"
 node "$ROOT/scripts/test-export-storage.cjs"
 
 node "$ROOT/scripts/test-track-deletion.cjs"
+node "$ROOT/scripts/test-android-target-access.cjs"
