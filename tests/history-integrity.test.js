@@ -8,6 +8,7 @@ const { emptyRow, migrateSurvey, recordStop, completeSurvey, reopenSurvey, appen
 const stopReference = surveyModel.stopReference || (() => null);
 const reconcileEvidenceStops = surveyModel.reconcileEvidenceStops || (() => {});
 import { load, save } from "../storage.js";
+import { uploadReceiptStatus } from "../upload.js";
 import { importNativeTrack } from "../native-track.js";
 import { hkTimestamp, makeGpx, tripMetrics } from "../fieldkit.js";
 import { hkClock, validPassengerCount } from "../core.js";
@@ -16,7 +17,7 @@ import { makeExportBundle } from "../export.js";
 // Exercise production event handlers with synthetic storage and bridge commands.
 // These are deterministic host regressions, not Android device validation.
 const source = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
-const functions = [...(source.includes("function historySnapshot(") ? ["historySnapshot"] : []), "updateHistoryButtons", "resetHistory", "restoreHistory", "undo", "redo", "edit", "persist", "appendTrackPoint", "syncNativeTrack", "startNativeTracking", "stopNativeTracking", "showScreen", "openSurvey", "active", "pause", "complete", "goHome", "joinSection", "changeWeather", "captureStartEnvironment", "captureEta", "setCount", "enterKey"];
+const functions = [...(source.includes("function historySnapshot(") ? ["historySnapshot"] : []), "renderUploadStatus", "updateHistoryButtons", "resetHistory", "restoreHistory", "undo", "redo", "edit", "persist", "appendTrackPoint", "syncNativeTrack", "startNativeTracking", "stopNativeTracking", "showScreen", "openSurvey", "active", "pause", "complete", "goHome", "joinSection", "changeWeather", "captureStartEnvironment", "captureEta", "setCount", "enterKey"];
 const handlers = functions.map(name => {
   const body = source.match(new RegExp(`(?:async )?function ${name}\\([^]*?\\n\\}`));
   assert.ok(body, `actual app handler ${name} exists`);
@@ -56,6 +57,7 @@ function fixture({ status = "in_progress", failSave = false, failStop = false } 
     setFollow: noop, renderHome: noop, locate: noop, requestAnimationFrame: noop, measureDock: noop,
     buildStopOptions: noop, buildTable: noop, renderSetup: noop, renderCount: noop, renderRecord: noop, setupMap: noop,
     t: value => value, error: value => { lastError = value; }, hkClock, hkTimestamp, tripMetrics, data: null,
+    uploadReceiptStatus, deleting: id => state.deletingIds?.includes(id) === true,
     save, recordStop, completeSurvey, reopenSurvey, appendSection, insertStop, importNativeTrack,
     stopReference, reconcileEvidenceStops, validPassengerCount,
     schoolHolidayRanges: () => [],

@@ -1,0 +1,3 @@
+Local browser harness first found no bundled Playwright browser. The installed /usr/bin/chromium then failed before test execution:
+FATAL:chrome/browser/process_singleton_posix.cc:297 Check failed: . socket() failed: Operation not permitted (1)
+No socket permissions or browser isolation settings were changed. Hosted Chromium remains required.

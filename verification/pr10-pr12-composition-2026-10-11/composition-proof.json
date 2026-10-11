@@ -1,0 +1,1304 @@
+{
+  "base": "fb48d501b2d2bb260808c622cccbe57699184afb",
+  "parents": [
+    "28c13494a143b0cca8ada3915087fe9007b12e1b",
+    "153df48d5b3dc3f41a8fbc6ec342a9c0b4234d56"
+  ],
+  "producer_leaves_verified": {
+    "base": 105,
+    "pr10": 120,
+    "pr12": 110
+  },
+  "files": [
+    {
+      "path": ".github/workflows/v19-validate.yml",
+      "git_blob": "e7f2875019694a155773854895312bded8ebfa60",
+      "sha256": "b89e0d1b59c0bdc0e88c1c41e703eb59c5c00b3670f7a4a0fb0bfecd956d983c",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": ".gitignore",
+      "git_blob": "0e5f3cd7c7640c59838fc98550217be63a340d0d",
+      "sha256": "64b7fed38e712697549208a25e3aa00d8bb5c5327660d1c691797669282fb56d",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "README.md",
+      "git_blob": "e62fceb71722d00142574d944038489d4430c395",
+      "sha256": "3dd0de52b9c319bf3699587c3327b9754a95639d825e321b6dc98a4e78bec952",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "android/AndroidManifest.xml",
+      "git_blob": "71e664ff73f0ab8e1c666aae4325fab9e24f6d4a",
+      "sha256": "010af31b8dbb0620f599e12dd763f16232a2b78e26bdeecaa077a740b39db0d8",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "android/build.sh",
+      "git_blob": "31a5b88a8c9b45b4c26b64afa683e3f74e5e19a7",
+      "sha256": "78f92f3abe3b73d60a61b795784633317b765841b1604660e571f347e951ae12",
+      "mode": "100755",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "android/res/drawable/ic_launcher.xml",
+      "git_blob": "e3edb500d3d9a3a651af399a8983dffba92e0deb",
+      "sha256": "cfc426c35a2a9784cb9abe56d9dc2494e4f0fb2bd34641405dfc9408a038672b",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "android/res/values/styles.xml",
+      "git_blob": "1ee3cf6fd96fd669b419fcba60f546b39f40de0e",
+      "sha256": "6e37b022a8826545d43216c00919577fc4115c3315b252973d78056fa8322b56",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/ExportSession.java",
+      "git_blob": "4a6819e23358b5e8ffe34fb7e3a15146dd128aef",
+      "sha256": "609fbf25b182afa72d4f8d4a7eb9bccc69056fb75ec3aa785c4f2a955a38f26a",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/ExportStorage.java",
+      "git_blob": "5076c1fba53ba0b1fcaa3259f1579ee910d113ac",
+      "sha256": "e4bfe7133a769ecfcd101b052092dc661b23ef14865dc81851a3a87a6117e6b7",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/MainActivity.java",
+      "git_blob": "ed4a837d258249a08bd0eeea6076e88420489c3e",
+      "sha256": "050de31c21967e68de7b43a66a3445f8663f1cfb904524794512c8a1d54fc390",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/TrackDeletion.java",
+      "git_blob": "4e35c5690882b22817d1c5e7336c8931f3ffe91f",
+      "sha256": "97f30c1fb3d305a31757d3cb523ba3363a654c4e97b0bd3d4d9f4036adcfaac2",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/TrackJournal.java",
+      "git_blob": "1a7091b8b87d12518a0f684965e99234098a8e3e",
+      "sha256": "12e7094ad92d86fcef61cbbc914aa2cac290e8ab5a1c351523a60737898b3618",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/TrackService.java",
+      "git_blob": "fa77142513b1c57080a37dfff8302f5463810259",
+      "sha256": "e68120c3df672a8239905772384fe25994e3051d8aaf5d50e7e22565377d6bb1",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "android/src/app/passengercount/TrackSession.java",
+      "git_blob": "c22f1f09ac678f10b7a6c1ddb01deaedc8e5c483",
+      "sha256": "93e59e638caa965125f5475bd651b663fae863c54cca33d396f2fe817b3f9c3b",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "app.js",
+      "git_blob": "a89a9a710850238ae3d71e576b42bfc87201679b",
+      "sha256": "e755208602a3b588f313837ba076ae26bac909349cdebe9fc4d712b98930c88f",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "charts.js",
+      "git_blob": "a86e0071aa5c687efe93cf0822b6e0260a2a42b2",
+      "sha256": "fadb89ffd0e3b6336473aa61ed1e8089fe46a81562458c45662597d017688306",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "core.js",
+      "git_blob": "d9d3f216543fc0ad6c22c6abcd5737ce9900fd95",
+      "sha256": "82bd82aba0d6b06b9d0b8b0a26902ceca99aa0ec5b5156e8b35067b448d0968f",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "data.js",
+      "git_blob": "dd6f13263f07f00863938b90e0b98437904f4ff7",
+      "sha256": "3fa28b436a41204509685fa41bf2c61309c72a80d6a67a583030361901da865c",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "data/government-routes.json.gz",
+      "git_blob": "75a7bf6e1614adb91907d233af691bbf8ad8c7a1",
+      "sha256": "a3e7d90f8989bb06ea592d9e763a8c3228e9d24b195e5dae902f40e82c12f54d",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "export.js",
+      "git_blob": "1d88b78edf71800fceb39392656a4396ecd177a6",
+      "sha256": "5a92fa81e61dd8618169f3b5426c75b6064d1590aca3a07896541f6fcd458dc6",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "fieldkit.js",
+      "git_blob": "d7976bb83528be85859270123e30a627e2196aff",
+      "sha256": "e011c1c25f54ead45f347dcee16b2a37bedc1019cf47c8fa5fcd2c323b97a931",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "government.js",
+      "git_blob": "e2e67e130dac5e2766a399a9ed4c52fc3defe32b",
+      "sha256": "7e26905fa98f5adb62c0837118c08c973c29239a5b78d4a2c204a9da4c727b81",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "i18n.js",
+      "git_blob": "5008c7234525109b8c5296876c5d2fc41cdd7217",
+      "sha256": "fecf5d276471a43b2bfe5d4c3419e8e54f78408aa38a4f2bb0d3944654649545",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "icon-192.png",
+      "git_blob": "3156bf43f596e737636cda9081a4ecef299ab39d",
+      "sha256": "f5daca0e2236f0e88e2ad3dcd88f4a2be695490bde321e147c7f360ae1105956",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "icon-512.png",
+      "git_blob": "a21c30580c7191a6d393a1d1f2ef0aabc792e3be",
+      "sha256": "7ba38184bdf43cf601d1d48687d9be1ffd79cb42188f5c9ed5b9f3a3fd3a2b0c",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "index.html",
+      "git_blob": "b84d66ef622555593f1cffb4be891093d5d3584f",
+      "sha256": "c8594ddb14ae6cbe1d74d1e554dcf9c73015df9b39f34df2ddffb0b38093d313",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "live.js",
+      "git_blob": "e5e5d823afad38e596e43cddc62b263b1c796442",
+      "sha256": "298e2821cff83ac4020b21f251aa3db9a6cdcf552b29d92ac2144cc4e4e45e9e",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "manifest.json",
+      "git_blob": "4e0e828258810fb0bb3ed696cf6af4c9daea22ca",
+      "sha256": "155d435437d7f055e6e2077d852fb96cba4ebe730d859b6c4db5ea85e5100626",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "native-track.js",
+      "git_blob": "68b41358317209444215867677882ff2a1d4d2a5",
+      "sha256": "255f549ff440a48f44f363ad84f67702225b3522e87c3a8b4c3db863f0baeac7",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "package-lock.json",
+      "git_blob": "e4466d2ba1d74d921e6db91cd2568c5aca236cef",
+      "sha256": "51c1a9cccc48427d3e89b81a4d567962f44a7aeca106553004dfb03792b94016",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "package.json",
+      "git_blob": "f5b7716307b43afb39e199d637fa5764819569f4",
+      "sha256": "4518af15a364b6f34edf92fa8ee26e577d36df3de01c10831f5dfb8a6e9cef1e",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "record-deletion.js",
+      "git_blob": "5d0a92f3d39c68669f8770d362f6c99adb45c0ee",
+      "sha256": "24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "route-worker.js",
+      "git_blob": "b48ee00f1209dee72561f21dd490cdb42be10755",
+      "sha256": "a0e5f0a0114a2e5645ae7b6df97a3a36a2d551e5cd51b8ab7fc48c8f3263f24e",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "scripts/build-android-tests.sh",
+      "git_blob": "c3e491b55c83fc937f5d697c38cef124c370bded",
+      "sha256": "4ea811e9743515e9aa065ca6362f37557754b7f0a9967c7338f1af6d0ab6206f",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "scripts/build-government-data.mjs",
+      "git_blob": "e99c63ea05dabf097639aaaf6671fea23a5650b8",
+      "sha256": "9111c1f221a00ec386383dfef31bbe5bafc04cff1d9c974f2570ba9396f3e021",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "scripts/test-android-installed.sh",
+      "git_blob": "2e791a3a4b5a57980e465f91152805a0d6e446e7",
+      "sha256": "1ce5e190fc41342e78b7e79fad692eccfbb59d7d8d6cbff0a148bb6f685b21bb",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "scripts/test-android-target-access.cjs",
+      "git_blob": "14bc815df791c0525950a95aef8b665ad99e377e",
+      "sha256": "8376078b8cef80974de78c5ece43a8131c15ae7da0e3c0687a95734dce62e13f",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "scripts/test-export-permission.cjs",
+      "git_blob": "ac2aafe41fed0713410cf23aa5c955124f3ab86b",
+      "sha256": "2befece6b9ed9f767fc1182623e670eccacabaafd1505dae12b4a0677c7ae427",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "scripts/test-export-storage.cjs",
+      "git_blob": "5cc0c67e384a8d3fc1c21a98cc4c06e9f83b351d",
+      "sha256": "40b18f2b1854c4f26c13983810df097449e9e90b4ccbd22c43ef86c2d98c7dd0",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "scripts/test-native-track.sh",
+      "git_blob": "96795f1a94860ed02fd04b1d854c5372585e0f72",
+      "sha256": "7b65027929702f53386854376ec42a1797e312acbe1db53c2bbbb99c3424f56f",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "scripts/test-track-deletion.cjs",
+      "git_blob": "e227086430a548e3e0141d7f43812f0f4fcc250b",
+      "sha256": "36536fedcbee8352758c497328540ae26875995aeb95bd50f957f7e69c9a57e1",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "storage.js",
+      "git_blob": "ffabb476d930be838e59bdcf72259a483a0df76f",
+      "sha256": "a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "style.css",
+      "git_blob": "9d7420a56660cf51168a8d32d74dce648034036e",
+      "sha256": "5a571d2440a6360c2eec44a4f6c3ccb61972c1c14dc27bb508cfbeddfa7039fd",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "supabase-config.js",
+      "git_blob": "04d21c5b6cb64f89c6adde67a0c7c4098e9318c5",
+      "sha256": "c3fb872888129813a6228dbed43f13271cc8b4a2a4faf4ce519173c2a252502f",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "survey.js",
+      "git_blob": "9d81dfddcf7befa79392daf688bfb528c801c7bd",
+      "sha256": "a5d75ef4c0c28bd9fe651f95d8898abba3187dd25ca6827ea3368dc5f08bf461",
+      "mode": "100644",
+      "matches": [
+        "pr12"
+      ]
+    },
+    {
+      "path": "sw.js",
+      "git_blob": "a6a4009568dcc4778068c512525f1f6d2a4afc3a",
+      "sha256": "edb54db26c36e6e96c8e4028c41ad00df56a6b4f667fdf5294a9e9fb538bc484",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "tests/android-harness.test.js",
+      "git_blob": "c7cf9c6adf7e56d9d2f4c4250ed2f4ad580a209c",
+      "sha256": "a0728adca78098e34325021995639df352db7298816f36f5ece7679e653c65e5",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "tests/android/AndroidManifest.xml",
+      "git_blob": "7140b612717079351f2e40f93b40ab4a98db9253",
+      "sha256": "33c26a57cfd17f3024b41d812ce822b34b00ab418e8ac71ab1489741c3a48265",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/android/JournalLifecycleInstrumentation.java",
+      "git_blob": "55cbbb0cb5231c14ca1b4540cfd491858bcb0c5d",
+      "sha256": "ac9717ed268cc82c8ba5af2c371e8323a256b62bae40c0f4deb9c2e4924a97d4",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/android/README.md",
+      "git_blob": "a2609216de1ce038eb611a1de74bea826292a1e9",
+      "sha256": "7cd5406e003bc5b74edeccfed4cf102cdec1d4547e63862dafdd3a1ebb1e2b5b",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/android/TargetAccess.java",
+      "git_blob": "0ffa6259b770da0ee0a1793128624e4433f7c6d1",
+      "sha256": "2e4dbb258b5c7c18c7b6f05e4d5c7db25be72cc59a598b63968473f5e092eba7",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/browser.cjs",
+      "git_blob": "f3f79508a76b7490a01ac887d3ced01b511b9bad",
+      "sha256": "569a11da3d5191e0e1ace84fcd35ad855769694c1ce8ea8e8e0825fc2e24ac8b",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "tests/bundle-export-browser.cjs",
+      "git_blob": "35f9a196a1a782afe0dcdabff6732a3bb99f3fe4",
+      "sha256": "d8703100c1adba39cb17d2a5efec096533783a040015fb8c5b717d47775c91e6",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/bundle-export.test.js",
+      "git_blob": "d87c0e0667636d07d9bf1017114fb4f3ce38ea96",
+      "sha256": "d651f66b8a016126e7e4b1d4d36b404d8aca030cdc3691c8df58ad00b7eff820",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/core.test.js",
+      "git_blob": "3bfdda4cc72cdf425725c4f07ba11113b956d1b3",
+      "sha256": "5f4c2eaa1eea461984cf98ec393425a6e3a043b7ab9ced398839407829fa8d1e",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/data.test.js",
+      "git_blob": "04122c490f5dcf8fbdb7ff6adca90c1bc8690838",
+      "sha256": "c5b87a9d974902fb11b34aa2e13e8f252e84cd64708cf02cf8d759ebd21bd02d",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/export-pending.test.js",
+      "git_blob": "452fb30cf082e67fff7cdf82b29a62e21ea63482",
+      "sha256": "a1c4de28dfecd6ec4a4a247fcfa31ee73c48684012d5a601181f2c066870a3f5",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/export-permission-browser.cjs",
+      "git_blob": "ec7779a25501de086fb745f7ebab08d858932582",
+      "sha256": "9c57d00e868ddcc14a12931e61a93e4c3610116e8d4d87cafaf22c074ae8d8fe",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/export.test.js",
+      "git_blob": "94c5bf95b45f2ba041a15b2fe0241daaa5067abc",
+      "sha256": "4d990daa21576ad5939a8cf2d9995f55876f5f72e61ad8e77f15b771f0b45675",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/fieldkit.test.js",
+      "git_blob": "8769bb5da7e31f9ed021eb54299096cb5b513c25",
+      "sha256": "937e92392424518f58cfafc995ff2c13b92820698fd9b0f0471315e1be872738",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/government.test.js",
+      "git_blob": "3ab7783eec8848252d7d2b8a3c7009a61e7035c3",
+      "sha256": "37bd0c5fcf0d6ca08d771124b95e0db8310b5a57442253efa27a0960bd384373",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/history-integrity.test.js",
+      "git_blob": "1a5efe440330639f8715245ac73b1db9e76e234d",
+      "sha256": "4839041f7297b4cdf9d5da3a4e72b5006b3c7da1a1ec2936608bf77dc9f6cd36",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "tests/momentum.test.js",
+      "git_blob": "a9f6fdf96c3066bc6ce919199da5d0f468749ba2",
+      "sha256": "0fc820c2bf7f0f23c8f64b6a90514a440b7158779fcc727d644b817d027a4c7c",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native-track.test.js",
+      "git_blob": "d11730f9e5218c1247f34cef2f7dcd76fcde68f7",
+      "sha256": "c8213389ab8a037053d9b5634f1ceae222f34ed3b930a02be68916eb38c5ed30",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/ExportPermissionFixture.java",
+      "git_blob": "33993447e4338079e285d8330db0ef418dc18872",
+      "sha256": "75c6dea6171e398575238bbe940d6c09b64fab331917fa34ebbd36bf6ff305b9",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/ExportStorageTest.java",
+      "git_blob": "5351c394343fa432095bdbf42d57d4e3b3865d02",
+      "sha256": "060f7b3fb0a1b78dfd8cca644ecca6f4481cc5f1979b3beb91b85a72912bc294",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/TrackDeletionFixture.java",
+      "git_blob": "21e3f76396c7f4e4c2abe2051cf78746f92d4f58",
+      "sha256": "19489e2b10b950c6defe4945a688ab2e49ff17d5193ff262c8e5df0fee534d55",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/native/TrackJournalTest.java",
+      "git_blob": "afaafd52758234aeea3eb423e883f55b2102207e",
+      "sha256": "c30415c60731b910401302387d25569d670cc4a3322b04bbb5544c11730c277f",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/TrackSessionTest.java",
+      "git_blob": "e396da52be96bc453e057924dfd02b096ceba9d4",
+      "sha256": "5d8ad1f91c244f84a734eab86f3447a573d69de6c9fa5d1a590300ab3eeafea4",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/README.md",
+      "git_blob": "51b2648c19edcdc7a5f2b38907f1253092b0372d",
+      "sha256": "89b7b2e6dbfd54ad05867b2ee83a1a638d194787b92b25d2137c239a13260baa",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/ContentResolver.java",
+      "git_blob": "0b0078074eebef50d9ee3d7c65cd78dda5f24c24",
+      "sha256": "cdf5ba3dfee070851baa9c82931833dfa125a6a5693e21bae3e2c477cf580ea5",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/ContentValues.java",
+      "git_blob": "fe8027ac55c6131bf90c0bdb9373d59be62e32ad",
+      "sha256": "e5a5b85c88e203722ebf66e26cfd3872f5c3536609ac9cffc11636444d228a3a",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/Context.java",
+      "git_blob": "fe2c4fb12a6b1d975f84466f8e99f5c4d8b1b21c",
+      "sha256": "eed95386eed9043723bc615562e4b3abbbe683259886234c85e56632df5f2cc5",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/SharedPreferences.java",
+      "git_blob": "e919da839866fded6cadbfc3d58b785c96efebcd",
+      "sha256": "7cfd0eb0b787221afa272fc2ef69fe9601a635eb54a42ace58eb98551c657193",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/database/Cursor.java",
+      "git_blob": "303f9e834bb86c58c6a9ed5811550ac0e4cee90f",
+      "sha256": "ff0514a984b9de10610ec61f8743f3f8ffeb653fd05d9d40908ad1fe36c7561d",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/net/Uri.java",
+      "git_blob": "e098446e78bfe58f11c5c10a78865f21b2c98b0f",
+      "sha256": "bff169dc4ff6bac156a8db18e248f666f0a4752fbb652f317b85c289f35b3219",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/os/Build.java",
+      "git_blob": "74fc8f5c50885221d39164ad243944fff98bcf96",
+      "sha256": "1a32721e014ab8eb1e23a5d17585c29f7dca56e514ebed388b194c459899b627",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/os/Environment.java",
+      "git_blob": "961d40ab5252f3079b613f59cdb6b77ca2d39710",
+      "sha256": "db2d22dc4baa8ee9fa50f2aaf766ca4d2422252aedd18af181148202530be0fd",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/provider/DocumentsContract.java",
+      "git_blob": "711763384769916b8bbcc7cc05e70f55345d27d0",
+      "sha256": "e615f986dad1eeb4fd4ad865837d7c965a5d1376e307be414350d5e6467879cc",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/native/storage-stubs/android/provider/MediaStore.java",
+      "git_blob": "7cdad94b7775ab5f57c01a1fa8c0eca254a657ff",
+      "sha256": "28c1b51239ba5e867ff76b05ef571306f13a42b6cfab3812df418554a3dbe487",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/png-export-browser.cjs",
+      "git_blob": "a125a5aebc5d6bb9c55d948fbf2eb6c7c104d98a",
+      "sha256": "bced710546468ddcd915a805b75b1664afef43db0f0de0e5481b80efe033a7fe",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/png-export.test.js",
+      "git_blob": "dfc477145f8cd98840da0d6d530c1d0c753d297a",
+      "sha256": "0c64c10c780c143782ab40d71cd073027a2f0fb5b0b63494dd29a36d27ee0fcc",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/record-deletion.test.js",
+      "git_blob": "22cbf1c6d6f7f7b4f9aaa1d3e051fb304d2e71d1",
+      "sha256": "3fdc62eeba5ffc0679dc6e0b7fa425b5c48313161855a335b17cb6e758ff04e3",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/recording-lifecycle.test.js",
+      "git_blob": "430cd9a36cc137c848cfb59825327a39a717cee8",
+      "sha256": "a1d2f51fe6b8f99ce910ac81453b6cf7405699c762731226a2f92c1cdcff2d9c",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "tests/storage.test.js",
+      "git_blob": "365bc6dc0f8300e88d1edd5009f19a31cfdad652",
+      "sha256": "5e258fb79cc9d6d079fcdf7474894bac6ba0f0d84b3423d907d3a5901ad436e2",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/survey.test.js",
+      "git_blob": "784d0d53d000ceb50ac98d362be58021a851b694",
+      "sha256": "6a1fcc2bb981867a6bbb67562dd9b28953a9b9318082c4162cf47047e1ebaaf4",
+      "mode": "100644",
+      "matches": [
+        "pr12"
+      ]
+    },
+    {
+      "path": "tests/upload-lifecycle.test.js",
+      "git_blob": "6033e171e2f778dc5e4a5a5b677c48d610cb2c23",
+      "sha256": "9aaecaa09310f46840f390bc7e7a1d9b0aa9cfb91171cccff2ff49c6e55e7d97",
+      "mode": "100644",
+      "matches": []
+    },
+    {
+      "path": "tests/upload-persistence.test.js",
+      "git_blob": "793339e42da0a1887d49f40f3cd66b8e5e0b24f7",
+      "sha256": "b40af9dc9925aca08065407279e338da2a143c46dcb8429f0a1e7b68ec6fdb91",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "tests/upload.test.js",
+      "git_blob": "eb92929f9c36b8e54a86b5d49b6be95deb922bfe",
+      "sha256": "418451b0556a98f62d87eb5678124bd24fdbe79ceac21462eb8a7abb3f0f8098",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "upload.js",
+      "git_blob": "7f4ee665533812b1237ccc5ed1c50699f71488df",
+      "sha256": "1ae20397e9e7e0b69212eeb65ffe944727b43c7d52c4f917e122d122bc1a4528",
+      "mode": "100644",
+      "matches": [
+        "pr10"
+      ]
+    },
+    {
+      "path": "vendor/fflate/LICENSE",
+      "git_blob": "bd36874f34b9ae537f2bbc383fdf6e320dfafe98",
+      "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/fflate/fflate.js",
+      "git_blob": "82af0fdb655f00655d2da3354c4533744edcde6e",
+      "sha256": "b7ca4450b19559a1d50eb381adcee94b82449674be4cd17789d9beba7e6122a1",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/LICENSE",
+      "git_blob": "bcb3ba1aca095155857556d96e3193a50fe1bd11",
+      "sha256": "53e8dc25862014e4324741ca18fbe3611e11d42ef69f59f86ea8c5389647d4cb",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/images/layers-2x.png",
+      "git_blob": "200c333dca9652ac4cba004d609e5af4eee168c1",
+      "sha256": "066daca850d8ffbef007af00b06eac0015728dee279c51f3cb6c716df7c42edf",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/images/layers.png",
+      "git_blob": "1a72e5784b2b456eac5d7670738db80697af3377",
+      "sha256": "1dbbe9d028e292f36fcba8f8b3a28d5e8932754fc2215b9ac69e4cdecf5107c6",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/images/marker-icon-2x.png",
+      "git_blob": "88f9e501888c9c6cb29ad340d9a888627dd1b6d8",
+      "sha256": "00179c4c1ee830d3a108412ae0d294f55776cfeb085c60129a39aa6fc4ae2528",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/images/marker-icon.png",
+      "git_blob": "950edf24677ded147df13b26f91baa2b0fa70513",
+      "sha256": "574c3a5cca85f4114085b6841596d62f00d7c892c7b03f28cbfa301deb1dc437",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/images/marker-shadow.png",
+      "git_blob": "9fd2979532a19a15b824ce763c76e04a8dafadfb",
+      "sha256": "264f5c640339f042dd729062cfc04c17f8ea0f29882b538e3848ed8f10edb4da",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/leaflet.css",
+      "git_blob": "2961b7618a57617d1015d31d2094c425c3d86ce9",
+      "sha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "vendor/leaflet/leaflet.js",
+      "git_blob": "a3bf693d0fcaff885cc5f21b3a699aaa567b3533",
+      "sha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/edit-history-integrity-2026-10-11/README.md",
+      "git_blob": "bdb7ab7e8f42dcb3ae45f85fc686c7d46624acde",
+      "sha256": "67575cc5e70112184291d58f47773f3c560a256234296d6cda9ac2135760968d",
+      "mode": "100644",
+      "matches": [
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/edit-history-integrity-2026-10-11/native-tests.log",
+      "git_blob": "8c07ae2ecf2c816453ab56632da10119613780cb",
+      "sha256": "ed2f5cafaa44ebc15b4cc88dc86553dfdf769e30ab02bcd9e055f0ee05c04618",
+      "mode": "100644",
+      "matches": [
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/edit-history-integrity-2026-10-11/node-tests.log",
+      "git_blob": "187bcef2fcee5c096d53b02610de7d53e6846044",
+      "sha256": "47a2d4dd05991271973d896dd161242d389c1cc8e925214089bdca7177b15e9f",
+      "mode": "100644",
+      "matches": [
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/edit-history-integrity-2026-10-11/source-verification.json",
+      "git_blob": "b6520bbd4b52f41a6fc773d46bf18ad2c2752b32",
+      "sha256": "852bb7074f840cf409d96477fa63d2953a039a4030a696ca74d657a8b5bf0466",
+      "mode": "100644",
+      "matches": [
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc001-recording-lifecycle.md",
+      "git_blob": "6e648c73fbd81979c45e29665e178cd213dd7e7b",
+      "sha256": "9ef6fe1d0c2b8cde8b8cd35d4f2c142310122c9b66a089bfbaecaec5851ad356",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc002-native-track-replay.md",
+      "git_blob": "ec2c521d81869febedde80fe15c0cf8242ad5923",
+      "sha256": "28b2f207627cf78596507fab5af4bd0100adf8a879e8bd1d43b45a2e65c10d51",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc003-png-export-identity.md",
+      "git_blob": "95739f1a2c714726f6071377e8832ee55232c40e",
+      "sha256": "bea81c76bfdb39efe8760a66a12842bf560e7dc45803368ae38a8b4afa1019cb",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc004-export-permission-recovery.md",
+      "git_blob": "cc1655b97935acd67cbae4f99a0738464ab3a801",
+      "sha256": "267a799539d8c9237dd4412314d4d58f6f8b7b9af1f2004f7153070cd8c9489d",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc004-granted-write-followup.md",
+      "git_blob": "a0c5ddd07d4cc2283a0d7fd884a89468ce6fb295",
+      "sha256": "ec6c66ffc6e9b32768e8374e4ed3cf9d480c5563bb1b1a6d48b8a347eb517caf",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc004-observer-transition-matrix.md",
+      "git_blob": "4d9cec7d0ac61eadc1a38d644dc1153e017bac35",
+      "sha256": "ce5d39c63b2c0771b3fe014549be5a2c8408a94c390f50a27cbdd2ffed86d131",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc004-result-persistence-followup.md",
+      "git_blob": "06dbe6a378e62e36aed8a3e9ea41d634f7f75fbb",
+      "sha256": "cdb84a5ff05c20bebc2148857798403342cefe8ad5e2c4acca52ac4a16b78c8b",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pc005-missing-gps-heading.md",
+      "git_blob": "d03732d64b88e7f4e48897d23fda56c4ab1ec659",
+      "sha256": "9cfef6fb610f1cdf23b89f61a3712d5ff76078cbe81be38c0099a70f55ce9b98",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/README.md",
+      "git_blob": "8910aaf18e64c802a17cd5bd85aa2831451df116",
+      "sha256": "19ccdd492ac84d491de0a73dde49e143be1b75d2270aed9cc4d43c3a709fb7bd",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/native-tests.log",
+      "git_blob": "f59176743cc05b02fd4b8f4923a563185df09908",
+      "sha256": "8a5b162a0f55d42dd3f290bb404077afbf140b33f9d0f8bd7f8e7adef76fd5ef",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/node-tests.log",
+      "git_blob": "13c18d56e7f59e7855da0177c5d3b8ac4573ff6e",
+      "sha256": "2e7b7a458a6f34e6e779e1bdf2b0977b0ecd93a765da4b0bac265a4c9802910b",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/preservation-proof.json",
+      "git_blob": "2604dcfab733f69bb4b579c5fbb4c52488b4df81",
+      "sha256": "ae1b47845e8d47cbc3cd3e4697045c71d6b7897314a19b0a78007763d9fd8a1d",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/storage-negative-control.log",
+      "git_blob": "1a3810d35f70faacda1a0403dc2ccf3c2a529c72",
+      "sha256": "d1259791bf4a4bb6ff542940fa65d0157083b3b6cc794a838dc47ccf0d2a8fec",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/README.md",
+      "git_blob": "2d3fc42228f4e0c29243942783eb40b54b672052",
+      "sha256": "2de9e465bc7066c2b26101880fca90966878fcf6707c80f3b43e6c55454d88de",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/native-tests.log",
+      "git_blob": "8c07ae2ecf2c816453ab56632da10119613780cb",
+      "sha256": "ed2f5cafaa44ebc15b4cc88dc86553dfdf769e30ab02bcd9e055f0ee05c04618",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/negative-control.log",
+      "git_blob": "e692efaba21dee788dc7d6c5c1c6d92b1b070c76",
+      "sha256": "9b0c5d8b0ebd68f0ad6c670ff550560464adc66ac6d1fccadf1dca4d638bb98b",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/node-tests.log",
+      "git_blob": "37665f60d0040a810c50964481e19f9039aeda07",
+      "sha256": "15dab974bf10ad60bdca01371017c618a7ff731032e4ba85a94ea6ef7097ecc6",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/preservation-proof.json",
+      "git_blob": "4efb9eb519c9dea8f06c1e8b41af389ff8431dd2",
+      "sha256": "7b40e632bedc8d9a32d753eafd71837fff78321a724fc320947fc407e56fb90a",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/rollback-reproduction.log",
+      "git_blob": "d2a207d2b6b470868194f9de41638e06fc2dcbab",
+      "sha256": "642df82587a5edc8ca272efc91ff0928869172883881387542b0be861a760360",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/releases/1.11-notes.md",
+      "git_blob": "6cb97b4503961840779de07ee8585cf314d96a28",
+      "sha256": "690244f54dabcc655eae26a89a2f505672d18cef18fd0252be8d2a81960815ab",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    },
+    {
+      "path": "verification/releases/1.11-signing-provenance.json",
+      "git_blob": "6c1434b8169ebfea411e3b2d02e316ad5c5c7d78",
+      "sha256": "e3f7a73673223c81f9b6830a6ceefe76f7d3bb6e6ea515c5b570b4031f245ae7",
+      "mode": "100644",
+      "matches": [
+        "base",
+        "pr10",
+        "pr12"
+      ]
+    }
+  ],
+  "unchanged_android_production_and_build": true,
+  "unchanged_installed_gate": true,
+  "removed_parent_assertion_lines": []
+}
