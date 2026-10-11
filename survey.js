@@ -19,6 +19,51 @@ export const rowObserved = (row) =>
     (k) => row[k] !== "" && row[k] != null,
   ) ||
   Object.values(row.skipped || {}).some(Boolean);
+// Occurrence identity is survey-local, monotonic, and distinct from a route's
+// stop ID (which may repeat on circular sections). History never rewinds it.
+function ensureStopOccurrences(s) {
+  if (!Number.isSafeInteger(s.nextStopOccurrence) || s.nextStopOccurrence < 0)
+    s.nextStopOccurrence = 0;
+  const used = new Set((s.stops || []).map(stop => stop.occurrenceId).filter(Boolean));
+  const seen = new Set();
+  for (const stop of s.stops || []) {
+    if (!stop.occurrenceId || seen.has(stop.occurrenceId)) {
+      do {
+        if (s.nextStopOccurrence >= Number.MAX_SAFE_INTEGER) s.nextStopOccurrence = 0;
+        stop.occurrenceId = `stop-${++s.nextStopOccurrence}`;
+      } while (used.has(stop.occurrenceId));
+      used.add(stop.occurrenceId);
+    }
+    seen.add(stop.occurrenceId);
+  }
+}
+export function stopReference(s, index) {
+  const stop = s.stops?.[index];
+  return stop ? { occurrenceId: stop.occurrenceId, index,
+    stop: JSON.parse(JSON.stringify(stop)) }
+    : { occurrenceId: null, index: index ?? null, stop: null };
+}
+export function reconcileEvidenceStops(s) {
+  const current = new Map((s.stops || []).map((stop, index) => [stop.occurrenceId, index]));
+  const reconcile = (entry, indexKey, referenceKey, stopId) => {
+    if (!entry[referenceKey]) {
+      // Older app versions did not update evidence indices during route edits.
+      // Even a matching provider stop ID cannot prove a repeated occurrence.
+      // Preserve the legacy index as unverified evidence, never invent a ref.
+      entry[referenceKey] = { occurrenceId: null, index: entry[indexKey] ?? null,
+        stop: null, providerStopId: stopId ?? null, association: "unverified-legacy-index" };
+    }
+    const id = entry[referenceKey].occurrenceId;
+    entry[indexKey] = id && current.has(id) ? current.get(id) : null;
+  };
+  for (const event of s.weatherHistory || []) reconcile(event, "stopIndex", "stopRef");
+  for (const evidence of s.etaSnapshots || []) {
+    const currentResult = (evidence.results || []).find(result => result.stopIndex === evidence.currentStop);
+    reconcile(evidence, "currentStop", "currentStopRef", currentResult?.stopId);
+    for (const result of evidence.results || [])
+      reconcile(result, "stopIndex", "stopRef", result.stopId);
+  }
+}
 export function migrateSurvey(s) {
   s.status ??= s.startIndex == null ? "draft" : "in_progress";
   s.initialOnboard ??= "";
@@ -32,6 +77,8 @@ export function migrateSurvey(s) {
   s.etaSnapshots ??= [];
   s.calendarContext ??= null;
   s.vehicleMatch ??= null;
+  ensureStopOccurrences(s);
+  reconcileEvidenceStops(s);
   s.rows.forEach((r) => {
     r.skipped ??= {};
     r.observedAt ??= null;
@@ -181,16 +228,21 @@ export function completeSurvey(s, index, now = new Date().toISOString()) {
   s.updatedAt = now;
   return calculateOnboard(s);
 }
-export function reopenSurvey(s, now = new Date().toISOString()) {
-  if (s.status !== "completed") return;
+function preserveFinalObservation(s) {
   const end = Number.isInteger(s.endIndex) ? s.endIndex : s.activeIndex;
   const row = s.rows[end];
+  if (!row) throw Error("Invalid end stop");
   // A known final count belongs at the old end, not at a future terminus.
   // Preserve both observations by requiring an existing conflict to be corrected.
   if (s.finalOnboard !== "" && row.onboard !== "" &&
       Number(s.finalOnboard) !== Number(row.onboard))
     throw Error("Conflicting final count");
   if (s.finalOnboard !== "") row.onboard = s.finalOnboard;
+  return end;
+}
+export function reopenSurvey(s, now = new Date().toISOString()) {
+  if (s.status !== "completed") return;
+  const end = preserveFinalObservation(s);
   s.finalOnboard = "";
   s.endIndex = null;
   s.completedAt = null;
@@ -205,10 +257,16 @@ function shiftIndexes(s, index) {
 export function insertStop(s, index, stop) {
   if (!Number.isInteger(index) || index < 0 || index > s.stops.length)
     throw Error("Invalid insertion position");
+  ensureStopOccurrences(s);
+  reconcileEvidenceStops(s);
   shiftIndexes(s, index);
-  s.stops.splice(index, 0, { ...stop, custom: true });
+  const added = { ...stop, custom: true };
+  delete added.occurrenceId;
+  s.stops.splice(index, 0, added);
   s.rows.splice(index, 0, emptyRow());
   s.stops.forEach((x, i) => (x.sequence = i + 1));
+  ensureStopOccurrences(s);
+  reconcileEvidenceStops(s);
   if (s.startIndex !== 0) s.startsAtOrigin = false;
   s.routeEdits ??= [];
   s.routeEdits.push({
@@ -226,17 +284,21 @@ export function overlapCount(previous, next) {
 export function appendSection(s, route, stops, skip = 0) {
   if (!Number.isInteger(skip) || skip < 0 || skip >= stops.length)
     throw Error("Invalid overlap");
-  const added = stops.slice(skip).map((x) => ({ ...x, name: { ...x.name } }));
-  if (
-    s.status === "completed" &&
-    s.finalOnboard !== "" &&
-    Number.isInteger(s.endIndex) &&
-    s.rows[s.endIndex].onboard === ""
-  )
-    s.rows[s.endIndex].onboard = s.finalOnboard;
+  const added = stops.slice(skip).map((x) => {
+    const stop = { ...x, name: { ...x.name } };
+    delete stop.occurrenceId;
+    return stop;
+  });
+  // Validate before mutating stops, rows or lifecycle boundaries. A rejected
+  // join must preserve both conflicting observations for correction.
+  if (s.status === "completed") preserveFinalObservation(s);
+  ensureStopOccurrences(s);
+  reconcileEvidenceStops(s);
   s.stops.push(...added);
   s.rows.push(...added.map(emptyRow));
   s.stops.forEach((x, i) => (x.sequence = i + 1));
+  ensureStopOccurrences(s);
+  reconcileEvidenceStops(s);
   s.routeEdits ??= [];
   s.routeEdits.push({
     type: "append",

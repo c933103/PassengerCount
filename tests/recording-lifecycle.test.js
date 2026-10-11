@@ -41,7 +41,7 @@ function fixture({ failStop = false, failSave = false } = {}) {
     hkClock, hkTimestamp, tripMetrics, makeGpx, data: null,
     nativeExportPending: false, chartExportPending: false,
     persist: () => { calls.push("save"); if (failSave) return false; durable = JSON.stringify(state); return true; },
-    error: value => { error = value; }, t: value => value, renderCount() {},
+    error: value => { error = value; }, t: value => value, renderCount() {}, resetHistory() {},
     showScreen(screen) { state.screen = screen; durable = JSON.stringify(state); },
     exportFilename: () => "fixture.gpx", $: () => ({}), exportResult: value => { error = value; },
   });
