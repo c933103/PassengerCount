@@ -41,3 +41,7 @@ All 105 baseline files were materialized and checked against the exact main tree
 - Independent code review of current source and event ordering.
 - Deliberate integration with PR #10's overlapping history changes and repeat checks on the combined result.
 - Existing installed-device validation remains separate; host tests do not replace it.
+
+## First hosted run
+
+[Run 38107392950](https://github.com/c933103/PassengerCount/actions/runs/38107392950) passed Node/native checks and reached the new weather UI regression after the GPS/keypad assertions. It failed because the test attempted to select the weather control while its Details panel was collapsed. The follow-up changes only the browser setup to open and close that panel through its summary; no application code changed. Hosted browser/APK acceptance remains pending the new run.

@@ -419,6 +419,7 @@ const data = {
   assert.equal(current().rows[laterHistoryStop].boarding, "", "Undo resets the stale keypad target");
   await page.locator("#undo").click();
   assert.equal(await page.locator("#boarding").inputValue(), "3");
+  await page.locator("#fieldContext summary").click();
   const previousWeather = await page.locator("#weatherCount").inputValue();
   await page.locator("#weatherCount").selectOption("🌧️");
   await page.locator("#undo").click();
@@ -430,6 +431,7 @@ const data = {
   await flush();
   assert.equal(current().weatherHistory.filter(event => event.kind === "change").at(-1).undone, undefined);
   await page.locator("#undo").click();
+  await page.locator("#fieldContext summary").click();
   await page.keyboard.type("e.-+abc");
   assert.equal(await page.locator("#boarding").inputValue(), "3");
   await page.locator("#boarding").evaluate((e) => {
