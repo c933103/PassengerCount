@@ -134,6 +134,9 @@ phase bootstrap
 launch_home
 phase basics attached
 phase recover
+phase receipts-prepare
+phase receipts-recover
+phase receipts-final
 launch_home
 background_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"

@@ -60,6 +60,9 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             if (phase.equals("bootstrap")) bootstrap();
             else if (phase.equals("basics")) basics();
             else if (phase.equals("recover")) recover();
+            else if (phase.equals("receipts-prepare")) receiptsPrepare();
+            else if (phase.equals("receipts-recover")) receiptsRecover();
+            else if (phase.equals("receipts-final")) receiptsFinal();
             else if (phase.equals("prepare-valid")) prepareCrash(false);
             else if (phase.equals("verify-valid")) verifyValidRestart();
             else if (phase.equals("prepare-deleted")) prepareCrash(true);
@@ -109,6 +112,7 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
                 + "const {deleteRecords}=await import(blob(" + JSONObject.quote(asset("record-deletion.js")) + "));"
                 + "const store=await import(blob(" + JSONObject.quote(asset("storage.js")) + "));"
                 + "window.fixtureDelete=ids=>{const s=store.load();try{deleteRecords(s,ids,PassengerCountAndroid,store.save);return {ok:true,state:store.load()};}catch(e){return {ok:false,error:e.message,state:store.load()};}};"
+                + "window.fixtureLoad=()=>store.load();window.fixtureSave=s=>{store.save(s);return store.load();};"
                 + "await store.cachePut({data:{source:{id:'hk-td-gtfs-v1',retrievedAt:new Date().toISOString(),publishedAt:new Date().toISOString()},routeList:{},stopList:{}},at:Date.now()});"
                 + "window.fixtureReady=true;";
             web.loadDataWithBaseURL("https://appassets.androidplatform.net/fixture.html",
@@ -214,6 +218,87 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
         check(bridge.deleteTrack(unlinked), "native phase finishes before simulated final-save interruption");
         check(delete().getBoolean("ok"), "already-unlinked native cleanup is retryable from persisted pending state");
         evidence("recovered",a,b); saveState(state());
+    }
+
+    // Installed APK storage and coordinator, not a host-memory mock. Simulated receipt
+    // values are local fixtures: these phases NEVER contact or modify a backend.
+    private void receiptsPrepare() throws Exception {
+        String keep=PREFIX+"receipt-keep", remove=PREFIX+"receipt-remove";
+        seed(keep); seed(remove);
+        JSONObject s=state(keep,remove);
+        s.getJSONArray("surveys").getJSONObject(0).put("upload",
+            new JSONObject().put("id",901).put("done",true)
+                .put("uncertain",false).put("payloadKey","fixture-payload-original"));
+        s.getJSONArray("surveys").getJSONObject(1).put("upload",
+            new JSONObject().put("id",902).put("done",false)
+                .put("uncertain",true).put("payloadKey","fixture-payload-unconfirmed"));
+        saveState(s);
+        // Production storage.js save/load, through real @JavascriptInterface disk commits.
+        String edit="(()=>{const s=window.fixtureLoad();const x=s.surveys.find(v=>v.id==="
+            +JSONObject.quote(keep)
+            +");x.notes='user-edit-after-receipt';window.fixtureSave(s);return true;})()";
+        check("true".equals(js(edit)), "packaged storage.js edit durably acknowledged");
+        JSONObject persisted=new JSONObject(bridge.get(KEY));
+        check("user-edit-after-receipt".equals(persisted.getJSONArray("surveys").getJSONObject(0).getString("notes")),
+            "editable survey field committed to device storage");
+        check(persisted.getJSONArray("surveys").getJSONObject(0).getJSONObject("upload").getBoolean("done"),
+            "completed immutable receipt retained during edit");
+        check(persisted.getJSONArray("surveys").getJSONObject(1).getJSONObject("upload").getBoolean("uncertain"),
+            "uncertain receipt retained during edit");
+        check(fixtures().edit().putInt("receiptsPreparePid",Process.myPid())
+            .putString("receiptsKeepHash",hash(journal(keep))).commit(), "receipt process/hash fixture committed");
+        evidence("receipts-prepared",keep,remove);
+    }
+    private void receiptsRecover() throws Exception {
+        String keep=PREFIX+"receipt-keep", remove=PREFIX+"receipt-remove";
+        check(fixtures().getInt("receiptsPreparePid",0)!=Process.myPid(),
+            "receipts recovered in an independent Android process");
+        JSONObject persisted=new JSONObject(bridge.get(KEY));
+        check(new JSONObject(new JSONArray("["+js("JSON.stringify(window.fixtureLoad())")+"]").getString(0))
+            .similar(persisted), "packaged storage.js reads exactly the recovered native workspace");
+        JSONObject retained=persisted.getJSONArray("surveys").getJSONObject(0);
+        JSONObject receipt=retained.getJSONObject("upload");
+        check("user-edit-after-receipt".equals(retained.getString("notes")),
+            "edited field survives process restart");
+        check(receipt.getInt("id")==901 && receipt.getBoolean("done")
+            && !receipt.getBoolean("uncertain")
+            && "fixture-payload-original".equals(receipt.getString("payloadKey")),
+            "completed receipt identity and original payload binding survive cold restart");
+        JSONObject unknown=persisted.getJSONArray("surveys").getJSONObject(1).getJSONObject("upload");
+        check(unknown.getInt("id")==902 && !unknown.getBoolean("done")
+            && unknown.getBoolean("uncertain"),
+            "unconfirmed upload remains uncertain after cold restart");
+        check(delete(remove).getBoolean("ok"), "production JS/native coordinator deletes selected receipted record");
+        check(!journal(remove).exists(), "selected journal durably unlinked");
+        persisted=new JSONObject(bridge.get(KEY));
+        check(persisted.getJSONArray("surveys").length()==1, "deleted survey removed from saved workspace");
+        check(persisted.getJSONArray("surveys").getJSONObject(0).getJSONObject("upload").getInt("id")==901,
+            "unrelated completed upload receipt retained after deletion");
+        check(hash(journal(keep)).equals(fixtures().getString("receiptsKeepHash","")),
+            "unrelated journal bytes preserved through receipt-aware deletion");
+        check(fixtures().edit().putInt("receiptsRecoverPid",Process.myPid()).commit(),
+            "post-deletion process fixture committed");
+        evidence("receipts-deleted",keep,remove);
+    }
+    private void receiptsFinal() throws Exception {
+        String keep=PREFIX+"receipt-keep", remove=PREFIX+"receipt-remove";
+        check(fixtures().getInt("receiptsRecoverPid",0)!=Process.myPid(),
+            "post-deletion state checked in another independent Android process");
+        JSONObject s=new JSONObject(bridge.get(KEY));
+        check(s.getJSONArray("surveys").length()==1
+            && keep.equals(s.getJSONArray("surveys").getJSONObject(0).getString("id")),
+            "deleted survey absent after cold process restart");
+        JSONObject receipt=s.getJSONArray("surveys").getJSONObject(0).getJSONObject("upload");
+        check(receipt.getInt("id")==901 && receipt.getBoolean("done")
+            && "fixture-payload-original".equals(receipt.getString("payloadKey")),
+            "immutable upload receipt persists after edit, deletion, and two process restarts");
+        check(!journal(remove).exists() && bridge.getTrack(remove).equals("[]"),
+            "native journal deletion durable and no replay after second restart");
+        check(hash(journal(keep)).equals(fixtures().getString("receiptsKeepHash","")),
+            "untouched retained journal survives deletion and two process restarts");
+        check(s.getJSONArray("deletingIds").length()==0, "no pending deletion after restart");
+        evidence("receipts-durable",keep,remove);
+        saveState(state());
     }
     private void prepareCrash(boolean deleted) throws Exception {
         String id=PREFIX+(deleted?"crash-deleted-A":"crash-valid-B"); seed(id); start(id);
