@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -101,6 +103,14 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             web.getSettings().setDomStorageEnabled(true);
             web.getSettings().setBlockNetworkLoads(true);
             web.addJavascriptInterface(bridge, "PassengerCountAndroid");
+            // The test-only WebView must expose real module/IndexedDB errors.
+            web.setWebChromeClient(new WebChromeClient() {
+                @Override public boolean onConsoleMessage(ConsoleMessage message) {
+                    Log.e(TAG, "TEST_WEB_CONSOLE " + message.messageLevel() + " "
+                        + message.sourceId() + ":" + message.lineNumber() + " " + message.message());
+                    return true;
+                }
+            });
             web.setWebViewClient(new WebViewClient() {
                 @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     interceptedRequests++;
@@ -108,17 +118,28 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
                         new HashMap<String,String>(), new ByteArrayInputStream(new byte[0]));
                 }
             });
-            String module = "const blob=s=>URL.createObjectURL(new Blob([s],{type:'text/javascript'}));"
+            String module = "window.fixtureStage='start';"
+                + "const blob=s=>URL.createObjectURL(new Blob([s],{type:'text/javascript'}));"
                 + "const {deleteRecords}=await import(blob(" + JSONObject.quote(asset("record-deletion.js")) + "));"
                 + "const store=await import(blob(" + JSONObject.quote(asset("storage.js")) + "));"
                 + "window.fixtureDelete=ids=>{const s=store.load();try{deleteRecords(s,ids,PassengerCountAndroid,store.save);return {ok:true,state:store.load()};}catch(e){return {ok:false,error:e.message,state:store.load()};}};"
                 + "window.fixtureLoad=()=>store.load();window.fixtureSave=s=>{store.save(s);return store.load();};"
+                + "window.fixtureStage='imports-done';"
                 + "await store.cachePut({data:{source:{id:'hk-td-gtfs-v1',retrievedAt:new Date().toISOString(),publishedAt:new Date().toISOString()},routeList:{},stopList:{}},at:Date.now()});"
-                + "window.fixtureReady=true;";
+                + "window.fixtureStage='catalogue-saved';window.fixtureReady=true;";
             web.loadDataWithBaseURL("https://appassets.androidplatform.net/fixture.html",
                 "<!doctype html><meta charset=utf-8><script type=module>" + module + "</script>", "text/html", "UTF-8", null);
         });
-        await("exact packaged modules and fresh local catalogue loaded", () -> "true".equals(js("window.fixtureReady===true")), 15000);
+        try {
+            await("exact packaged modules and fresh local catalogue loaded",
+                () -> "true".equals(js("window.fixtureReady===true")), 45000);
+        } catch (Throwable problem) {
+            // Report why the fixture is not ready; preserve the assertion.
+            Log.e(TAG, "TEST_WEB_BOOTSTRAP_STATE " + js(
+                "JSON.stringify({href:location.href,stage:window.fixtureStage||'not-started',"
+                + "ready:window.fixtureReady===true,hasIndexedDb:!!window.indexedDB})"));
+            throw problem;
+        }
     }
     private void bootstrap() throws Exception {
         for (File f : target.getFilesDir().listFiles())

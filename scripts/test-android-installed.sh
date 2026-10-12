@@ -41,7 +41,32 @@ sha256sum "$ROOT/android/build/PassengerCount.apk" \
 "$SDKMANAGER" --list_installed > "$OUT/sdk-installed.txt"
 # Do not chmod /dev/kvm, change udev rules, or silently fall back to costly emulation.
 [[ -r /dev/kvm && -w /dev/kvm ]] || { echo 'KVM is unavailable to this runner; installed validation is blocked' | tee "$OUT/blocker.txt"; exit 2; }
-"$SDKMANAGER" 'emulator' "$IMAGE" > "$OUT/sdk-image-install.txt" 2>&1
+# An SDK ZIP can be truncated on a transient CDN/proxy fetch. Retry only the
+# fixed API35 image in this disposable hosted job; never accept a partial image,
+# alter its API level, or fall back to software emulation.
+: > "$OUT/sdk-image-install.txt"
+image_ready=false
+for attempt in 1 2 3; do
+  printf 'SDK_IMAGE_ATTEMPT %s of 3\n' "$attempt" | tee -a "$OUT/sdk-image-install.txt"
+  if "$SDKMANAGER" 'emulator' "$IMAGE" > "$OUT/sdk-image-install-$attempt.txt" 2>&1; then
+    cat "$OUT/sdk-image-install-$attempt.txt" >> "$OUT/sdk-image-install.txt"
+    if [[ -s "$ANDROID_HOME/system-images/android-35/google_apis/x86_64/system.img" ]]; then
+      image_ready=true
+      break
+    fi
+    echo 'SDK_IMAGE_INCOMPLETE: sdkmanager returned success without an API35 system.img' | tee -a "$OUT/sdk-image-install.txt"
+  else
+    code=$?
+    cat "$OUT/sdk-image-install-$attempt.txt" >> "$OUT/sdk-image-install.txt"
+    printf 'SDK_IMAGE_FAILED attempt=%s exit=%s\n' "$attempt" "$code" | tee -a "$OUT/sdk-image-install.txt"
+  fi
+  if (( attempt < 3 )); then sleep $((attempt * 5)); fi
+done
+if ! $image_ready; then
+  echo 'SDK_IMAGE_UNAVAILABLE: required API35 image failed three bounded attempts' | tee "$OUT/blocker.txt"
+  tail -c 1500 "$OUT/sdk-image-install.txt" >&2
+  exit 2
+fi
 if ! "$EMULATOR" -version > "$OUT/emulator-version.txt" 2>&1; then
   echo 'EMULATOR_LOADER_FAILED: inspect emulator-version.txt for missing shared libraries or runtime issues' | tee "$OUT/blocker.txt"
   cat "$OUT/emulator-version.txt" >&2
@@ -84,8 +109,12 @@ phase() {
   local name=$1 mode=${2:-cold}
   local opts=()
   [[ "$mode" != attached ]] || opts+=(--no-restart)
-  timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$RUNNER" \
-    > "$OUT/$name.txt" 2>&1
+  if ! timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$RUNNER" \
+    > "$OUT/$name.txt" 2>&1; then
+    echo "INSTALLED_PHASE_COMMAND_FAILED: $name" >&2
+    cat "$OUT/$name.txt" >&2
+    exit 1
+  fi
   cat "$OUT/$name.txt"
   grep -q "PHASE_PASS $name " "$OUT/$name.txt"
   grep -q 'INSTRUMENTATION_CODE: -1' "$OUT/$name.txt"
