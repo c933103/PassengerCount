@@ -46,7 +46,7 @@ jobs:
           set -euo pipefail
           mkdir -p android/build/lifecycle-evidence
           {
-            printf 'Runner OS=%s arch=%s environment=%s\\n' "${RUNNER_OS:-unset}" "${RUNNER_ARCH:-unset}" "${RUNNER_ENVIRONMENT:-unset}"
+            printf 'Runner OS=%s arch=%s environment=%s\n' "${RUNNER_OS:-unset}" "${RUNNER_ARCH:-unset}" "${RUNNER_ENVIRONMENT:-unset}"
             id
             if [[ "${CI:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "${RUNNER_OS:-}" != Linux || "${RUNNER_ARCH:-}" != X64 ]]; then
               echo 'KVM_RUNNER_UNSUPPORTED: expected disposable GitHub-hosted Linux x64 VM'

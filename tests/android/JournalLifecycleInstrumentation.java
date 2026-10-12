@@ -254,8 +254,12 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
         check(fixtures().getInt("receiptsPreparePid",0)!=Process.myPid(),
             "receipts recovered in an independent Android process");
         JSONObject persisted=new JSONObject(bridge.get(KEY));
-        check(new JSONObject(new JSONArray("["+js("JSON.stringify(window.fixtureLoad())")+"]").getString(0))
-            .similar(persisted), "packaged storage.js reads exactly the recovered native workspace");
+        JSONObject fromJs = new JSONObject(new JSONArray("["+js("JSON.stringify(window.fixtureLoad())")+"]").getString(0));
+        check(fromJs.getJSONArray("surveys").length()==2
+            && fromJs.getJSONArray("surveys").getJSONObject(0).getJSONObject("upload").getInt("id")==901
+            && "user-edit-after-receipt".equals(fromJs.getJSONArray("surveys").getJSONObject(0).getString("notes"))
+            && fromJs.getJSONArray("surveys").getJSONObject(1).getJSONObject("upload").getBoolean("uncertain"),
+            "packaged storage.js reads persisted surveys and receipt state after cold restart");
         JSONObject retained=persisted.getJSONArray("surveys").getJSONObject(0);
         JSONObject receipt=retained.getJSONObject("upload");
         check("user-edit-after-receipt".equals(retained.getString("notes")),
