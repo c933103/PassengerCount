@@ -42,8 +42,16 @@ sha256sum "$ROOT/android/build/PassengerCount.apk" \
 # Do not chmod /dev/kvm, change udev rules, or silently fall back to costly emulation.
 [[ -r /dev/kvm && -w /dev/kvm ]] || { echo 'KVM is unavailable to this runner; installed validation is blocked' | tee "$OUT/blocker.txt"; exit 2; }
 "$SDKMANAGER" 'emulator' "$IMAGE" > "$OUT/sdk-image-install.txt" 2>&1
-"$EMULATOR" -version > "$OUT/emulator-version.txt" 2>&1
-"$EMULATOR" -accel-check > "$OUT/acceleration.txt" 2>&1
+if ! "$EMULATOR" -version > "$OUT/emulator-version.txt" 2>&1; then
+  echo 'EMULATOR_LOADER_FAILED: inspect emulator-version.txt for missing shared libraries or runtime issues' | tee "$OUT/blocker.txt"
+  cat "$OUT/emulator-version.txt" >&2
+  exit 2
+fi
+if ! "$EMULATOR" -accel-check > "$OUT/acceleration.txt" 2>&1; then
+  echo 'EMULATOR_ACCEL_FAILED: required hardware acceleration unavailable' | tee "$OUT/blocker.txt"
+  cat "$OUT/acceleration.txt" >&2
+  exit 2
+fi
 "$ADB" start-server
 if "$ADB" devices | grep -q "^$SERIAL[[:space:]]"; then echo 'Selected emulator serial already exists; refusing'; exit 2; fi
 printf 'no\n' | "$AVDMANAGER" create avd -n "$NAME" -k "$IMAGE" -p "$TEMP/device" > "$OUT/avd-create.txt" 2>&1

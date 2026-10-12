@@ -79,6 +79,25 @@ jobs:
             fi
             echo 'KVM_ACCESS_READY: device is readable/writable; emulator -accel-check still required'
           } 2>&1 | tee android/build/lifecycle-evidence/kvm-access.txt
+      # Headless Android emulator's QEMU loader still needs libpulse.so.0
+      # even when started with -no-audio. Use Ubuntu's signed distro package;
+      # do not downgrade the emulator or weaken KVM acceleration checks.
+      - name: Install headless Android emulator runtime dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            if ! dpkg-query -W -f='\${Status}' libpulse0 2>/dev/null | grep -Fxq 'install ok installed'; then
+              sudo -n apt-get update -qq
+              sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends libpulse0
+            fi
+            dpkg-query -W -f='\${Package} \${Version} \${Status}\\n' libpulse0
+            if ! ldconfig -p | grep -F 'libpulse.so.0 '; then
+              echo 'EMULATOR_DEPENDENCY_MISSING: libpulse.so.0 is not resolvable'
+              exit 2
+            fi
+            echo 'EMULATOR_DEPENDENCY_READY: libpulse.so.0 resolves; emulator -version and -accel-check remain required'
+          } 2>&1 | tee android/build/lifecycle-evidence/emulator-dependency.txt
       - name: Validate installed journal lifecycle on API35
         timeout-minutes: 12
         run: bash scripts/test-android-installed.sh
