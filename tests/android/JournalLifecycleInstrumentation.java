@@ -339,7 +339,7 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             "unrelated journal bytes preserved through receipt-aware deletion");
         check(fixtures().edit().putInt("receiptsRecoverPid",Process.myPid()).commit(),
             "post-deletion process fixture committed");
-        evidence("receipts-deleted",keep,remove);
+        evidence("receipts-deleted",remove,keep);
     }
     private void receiptsFinal() throws Exception {
         String keep=PREFIX+"receipt-keep", remove=PREFIX+"receipt-remove";
@@ -358,7 +358,7 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
         check(hash(journal(keep)).equals(fixtures().getString("receiptsKeepHash","")),
             "untouched retained journal survives deletion and two process restarts");
         check(s.getJSONArray("deletingIds").length()==0, "no pending deletion after restart");
-        evidence("receipts-durable",keep,remove);
+        evidence("receipts-durable",remove,keep);
         saveState(state());
     }
     private void prepareCrash(boolean deleted) throws Exception {
