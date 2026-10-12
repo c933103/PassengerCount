@@ -87,11 +87,11 @@ jobs:
         run: |
           set -euo pipefail
           {
-            if ! dpkg-query -W -f='\${Status}' libpulse0 2>/dev/null | grep -Fxq 'install ok installed'; then
+            if ! dpkg-query -W -f='${Status}' libpulse0 2>/dev/null | grep -Fxq 'install ok installed'; then
               sudo -n apt-get update -qq
               sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends libpulse0
             fi
-            dpkg-query -W -f='\${Package} \${Version} \${Status}\\n' libpulse0
+            dpkg-query -W -f='${Package} ${Version} ${Status}\\n' libpulse0
             if ! ldconfig -p | grep -F 'libpulse.so.0 '; then
               echo 'EMULATOR_DEPENDENCY_MISSING: libpulse.so.0 is not resolvable'
               exit 2
