@@ -111,13 +111,6 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
                     return true;
                 }
             });
-            web.setWebViewClient(new WebViewClient() {
-                @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                    interceptedRequests++;
-                    return new WebResourceResponse("text/plain", "UTF-8", 403, "Test network blocked",
-                        new HashMap<String,String>(), new ByteArrayInputStream(new byte[0]));
-                }
-            });
             String module = "window.fixtureStage='start';"
                 + "const blob=s=>URL.createObjectURL(new Blob([s],{type:'text/javascript'}));"
                 + "const {deleteRecords}=await import(blob(" + JSONObject.quote(asset("record-deletion.js")) + "));"
@@ -127,8 +120,37 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
                 + "window.fixtureStage='imports-done';"
                 + "await store.cachePut({data:{source:{id:'hk-td-gtfs-v1',retrievedAt:new Date().toISOString(),publishedAt:new Date().toISOString()},routeList:{},stopList:{}},at:Date.now()});"
                 + "window.fixtureStage='catalogue-saved';window.fixtureReady=true;";
-            web.loadDataWithBaseURL("https://appassets.androidplatform.net/fixture.html",
-                "<!doctype html><meta charset=utf-8><script type=module>" + module + "</script>", "text/html", "UTF-8", null);
+            // The former loadDataWithBaseURL + blanket interception rejected the
+            // synthetic main document, navigating Chrome to chrome-error://.
+            // Serve only this exact fixture URL from immutable in-memory bytes,
+            // on the app's real HTTPS-like asset origin, with network loads blocked.
+            final String fixtureUrl = "https://appassets.androidplatform.net/fixture.html";
+            final byte[] fixtureBytes = ("<!doctype html><meta charset=utf-8><script type=module>"
+                + module + "</script>").getBytes(StandardCharsets.UTF_8);
+            web.setWebViewClient(new WebViewClient() {
+                @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                    if (request.isForMainFrame() && "GET".equals(request.getMethod())
+                        && fixtureUrl.equals(request.getUrl().toString())) {
+                        Log.i(TAG, "TEST_LOCAL_FIXTURE_SERVED " + fixtureUrl);
+                        return new WebResourceResponse("text/html", "UTF-8", 200, "OK",
+                            Collections.singletonMap("Cache-Control", "no-store"),
+                            new ByteArrayInputStream(fixtureBytes));
+                    }
+                    interceptedRequests++;
+                    Log.e(TAG, "TEST_BLOCKED_RESOURCE " + request.getUrl());
+                    return new WebResourceResponse("text/plain", "UTF-8", 403, "Test network blocked",
+                        new HashMap<String,String>(), new ByteArrayInputStream(new byte[0]));
+                }
+                @Override public void onReceivedError(WebView view, WebResourceRequest request,
+                    android.webkit.WebResourceError error) {
+                    Log.e(TAG, "TEST_WEB_RESOURCE_ERROR " + request.getUrl()
+                        + " code=" + error.getErrorCode() + " description=" + error.getDescription());
+                }
+                @Override public void onPageFinished(WebView view, String url) {
+                    Log.i(TAG, "TEST_PAGE_FINISHED " + url);
+                }
+            });
+            web.loadUrl(fixtureUrl);
         });
         try {
             await("exact packaged modules and fresh local catalogue loaded",
