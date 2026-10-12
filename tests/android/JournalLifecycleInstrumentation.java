@@ -125,8 +125,12 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             // Serve only this exact fixture URL from immutable in-memory bytes,
             // on the app's real HTTPS-like asset origin, with network loads blocked.
             final String fixtureUrl = "https://appassets.androidplatform.net/fixture.html";
-            final byte[] fixtureBytes = ("<!doctype html><meta charset=utf-8><script type=module>"
-                + module + "</script>").getBytes(StandardCharsets.UTF_8);
+            final byte[] fixtureBytes = ("<!doctype html><meta charset=utf-8>"
+                + "<link rel='icon' type='image/png' href='/favicon.ico'>"
+                + "<script type=module>" + module + "</script>").getBytes(StandardCharsets.UTF_8);
+            final byte[] faviconBytes = android.util.Base64.decode(
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==",
+                android.util.Base64.DEFAULT);
             web.setWebViewClient(new WebViewClient() {
                 @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     if (request.isForMainFrame() && "GET".equals(request.getMethod())
@@ -135,6 +139,16 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
                         return new WebResourceResponse("text/html", "UTF-8", 200, "OK",
                             Collections.singletonMap("Cache-Control", "no-store"),
                             new ByteArrayInputStream(fixtureBytes));
+                    }
+                    // Android WebView requests the page icon automatically.
+                    // Serve only this known, tiny icon in-memory. This is not
+                    // an external network request or a general request bypass.
+                    if (!request.isForMainFrame() && "GET".equals(request.getMethod())
+                        && "https://appassets.androidplatform.net/favicon.ico".equals(request.getUrl().toString())) {
+                        Log.i(TAG, "TEST_LOCAL_FAVICON_SERVED");
+                        return new WebResourceResponse("image/png", null, 200, "OK",
+                            Collections.singletonMap("Cache-Control", "no-store"),
+                            new ByteArrayInputStream(faviconBytes));
                     }
                     interceptedRequests++;
                     Log.e(TAG, "TEST_BLOCKED_RESOURCE " + request.getUrl());
