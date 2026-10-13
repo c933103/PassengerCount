@@ -14,7 +14,7 @@ const observer=source.slice(start,end+2).replace(/\bSECONDS\b/g,'fixtureSeconds'
 const detachedStart=source.indexOf('detached() {'), detachedEnd=source.indexOf('\ncrash_observe() {',detachedStart);
 assert.ok(detachedStart>=0&&detachedEnd>detachedStart);
 const detachedCheck=source.slice(detachedStart,detachedEnd);
-function detachedFixture({output,stderr='',code=0}) {
+function detachedFixture({output,stderr='',code=0,call='detached valid 111'}) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'passenger-detached-'));
   try {
     fs.writeFileSync(path.join(dir,'dump'),output);
@@ -28,7 +28,7 @@ adb(){
   return ${code}
 }
 ${detachedCheck}
-detached valid 111
+${call}
 `;
     const result=spawnSync('bash',['-c',script],{encoding:'utf8',timeout:5000});
     return {status:result.status,output:result.stdout+result.stderr,command:fs.readFileSync(path.join(dir,'command'),'utf8')};
@@ -73,6 +73,31 @@ for (const error of [
 ]) test('detachment rejects stderr despite complete stdout and zero exit: '+error,()=>{
   const r=detachedFixture({output:detachedDump,stderr:error+'\n'});
   assert.notEqual(r.status,0,r.output);assert.doesNotMatch(r.output,/DETACHED_STATE_PASS/);
+});
+function processStateDump(state,pid=111) {
+  return processHeader+'\n  *APP* UID 100 ProcessRecord{abc '+pid+':app.passengercount/u0a100}\n'
+    +'    curProcState='+state+' mRepProcState='+state+' setProcState='+state+'\n'+pidMapping+processEnd;
+}
+for (const [label,expected,actual,pid,passes] of [
+  ['actual foreground Activity before user start',2,2,111,true],
+  ['actual background foreground-service before kill',4,4,111,true],
+  ['background start cannot count as foreground user start',2,4,111,false],
+  ['foreground Activity cannot count as background restart context',4,2,111,false],
+  ['other process state cannot satisfy target foreground',2,2,222,false],
+]) test(label,()=>{
+  const r=detachedFixture({output:processStateDump(actual,pid),call:'activity_state control '+expected+' 111'});
+  assert.equal(r.status===0,passes,r.output);
+  if(passes) assert.match(r.output,/ACTIVITY_STATE_PASS control/);
+});
+test('both installed crash scenarios prove foreground start then background before the unchanged restart gate',()=>{
+  for(const kind of ['valid','deleted']) {
+    const begin=source.indexOf('activity_state before-'+kind+' 2 "$oldpid"');
+    const prepare=source.indexOf('phase prepare-'+kind+' attached',begin);
+    const background=source.indexOf('\nbackground_home\n',prepare);
+    const state=source.indexOf('activity_state background-'+kind+' 4 "$oldpid"',background);
+    const restart=source.indexOf('crash_observe '+kind+' "$oldpid"',state);
+    assert.ok(begin>0&&prepare>begin&&background>prepare&&state>background&&restart>state);
+  }
 });
 function fixture({kind='valid',marker=true,startAfter=true,rightPid=true,delayed=false}) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'passenger-observer-'));

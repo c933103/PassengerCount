@@ -127,7 +127,8 @@ launch_home() {
 }
 background_home() {
   # Prevent Activity relaunch from masquerading as a service-triggered restart.
-  # Let the unchanged Home page finish its visibility persistence BEFORE fixtures change.
+  # The service was started while the real Activity was foreground; now move
+  # it behind Home before the scheduled detached SIGKILL, as in ordinary use.
   adb shell input keyevent KEYCODE_HOME
   sleep 1
 }
@@ -153,6 +154,24 @@ detached() {
     echo 'Instrumentation still active; cannot claim an ordinary sticky restart'; exit 1
   fi
   printf 'DETACHED_STATE_PASS %s pid=%s\n' "$kind" "$oldpid"
+}
+activity_state() {
+  local kind=$1 expected=$2 oldpid=$3 proof="$OUT/instrumentation-detached-activity-$1.txt"
+  # On the bounded API35 image, TOP=2 and FOREGROUND_SERVICE=4. Use the
+  # actual process record, not instrumentation's OOM importance or old logs.
+  detached "activity-$kind" "$oldpid"
+  if ! awk -v pid="$oldpid" -v package="$PACKAGE" -v expected="$expected" '
+    /^  \*APP\* UID / { own=index($0," " pid ":" package "/")>0 }
+    own && /^[[:space:]]+curProcState=/ {
+      for(i=1;i<=NF;i++) if($i ~ /^curProcState=[0-9]+$/) {
+        split($i,state,"="); count++; valid=(state[2] == expected)
+      }
+    }
+    END { exit !(count == 1 && valid) }
+  ' "$proof"; then
+    echo "ACTIVITY_STATE_UNVERIFIED: $kind requires API35 process state $expected"; exit 1
+  fi
+  printf 'ACTIVITY_STATE_PASS %s state=%s pid=%s\n' "$kind" "$expected" "$oldpid"
 }
 crash_observe() {
   local kind=$1 oldpid=$2 deadline=$((SECONDS+75)) newpid= completed=false
@@ -192,13 +211,19 @@ phase receipts-prepare
 phase receipts-recover
 phase receipts-final
 launch_home
-background_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
+activity_state before-valid 2 "$oldpid"
 phase prepare-valid attached
+background_home
+activity_state background-valid 4 "$oldpid"
 crash_observe valid "$oldpid"
 phase verify-valid attached
+launch_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
+activity_state before-deleted 2 "$oldpid"
 phase prepare-deleted attached
+background_home
+activity_state background-deleted 4 "$oldpid"
 crash_observe deleted "$oldpid"
 # The tombstoned service must already be gone; this cold invocation checks durable
 # bytes and retries cleanup, not the automatic restart itself.

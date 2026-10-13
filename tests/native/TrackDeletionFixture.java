@@ -164,12 +164,60 @@ public final class MainActivity extends Context {
                 .putBoolean("deleted:A", true).commit();
             deletedRestart = deletedRestart.restart();
             TrackService service = new TrackService(deletedRestart.directory, deletedRestart.prefs);
+            service.foregroundRequired = explicit;
             TrackService.running = service;
             Intent stale = explicit ? new Intent(TrackService.ACTION_START, "A", "old") : null;
             check(service.onStartCommand(stale, 0, 1) == TrackService.START_NOT_STICKY, "tombstoned restart cannot stay sticky");
-            check(service.stopCalls > 0 && service.foreground == 0 && service.updates == 0, "tombstoned service stops without foreground or location");
-            check(service.recording == null, "tombstoned recording cleared");
+            check(service.stopCalls > 0 && service.updates == 0, "tombstoned service stops without location");
+            check(service.foreground == (explicit ? 1 : 0), "only explicit foreground delivery is acknowledged before stop");
+            check(service.recording == null && !service.foregroundActive, "tombstoned recording and transient foreground state cleared");
+            check(TrackService.isDeleted(deletedRestart, "A"), "foreground acknowledgement preserves durable tombstone");
+            check(TrackService.session(deletedRestart).start("A") == null && records(deletedRestart.directory,"A") == 0,
+                "foreground acknowledgement cannot revive deleted session or journal");
         }
+        MainActivity cancelled = fresh();
+        TrackSession.Request cancelledRequest = TrackService.session(cancelled).start("A");
+        TrackService.session(cancelled).stop("A");
+        TrackService cancelledService = new TrackService(cancelled.directory,cancelled.prefs);
+        TrackService.running = cancelledService; cancelledService.foregroundRequired = true;
+        check(cancelledService.onStartCommand(new Intent(TrackService.ACTION_START,"A",cancelledRequest.token),0,4)
+            == TrackService.START_NOT_STICKY, "cancelled foreground delivery is not sticky");
+        check(cancelledService.foreground == 1 && cancelledService.stopCalls > 0 && cancelledService.updates == 0,
+            "cancelled foreground delivery acknowledges before stop without location callbacks");
+        check(cancelledService.recording == null && !TrackService.session(cancelled).request().valid(),
+            "cancelled foreground acknowledgement cannot recreate a durable session");
+        for (RuntimeException denial : new RuntimeException[]{
+                new SecurityException("permission revoked"), new IllegalStateException("foreground start denied")}) {
+            MainActivity denied = fresh();
+            denied.prefs.edit().putString("pending_id","A").putString("session_token","old")
+                .putBoolean("deleted:A",true).commit();
+            TrackService rejected = new TrackService(denied.directory,denied.prefs);
+            TrackService.running = rejected; rejected.foregroundRequired = true;
+            rejected.foregroundDenial = denial; rejected.listener = new Object();
+            boolean propagated = false;
+            try { rejected.onStartCommand(new Intent(TrackService.ACTION_START,"A","old"),0,5); }
+            catch (RuntimeException e) { propagated = e == denial; }
+            check(propagated, "foreground denial propagates instead of claiming accepted runtime");
+            check(rejected.stopCalls > 0 && rejected.manager.removals > 0 && !rejected.foregroundActive,
+                "foreground denial always stops rejected service and removes listener");
+            check(rejected.recording == null && rejected.updates == 0 && rejected.foreground == 0,
+                "foreground denial cannot record or activate GPS");
+            check(TrackService.isDeleted(denied,"A") && TrackService.session(denied).start("A") == null
+                && records(denied.directory,"A") == 0, "foreground denial preserves tombstone and empty journal");
+        }
+        // This covers data safety for a null sticky restart after permission
+        // revocation. Explicit foreground-delivery timing is an installed-device
+        // limitation of the separate early !hasLocation branch, not modeled here.
+        MainActivity revoked = fresh();
+        revoked.prefs.edit().putString("pending_id","A").putString("session_token","old")
+            .putBoolean("deleted:A",true).commit();
+        TrackService withoutLocation = new TrackService(revoked.directory,revoked.prefs);
+        TrackService.running = withoutLocation; withoutLocation.locationAllowed = false;
+        check(withoutLocation.onStartCommand(null,0,6) == TrackService.START_NOT_STICKY
+            && withoutLocation.stopCalls > 0 && withoutLocation.foreground == 0 && withoutLocation.updates == 0,
+            "permission-revoked null restart stops without GPS or promotion");
+        check(withoutLocation.recording == null && TrackService.session(revoked).start("A") == null
+            && records(revoked.directory,"A") == 0, "permission-revoked restart cannot resurrect tombstone");
         for (String action : new String[]{"restart", "stale-start", "stale-stop", "old-generation"}) {
             MainActivity current = fresh();
             TrackSession.Request before = TrackService.session(current).start("A");
@@ -227,11 +275,19 @@ class TrackService extends Context {
     static final String ACTION_START = "START", ACTION_STOP = "STOP";
     static final int START_STICKY = 1, START_NOT_STICKY = 2;
     int foreground, updates;
-    boolean hasLocation() { return true; }
+    boolean foregroundRequired, foregroundActive, locationAllowed = true;
+    RuntimeException foregroundDenial;
+    boolean hasLocation() { return locationAllowed; }
     Object notification() { return null; }
-    void startForeground(int id, Object notification) { foreground++; }
+    void startForeground(int id, Object notification) {
+        // Android 15 acknowledges the delivery before its runtime allow/type
+        // checks; a denial must still propagate through production cleanup.
+        foregroundRequired = false;
+        if (foregroundDenial != null) throw foregroundDenial;
+        foreground++; foregroundActive = true;
+    }
     void beginUpdates() { updates++; }
-    void stopSelf(int startId) { stopCalls++; }
+    void stopSelf(int startId) { stopSelf(); }
     static TrackSession session;
     TrackService(File directory, SharedPreferences prefs) { super(directory,prefs); }
     static TrackService running;
@@ -239,7 +295,11 @@ class TrackService extends Context {
     Object listener;
     static class Manager { int removals; void removeUpdates(Object listener) { removals++; } }
     Manager manager = new Manager(); int stopCalls;
-    void stopSelf() { stopCalls++; }
+    void stopSelf() {
+        if (foregroundRequired)
+            throw new AssertionError("foreground delivery stopped before acknowledgement");
+        stopCalls++; foregroundActive = false;
+    }
     /* SERVICE_METHODS */
 }
 
@@ -249,3 +309,4 @@ class Intent {
     String getAction() { return action; }
     String getStringExtra(String key) { return key.equals(TrackService.EXTRA_ID) ? id : token; }
 }
+

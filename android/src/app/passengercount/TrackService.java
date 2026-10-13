@@ -124,8 +124,20 @@ public final class TrackService extends Service {
         if (!control.accepts(requested)) requested = control.request();
         if (!control.accepts(requested)) {
             recording = null;
-            finishStop();
-            stopSelf(startId);
+            // An explicit startForegroundService delivery still carries Android's
+            // foreground acknowledgement obligation after its survey is deleted.
+            // Acknowledge that delivery before stopping, without accepting a
+            // session, requesting locations, or reviving the tombstoned journal.
+            // A null sticky restart or an ordinary stop has no such new request.
+            try {
+                if (intent != null && ACTION_START.equals(intent.getAction()))
+                    startForeground(19, notification());
+            } finally {
+                // A denied acknowledgement remains a failure, but must not
+                // leave a rejected service or old location listener running.
+                finishStop();
+                stopSelf(startId);
+            }
             return START_NOT_STICKY;
         }
         recording = requested;
@@ -170,7 +182,8 @@ public final class TrackService extends Service {
         return builder
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setContentTitle("PassengerCount")
-            .setContentText("Recording active survey location")
+            .setContentText(recording == null ? "Finishing survey location recording"
+                : "Recording active survey location")
             .setContentIntent(pending)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
@@ -209,3 +222,4 @@ public final class TrackService extends Service {
 
     @Override public android.os.IBinder onBind(Intent intent) { return null; }
 }
+
