@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,84 @@ jobs:
           SIGNING_KEY_PASSWORD: validation123
           SIGNING_KEY_ALIAS: passengercount
         run: bash android/build.sh
+      - name: Build test-only Android lifecycle instrumentation
+        env:
+          SIGNING_KEYSTORE: ${{ runner.temp }}/passengercount-validation.jks
+          SIGNING_STORE_PASSWORD: validation123
+          SIGNING_KEY_PASSWORD: validation123
+          SIGNING_KEY_ALIAS: passengercount
+        run: bash scripts/build-android-tests.sh
+      # Public GitHub-hosted Ubuntu 24.04 VMs support accelerated Android emulators.
+      # Give only the current ephemeral runner user rw on an existing KVM device;
+      # never chmod 0666, create a fake device, or request software emulation.
+      - name: Diagnose KVM and grant runner-only access
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p android/build/lifecycle-evidence
+          {
+            printf 'Runner OS=%s arch=%s environment=%s\n' "${RUNNER_OS:-unset}" "${RUNNER_ARCH:-unset}" "${RUNNER_ENVIRONMENT:-unset}"
+            id
+            if [[ "${CI:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "${RUNNER_OS:-}" != Linux || "${RUNNER_ARCH:-}" != X64 ]]; then
+              echo 'KVM_RUNNER_UNSUPPORTED: expected disposable GitHub-hosted Linux x64 VM'
+              exit 2
+            fi
+            if [[ ! -e /dev/kvm ]]; then
+              echo 'KVM_DEVICE_MISSING: this runner has no /dev/kvm'
+              exit 2
+            fi
+            if [[ ! -c /dev/kvm ]]; then
+              echo 'KVM_NOT_CHARACTER_DEVICE: refusing to change the device'
+              exit 2
+            fi
+            stat -c 'KVM before: type=%F owner=%U group=%G mode=%a' /dev/kvm
+            if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+              if ! command -v setfacl >/dev/null 2>&1; then
+                echo 'KVM_ACL_TOOL_MISSING: runner image lacks setfacl'
+                exit 2
+              fi
+              if ! sudo -n setfacl -m "u:$(id -un):rw" /dev/kvm; then
+                echo 'KVM_ACL_GRANT_FAILED: could not grant only the runner user rw'
+                exit 2
+              fi
+            fi
+            stat -c 'KVM after: type=%F owner=%U group=%G mode=%a' /dev/kvm
+            if command -v getfacl >/dev/null 2>&1; then getfacl -cp /dev/kvm; fi
+            if [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+              echo 'KVM_ACCESS_DENIED: access still absent after attempted grant'
+              exit 2
+            fi
+            echo 'KVM_ACCESS_READY: device is readable/writable; emulator -accel-check still required'
+          } 2>&1 | tee android/build/lifecycle-evidence/kvm-access.txt
+      # Headless Android emulator's QEMU loader still needs libpulse.so.0
+      # even when started with -no-audio. Use Ubuntu's signed distro package;
+      # do not downgrade the emulator or weaken KVM acceleration checks.
+      - name: Install headless Android emulator runtime dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            if ! dpkg-query -W -f='${Status}' libpulse0 2>/dev/null | grep -Fxq 'install ok installed'; then
+              sudo -n apt-get update -qq
+              sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends libpulse0
+            fi
+            dpkg-query -W -f='${Package} ${Version} ${Status}\\n' libpulse0
+            if ! ldconfig -p | grep -F 'libpulse.so.0 '; then
+              echo 'EMULATOR_DEPENDENCY_MISSING: libpulse.so.0 is not resolvable'
+              exit 2
+            fi
+            echo 'EMULATOR_DEPENDENCY_READY: libpulse.so.0 resolves; emulator -version and -accel-check remain required'
+          } 2>&1 | tee android/build/lifecycle-evidence/emulator-dependency.txt
+      - name: Validate installed journal lifecycle on API35
+        timeout-minutes: 12
+        run: bash scripts/test-android-installed.sh
+      - name: Preserve installed lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PassengerCount-API35-lifecycle-${{ github.sha }}
+          path: android/build/lifecycle-evidence
+          if-no-files-found: warn
       - name: Include signing utility for local production re-sign
         run: |
           mkdir -p android/build/signing-tools/lib

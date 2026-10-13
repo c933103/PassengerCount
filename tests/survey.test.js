@@ -289,3 +289,41 @@ test("reopening cannot discard incompatible entered final counts", () => {
   assert.throws(() => reopenSurvey(s), /Conflicting/);
   assert.deepEqual(s, before);
 });
+
+
+test("section join rejects conflicting final observations without any mutation", () => {
+  const s = survey();
+  completeSurvey(s, 1);
+  s.finalOnboard = "5";
+  s.rows[1].onboard = "3";
+  const before = structuredClone(s);
+  assert.throws(() => appendSection(s, { key: "b", dest: {} }, [stop("next")]), /Conflicting final count/);
+  assert.deepEqual(s, before);
+  assert.throws(() => appendSection(s, { key: "b", dest: {} }, [stop("next")], 1), /Invalid overlap/);
+  assert.deepEqual(s, before);
+});
+
+test("section join preserves equivalent and zero final counts at the former end", () => {
+  for (const [final, existing] of [["5", ""], ["5", "05"], ["0", "0"], ["0", ""]]) {
+    const s = survey();
+    completeSurvey(s, 1);
+    s.finalOnboard = final;
+    s.rows[1].onboard = existing;
+    assert.equal(appendSection(s, { key: "b", dest: {} }, [stop("next")]), 1);
+    assert.equal(s.rows[1].onboard, final);
+    assert.equal(s.finalOnboard, "");
+    assert.equal(s.endIndex, null);
+    assert.equal(s.status, "in_progress");
+    assert.equal(s.rows.length, 4);
+  }
+});
+
+test("section join and explicit reopen use the same legacy end-index fallback", () => {
+  const s = survey();
+  completeSurvey(s, 1); delete s.endIndex; s.activeIndex = 1; s.finalOnboard = "5";
+  const reopened = structuredClone(s);
+  reopenSurvey(reopened);
+  appendSection(s, { key: "b", dest: {} }, [stop("next")]);
+  assert.equal(s.rows[1].onboard, reopened.rows[1].onboard);
+  assert.equal(s.rows[1].onboard, "5");
+});

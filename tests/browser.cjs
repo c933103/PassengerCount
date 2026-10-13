@@ -129,6 +129,7 @@ const data = {
     await page.addInitScript((seed) => {
       const native = { ...seed };
       window.__nativeJournals = seed.nativeJournals || {};
+      window.__failTrackDelete = seed.failTrackDelete;
       window.__trackReads = [];
       window.__trackStarts = [];
       const defaultFolder = "/storage/emulated/0/Download/PaxCountRecord";
@@ -164,6 +165,14 @@ const data = {
           delete native.exportDirectory;
           window.captureDisk("exportDirectory", null);
           window.dispatchEvent(new Event("export-directory-changed"));
+        },
+        deleteTrack: (id) => {
+          if (window.__failTrackDelete === id || window.__failTrackStop) return false;
+          if (native.trackingId === id) delete native.trackingId;
+          delete window.__nativeJournals[id];
+          window.captureDisk("nativeJournals", window.__nativeJournals);
+          window.captureDisk("trackingId", native.trackingId || null);
+          return true;
         },
         startTracking: (id) => {
           window.__trackStarts.push(id);
@@ -397,10 +406,41 @@ const data = {
   await checkDock();
   await key(3);
   assert.equal(await page.locator("#boarding").inputValue(), "3");
+  await context.setGeolocation({ latitude: 22.30123, longitude: 114.17123, accuracy: 10 });
+  await page.waitForFunction(() => JSON.parse(window.PassengerCountAndroid.get("passenger-count:workspace:v2")).surveys.some(s => s.track?.some(p => p.lat === 22.30123)));
+  const trackBeforeUndo = current().track;
   await page.locator("#undo").click();
   assert.equal(await page.locator("#boarding").inputValue(), "", "undo restores the prior passenger entry");
+  await flush();
+  assert.deepEqual(current().track, trackBeforeUndo, "undo preserves GPS evidence accepted after the edit");
   await page.locator("#redo").click();
   assert.equal(await page.locator("#boarding").inputValue(), "3", "redo reapplies the passenger entry");
+  await flush();
+  assert.deepEqual(current().track, trackBeforeUndo, "redo preserves the same GPS evidence");
+  const visibleHistoryStop = current().activeIndex, laterHistoryStop = visibleHistoryStop + 1;
+  await page.locator("#active").selectOption(String(laterHistoryStop));
+  await key(5);
+  await page.locator("#undo").click();
+  assert.equal(await page.locator("#active").inputValue(), String(visibleHistoryStop));
+  await key(9);
+  await flush();
+  assert.equal(current().rows[visibleHistoryStop].boarding, "9", "the next digit edits the stop shown after Undo");
+  assert.equal(current().rows[laterHistoryStop].boarding, "", "Undo resets the stale keypad target");
+  await page.locator("#undo").click();
+  assert.equal(await page.locator("#boarding").inputValue(), "3");
+  await page.locator("#fieldContext summary").click();
+  const previousWeather = await page.locator("#weatherCount").inputValue();
+  await page.locator("#weatherCount").selectOption("🌧️");
+  await page.locator("#undo").click();
+  await flush();
+  assert.equal(await page.locator("#weatherCount").inputValue(), previousWeather);
+  assert.equal(current().weatherHistory.filter(event => event.kind === "change").at(-1).undone, true,
+    "weather Undo retains the fetched event with an explicit unapplied state");
+  await page.locator("#redo").click();
+  await flush();
+  assert.equal(current().weatherHistory.filter(event => event.kind === "change").at(-1).undone, undefined);
+  await page.locator("#undo").click();
+  await page.locator("#fieldContext summary").click();
   await page.keyboard.type("e.-+abc");
   assert.equal(await page.locator("#boarding").inputValue(), "3");
   await page.locator("#boarding").evaluate((e) => {
@@ -851,6 +891,15 @@ const data = {
   await key(9);
   await flush();
   assert.equal(current().rows[0].boarding, "9");
+  await page.locator("#undo").click();
+  await flush();
+  assert.equal(current().status, "in_progress", "count Undo cannot restore the completed lifecycle boundary");
+  assert.equal(current().endIndex, null);
+  assert.equal(current().rows[0].boarding, reopening.rows[0].boarding);
+  assert.equal(disk.trackingId, "reopening-trip", "the explicit continuation remains the active synthetic native session");
+  await page.locator("#redo").click();
+  await flush();
+  assert.equal(current().rows[0].boarding, "9");
   assert.equal(current().rows[0].time, preservedTime, "later table correction does not replace stop time");
   assert.equal(current().rows[0].observedAt, preservedObservedAt, "later table correction does not replace full observation timestamp");
   await page.locator("#active").selectOption("1");
@@ -1068,6 +1117,102 @@ const data = {
     }
     await context.close();
   }
+  // A partial native cleanup is visible and retryable after a cold restart.
+  const cleanupState = structuredClone(trackState);
+  cleanupState.language = "en";
+  cleanupState.currentId = null;
+  cleanupState.screen = "home";
+  cleanupState.surveys = ["delete-A", "delete-B", "keep-C"].map(id => ({
+    ...structuredClone(trackTrip), id, status: "completed", track: [], nativeTrackCursor: "",
+  }));
+  const cleanupSeed = { "passenger-count:workspace:v2": JSON.stringify(cleanupState),
+    failTrackDelete: "delete-B", nativeJournals: Object.fromEntries(cleanupState.surveys.map(s => [s.id, [journal[0]]])) };
+  ({ context, page } = await open(cleanupSeed));
+  await page.locator("#deleteRecords").click();
+  for (const id of ["delete-A", "delete-B"])
+    await page.locator(`input[data-record-id="${id}"]`).check();
+  await page.locator("#selectionOkay").click();
+  await page.locator("#confirmDelete").click();
+  await flush();
+  assert.match(await page.locator("#deleteError").textContent(), /incomplete.*already be removed/i);
+  assert.equal(saved().surveys.length, 3);
+  assert.deepEqual(saved().deletingIds, ["delete-A", "delete-B"]);
+  assert.deepEqual(await page.evaluate(() => Object.keys(window.__nativeJournals).sort()), ["delete-B", "keep-C"]);
+  await page.locator("#cancelDelete").click();
+  await page.locator("#cancelSelection").click();
+  assert.equal(await page.getByRole("button", { name: "Retry deletion", exact: true }).count(), 2);
+  const interruptedCleanup = { ...disk, failTrackDelete: "delete-B" };
+  await context.close();
+  ({ context, page } = await open(interruptedCleanup));
+  await flush();
+  assert.deepEqual(saved().deletingIds, ["delete-A", "delete-B"]);
+  assert.equal(await page.evaluate(() => window.__trackReads.some(x => x.id.startsWith("delete-"))), false);
+  await page.evaluate(() => { window.__failTrackDelete = undefined; });
+  await page.getByRole("button", { name: "Retry deletion", exact: true }).first().click();
+  await flush();
+  assert.deepEqual(saved().surveys.map(s => s.id), ["keep-C"]);
+  assert.deepEqual(saved().deletingIds, []);
+  assert.deepEqual(await page.evaluate(() => Object.keys(window.__nativeJournals)), ["keep-C"]);
+  const completedCleanup = { ...disk };
+  await context.close();
+  ({ context, page } = await open(completedCleanup));
+  await flush();
+  assert.equal(await page.locator(".recordCard").count(), 1);
+  assert.deepEqual(saved().surveys.map(s => s.id), ["keep-C"]);
+  await context.close();
+  // A completed receipt survives an ordinary edit and cannot silently insert
+  // another database copy when the owner presses Upload after a cold restart.
+  const receiptTrip = { ...structuredClone(trackTrip), id: "receipt-A", status: "completed", activeIndex: 0 };
+  receiptTrip.rows[0].boarding = "1";
+  receiptTrip.rows[0].recorded = true;
+  const { uploadPayloadKey } = await import(require("url").pathToFileURL(path.join(root, "upload.js")));
+  receiptTrip.upload = { id: 77, done: true, uncertain: false, payloadKey: uploadPayloadKey(receiptTrip) };
+  const receiptBytes = JSON.stringify(receiptTrip.upload);
+  const receiptState = { ...structuredClone(trackState), language: "en", currentId: receiptTrip.id,
+    screen: "record", surveys: [receiptTrip] };
+  ({ context, page } = await open({ "passenger-count:workspace:v2": JSON.stringify(receiptState) }));
+  assert.match(await page.locator("#uploadStatus").textContent(), /^Uploaded/);
+  await page.locator("#editRecord").click();
+  await page.locator('#body tr[data-i="0"] input[data-field="boarding"]').click();
+  await key(9); await flush();
+  assert.equal(current().rows[0].boarding, "9");
+  assert.equal(JSON.stringify(current().upload), receiptBytes);
+  // Native evidence arrives after the edit while the accepted receipt remains live.
+  await page.evaluate(({ id, point }) => {
+    window.__nativeJournals[id] = [point];
+    window.captureDisk("nativeJournals", window.__nativeJournals);
+    document.dispatchEvent(new Event("visibilitychange"));
+  }, { id: receiptTrip.id, point: { ...journal[0], nativeId: "receipt-late-native" } });
+  await flush();
+  assert.ok(current().track.some(p => p.nativeId === "receipt-late-native"));
+  const receiptTrack = structuredClone(current().track), receiptCursor = current().nativeTrackCursor;
+  await page.locator("#undo").click(); await flush();
+  assert.equal(current().rows[0].boarding, "1");
+  assert.equal(JSON.stringify(current().upload), receiptBytes);
+  assert.deepEqual(current().track, receiptTrack);
+  assert.equal(current().nativeTrackCursor, receiptCursor);
+  assert.match(await page.locator("#uploadStatus").textContent(), /^Uploaded/);
+  await page.locator("#redo").click(); await flush();
+  assert.equal(current().rows[0].boarding, "9");
+  assert.equal(JSON.stringify(current().upload), receiptBytes);
+  assert.deepEqual(current().track, receiptTrack);
+  assert.equal(current().nativeTrackCursor, receiptCursor);
+  const editedReceiptSeed = { ...disk };
+  await context.close();
+  ({ context, page } = await open(editedReceiptSeed));
+  const duplicatePosts = [];
+  await context.route("**/rest/v1/**", route => {
+    duplicatePosts.push(route.request().url());
+    return route.fulfill({ body: "[]", status: 201, contentType: "application/json" });
+  });
+  assert.match(await page.locator("#uploadStatus").textContent(), /earlier version.*changes have not been uploaded/i);
+  await page.locator("#upload").click(); await flush();
+  assert.deepEqual(duplicatePosts, []);
+  assert.equal(JSON.stringify(current().upload), receiptBytes);
+  assert.equal(current().upload.id, 77);
+  assert.deepEqual(current().track, receiptTrack);
+  assert.equal(current().nativeTrackCursor, receiptCursor);
+  await context.close();
   const boundaryData = structuredClone(stale);
   boundaryData.source.retrievedAt = "2026-09-12T16:00:00Z";
   ({ context, page } = await open({}, 360, boundaryData, "2026-09-15T06:10:00Z", fresh));

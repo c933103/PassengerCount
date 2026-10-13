@@ -41,11 +41,11 @@ function fixture({ failStop = false, failSave = false } = {}) {
     hkClock, hkTimestamp, tripMetrics, makeGpx, data: null,
     nativeExportPending: false, chartExportPending: false,
     persist: () => { calls.push("save"); if (failSave) return false; durable = JSON.stringify(state); return true; },
-    error: value => { error = value; }, t: value => value, renderCount() {},
+    error: value => { error = value; }, t: value => value, renderCount() {}, resetHistory() {},
     showScreen(screen) { state.screen = screen; durable = JSON.stringify(state); },
     exportFilename: () => "fixture.gpx", $: () => ({}), exportResult: value => { error = value; },
   });
-  vm.runInContext(handlers, context);
+  vm.runInContext("const deleting = id => state.deletingIds?.includes(id) === true;\n" + handlers, context);
   return { s, state, journals, calls, bridge, run: code => vm.runInContext(code, context),
     saved: () => JSON.parse(durable), exported: () => exported, error: () => error,
     allowSave: () => { failSave = false; }, allowStop: () => { failStop = false; } };

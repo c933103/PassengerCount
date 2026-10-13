@@ -1,0 +1,8 @@
+{
+  "previous_fixture_budget": "SECONDS+1 (wall-clock)",
+  "observed_failure": "valid delayed foreground state was not reached before the one-second boundary, 83.9ms observed test duration",
+  "change": "Replace SECONDS with a synthetic counter only inside the extracted host fixture. Advance on stubbed sleep; bound to five iterations. Production script unchanged.",
+  "runs": 10,
+  "tests_per_run": 5,
+  "failures": 0
+}

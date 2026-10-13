@@ -1,0 +1,636 @@
+{
+  "base": "fb48d501b2d2bb260808c622cccbe57699184afb",
+  "base_tree": "6fb858025014223061bbe7dc84d743e5d094114a",
+  "files": [
+    {
+      "path": ".github/workflows/v19-validate.yml",
+      "base_blob": "5e7b63a895cdcad70fac71e7d49d25711fa9bfca",
+      "candidate_blob": "5e7b63a895cdcad70fac71e7d49d25711fa9bfca",
+      "unchanged": true
+    },
+    {
+      "path": ".gitignore",
+      "base_blob": "0e5f3cd7c7640c59838fc98550217be63a340d0d",
+      "candidate_blob": "0e5f3cd7c7640c59838fc98550217be63a340d0d",
+      "unchanged": true
+    },
+    {
+      "path": "README.md",
+      "base_blob": "acd74424dee81aef2e78eecc865a0c70ac396cfd",
+      "candidate_blob": "7f026e4b216e56a1a1124d2ddf664663d6ddfc81",
+      "unchanged": false
+    },
+    {
+      "path": "android/AndroidManifest.xml",
+      "base_blob": "71e664ff73f0ab8e1c666aae4325fab9e24f6d4a",
+      "candidate_blob": "71e664ff73f0ab8e1c666aae4325fab9e24f6d4a",
+      "unchanged": true
+    },
+    {
+      "path": "android/build.sh",
+      "base_blob": "1b1cd43aad8ca4c859742ca9aed4a544f5ef1ea9",
+      "candidate_blob": "1b1cd43aad8ca4c859742ca9aed4a544f5ef1ea9",
+      "unchanged": true
+    },
+    {
+      "path": "android/res/drawable/ic_launcher.xml",
+      "base_blob": "e3edb500d3d9a3a651af399a8983dffba92e0deb",
+      "candidate_blob": "e3edb500d3d9a3a651af399a8983dffba92e0deb",
+      "unchanged": true
+    },
+    {
+      "path": "android/res/values/styles.xml",
+      "base_blob": "1ee3cf6fd96fd669b419fcba60f546b39f40de0e",
+      "candidate_blob": "1ee3cf6fd96fd669b419fcba60f546b39f40de0e",
+      "unchanged": true
+    },
+    {
+      "path": "android/src/app/passengercount/ExportSession.java",
+      "base_blob": "4a6819e23358b5e8ffe34fb7e3a15146dd128aef",
+      "candidate_blob": "4a6819e23358b5e8ffe34fb7e3a15146dd128aef",
+      "unchanged": true
+    },
+    {
+      "path": "android/src/app/passengercount/ExportStorage.java",
+      "base_blob": "5076c1fba53ba0b1fcaa3259f1579ee910d113ac",
+      "candidate_blob": "5076c1fba53ba0b1fcaa3259f1579ee910d113ac",
+      "unchanged": true
+    },
+    {
+      "path": "android/src/app/passengercount/MainActivity.java",
+      "base_blob": "2ed26ad30618c2ce9047c892470b297bcba7a21d",
+      "candidate_blob": "2ed26ad30618c2ce9047c892470b297bcba7a21d",
+      "unchanged": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackJournal.java",
+      "base_blob": "1a7091b8b87d12518a0f684965e99234098a8e3e",
+      "candidate_blob": "1a7091b8b87d12518a0f684965e99234098a8e3e",
+      "unchanged": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackService.java",
+      "base_blob": "5815677a54fd20749cba617b86f0ef9188e54b8f",
+      "candidate_blob": "5815677a54fd20749cba617b86f0ef9188e54b8f",
+      "unchanged": true
+    },
+    {
+      "path": "android/src/app/passengercount/TrackSession.java",
+      "base_blob": "962537bda2bbf58ada5d549d32514dbe27d83a9d",
+      "candidate_blob": "962537bda2bbf58ada5d549d32514dbe27d83a9d",
+      "unchanged": true
+    },
+    {
+      "path": "app.js",
+      "base_blob": "76914aef7bdcc0b0e873b581a0de1e70677cbb8d",
+      "candidate_blob": "da54d5be3756d6cbf09f206725c8bc395ec50c7e",
+      "unchanged": false
+    },
+    {
+      "path": "charts.js",
+      "base_blob": "a86e0071aa5c687efe93cf0822b6e0260a2a42b2",
+      "candidate_blob": "a86e0071aa5c687efe93cf0822b6e0260a2a42b2",
+      "unchanged": true
+    },
+    {
+      "path": "core.js",
+      "base_blob": "d9d3f216543fc0ad6c22c6abcd5737ce9900fd95",
+      "candidate_blob": "d9d3f216543fc0ad6c22c6abcd5737ce9900fd95",
+      "unchanged": true
+    },
+    {
+      "path": "data.js",
+      "base_blob": "dd6f13263f07f00863938b90e0b98437904f4ff7",
+      "candidate_blob": "dd6f13263f07f00863938b90e0b98437904f4ff7",
+      "unchanged": true
+    },
+    {
+      "path": "data/government-routes.json.gz",
+      "base_blob": "75a7bf6e1614adb91907d233af691bbf8ad8c7a1",
+      "candidate_blob": "75a7bf6e1614adb91907d233af691bbf8ad8c7a1",
+      "unchanged": true
+    },
+    {
+      "path": "export.js",
+      "base_blob": "1d88b78edf71800fceb39392656a4396ecd177a6",
+      "candidate_blob": "1d88b78edf71800fceb39392656a4396ecd177a6",
+      "unchanged": true
+    },
+    {
+      "path": "fieldkit.js",
+      "base_blob": "d7976bb83528be85859270123e30a627e2196aff",
+      "candidate_blob": "d7976bb83528be85859270123e30a627e2196aff",
+      "unchanged": true
+    },
+    {
+      "path": "government.js",
+      "base_blob": "e2e67e130dac5e2766a399a9ed4c52fc3defe32b",
+      "candidate_blob": "e2e67e130dac5e2766a399a9ed4c52fc3defe32b",
+      "unchanged": true
+    },
+    {
+      "path": "i18n.js",
+      "base_blob": "1140f2403e1067b10c4ea567d70a7cbab85e8e10",
+      "candidate_blob": "1140f2403e1067b10c4ea567d70a7cbab85e8e10",
+      "unchanged": true
+    },
+    {
+      "path": "icon-192.png",
+      "base_blob": "3156bf43f596e737636cda9081a4ecef299ab39d",
+      "candidate_blob": "3156bf43f596e737636cda9081a4ecef299ab39d",
+      "unchanged": true
+    },
+    {
+      "path": "icon-512.png",
+      "base_blob": "a21c30580c7191a6d393a1d1f2ef0aabc792e3be",
+      "candidate_blob": "a21c30580c7191a6d393a1d1f2ef0aabc792e3be",
+      "unchanged": true
+    },
+    {
+      "path": "index.html",
+      "base_blob": "b84d66ef622555593f1cffb4be891093d5d3584f",
+      "candidate_blob": "b84d66ef622555593f1cffb4be891093d5d3584f",
+      "unchanged": true
+    },
+    {
+      "path": "live.js",
+      "base_blob": "e5e5d823afad38e596e43cddc62b263b1c796442",
+      "candidate_blob": "e5e5d823afad38e596e43cddc62b263b1c796442",
+      "unchanged": true
+    },
+    {
+      "path": "manifest.json",
+      "base_blob": "4e0e828258810fb0bb3ed696cf6af4c9daea22ca",
+      "candidate_blob": "4e0e828258810fb0bb3ed696cf6af4c9daea22ca",
+      "unchanged": true
+    },
+    {
+      "path": "native-track.js",
+      "base_blob": "68b41358317209444215867677882ff2a1d4d2a5",
+      "candidate_blob": "68b41358317209444215867677882ff2a1d4d2a5",
+      "unchanged": true
+    },
+    {
+      "path": "package-lock.json",
+      "base_blob": "e4466d2ba1d74d921e6db91cd2568c5aca236cef",
+      "candidate_blob": "e4466d2ba1d74d921e6db91cd2568c5aca236cef",
+      "unchanged": true
+    },
+    {
+      "path": "package.json",
+      "base_blob": "f5b7716307b43afb39e199d637fa5764819569f4",
+      "candidate_blob": "f5b7716307b43afb39e199d637fa5764819569f4",
+      "unchanged": true
+    },
+    {
+      "path": "route-worker.js",
+      "base_blob": "b48ee00f1209dee72561f21dd490cdb42be10755",
+      "candidate_blob": "b48ee00f1209dee72561f21dd490cdb42be10755",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/build-government-data.mjs",
+      "base_blob": "e99c63ea05dabf097639aaaf6671fea23a5650b8",
+      "candidate_blob": "e99c63ea05dabf097639aaaf6671fea23a5650b8",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/test-export-permission.cjs",
+      "base_blob": "ac2aafe41fed0713410cf23aa5c955124f3ab86b",
+      "candidate_blob": "ac2aafe41fed0713410cf23aa5c955124f3ab86b",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/test-export-storage.cjs",
+      "base_blob": "5cc0c67e384a8d3fc1c21a98cc4c06e9f83b351d",
+      "candidate_blob": "5cc0c67e384a8d3fc1c21a98cc4c06e9f83b351d",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/test-native-track.sh",
+      "base_blob": "cc991d4b3de70c0a9bf4bd4ec6f8fd2bd9333756",
+      "candidate_blob": "cc991d4b3de70c0a9bf4bd4ec6f8fd2bd9333756",
+      "unchanged": true
+    },
+    {
+      "path": "storage.js",
+      "base_blob": "ffabb476d930be838e59bdcf72259a483a0df76f",
+      "candidate_blob": "ffabb476d930be838e59bdcf72259a483a0df76f",
+      "unchanged": true
+    },
+    {
+      "path": "style.css",
+      "base_blob": "9d7420a56660cf51168a8d32d74dce648034036e",
+      "candidate_blob": "9d7420a56660cf51168a8d32d74dce648034036e",
+      "unchanged": true
+    },
+    {
+      "path": "supabase-config.js",
+      "base_blob": "04d21c5b6cb64f89c6adde67a0c7c4098e9318c5",
+      "candidate_blob": "04d21c5b6cb64f89c6adde67a0c7c4098e9318c5",
+      "unchanged": true
+    },
+    {
+      "path": "survey.js",
+      "base_blob": "0ac20a2576cc298f9bff7b3d20fca2478f81287e",
+      "candidate_blob": "9d81dfddcf7befa79392daf688bfb528c801c7bd",
+      "unchanged": false
+    },
+    {
+      "path": "sw.js",
+      "base_blob": "8976b0c3668b0946cbfb4df2a75b463886e9ecda",
+      "candidate_blob": "176ff5c91a2ce65eb385c44fa47c78365f718c79",
+      "unchanged": false
+    },
+    {
+      "path": "tests/browser.cjs",
+      "base_blob": "2b59f99fc9a1e6ee2488f2ffff01c5f815037392",
+      "candidate_blob": "4f48cf70f8f1d125ec9de383f7356dfd32967055",
+      "unchanged": false
+    },
+    {
+      "path": "tests/bundle-export-browser.cjs",
+      "base_blob": "35f9a196a1a782afe0dcdabff6732a3bb99f3fe4",
+      "candidate_blob": "35f9a196a1a782afe0dcdabff6732a3bb99f3fe4",
+      "unchanged": true
+    },
+    {
+      "path": "tests/bundle-export.test.js",
+      "base_blob": "44b9363311335520c8fb66b6e34086821604b253",
+      "candidate_blob": "44b9363311335520c8fb66b6e34086821604b253",
+      "unchanged": true
+    },
+    {
+      "path": "tests/core.test.js",
+      "base_blob": "3bfdda4cc72cdf425725c4f07ba11113b956d1b3",
+      "candidate_blob": "3bfdda4cc72cdf425725c4f07ba11113b956d1b3",
+      "unchanged": true
+    },
+    {
+      "path": "tests/data.test.js",
+      "base_blob": "04122c490f5dcf8fbdb7ff6adca90c1bc8690838",
+      "candidate_blob": "04122c490f5dcf8fbdb7ff6adca90c1bc8690838",
+      "unchanged": true
+    },
+    {
+      "path": "tests/export-pending.test.js",
+      "base_blob": "452fb30cf082e67fff7cdf82b29a62e21ea63482",
+      "candidate_blob": "452fb30cf082e67fff7cdf82b29a62e21ea63482",
+      "unchanged": true
+    },
+    {
+      "path": "tests/export-permission-browser.cjs",
+      "base_blob": "ec7779a25501de086fb745f7ebab08d858932582",
+      "candidate_blob": "ec7779a25501de086fb745f7ebab08d858932582",
+      "unchanged": true
+    },
+    {
+      "path": "tests/export.test.js",
+      "base_blob": "94c5bf95b45f2ba041a15b2fe0241daaa5067abc",
+      "candidate_blob": "94c5bf95b45f2ba041a15b2fe0241daaa5067abc",
+      "unchanged": true
+    },
+    {
+      "path": "tests/fieldkit.test.js",
+      "base_blob": "8769bb5da7e31f9ed021eb54299096cb5b513c25",
+      "candidate_blob": "8769bb5da7e31f9ed021eb54299096cb5b513c25",
+      "unchanged": true
+    },
+    {
+      "path": "tests/government.test.js",
+      "base_blob": "3ab7783eec8848252d7d2b8a3c7009a61e7035c3",
+      "candidate_blob": "3ab7783eec8848252d7d2b8a3c7009a61e7035c3",
+      "unchanged": true
+    },
+    {
+      "path": "tests/momentum.test.js",
+      "base_blob": "a9f6fdf96c3066bc6ce919199da5d0f468749ba2",
+      "candidate_blob": "a9f6fdf96c3066bc6ce919199da5d0f468749ba2",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native-track.test.js",
+      "base_blob": "d11730f9e5218c1247f34cef2f7dcd76fcde68f7",
+      "candidate_blob": "d11730f9e5218c1247f34cef2f7dcd76fcde68f7",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/ExportPermissionFixture.java",
+      "base_blob": "33993447e4338079e285d8330db0ef418dc18872",
+      "candidate_blob": "33993447e4338079e285d8330db0ef418dc18872",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/ExportStorageTest.java",
+      "base_blob": "5351c394343fa432095bdbf42d57d4e3b3865d02",
+      "candidate_blob": "5351c394343fa432095bdbf42d57d4e3b3865d02",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/TrackJournalTest.java",
+      "base_blob": "afaafd52758234aeea3eb423e883f55b2102207e",
+      "candidate_blob": "afaafd52758234aeea3eb423e883f55b2102207e",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/TrackSessionTest.java",
+      "base_blob": "e396da52be96bc453e057924dfd02b096ceba9d4",
+      "candidate_blob": "e396da52be96bc453e057924dfd02b096ceba9d4",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/README.md",
+      "base_blob": "51b2648c19edcdc7a5f2b38907f1253092b0372d",
+      "candidate_blob": "51b2648c19edcdc7a5f2b38907f1253092b0372d",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/ContentResolver.java",
+      "base_blob": "0b0078074eebef50d9ee3d7c65cd78dda5f24c24",
+      "candidate_blob": "0b0078074eebef50d9ee3d7c65cd78dda5f24c24",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/ContentValues.java",
+      "base_blob": "fe8027ac55c6131bf90c0bdb9373d59be62e32ad",
+      "candidate_blob": "fe8027ac55c6131bf90c0bdb9373d59be62e32ad",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/Context.java",
+      "base_blob": "fe2c4fb12a6b1d975f84466f8e99f5c4d8b1b21c",
+      "candidate_blob": "fe2c4fb12a6b1d975f84466f8e99f5c4d8b1b21c",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/content/SharedPreferences.java",
+      "base_blob": "e919da839866fded6cadbfc3d58b785c96efebcd",
+      "candidate_blob": "e919da839866fded6cadbfc3d58b785c96efebcd",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/database/Cursor.java",
+      "base_blob": "303f9e834bb86c58c6a9ed5811550ac0e4cee90f",
+      "candidate_blob": "303f9e834bb86c58c6a9ed5811550ac0e4cee90f",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/net/Uri.java",
+      "base_blob": "e098446e78bfe58f11c5c10a78865f21b2c98b0f",
+      "candidate_blob": "e098446e78bfe58f11c5c10a78865f21b2c98b0f",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/os/Build.java",
+      "base_blob": "74fc8f5c50885221d39164ad243944fff98bcf96",
+      "candidate_blob": "74fc8f5c50885221d39164ad243944fff98bcf96",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/os/Environment.java",
+      "base_blob": "961d40ab5252f3079b613f59cdb6b77ca2d39710",
+      "candidate_blob": "961d40ab5252f3079b613f59cdb6b77ca2d39710",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/provider/DocumentsContract.java",
+      "base_blob": "711763384769916b8bbcc7cc05e70f55345d27d0",
+      "candidate_blob": "711763384769916b8bbcc7cc05e70f55345d27d0",
+      "unchanged": true
+    },
+    {
+      "path": "tests/native/storage-stubs/android/provider/MediaStore.java",
+      "base_blob": "7cdad94b7775ab5f57c01a1fa8c0eca254a657ff",
+      "candidate_blob": "7cdad94b7775ab5f57c01a1fa8c0eca254a657ff",
+      "unchanged": true
+    },
+    {
+      "path": "tests/png-export-browser.cjs",
+      "base_blob": "a125a5aebc5d6bb9c55d948fbf2eb6c7c104d98a",
+      "candidate_blob": "a125a5aebc5d6bb9c55d948fbf2eb6c7c104d98a",
+      "unchanged": true
+    },
+    {
+      "path": "tests/png-export.test.js",
+      "base_blob": "dfc477145f8cd98840da0d6d530c1d0c753d297a",
+      "candidate_blob": "dfc477145f8cd98840da0d6d530c1d0c753d297a",
+      "unchanged": true
+    },
+    {
+      "path": "tests/recording-lifecycle.test.js",
+      "base_blob": "283c70aaedfe08e90b70de2003e17e3ceb8e7f84",
+      "candidate_blob": "8f205e5431ecd954532aef78f7919baf784fefa2",
+      "unchanged": false
+    },
+    {
+      "path": "tests/storage.test.js",
+      "base_blob": "365bc6dc0f8300e88d1edd5009f19a31cfdad652",
+      "candidate_blob": "365bc6dc0f8300e88d1edd5009f19a31cfdad652",
+      "unchanged": true
+    },
+    {
+      "path": "tests/survey.test.js",
+      "base_blob": "5dcec3601a74843734f27eb180e4427d5934e240",
+      "candidate_blob": "784d0d53d000ceb50ac98d362be58021a851b694",
+      "unchanged": false
+    },
+    {
+      "path": "tests/upload.test.js",
+      "base_blob": "eb92929f9c36b8e54a86b5d49b6be95deb922bfe",
+      "candidate_blob": "eb92929f9c36b8e54a86b5d49b6be95deb922bfe",
+      "unchanged": true
+    },
+    {
+      "path": "upload.js",
+      "base_blob": "88394798b821b141147409d83633d5238730115a",
+      "candidate_blob": "88394798b821b141147409d83633d5238730115a",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/fflate/LICENSE",
+      "base_blob": "bd36874f34b9ae537f2bbc383fdf6e320dfafe98",
+      "candidate_blob": "bd36874f34b9ae537f2bbc383fdf6e320dfafe98",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/fflate/fflate.js",
+      "base_blob": "82af0fdb655f00655d2da3354c4533744edcde6e",
+      "candidate_blob": "82af0fdb655f00655d2da3354c4533744edcde6e",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/LICENSE",
+      "base_blob": "bcb3ba1aca095155857556d96e3193a50fe1bd11",
+      "candidate_blob": "bcb3ba1aca095155857556d96e3193a50fe1bd11",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/images/layers-2x.png",
+      "base_blob": "200c333dca9652ac4cba004d609e5af4eee168c1",
+      "candidate_blob": "200c333dca9652ac4cba004d609e5af4eee168c1",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/images/layers.png",
+      "base_blob": "1a72e5784b2b456eac5d7670738db80697af3377",
+      "candidate_blob": "1a72e5784b2b456eac5d7670738db80697af3377",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/images/marker-icon-2x.png",
+      "base_blob": "88f9e501888c9c6cb29ad340d9a888627dd1b6d8",
+      "candidate_blob": "88f9e501888c9c6cb29ad340d9a888627dd1b6d8",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/images/marker-icon.png",
+      "base_blob": "950edf24677ded147df13b26f91baa2b0fa70513",
+      "candidate_blob": "950edf24677ded147df13b26f91baa2b0fa70513",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/images/marker-shadow.png",
+      "base_blob": "9fd2979532a19a15b824ce763c76e04a8dafadfb",
+      "candidate_blob": "9fd2979532a19a15b824ce763c76e04a8dafadfb",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/leaflet.css",
+      "base_blob": "2961b7618a57617d1015d31d2094c425c3d86ce9",
+      "candidate_blob": "2961b7618a57617d1015d31d2094c425c3d86ce9",
+      "unchanged": true
+    },
+    {
+      "path": "vendor/leaflet/leaflet.js",
+      "base_blob": "a3bf693d0fcaff885cc5f21b3a699aaa567b3533",
+      "candidate_blob": "a3bf693d0fcaff885cc5f21b3a699aaa567b3533",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc001-recording-lifecycle.md",
+      "base_blob": "6e648c73fbd81979c45e29665e178cd213dd7e7b",
+      "candidate_blob": "6e648c73fbd81979c45e29665e178cd213dd7e7b",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc002-native-track-replay.md",
+      "base_blob": "ec2c521d81869febedde80fe15c0cf8242ad5923",
+      "candidate_blob": "ec2c521d81869febedde80fe15c0cf8242ad5923",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc003-png-export-identity.md",
+      "base_blob": "95739f1a2c714726f6071377e8832ee55232c40e",
+      "candidate_blob": "95739f1a2c714726f6071377e8832ee55232c40e",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc004-export-permission-recovery.md",
+      "base_blob": "cc1655b97935acd67cbae4f99a0738464ab3a801",
+      "candidate_blob": "cc1655b97935acd67cbae4f99a0738464ab3a801",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc004-granted-write-followup.md",
+      "base_blob": "a0c5ddd07d4cc2283a0d7fd884a89468ce6fb295",
+      "candidate_blob": "a0c5ddd07d4cc2283a0d7fd884a89468ce6fb295",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc004-observer-transition-matrix.md",
+      "base_blob": "4d9cec7d0ac61eadc1a38d644dc1153e017bac35",
+      "candidate_blob": "4d9cec7d0ac61eadc1a38d644dc1153e017bac35",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc004-result-persistence-followup.md",
+      "base_blob": "06dbe6a378e62e36aed8a3e9ea41d634f7f75fbb",
+      "candidate_blob": "06dbe6a378e62e36aed8a3e9ea41d634f7f75fbb",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pc005-missing-gps-heading.md",
+      "base_blob": "d03732d64b88e7f4e48897d23fda56c4ab1ec659",
+      "candidate_blob": "d03732d64b88e7f4e48897d23fda56c4ab1ec659",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/README.md",
+      "base_blob": "8910aaf18e64c802a17cd5bd85aa2831451df116",
+      "candidate_blob": "8910aaf18e64c802a17cd5bd85aa2831451df116",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/native-tests.log",
+      "base_blob": "f59176743cc05b02fd4b8f4923a563185df09908",
+      "candidate_blob": "f59176743cc05b02fd4b8f4923a563185df09908",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/node-tests.log",
+      "base_blob": "13c18d56e7f59e7855da0177c5d3b8ac4573ff6e",
+      "candidate_blob": "13c18d56e7f59e7855da0177c5d3b8ac4573ff6e",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/preservation-proof.json",
+      "base_blob": "2604dcfab733f69bb4b579c5fbb4c52488b4df81",
+      "candidate_blob": "2604dcfab733f69bb4b579c5fbb4c52488b4df81",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-current-main-integration-2026-10-10/storage-negative-control.log",
+      "base_blob": "1a3810d35f70faacda1a0403dc2ccf3c2a529c72",
+      "candidate_blob": "1a3810d35f70faacda1a0403dc2ccf3c2a529c72",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/README.md",
+      "base_blob": "2d3fc42228f4e0c29243942783eb40b54b672052",
+      "candidate_blob": "2d3fc42228f4e0c29243942783eb40b54b672052",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/native-tests.log",
+      "base_blob": "8c07ae2ecf2c816453ab56632da10119613780cb",
+      "candidate_blob": "8c07ae2ecf2c816453ab56632da10119613780cb",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/negative-control.log",
+      "base_blob": "e692efaba21dee788dc7d6c5c1c6d92b1b070c76",
+      "candidate_blob": "e692efaba21dee788dc7d6c5c1c6d92b1b070c76",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/node-tests.log",
+      "base_blob": "37665f60d0040a810c50964481e19f9039aeda07",
+      "candidate_blob": "37665f60d0040a810c50964481e19f9039aeda07",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/preservation-proof.json",
+      "base_blob": "4efb9eb519c9dea8f06c1e8b41af389ff8431dd2",
+      "candidate_blob": "4efb9eb519c9dea8f06c1e8b41af389ff8431dd2",
+      "unchanged": true
+    },
+    {
+      "path": "verification/pr3-rollback-uncertainty-2026-10-10/rollback-reproduction.log",
+      "base_blob": "d2a207d2b6b470868194f9de41638e06fc2dcbab",
+      "candidate_blob": "d2a207d2b6b470868194f9de41638e06fc2dcbab",
+      "unchanged": true
+    },
+    {
+      "path": "verification/releases/1.11-notes.md",
+      "base_blob": "6cb97b4503961840779de07ee8585cf314d96a28",
+      "candidate_blob": "6cb97b4503961840779de07ee8585cf314d96a28",
+      "unchanged": true
+    },
+    {
+      "path": "verification/releases/1.11-signing-provenance.json",
+      "base_blob": "6c1434b8169ebfea411e3b2d02e316ad5c5c7d78",
+      "candidate_blob": "6c1434b8169ebfea411e3b2d02e316ad5c5c7d78",
+      "unchanged": true
+    }
+  ]
+}

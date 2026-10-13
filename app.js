@@ -19,14 +19,17 @@ import {
   insertStop,
   overlapCount,
   appendSection,
+  stopReference,
+  reconcileEvidenceStops,
 } from "./survey.js";
 import { DEFAULT_LANGUAGE, translate } from "./i18n.js";
 import { renderChart, chartPng } from "./charts.js";
 import { load, save, loadSurveyor, saveSurveyor } from "./storage.js";
 import { routes, checkRouteUpdates } from "./data.js";
-import { uploadSurvey } from "./upload.js";
+import { uploadSurvey, uploadReceiptStatus } from "./upload.js";
 import { makeExportBundle, withBundleChart } from "./export.js";
 import { importNativeTrack } from "./native-track.js";
+import { deleteRecords } from "./record-deletion.js";
 import {
   hkTimestamp,
   makeGpx,
@@ -70,7 +73,8 @@ let undoStack = [], redoStack = [], historyCurrent = null, historyId = null;
 const WEATHER = ["", "☀️", "🌤️", "☁️", "🌧️", "⛈️", "🌫️", "💨", "🌡️", "❄️"];
 const selectedRecordIds = new Set();
 let pendingDeleteIds = [];
-const cur = () => state.surveys.find((s) => s.id === state.currentId);
+const deleting = (id) => state.deletingIds?.includes(id) === true;
+const cur = () => state.surveys.find((s) => s.id === state.currentId && !deleting(s.id));
 const t = (key, values) => translate(state.language, key, values);
 const name = (stop) =>
   stop?.name?.[state.language === "en" ? "en" : "zh"] ||
@@ -98,25 +102,57 @@ function updateHistoryButtons() {
   $("undo").disabled = !undoStack.length;
   $("redo").disabled = !redoStack.length;
 }
+// Only user-editable survey data belongs in Undo/Redo. Evidence, upload state,
+// lifecycle state and view/cache metadata stay on the live survey object.
+function historySnapshot(s) {
+  const snapshot = {};
+  for (const key of [
+    "id", "route", "stops", "rows", "date", "vehicle", "notes", "weatherEmoji",
+    "surveyor", "startIndex", "pendingStart", "startSource", "activeIndex",
+    "initialOnboard", "finalOnboard", "endIndex", "startsAtOrigin", "endsAtTerminus",
+    "routeEdits", "segments",
+  ]) if (Object.hasOwn(s, key)) snapshot[key] = s[key];
+  // Keep every fetched snapshot in the live ledger. Undo only changes whether
+  // an intentional weather-selection event is applied, so late replies survive.
+  snapshot.weatherChanges = (s.weatherHistory || []).flatMap((event, index) =>
+    event.kind === "change" && !event.undone ? [index] : []);
+  return clone(snapshot);
+}
 function resetHistory() {
   const s = cur();
   historyId = s?.id || null;
-  historyCurrent = s ? clone(s) : null;
+  historyCurrent = s ? historySnapshot(s) : null;
   undoStack = [];
   redoStack = [];
   updateHistoryButtons();
 }
 function restoreHistory(snapshot, targetStack) {
   const s = cur();
-  if (!s || !snapshot) return;
-  const index = state.surveys.findIndex((x) => x.id === s.id);
-  if (index < 0) return;
-  targetStack.push(clone(s));
-  state.surveys[index] = clone(snapshot);
-  state.currentId = snapshot.id;
-  historyId = snapshot.id;
-  historyCurrent = clone(snapshot);
+  if (!s || !snapshot || snapshot.id !== s.id || !state.surveys.includes(s)) return;
+  reconcileEvidenceStops(s);
+  targetStack.push(historySnapshot(s));
+  // Apply the same editable whitelist to incoming snapshots so legacy or
+  // external history values cannot inject receipts or replace live evidence.
+  const restored = historySnapshot(snapshot);
+  const weatherChanges = new Set(snapshot.weatherChanges || restored.weatherChanges || []);
+  delete restored.weatherChanges;
+  // Retain live evidence and object identity for pending native imports,
+  // environment requests and upload checkpoints.
+  for (const key of Object.keys(historySnapshot(s))) delete s[key];
+  Object.assign(s, restored);
+  for (const [index, event] of (s.weatherHistory || []).entries()) {
+    if (event.kind !== "change") continue;
+    if (weatherChanges.has(index)) delete event.undone;
+    else event.undone = true;
+  }
+  reconcileEvidenceStops(s);
+  target = { index: s.activeIndex, field: target.field };
+  replaceOnDigit = true;
+  s.updatedAt = new Date().toISOString();
+  historyId = s.id;
+  historyCurrent = historySnapshot(s);
   persist();
+  renderUploadStatus(s);
   buildStopOptions();
   buildTable();
   renderSetup();
@@ -171,11 +207,12 @@ function appendTrackPoint(s, p) {
   if (s.track.length > 20000) s.track.splice(0, s.track.length - 20000);
 }
 function syncNativeTrack(s = cur()) {
+  if (s && deleting(s.id)) return false;
   try { return importNativeTrack(s, window.PassengerCountAndroid, persist); }
   catch { return false; }
 }
 function startNativeTracking(s = cur()) {
-  if (!s || s.status !== "in_progress") return;
+  if (!s || deleting(s.id) || s.status !== "in_progress") return;
   window.PassengerCountAndroid?.startTracking?.(s.id);
 }
 function stopNativeTracking(s = cur()) {
@@ -191,7 +228,7 @@ function reconcileSavedNativeTracks() {
   for (const s of state.surveys) syncNativeTrack(s);
 }
 async function captureStartEnvironment(s) {
-  const id = s.id;
+  const id = s.id, stopRef = stopReference(s, s.startIndex), emoji = s.weatherEmoji || "";
   const [calendar, weather] = await Promise.allSettled([
     fetchCalendarContext(s.date, schoolHolidayRanges()),
     fetchWeatherSnapshot(state.language),
@@ -203,23 +240,29 @@ async function captureStartEnvironment(s) {
     targetSurvey.weatherHistory ??= [];
     targetSurvey.weatherHistory.push({
       at: hkTimestamp(),
-      stopIndex: targetSurvey.startIndex,
-      emoji: targetSurvey.weatherEmoji || "",
+      stopIndex: stopRef?.index ?? null,
+      stopRef,
+      emoji,
       kind: "start",
       snapshot: weather.value,
     });
   }
+  reconcileEvidenceStops(targetSurvey);
   persist();
   if (cur()?.id === id) renderCount();
 }
 async function captureEta(s, index) {
-  const id = s.id;
+  const id = s.id, stopRefs = s.stops.map((_, i) => stopReference(s, i));
   const evidence = await fetchEtaEvidence(s, index);
+  evidence.currentStopRef = stopRefs[index] || null;
+  for (const [offset, result] of (evidence.results || []).entries())
+    result.stopRef = stopRefs[Number.isInteger(result.stopIndex) ? result.stopIndex : index + offset] || null;
   const targetSurvey = state.surveys.find((x) => x.id === id);
   if (!targetSurvey) return;
   targetSurvey.etaSnapshots ??= [];
   targetSurvey.etaSnapshots.push(evidence);
   if (targetSurvey.etaSnapshots.length > 200) targetSurvey.etaSnapshots.splice(0, targetSurvey.etaSnapshots.length - 200);
+  reconcileEvidenceStops(targetSurvey);
   persist();
   if (cur()?.id === id) {
     renderCount();
@@ -235,7 +278,8 @@ async function changeWeather(emoji, setupOnly = false) {
     renderSetup();
     return;
   }
-  const event = { at: hkTimestamp(), stopIndex: s.activeIndex, emoji, kind: "change", snapshot: null };
+  const event = { at: hkTimestamp(), stopIndex: s.activeIndex,
+    stopRef: stopReference(s, s.activeIndex), emoji, kind: "change", snapshot: null };
   s.weatherHistory ??= [];
   s.weatherHistory.push(event);
   edit();
@@ -287,7 +331,7 @@ function edit(recordHistory = true) {
   if (s) {
     if (recordHistory && historyId === s.id && historyCurrent) {
       const before = JSON.stringify(historyCurrent);
-      const after = JSON.stringify(s);
+      const after = JSON.stringify(historySnapshot(s));
       if (before !== after) {
         undoStack.push(historyCurrent);
         if (undoStack.length > 100) undoStack.shift();
@@ -295,12 +339,12 @@ function edit(recordHistory = true) {
       }
     }
     s.updatedAt = new Date().toISOString();
-    if (s.upload?.done) delete s.upload;
   }
   const saved = persist();
   if (s) {
+    renderUploadStatus(s);
     historyId = s.id;
-    historyCurrent = clone(s);
+    historyCurrent = historySnapshot(s);
   }
   updateHistoryButtons();
   return saved;
@@ -404,6 +448,7 @@ function showScreen(next) {
 function goHome() {
   if (!stopNativeTracking(cur())) { error(t("recordFailed")); return; }
   state.currentId = null;
+  resetHistory();
   showScreen("home");
 }
 function updateRecordSelection() {
@@ -440,10 +485,20 @@ function renderHome() {
     open.textContent = t(s.status === "completed" ? "view" : "resume");
     open.onclick = () =>
       openSurvey(s.id, s.status === "completed" ? "record" : "resume");
+    if (deleting(s.id)) {
+      detail.textContent += ` · ${t("deletePending")}`;
+      open.textContent = t("retryDelete");
+      open.onclick = () => {
+        pendingDeleteIds = [...state.deletingIds];
+        $("deleteDialog").showModal();
+        confirmDelete();
+      };
+    }
     buttons.append(open);
     if (s.status !== "completed") {
       const review = document.createElement("button");
       review.className = "secondary";
+      review.disabled = deleting(s.id);
       review.textContent = t("view");
       review.onclick = () => openSurvey(s.id, "record");
       buttons.append(review);
@@ -491,45 +546,51 @@ function requestDelete() {
   $("deleteReview").scrollTop = 0;
 }
 function confirmDelete() {
-  const ids = new Set(pendingDeleteIds);
-  if (!state.surveys.some((s) => ids.has(s.id))) return;
-  const next = {
-    ...state,
-    surveys: state.surveys.filter((s) => !ids.has(s.id)),
-  };
-  if (ids.has(next.currentId)) {
-    next.currentId = null;
-    next.screen = "home";
-  }
-  // Commit the whole selection together; a failed write retains every record.
   try {
-    save(next);
+    deleteRecords(state, pendingDeleteIds, window.PassengerCountAndroid, save);
   } catch {
-    $("deleteError").textContent = t("deleteFailed");
+    $("deleteError").textContent = t(state.deletingIds?.length ? "deleteIncomplete" : "deleteFailed");
     $("deleteError").hidden = false;
     $("deleteError").scrollIntoView({ block: "nearest" });
+    renderHome();
     return;
   }
-  Object.assign(state, next);
   deleteMode = false;
   selectedRecordIds.clear();
   pendingDeleteIds = [];
   $("deleteDialog").close();
   showScreen("home");
 }
+function resumePendingDeletion() {
+  if (!state.deletingIds?.length) return;
+  const ids = new Set(state.deletingIds);
+  try {
+    deleteRecords(state, [], window.PassengerCountAndroid, save);
+    for (const id of ids) selectedRecordIds.delete(id);
+    pendingDeleteIds = pendingDeleteIds.filter(id => !ids.has(id));
+    if (!pendingDeleteIds.length && $("deleteDialog").open) $("deleteDialog").close();
+    if ($("error").textContent === t("deleteIncomplete")) error("");
+    if (screen === "home") renderHome();
+  } catch { error(t("deleteIncomplete")); }
+}
+
 function openSurvey(id, mode) {
+  if (deleting(id)) return;
   state.currentId = id;
   const s = cur();
   if (!s) return;
   target = { index: s.activeIndex || 0, field: "boarding" };
   replaceOnDigit = true;
   nearestIndex = null;
-  resetHistory();
-  if (mode === "resume" && s.startIndex != null) {
+  if (mode === "resume" && s.startIndex != null && s.status !== "completed") {
     s.status = "in_progress";
     s.completedAt = null;
+    resetHistory();
     showScreen("count");
-  } else showScreen(mode === "record" ? "record" : "setup");
+  } else {
+    resetHistory();
+    showScreen(mode === "record" || s.status === "completed" ? "record" : "setup");
+  }
 }
 function dataStatus(raw) {
   const date = /\d{4}-\d{2}-\d{2}/.exec(raw)?.[0];
@@ -960,6 +1021,7 @@ function pause(status) {
   s.status = status;
   s.updatedAt = new Date().toISOString();
   s[status === "aborted" ? "abortedAt" : "pausedAt"] = s.updatedAt;
+  resetHistory();
   if (stopNativeTracking(s) && persist()) {
     error();
     goHome();
@@ -970,6 +1032,7 @@ function complete() {
   if (s.status !== "completed") {
     recordStop(s, s.activeIndex, hkClock().time, false, hkTimestamp());
     completeSurvey(s, s.activeIndex);
+    resetHistory();
   }
   if (!stopNativeTracking(s) || !persist()) {
     error(t("recordFailed"));
@@ -994,7 +1057,7 @@ function renderRecord() {
   $("recordMetrics").textContent = metricsText(s);
   if (document.activeElement !== $("vehicleRecord")) $("vehicleRecord").value = s.vehicle || "";
   $("vehicleRecordInfo").textContent = vehicleInfo(s);
-  const weatherEvents = s.weatherHistory || [];
+  const weatherEvents = (s.weatherHistory || []).filter(event => !event.undone);
   const changes = weatherEvents.filter((x) => x.kind === "change").length;
   const calendarBits = [
     s.calendarContext?.publicHoliday ? "public holiday" : "",
@@ -1009,7 +1072,7 @@ function renderRecord() {
   $("etaRecordSummary").textContent = etaStatusText(s);
   $("completedMessage").textContent =
     s.status === "completed" ? t("completedSaved") : t("pauseHelp");
-  $("uploadStatus").textContent = s.upload?.done ? t("uploaded") : "";
+  renderUploadStatus(s);
   showIssues($("recordIssues"), result);
   renderChart($("chart"), s, t, name);
   $("recordBody").replaceChildren();
@@ -1343,13 +1406,16 @@ function joinSection() {
   const s = cur(),
     route = sectionOptions[+$("sectionChoice").value];
   if (!route) return;
-  appendSection(s, route, sectionStops, +$("sectionOverlap").value);
+  const previousStatus = s.status;
+  try { appendSection(s, route, sectionStops, +$("sectionOverlap").value); }
+  catch { error(t("continueConflict")); return; }
+  // Appending an active route is editable; reopening a stopped journey is a
+  // lifecycle boundary and cannot be reversed by count-history navigation.
+  if (s.status !== previousStatus) resetHistory();
+  error();
   edit();
   $("sectionDialog").close();
-  buildStopOptions();
-  buildTable();
-  setupMap();
-  renderCount();
+  showScreen("count");
 }
 function exportFilename(extension) {
   const s = cur(), stamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -1466,17 +1532,28 @@ async function saveChart() {
     updateExportControls();
   }
 }
+function renderUploadStatus(s = cur()) {
+  const key = { current: "uploaded", changed: "uploadedEarlier", unknown: "uploadedUnverified", uncertain: "uploadUncertain" }[uploadReceiptStatus(s)];
+  $("uploadStatus").textContent = key ? t(key) : "";
+}
 async function upload() {
   const s = cur();
-  if (uploadBusy) return;
+  if (uploadBusy || !s) return;
+  if (s.upload?.done || s.upload?.uncertain) { renderUploadStatus(s); return; }
   if (!s.rows.some(rowObserved)) return error(t("noObservations"));
   uploadBusy = true;
   $("upload").disabled = true;
   try {
     $("uploadStatus").textContent = t("uploading");
-    await uploadSurvey(s, persist);
-    $("uploadStatus").textContent = t("uploaded");
+    await uploadSurvey(s, () => {
+      // A successful save of a different/current workspace is not an upload
+      // checkpoint for a removed, pending-deletion or replaced survey object.
+      if (!state.surveys.includes(s) || deleting(s.id)) return false;
+      return persist();
+    });
+    if (cur() === s) renderUploadStatus(s);
   } catch {
+    if (cur() === s) renderUploadStatus(s);
     error(t("uploadError"));
   } finally {
     uploadBusy = false;
@@ -1497,7 +1574,10 @@ $("new").onclick = () => {
   showScreen("setup");
 };
 $("setupHome").onclick = () => {
-  if (cur()?.status === "in_progress") cur().status = "paused";
+  if (cur()?.status === "in_progress") {
+    cur().status = "paused";
+    resetHistory();
+  }
   goHome();
 };
 $("recordHome").onclick = goHome;
@@ -1593,12 +1673,16 @@ $("confirm").onclick = () => {
   s.endIndex = null;
   s.completedAt = null;
   active(s.startIndex);
-  edit();
+  resetHistory();
+  edit(false);
   captureStartEnvironment(s).catch(() => {});
   showScreen("count");
 };
 $("resume").onclick = () => {
-  if (cur().status !== "completed") cur().status = "in_progress";
+  if (cur().status !== "completed" && cur().status !== "in_progress") {
+    cur().status = "in_progress";
+    resetHistory();
+  }
   showScreen("count");
 };
 $("settings").onclick = () => showScreen("setup");
@@ -1718,6 +1802,7 @@ $("editRecord").onclick = () => {
 $("continueRecord").onclick = () => {
   try {
     reopenSurvey(cur());
+    resetHistory();
     error();
     target = { index: cur().activeIndex, field: "boarding" };
     showScreen("count");
@@ -1816,6 +1901,7 @@ new ResizeObserver(() => {
     `${Math.ceil($("recordSelection").getBoundingClientRect().height)}px`,
   );
 }).observe($("recordSelection"));
+resumePendingDeletion();
 const query = state.search || {};
 const initialScreen = state.screen || cur()?.screen;
 $("route").value = query.number || "";
@@ -1824,6 +1910,7 @@ $("operator").value = query.operator || "";
 if (cur()) {
   target = { index: cur().activeIndex || 0, field: "boarding" };
   $("allStops").open = cur().tableExpanded === true;
+  resetHistory();
   showScreen(
     cur().status === "completed"
       ? "record"
@@ -1847,6 +1934,7 @@ else checkRouteUpdates(dataStatus).then((value) => { data = value; })
 window.addEventListener("pagehide", persist);
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
+    resumePendingDeletion();
     reconcileSavedNativeTracks();
     checkRouteUpdates(dataStatus).then((value) => { data = value; })
       .catch(() => dataStatus("Update unavailable"));

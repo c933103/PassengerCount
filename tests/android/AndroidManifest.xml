@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.passengercount.tests">
+    <uses-sdk android:minSdkVersion="35" android:targetSdkVersion="35" />
+    <application android:label="PassengerCount lifecycle tests" />
+    <instrumentation android:name="app.passengercount.JournalLifecycleInstrumentation"
+        android:targetPackage="app.passengercount" android:functionalTest="true" />
+</manifest>
