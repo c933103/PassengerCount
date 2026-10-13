@@ -135,14 +135,18 @@ detached() {
   local kind=$1 oldpid=$2 proof="$OUT/instrumentation-detached-$1.txt"
   # API35 has no `activity instrumentation` dump command: its error text is not
   # evidence of detachment. The package-filtered processes dump includes active
-  # instrumentation before PID mappings. Require both the expected header and
-  # the original process's later mapping, and reject errors/partial output.
-  if ! adb shell dumpsys activity processes "$PACKAGE" > "$proof" 2>&1; then
+  # instrumentation before PID mappings. Its final field is emitted only after
+  # the whole dump. Require that complete response and empty stderr: dumpsys
+  # can return zero after Binder/poll/read failures, so exit status isn't proof.
+  if ! adb shell dumpsys activity processes "$PACKAGE" > "$proof" 2> "$proof.stderr"; then
     echo 'INSTRUMENTATION_DETACH_UNVERIFIED: process dump command failed'; exit 1
   fi
-  if grep -Eiq 'Unknown command|Bad activity command|Permission Denial|SecurityException|DUMP TIMEOUT|Error dumping service' "$proof" \
-    || ! grep -Fxq 'ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)' "$proof" \
-    || ! grep -Eq "PID #$oldpid:.*[[:space:]]$oldpid:$PACKAGE/" "$proof"; then
+  if [[ -s "$proof.stderr" ]] || ! awk -v pid="$oldpid" -v package="$PACKAGE" '
+    NR == 1 { header=($0 == "ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)") }
+    index($0,"PID #" pid ":") && index($0," " pid ":" package "/") { mapped=1 }
+    NF { last=$0 }
+    END { exit !(header && mapped && last ~ /^  mForceBackgroundCheck=(true|false)$/) }
+  ' "$proof"; then
     echo 'INSTRUMENTATION_DETACH_UNVERIFIED: missing complete supported process dump'; exit 1
   fi
   if grep -Eq 'Active instrumentation:|ActiveInstrumentation|mInstr=' "$proof"; then

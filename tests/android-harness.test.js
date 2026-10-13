@@ -14,15 +14,17 @@ const observer=source.slice(start,end+2).replace(/\bSECONDS\b/g,'fixtureSeconds'
 const detachedStart=source.indexOf('detached() {'), detachedEnd=source.indexOf('\ncrash_observe() {',detachedStart);
 assert.ok(detachedStart>=0&&detachedEnd>detachedStart);
 const detachedCheck=source.slice(detachedStart,detachedEnd);
-function detachedFixture({output,code=0}) {
+function detachedFixture({output,stderr='',code=0}) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'passenger-detached-'));
   try {
     fs.writeFileSync(path.join(dir,'dump'),output);
+    fs.writeFileSync(path.join(dir,'stderr'),stderr);
     const script=`set -euo pipefail
 OUT=${JSON.stringify(dir)}; PACKAGE=app.passengercount
 adb(){
   printf '%s\\n' "$*" > "$OUT/command"
   cat "$OUT/dump"
+  cat "$OUT/stderr" >&2
   return ${code}
 }
 ${detachedCheck}
@@ -34,7 +36,8 @@ detached valid 111
 }
 const processHeader='ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)';
 const pidMapping='  PID mappings:\n    PID #111: ProcessRecord{abc 111:app.passengercount/u0a100}\n';
-const detachedDump=processHeader+'\n'+pidMapping;
+const processEnd='  mForceBackgroundCheck=false\n';
+const detachedDump=processHeader+'\n'+pidMapping+processEnd;
 test('detachment requires supported package-filtered process dump and original PID mapping',()=>{
   const r=detachedFixture({output:detachedDump});
   assert.equal(r.status,0,r.output);
@@ -45,16 +48,31 @@ for (const [label,output,code] of [
   ['captured API35 unsupported command','Unknown command: instrumentation\nBad activity command, or no activities match: instrumentation\nUse -h for help.\n',0],
   ['empty output','',0],
   ['header-only partial output',processHeader+'\n',0],
+  ['truncated after PID mapping',processHeader+'\n'+pidMapping,0],
+  ['unrecognized trailing output',detachedDump+'unexpected trailing result\n',0],
   ['missing header',pidMapping,0],
   ['another process PID',detachedDump.replaceAll('111','222'),0],
   ['command failure with otherwise valid output',detachedDump,1],
   ['dump timeout',detachedDump+'*** DUMP TIMEOUT ***\n',0],
   ['permission denial',detachedDump+'Permission Denial: cannot dump activity\n',0],
-  ['active instrumentation summary',processHeader+'\n  Active instrumentation:\n    Instrumentation #0: ActiveInstrumentation{abc app.passengercount.tests/.JournalLifecycleInstrumentation}\n'+pidMapping,0],
-  ['active instrumentation on following lines',processHeader+'\n  Active instrumentation:\n    targetInfo=app.passengercount\n'+pidMapping,0],
-  ['process still instrumented',processHeader+'\n    mInstr=ActiveInstrumentation{abc}\n'+pidMapping,0],
+  ['active instrumentation summary',processHeader+'\n  Active instrumentation:\n    Instrumentation #0: ActiveInstrumentation{abc app.passengercount.tests/.JournalLifecycleInstrumentation}\n'+pidMapping+processEnd,0],
+  ['active instrumentation on following lines',processHeader+'\n  Active instrumentation:\n    targetInfo=app.passengercount\n'+pidMapping+processEnd,0],
+  ['process still instrumented',processHeader+'\n    mInstr=ActiveInstrumentation{abc}\n'+pidMapping+processEnd,0],
 ]) test('detachment fails closed for '+label,()=>{
   const r=detachedFixture({output,code});assert.notEqual(r.status,0,r.output);assert.doesNotMatch(r.output,/DETACHED_STATE_PASS/);
+});
+for (const error of [
+  'Error in poll while dumping service activity : Interrupted system call',
+  'Failed to read while dumping service activity: Broken pipe',
+  "Error with service 'activity' while dumping: DEAD_OBJECT",
+  'Failed to write while dumping service activity: Broken pipe',
+  'Failed to create pipe to dump service info for activity: Too many open files',
+  "Can't find service: activity",
+  'Permission Denial: cannot dump activity',
+  'unrecognized diagnostic from transport',
+]) test('detachment rejects stderr despite complete stdout and zero exit: '+error,()=>{
+  const r=detachedFixture({output:detachedDump,stderr:error+'\n'});
+  assert.notEqual(r.status,0,r.output);assert.doesNotMatch(r.output,/DETACHED_STATE_PASS/);
 });
 function fixture({kind='valid',marker=true,startAfter=true,rightPid=true,delayed=false}) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'passenger-observer-'));
