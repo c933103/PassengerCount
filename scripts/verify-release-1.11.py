@@ -169,57 +169,43 @@ def run_verified_tool(args, label):
     return proc.stdout
 
 
-def run_verification(ci_artifact_path, candidate_path, previous_path, android_home):
-    with POLICY_FILE.open(encoding="utf-8") as inp:
-        policy = json.load(inp)
-    with OLD_PROVENANCE_FILE.open(encoding="utf-8") as inp:
-        provenance = json.load(inp)
-    validate_policy(policy, provenance)
+def private_snapshot(directory, filename, binary):
+    """Pin previously read bytes to a private, exclusive file for SDK tooling."""
+    path = Path(directory) / filename
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags, 0o600)
+    with os.fdopen(fd, "wb") as out:
+        out.write(binary)
+        out.flush()
+        os.fsync(out.fileno())
+    require(path.stat().st_size == len(binary),
+            "Private verifier snapshot was not completely persisted")
+    return path
 
-    archive = bounded_read_file(ci_artifact_path)
-    require(sha256_bytes(archive) == policy["ci_artifact_zip_sha256"],
-            "CI artifact ZIP differs from the accepted post-merge GitHub artifact")
-    ci_files = safe_entries(archive, "CI artifact ZIP")
-    require({"aligned.apk", "PassengerCount.apk", "signing-tools/lib/apksigner.jar"}.issubset(ci_files),
-            "Accepted CI ZIP is missing mandatory signed/unsigned APKs or verification utility")
-    aligned = ci_files["aligned.apk"]
-    require(sha256_bytes(aligned) == policy["aligned_apk_sha256"],
-            "CI aligned unsigned APK SHA-256 differs from accepted source")
-    require(sha256_bytes(ci_files["PassengerCount.apk"]) == policy["ci_ephemeral_apk_sha256"],
-            "CI validation-signer APK SHA-256 differs from accepted source")
 
-    candidate = bounded_read_file(candidate_path)
-    require(sha256_bytes(candidate) != policy["ci_ephemeral_apk_sha256"],
-            "CI ephemeral validation APK cannot be published as a production upgrade")
-    payload_entry_count = verify_payload_identity(aligned, candidate)
-
-    previous = bounded_read_file(previous_path)
-    require(sha256_bytes(previous) == policy["previous_apk_sha256"],
-            "1.10 APK bytes differ from previously delivered version")
-    # Check prior APK ZIP integrity too, regardless of whether it verifies cryptographically.
-    safe_entries(previous, "previous delivered v1.10 APK")
-    require(android_home and Path(android_home).is_dir(),
-            "ANDROID_HOME must point to a trusted installed Android SDK")
-    aapt = Path(android_home) / "build-tools" / "35.0.0" / "aapt2"
-    require(aapt.is_file() and os.access(aapt, os.X_OK),
-            "Android SDK build-tools/35.0.0/aapt2 is required; do not skip manifest checks")
-
+def local_sdk_tools(android_home):
+    # Local, audited SDK tools must be used on the private signing workstation.
+    # Never execute the apksigner.jar bundled in a downloaded CI artifact.
+    aapt, apksigner = local_sdk_tools(android_home)
+    # Every tool sees the exact already-validated bytes, not caller-controlled
+    # paths that could be swapped between the ZIP, signer and manifest checks.
     with tempfile.TemporaryDirectory(prefix="passengercount-verify-") as temp_dir:
-        verifier = Path(temp_dir) / "apksigner.jar"
-        verifier.write_bytes(ci_files["signing-tools/lib/apksigner.jar"])
-        signer_cmd = ["java", "-jar", str(verifier), "verify", "--verbose",
+        snapshot_dir = Path(temp_dir)
+        candidate_snapshot = private_snapshot(snapshot_dir, "candidate.apk", candidate)
+        previous_snapshot = private_snapshot(snapshot_dir, "previous.apk", previous)
+        signer_cmd = [str(apksigner), "verify", "--verbose",
                       "--print-certs", "--min-sdk-version", "26"]
-        cert = parse_apksigner(run_verified_tool(signer_cmd + [str(candidate_path)],
+        cert = parse_apksigner(run_verified_tool(signer_cmd + [str(candidate_snapshot)],
                                                 "Android 1.11 APK signature"),
                                policy["original_certificate_sha256"])
-        parse_apksigner(run_verified_tool(signer_cmd + [str(previous_path)],
+        parse_apksigner(run_verified_tool(signer_cmd + [str(previous_snapshot)],
                                            "Delivered 1.10 APK signature"), cert)
-    parse_badging(run_verified_tool([str(aapt), "dump", "badging", str(candidate_path)],
-                                   "Android 1.11 APK manifest"),
-                  policy["package"], 12, "1.11", 26, 35)
-    # Previous 1.10 min/target SDK may differ: validate only the upgrade identity.
-    old_badging = run_verified_tool([str(aapt), "dump", "badging", str(previous_path)],
-                                    "Delivered 1.10 APK manifest")
+        parse_badging(run_verified_tool([str(aapt), "dump", "badging", str(candidate_snapshot)],
+                                       "Android 1.11 APK manifest"),
+                      policy["package"], 12, "1.11", 26, 35)
+        # Previous 1.10 min/target SDK may differ: validate only upgrade identity.
+        old_badging = run_verified_tool([str(aapt), "dump", "badging", str(previous_snapshot)],
+                                        "Delivered 1.10 APK manifest")
     old_pkg = re.findall(r"^package:\s+name='([^']+)' versionCode='([^']+)' versionName='([^']+)'(?:\s|$)",
                          old_badging, flags=re.M)
     require(old_pkg == [(policy["package"], "11", "1.10")],

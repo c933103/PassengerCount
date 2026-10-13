@@ -1,6 +1,9 @@
 """Offline release acceptance negative controls; no key material or network."""
 import importlib.util
 import io
+import os
+import stat
+import tempfile
 from pathlib import Path
 import re
 import unittest
@@ -156,6 +159,35 @@ targetSdkVersion:'35'
         badging = "package: name='app.passengercount' versionCode='12' versionName='1.11'\nsdkVersion:'28'\ntargetSdkVersion:'35'\n"
         with self.assertRaisesRegex(rv.VerificationError, "Wrong Android SDK bounds"):
             rv.parse_badging(badging, "app.passengercount", 12, "1.11", 26, 35)
+
+    def test_private_snapshot_is_unaffected_by_mutable_input(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            external = root / "external.apk"
+            external.write_bytes(b"captured-bytes")
+            with tempfile.TemporaryDirectory(dir=root) as private_dir:
+                captured = rv.private_snapshot(private_dir, "candidate.apk", external.read_bytes())
+                external.write_bytes(b"mutated-after-capture")
+                self.assertEqual(captured.read_bytes(), b"captured-bytes")
+                self.assertEqual(stat.S_IMODE(captured.stat().st_mode), 0o600)
+                with self.assertRaises(FileExistsError):
+                    rv.private_snapshot(private_dir, "candidate.apk", b"overwrite")
+
+    def test_trusted_local_sdk_tools_and_no_symlink(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            sdk = root / "build-tools" / "35.0.0"
+            sdk.mkdir(parents=True)
+            aapt = sdk / "aapt2"
+            signer = sdk / "apksigner"
+            for path in (aapt, signer):
+                path.write_bytes(b"fixture")
+                path.chmod(0o700)
+            self.assertEqual(rv.local_sdk_tools(root), (aapt, signer))
+            signer.unlink()
+            signer.symlink_to(aapt)
+            with self.assertRaisesRegex(rv.VerificationError, "Trusted Android SDK"):
+                rv.local_sdk_tools(root)
 
     def test_policy_is_bound_to_current_provenance(self):
         import json
