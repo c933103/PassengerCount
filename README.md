@@ -68,6 +68,8 @@ Install JDK 17, Android SDK Platform 35 and Build Tools 35.0.0. Keep the signing
 
 The output is `android/build/PassengerCount.apk`. Increment the manifest's `versionCode` for updates and sign with the same key to preserve existing installed surveys. Signing keys and build outputs are excluded from Git.
 
+For release 1.11, [candidate provenance and original-signer verification](verification/releases/1.11-candidate-verification.md) is a separate offline, fail-closed step. The GitHub Actions validation APK cannot be used as a same-signer upgrade. Do not publish without the original private signer, exact CI/source/APK checks and real-device upgrade acceptance.
+
 Calculation, storage and export-handler tests: `npm test` (Node 18 or newer). Native journal/session and export permission/lifecycle host tests: `npm run test:native` (JDK required). Browser smoke tests: `npm run test:browser` after installing Playwright, with `CHROME_PATH` if using a separately installed Chromium. The smoke test uses mock GPS, route data, tiles and the native bridge; it does not write to the live database.
 
 For web development only, serve this directory with any static web server. Deploy the browser version over HTTPS for geolocation and service workers.
