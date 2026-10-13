@@ -132,14 +132,27 @@ background_home() {
   sleep 1
 }
 detached() {
-  adb shell dumpsys activity instrumentation > "$OUT/instrumentation-detached-$1.txt"
-  if grep -q 'ActiveInstrumentation.*app.passengercount' "$OUT/instrumentation-detached-$1.txt"; then
+  local kind=$1 oldpid=$2 proof="$OUT/instrumentation-detached-$1.txt"
+  # API35 has no `activity instrumentation` dump command: its error text is not
+  # evidence of detachment. The package-filtered processes dump includes active
+  # instrumentation before PID mappings. Require both the expected header and
+  # the original process's later mapping, and reject errors/partial output.
+  if ! adb shell dumpsys activity processes "$PACKAGE" > "$proof" 2>&1; then
+    echo 'INSTRUMENTATION_DETACH_UNVERIFIED: process dump command failed'; exit 1
+  fi
+  if grep -Eiq 'Unknown command|Bad activity command|Permission Denial|SecurityException|DUMP TIMEOUT|Error dumping service' "$proof" \
+    || ! grep -Fxq 'ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)' "$proof" \
+    || ! grep -Eq "PID #$oldpid:.*[[:space:]]$oldpid:$PACKAGE/" "$proof"; then
+    echo 'INSTRUMENTATION_DETACH_UNVERIFIED: missing complete supported process dump'; exit 1
+  fi
+  if grep -Eq 'Active instrumentation:|ActiveInstrumentation|mInstr=' "$proof"; then
     echo 'Instrumentation still active; cannot claim an ordinary sticky restart'; exit 1
   fi
+  printf 'DETACHED_STATE_PASS %s pid=%s\n' "$kind" "$oldpid"
 }
 crash_observe() {
   local kind=$1 oldpid=$2 deadline=$((SECONDS+75)) newpid= completed=false
-  detached "$kind"
+  detached "$kind" "$oldpid"
   # Only service starts AFTER this phase's detached SIGKILL count. PID creation
   # precedes onStartCommand, so poll for the required service state as well.
   while ((SECONDS<deadline)); do
@@ -187,3 +200,4 @@ crash_observe deleted "$oldpid"
 # bytes and retries cleanup, not the automatic restart itself.
 phase verify-deleted
 printf 'PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim\n' | tee "$OUT/result.txt"
+
