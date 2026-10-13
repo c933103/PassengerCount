@@ -184,15 +184,55 @@ def private_snapshot(directory, filename, binary):
 
 
 def local_sdk_tools(android_home):
-    # Local, audited SDK tools must be used on the private signing workstation.
-    # Never execute the apksigner.jar bundled in a downloaded CI artifact.
+    """Only independently trusted local Android SDK executables are permitted."""
+    require(android_home and Path(android_home).is_dir(),
+            "ANDROID_HOME must point to a trusted installed Android SDK")
+    tools = Path(android_home) / "build-tools" / "35.0.0"
+    aapt = tools / "aapt2"
+    apksigner = tools / "apksigner"
+    for executable in (aapt, apksigner):
+        require(executable.is_file() and not executable.is_symlink()
+                and os.access(executable, os.X_OK),
+                f"Trusted Android SDK tool is missing, unsafe or not executable: {executable}")
+    return aapt, apksigner
+
+
+def run_verification(ci_artifact_path, candidate_path, previous_path, android_home):
+    with POLICY_FILE.open(encoding="utf-8") as inp:
+        policy = json.load(inp)
+    with OLD_PROVENANCE_FILE.open(encoding="utf-8") as inp:
+        provenance = json.load(inp)
+    validate_policy(policy, provenance)
+
+    archive = bounded_read_file(ci_artifact_path)
+    require(sha256_bytes(archive) == policy["ci_artifact_zip_sha256"],
+            "CI artifact ZIP differs from the accepted post-merge GitHub artifact")
+    ci_files = safe_entries(archive, "CI artifact ZIP")
+    require({"aligned.apk", "PassengerCount.apk"}.issubset(ci_files),
+            "Accepted CI ZIP is missing signed/unsigned validation APKs")
+    aligned = ci_files["aligned.apk"]
+    require(sha256_bytes(aligned) == policy["aligned_apk_sha256"],
+            "CI aligned unsigned APK SHA-256 differs from accepted source")
+    require(sha256_bytes(ci_files["PassengerCount.apk"]) == policy["ci_ephemeral_apk_sha256"],
+            "CI validation-signer APK SHA-256 differs from accepted source")
+
+    candidate = bounded_read_file(candidate_path)
+    require(sha256_bytes(candidate) != policy["ci_ephemeral_apk_sha256"],
+            "CI ephemeral validation APK cannot be published as a production upgrade")
+    payload_entry_count = verify_payload_identity(aligned, candidate)
+
+    previous = bounded_read_file(previous_path)
+    require(sha256_bytes(previous) == policy["previous_apk_sha256"],
+            "1.10 APK bytes differ from previously delivered version")
+    safe_entries(previous, "previous delivered v1.10 APK")
+
+    # Resolve only trusted *local* SDK executables, not executable data from
+    # the CI artifact. Run all tools on private copies of the exact bytes
+    # already hashed/compared, never on mutable caller-provided file paths.
     aapt, apksigner = local_sdk_tools(android_home)
-    # Every tool sees the exact already-validated bytes, not caller-controlled
-    # paths that could be swapped between the ZIP, signer and manifest checks.
     with tempfile.TemporaryDirectory(prefix="passengercount-verify-") as temp_dir:
-        snapshot_dir = Path(temp_dir)
-        candidate_snapshot = private_snapshot(snapshot_dir, "candidate.apk", candidate)
-        previous_snapshot = private_snapshot(snapshot_dir, "previous.apk", previous)
+        candidate_snapshot = private_snapshot(temp_dir, "candidate.apk", candidate)
+        previous_snapshot = private_snapshot(temp_dir, "previous.apk", previous)
         signer_cmd = [str(apksigner), "verify", "--verbose",
                       "--print-certs", "--min-sdk-version", "26"]
         cert = parse_apksigner(run_verified_tool(signer_cmd + [str(candidate_snapshot)],
@@ -203,11 +243,12 @@ def local_sdk_tools(android_home):
         parse_badging(run_verified_tool([str(aapt), "dump", "badging", str(candidate_snapshot)],
                                        "Android 1.11 APK manifest"),
                       policy["package"], 12, "1.11", 26, 35)
-        # Previous 1.10 min/target SDK may differ: validate only upgrade identity.
+        # The 1.10 min/target SDK may differ: check only original upgrade identity.
         old_badging = run_verified_tool([str(aapt), "dump", "badging", str(previous_snapshot)],
                                         "Delivered 1.10 APK manifest")
-    old_pkg = re.findall(r"^package:\s+name='([^']+)' versionCode='([^']+)' versionName='([^']+)'(?:\s|$)",
-                         old_badging, flags=re.M)
+    old_pkg = re.findall(
+        r"^package:\s+name='([^']+)' versionCode='([^']+)' versionName='([^']+)'(?:\s|$)",
+        old_badging, flags=re.M)
     require(old_pkg == [(policy["package"], "11", "1.10")],
             f"Previous APK identity does not match package/code11/version1.10: {old_pkg}")
 
