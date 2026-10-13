@@ -1,0 +1,16 @@
+{
+  "package": "app.passengercount",
+  "version_name": "1.11",
+  "version_code": 12,
+  "min_sdk": 26,
+  "target_sdk": 35,
+  "accepted_main_commit": "ed0a10a8bd61f9be7348cf6e3b980013acdecad3",
+  "accepted_tree": "2af449ab36a4d895ad2e8bcb2e323a596097d025",
+  "ci_run": 38332107783,
+  "ci_artifact_id": 11782629978,
+  "ci_artifact_zip_sha256": "f7ac677c193ad4afc3f43eb92d17949485e51243fc3358c7930c25b6d9b6ff81",
+  "aligned_apk_sha256": "c39e95233fa795f1af3e0f8f920933835ccb5a77ee31bb4568611fa15478e7f3",
+  "ci_ephemeral_apk_sha256": "4b37298bfb94f0492cc591a3aa0ced74d024bcc1fbe96fb5498aff05a7a3e964",
+  "previous_apk_sha256": "35be9119d6ad3506b23ed4f7ae9c6b6b6942e30b891e00b961c9bab01f467e19",
+  "original_certificate_sha256": "ce0a702a8515a3e5cfa03ba55ce2bd6279eb060cebcab9ac9aa4a4614a8667c8"
+}
