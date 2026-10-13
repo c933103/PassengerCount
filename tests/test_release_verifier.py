@@ -7,6 +7,9 @@ import tempfile
 from pathlib import Path
 import re
 import unittest
+from unittest import mock
+import hashlib
+import json
 import zipfile
 
 MODULE = Path(__file__).resolve().parents[1] / "scripts" / "verify-release-1.11.py"
@@ -207,6 +210,125 @@ targetSdkVersion:'35'
         policy["accepted_tree"] = "0" * 40
         with self.assertRaisesRegex(rv.VerificationError, "tree does not match"):
             rv.validate_policy(policy, provenance)
+
+
+    def test_complete_synthetic_release_gate_uses_only_snapshot_bytes(self):
+        # Contract integration: mock signer/aapt transcripts are NOT actual
+        # original-key acceptance. This catches broken CLI/helper wiring.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with zipfile.ZipFile(io.BytesIO(ALIGNED)) as source:
+                entries = [(name, source.read(name)) for name in source.namelist()]
+            candidate_bytes = zipped(entries + [
+                ("META-INF/MANIFEST.MF", b"signature manifest"),
+                ("META-INF/ORIGINAL.SF", b"signature file"),
+                ("META-INF/ORIGINAL.RSA", b"signer certificate")])
+            ci_ephemeral = zipped(entries)
+            previous_bytes = zipped([("AndroidManifest.xml", b"1.10"),
+                                     ("classes.dex", b"old-dex")])
+            artifact = zipped([("aligned.apk", ALIGNED),
+                               ("PassengerCount.apk", ci_ephemeral)])
+            artifact_path = root / "accepted-ci.zip"
+            candidate_path = root / "candidate.apk"
+            previous_path = root / "previous.apk"
+            artifact_path.write_bytes(artifact)
+            candidate_path.write_bytes(candidate_bytes)
+            previous_path.write_bytes(previous_bytes)
+            digest = lambda data: hashlib.sha256(data).hexdigest()
+            policy = {
+                "accepted_main_commit": "ed0a10a8bd61f9be7348cf6e3b980013acdecad3",
+                "accepted_tree": "2af449ab36a4d895ad2e8bcb2e323a596097d025",
+                "ci_run": 38332107783, "ci_artifact_id": 11782629978,
+                "ci_artifact_zip_sha256": digest(artifact),
+                "aligned_apk_sha256": digest(ALIGNED),
+                "ci_ephemeral_apk_sha256": digest(ci_ephemeral),
+                "previous_apk_sha256": digest(previous_bytes),
+                "original_certificate_sha256": ORIGINAL_CERT,
+                "package": "app.passengercount", "version_name": "1.11",
+                "version_code": 12, "min_sdk": 26, "target_sdk": 35,
+            }
+            provenance = {
+                "certificate_sha256": ORIGINAL_CERT,
+                "delivered_apk_sha256": digest(previous_bytes),
+                "package": "app.passengercount",
+                "candidate_version": "1.11", "candidate_version_code": 12,
+                "delivered_version": "1.10", "delivered_code": 11,
+            }
+            policy_file = root / "policy.json"
+            provenance_file = root / "provenance.json"
+            policy_file.write_text(json.dumps(policy))
+            provenance_file.write_text(json.dumps(provenance))
+            sdk = root / "sdk"
+            tools = sdk / "build-tools" / "35.0.0"
+            tools.mkdir(parents=True)
+            for name in ("aapt2", "apksigner"):
+                stub = tools / name
+                stub.write_text("trusted tool placeholder; never executed")
+                stub.chmod(0o700)
+            calls = []
+
+            def fake_tool(args, label):
+                self.assertIn(args[0], (str(tools / "aapt2"),
+                                        str(tools / "apksigner")))
+                snapshot_path = Path(args[-1])
+                self.assertEqual(snapshot_path.stat().st_mode & 0o777, 0o600)
+                expected = candidate_bytes if "1.11" in label else previous_bytes
+                self.assertEqual(snapshot_path.read_bytes(), expected)
+                calls.append(label)
+                if label == "Android 1.11 APK signature":
+                    candidate_path.write_bytes(b"mutated-original-file-during-verification")
+                if "signature" in label:
+                    return self.fake_apksigner()
+                if "1.11" in label:
+                    return ("package: name='app.passengercount' versionCode='12' "
+                            "versionName='1.11'\nsdkVersion:'26'\ntargetSdkVersion:'35'\n")
+                return "package: name='app.passengercount' versionCode='11' versionName='1.10'\n"
+
+            with mock.patch.object(rv, "POLICY_FILE", policy_file), \
+                 mock.patch.object(rv, "OLD_PROVENANCE_FILE", provenance_file), \
+                 mock.patch.object(rv, "run_verified_tool", side_effect=fake_tool):
+                report = rv.run_verification(artifact_path, candidate_path, previous_path, sdk)
+            self.assertEqual(len(calls), 4)
+            self.assertEqual(report["candidate_apk_sha256"], digest(candidate_bytes))
+            self.assertEqual(report["compared_non_signature_apk_entries"], len(entries))
+            self.assertFalse(report["published"])
+            self.assertFalse(report["physical_device_upgrade_verified"])
+
+    def test_tampered_ci_zip_rejected_before_any_sdk_execution(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            provenance = {
+                "certificate_sha256": ORIGINAL_CERT,
+                "delivered_apk_sha256": "1" * 64,
+                "package": "app.passengercount",
+                "candidate_version": "1.11", "candidate_version_code": 12,
+                "delivered_version": "1.10", "delivered_code": 11,
+            }
+            policy = {
+                "accepted_main_commit": "ed0a10a8bd61f9be7348cf6e3b980013acdecad3",
+                "accepted_tree": "2af449ab36a4d895ad2e8bcb2e323a596097d025",
+                "ci_run": 38332107783, "ci_artifact_id": 11782629978,
+                "ci_artifact_zip_sha256": "2" * 64,
+                "aligned_apk_sha256": "3" * 64,
+                "ci_ephemeral_apk_sha256": "4" * 64,
+                "previous_apk_sha256": "1" * 64,
+                "original_certificate_sha256": ORIGINAL_CERT,
+                "package": "app.passengercount", "version_name": "1.11",
+                "version_code": 12, "min_sdk": 26, "target_sdk": 35,
+            }
+            policy_file = root / "policy.json"
+            provenance_file = root / "prior.json"
+            artifact_file = root / "tampered.zip"
+            policy_file.write_text(json.dumps(policy))
+            provenance_file.write_text(json.dumps(provenance))
+            artifact_file.write_bytes(b"tampered downloaded artifact")
+            with mock.patch.object(rv, "POLICY_FILE", policy_file), \
+                 mock.patch.object(rv, "OLD_PROVENANCE_FILE", provenance_file), \
+                 mock.patch.object(rv, "run_verified_tool") as invoked:
+                with self.assertRaisesRegex(rv.VerificationError, "CI artifact ZIP differs"):
+                    rv.run_verification(artifact_file, root / "nonexistent.apk",
+                                        root / "nonexistent-old.apk", root)
+                invoked.assert_not_called()
 
 
 if __name__ == "__main__":

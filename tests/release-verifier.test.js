@@ -13,5 +13,5 @@ test("offline release verifier rejects unsafe APKs and wrong upgrade lineage", (
   assert.equal(result.error, undefined, String(result.error));
   assert.equal(result.status, 0,
     `Release verifier regressions failed:\n${result.stdout}\n${result.stderr}`);
-  assert.match(result.stderr, /Ran 22 tests/);
+  assert.match(result.stderr, /Ran 24 tests/);
 });
