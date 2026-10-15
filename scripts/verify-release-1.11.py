@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import re
+import struct
 import subprocess
 import sys
 import tempfile
@@ -144,6 +145,35 @@ def parse_apksigner(output, required_certificate_sha256):
     return cert
 
 
+def verify_candidate_resource_layout(candidate):
+    """Enforce Android 11+ resources.arsc installation requirements.
+
+    Payload equality alone does not retain ZIP compression or data alignment.
+    Read the local header from the same captured APK bytes used for all checks;
+    a central-directory extra-field length is not the on-disk data offset.
+    The caller has already validated every ZIP payload with safe_entries().
+    """
+    with zipfile.ZipFile(io.BytesIO(candidate), "r", allowZip64=False) as archive:
+        resource = archive.getinfo("resources.arsc")
+        require(resource.compress_type == zipfile.ZIP_STORED,
+                "Candidate resources.arsc must be stored uncompressed")
+        offset = resource.header_offset
+        require(0 <= offset <= len(candidate) - 30,
+                "Candidate resources.arsc local header is truncated")
+        header = struct.unpack_from("<4s5H3I2H", candidate, offset)
+        require(header[0] == b"PK\x03\x04" and header[3] == zipfile.ZIP_STORED,
+                "Candidate resources.arsc local header has invalid compression metadata")
+        name_size, extra_size = header[-2:]
+        name_start = offset + 30
+        data_offset = name_start + name_size + extra_size
+        require(candidate[name_start:name_start + name_size] == b"resources.arsc"
+                and data_offset + resource.file_size <= len(candidate),
+                "Candidate resources.arsc local data layout is invalid")
+        require(data_offset % 4 == 0,
+                "Candidate resources.arsc data is not aligned to a 4-byte boundary")
+        return data_offset
+
+
 def parse_badging(output, expected_package, expected_code, expected_name, min_sdk, target_sdk):
     match = re.findall(r"^package:\s+name='([^']+)' versionCode='([^']+)' versionName='([^']+)'(?:\s|$)",
                        output, flags=re.M)
@@ -232,6 +262,7 @@ def run_verification(ci_artifact_path, candidate_path, previous_path, android_ho
     require(sha256_bytes(candidate) != policy["ci_ephemeral_apk_sha256"],
             "CI ephemeral validation APK cannot be published as a production upgrade")
     payload_entry_count = verify_payload_identity(aligned, candidate)
+    resource_data_offset = verify_candidate_resource_layout(candidate)
 
     previous = bounded_read_file(previous_path)
     require(sha256_bytes(previous) == policy["previous_apk_sha256"],
@@ -273,6 +304,8 @@ def run_verification(ci_artifact_path, candidate_path, previous_path, android_ho
         "candidate_apk_sha256": sha256_bytes(candidate),
         "previous_apk_sha256": sha256_bytes(previous),
         "compared_non_signature_apk_entries": payload_entry_count,
+        "resources_arsc_stored_and_4_byte_aligned": True,
+        "resources_arsc_data_offset": resource_data_offset,
         "package": policy["package"],
         "version_name": "1.11",
         "version_code": 12,
@@ -304,3 +337,4 @@ def main(argv=None):
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
