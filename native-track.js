@@ -1,4 +1,4 @@
-import { hkTimestamp } from "./fieldkit.js";
+import { hkTimestamp, validTrackInterruptions, trackTimestamp, compareTrackTimes } from "./fieldkit.js";
 
 const LIMIT = 20000;
 const measurementKey = (p) => JSON.stringify([
@@ -14,6 +14,31 @@ function normalize(p) {
     source: p.source || "gps",
     time: p.time || hkTimestamp(new Date(p.timestamp || Date.now())),
   };
+}
+
+// Interruption records share the same journal/cursor as fixes, but are never
+// converted to coordinates. The timestamp is when denial was observed; its
+// missing-GPS interval and eventual recovery time remain unknown.
+export function mergeNativeInterruptions(previous = [], records = []) {
+  // Preserve malformed prior metadata for structured backup, but do not let it
+  // block valid new journal points or be mistaken for an acknowledged receipt.
+  const prior = Array.isArray(previous) ? previous : [previous];
+  const merged = prior.map((event) => event && typeof event === "object"
+    ? (Array.isArray(event) ? [...event] : { ...event }) : event);
+  const seen = new Set(validTrackInterruptions({ trackInterruptions: merged })
+    .map((event) => event.nativeId));
+  for (const record of records) {
+    if (record?.event !== "foreground_start_denied") continue;
+    if (typeof record.nativeId !== "string" || !record.nativeId ||
+        !Number.isFinite(record.timestamp) || record.timestamp <= 0 ||
+        !Number.isFinite(new Date(record.timestamp).getTime()))
+      throw Error("Invalid native tracking interruption");
+    if (seen.has(record.nativeId)) continue;
+    merged.push({ nativeId: record.nativeId, reason: record.event,
+      observedAt: new Date(record.timestamp).toISOString() });
+    seen.add(record.nativeId);
+  }
+  return merged;
 }
 
 // Native IDs identify journal records, not timestamps or approximate locations.
@@ -57,8 +82,17 @@ export function mergeNativeTrack(track, points) {
   // A foreground fix may already be newer than the background journal tail.
   // Use journal order for equal-time native points, including evicted points
   // replayed after cursor invalidation. Untagged foreground ties stay after them.
-  merged.sort((a, b) => (Date.parse(a.time) - Date.parse(b.time)) ||
-    ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity)));
+  // Malformed timestamps cannot participate in chronological comparisons.
+  // Keep those observations in their slots and sort only validated fixes;
+  // mixing precise instants with Date.parse fallback is non-transitive.
+  const times = new Map(merged.map(p => [p, trackTimestamp(p.time)]));
+  const ordered = merged.filter(p => times.get(p) !== null).sort((a, b) =>
+    compareTrackTimes(times.get(a), times.get(b)) ||
+      ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity)));
+  let next = 0;
+  for (let i = 0; i < merged.length; i++) {
+    if (times.get(merged[i]) !== null) merged[i] = ordered[next++];
+  }
   return merged.slice(-LIMIT);
 }
 
@@ -71,12 +105,15 @@ export function importNativeTrack(s, bridge, persist) {
   for (;;) {
     const previousTrack = s.track;
     const previousCursor = s.nativeTrackCursor;
+    const previousInterruptions = s.trackInterruptions;
     const raw = paged ? bridge.getTrackPage(s.id, previousCursor || "") : bridge.getTrack(s.id);
     if (!raw) return false;
     const page = JSON.parse(raw);
     const points = paged ? page.points : page;
     if (!Array.isArray(points) || (paged && typeof page.cursor !== "string")) return false;
+    const interruptions = mergeNativeInterruptions(s.trackInterruptions, points);
     s.track = mergeNativeTrack(s.track, points);
+    if (interruptions.length) s.trackInterruptions = interruptions;
     if (paged) s.nativeTrackCursor = page.cursor;
     // Track and cursor belong to the same durable workspace write. Never ack
     // journal consumption in memory after a failed storage commit.
@@ -85,6 +122,8 @@ export function importNativeTrack(s, bridge, persist) {
     finally {
       if (!saved) {
         s.track = previousTrack;
+        if (previousInterruptions === undefined) delete s.trackInterruptions;
+        else s.trackInterruptions = previousInterruptions;
         if (previousCursor === undefined) delete s.nativeTrackCursor;
         else s.nativeTrackCursor = previousCursor;
       }

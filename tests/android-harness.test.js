@@ -136,3 +136,11 @@ test('tombstone observer waits for observed restarted service to stop',()=>{
   const r=fixture({kind:'deleted'});assert.equal(r.status,0,r.output);assert.ok(r.polls>=3);assert.equal(r.pid,'111 -> 222\n');
 });
 
+
+
+test('controlled demotion follows both original sticky restart controls', () => {
+  const originalDone = source.indexOf('\nphase verify-deleted\n');
+  const controlledStart = source.indexOf('\nphase prepare-denied attached\n');
+  assert.ok(originalDone > 0 && controlledStart > originalDone,
+    'new policy-demotion fixture and delay must not precede the original sticky controls');
+});

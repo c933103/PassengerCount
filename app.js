@@ -33,6 +33,7 @@ import { deleteRecords } from "./record-deletion.js";
 import {
   hkTimestamp,
   makeGpx,
+  validTrackInterruptions,
   parseVehicleProfiles,
   matchVehicle,
   tripMetrics,
@@ -408,8 +409,11 @@ function showScreen(next) {
     $(key + "Screen").hidden = key !== next;
   const s = cur();
   if (s) s.screen = next;
-  if (next !== "home" && s?.status === "in_progress") startNativeTracking(s);
-  else if (!stopNativeTracking(s)) error(t("recordFailed"));
+  if ((next === "setup" || next === "count") && s?.status === "in_progress") startNativeTracking(s);
+  else if (next === "record" && s?.status === "in_progress") {
+    // View reconciles evidence without changing a live or interrupted session.
+    if (!syncNativeTrack(s)) error(t("recordFailed"));
+  } else if (!stopNativeTracking(s)) error(t("recordFailed"));
   const host =
     next === "count" && s
       ? $("countMapHost")
@@ -461,6 +465,10 @@ function updateRecordSelection() {
     n: selectedRecordIds.size,
   });
 }
+function trackingWarning(s) {
+  const interruption = validTrackInterruptions(s).at(-1);
+  return interruption ? t("trackingInterrupted", { at: interruption.observedAt }) : "";
+}
 function renderHome() {
   updateRecordSelection();
   const list = $("recordList");
@@ -479,6 +487,7 @@ function renderHome() {
     title.textContent = `${s.route.route} · ${operator(s.route.operator)} → ${name({ name: s.route.dest })}`;
     const detail = document.createElement("p");
     detail.textContent = `${t(s.status)} · ${s.date} · ${s.vehicle || ""} · ${s.rows.filter((r) => r.recorded).length}/${s.stops.length}`;
+    if (trackingWarning(s)) detail.textContent += ` · ${trackingWarning(s)}`;
     const buttons = document.createElement("div");
     buttons.className = "buttons";
     const open = document.createElement("button");
@@ -1071,7 +1080,8 @@ function renderRecord() {
   });
   $("etaRecordSummary").textContent = etaStatusText(s);
   $("completedMessage").textContent =
-    s.status === "completed" ? t("completedSaved") : t("pauseHelp");
+    (s.status === "completed" ? t("completedSaved") : t("pauseHelp")) +
+    (trackingWarning(s) ? ` ${trackingWarning(s)}` : "");
   renderUploadStatus(s);
   showIssues($("recordIssues"), result);
   renderChart($("chart"), s, t, name);
@@ -1264,6 +1274,7 @@ function renderGpsText() {
       stop: stopLabel(s.stops[nearestIndex], nearestIndex),
     });
   else $("gps").textContent = t("gpsUnavailable");
+  if (trackingWarning(s)) $("gps").textContent += ` · ${trackingWarning(s)}`;
   $("useNearest").hidden = !fresh || nearestIndex === s.activeIndex;
 }
 function openStopForm(editing) {
@@ -1922,6 +1933,8 @@ if (cur()) {
   );
 } else showScreen("home");
 reconcileSavedNativeTracks();
+if (screen === "home") renderHome();
+if (cur() && (screen === "count" || screen === "setup")) renderGpsText();
 try {
   const result = window.PassengerCountAndroid?.getExportResult?.();
   if (result) exportResult(JSON.parse(result));
@@ -1936,10 +1949,14 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
     resumePendingDeletion();
     reconcileSavedNativeTracks();
+    if (screen === "home") renderHome();
+    if (screen === "record" && cur()) renderRecord();
     checkRouteUpdates(dataStatus).then((value) => { data = value; })
       .catch(() => dataStatus("Update unavailable"));
     if (data && matches.length) renderMatches();
     if (cur() && (screen === "count" || screen === "setup")) {
+      startNativeTracking();
+      renderGpsText();
       setFollow(true);
       centerMap();
       locate(true);

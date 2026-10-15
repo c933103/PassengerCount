@@ -29,6 +29,7 @@ const methods = [
   'protected void onDestroy()',
   'protected void onResume()',
   'protected void onPause()',
+  'private void startPendingTrack(',
   'public String getExportResult()',
   'private void executeExport(',
   'private String currentExportResult()',
@@ -49,5 +50,5 @@ try {
     return result.status === 0;
   }
   if (run('java', ['com.sun.tools.javac.Main', '-encoding', 'UTF-8', '-source', '8', '-target', '8', '-d', build,
-      path.join(build, 'MainActivity.java'), path.join(root, 'android/src/app/passengercount/ExportSession.java')])) run('java', ['-cp', build, 'app.passengercount.MainActivity']);
+      path.join(build, 'MainActivity.java'), path.join(root, 'android/src/app/passengercount/ExportSession.java'), path.join(root, 'android/src/app/passengercount/TrackSession.java')])) run('java', ['-cp', build, 'app.passengercount.MainActivity']);
 } finally { fs.rmSync(build, { recursive: true, force: true }); }

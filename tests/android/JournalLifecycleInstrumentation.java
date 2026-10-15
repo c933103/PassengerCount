@@ -65,6 +65,9 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             else if (phase.equals("receipts-prepare")) receiptsPrepare();
             else if (phase.equals("receipts-recover")) receiptsRecover();
             else if (phase.equals("receipts-final")) receiptsFinal();
+            else if (phase.equals("prepare-denied")) prepareDeniedRestart();
+            else if (phase.equals("verify-denied")) verifyDeniedRestart();
+            else if (phase.equals("recover-denied")) recoverDeniedRestart();
             else if (phase.equals("prepare-valid")) prepareCrash(false);
             else if (phase.equals("verify-valid")) verifyValidRestart();
             else if (phase.equals("prepare-deleted")) prepareCrash(true);
@@ -72,7 +75,7 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             else throw new AssertionError("Unknown phase " + phase);
             check(interceptedRequests == 0, "test document made no network request");
             main(() -> { web.destroy(); web=null; });
-            if (phase.startsWith("prepare-")) {
+            if (phase.equals("prepare-valid") || phase.equals("prepare-deleted")) {
                 // --no-restart completion detaches without force-stop. The shell
                 // verifies that detached state before this test-only SIGKILL.
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
@@ -361,6 +364,76 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
         evidence("receipts-durable",remove,keep);
         saveState(state());
     }
+    // Separate controlled policy-denial test. This does not stand in for the
+    // unchanged detached process-death/sticky-restart acceptance below.
+    private void prepareDeniedRestart() throws Exception {
+        String id = PREFIX + "denied-restart";
+        seed(id); start(id);
+        await("denial control has actual GPS", () -> lines(journal(id)) > 1, 25000);
+        Object wanted = TargetAccess.call(session(), "request");
+        check(fixtures().edit().putString("denialId", id)
+            .putString("denialToken", (String) TargetAccess.field(wanted, "token"))
+            .putInt("denialPid", Process.myPid()).commit(), "save denial control identity");
+        final TrackService foregroundService = service();
+        // After --no-restart detaches and shell backgrounds the real Activity,
+        // use ordinary stopForeground to remove eligibility. No permissions,
+        // platform flags, service hooks or policy exemptions are changed.
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                foregroundService.stopForeground(android.app.Service.STOP_FOREGROUND_REMOVE);
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    try {
+                        String prefix = new String(java.nio.file.Files.readAllBytes(journal(id).toPath()), StandardCharsets.UTF_8);
+                        if (!fixtures().edit().putString("denialPrefix", prefix).commit())
+                            throw new AssertionError("Cannot save pre-denial bytes");
+                        Log.i(TAG, "DENIAL_AFTER_DETACH pid=" + Process.myPid());
+                        // Exercise the actual null-intent entry path under real
+                        // policy denial. -1 means stop this fixture's service;
+                        // this is a controlled callback, not a system restart.
+                        int result = foregroundService.onStartCommand(null, 0, -1);
+                        if (result != android.app.Service.START_NOT_STICKY)
+                            throw new AssertionError("Controlled denial did not stop");
+                        Log.i(TAG, "DENIAL_HANDLED pid=" + Process.myPid());
+                    } catch (Throwable failure) { Log.e(TAG, "PHASE_FAIL controlled-denial", failure); }
+                }, 1000);
+            } catch (Throwable failure) { Log.e(TAG, "PHASE_FAIL controlled-demotion", failure); }
+        }, 15000);
+    }
+    private void verifyDeniedRestart() throws Exception {
+        String id = fixtures().getString("denialId", "");
+        check(Process.myPid() == fixtures().getInt("denialPid", 0), "denial did not crash the process");
+        check(service() == null && !foreground(), "denied service stopped without background retry");
+        Object wanted = TargetAccess.call(session(), "request");
+        check(TargetAccess.field(wanted, "id").equals(id)
+            && TargetAccess.field(wanted, "token").equals(fixtures().getString("denialToken", "")), "denial retained durable survey and generation");
+        String content = new String(java.nio.file.Files.readAllBytes(journal(id).toPath()), StandardCharsets.UTF_8);
+        check(content.startsWith(fixtures().getString("denialPrefix", "")), "all pre-denial bytes retained");
+        int denials = 0;
+        for (String line:content.split("\n")) {
+            JSONObject record = new JSONObject(line);
+            if (record.optString("event").equals("foreground_start_denied")) {
+                denials++;
+                check(record.getLong("timestamp") > 0 && !record.has("lat") && !record.has("lng"), "receipt is an observation, not a fabricated location");
+            }
+        }
+        check(denials == 1, "exactly one durable denied-restart receipt");
+        String before = hash(journal(id));
+        bridge.startTracking(id); waitForIdleSync(); SystemClock.sleep(300);
+        check(service() == null && hash(journal(id)).equals(before), "background bridge cannot relaunch service or append");
+    }
+    private void recoverDeniedRestart() throws Exception {
+        String id = fixtures().getString("denialId", "");
+        String before = new String(java.nio.file.Files.readAllBytes(journal(id).toPath()), StandardCharsets.UTF_8);
+        int count = lines(journal(id));
+        start(id);
+        check(TargetAccess.field(TargetAccess.call(session(), "request"), "token").equals(fixtures().getString("denialToken", "")), "visible recovery keeps intended generation");
+        await("foreground recovery receives a new actual GPS callback", () -> lines(journal(id)) > count, 25000);
+        check(bridge.stopTrackingAndDrain(id), "stop recovered fixture");
+        await("recovered service stops", () -> service() == null, 5000);
+        check(new String(java.nio.file.Files.readAllBytes(journal(id).toPath()), StandardCharsets.UTF_8).startsWith(before), "recovery retains interruption and all earlier observations");
+        saveState(state());
+    }
+
     private void prepareCrash(boolean deleted) throws Exception {
         String id=PREFIX+(deleted?"crash-deleted-A":"crash-valid-B"); seed(id); start(id);
         await("crash control receives real GPS",()->lines(journal(id))>1,25000);

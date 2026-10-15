@@ -339,3 +339,31 @@ test("legacy index-only evidence is retained as unverified instead of assigning 
   assert.equal(legacy.etaSnapshots[0].results[0].stopIndex, null);
   assert.deepEqual(legacy.weatherHistory[0].snapshot, { synthetic: true });
 });
+
+test("denied-restart evidence survives edits, Undo/Redo, save/load and structured export", () => {
+  const f = fixture();
+  countEdit(f);
+  f.journal.push({ nativeId: "synthetic-denial", event: "foreground_start_denied", timestamp: Date.parse("2026-10-15T09:09:43.160Z") });
+  f.run("syncNativeTrack(); undo(); redo()");
+  const expected = [{ nativeId: "synthetic-denial", reason: "foreground_start_denied", observedAt: "2026-10-15T09:09:43.160Z" }];
+  assert.deepEqual(f.saved().surveys[0].trackInterruptions, expected);
+  assert.deepEqual(exportedSurvey(f).trackInterruptions, expected);
+  assert.equal(f.saved().surveys[0].nativeTrackCursor, "1");
+  assert.equal(f.s.track.length, 0, "interruption is never a synthetic fix");
+  assert.match(makeExportBundle(f.s, null).gpx, /tracking_interruption/);
+});
+
+
+test("view preserves active tracking and does not restart a denied service; resume requests tracking", () => {
+  for (const running of [true, false]) {
+    const f = fixture();
+    if (!running) f.run('window.PassengerCountAndroid.stopTrackingAndDrain(state.currentId)');
+    f.calls.length = 0;
+    f.run('openSurvey(state.currentId, "record")');
+    assert.equal(f.calls.some(call => call.startsWith("start:") || call.startsWith("stop:")), false);
+    assert.equal(f.nativeId(), running ? f.s.id : null, "view leaves native session state untouched");
+    assert.equal(f.s.status, "in_progress", "view does not rewrite survey status");
+    f.run('openSurvey(state.currentId, "resume")');
+    assert.equal(f.calls.filter(call => call === "start:synthetic-A").length, 1);
+  }
+});

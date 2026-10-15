@@ -19,3 +19,9 @@ node "$ROOT/scripts/test-export-storage.cjs"
 
 node "$ROOT/scripts/test-track-deletion.cjs"
 node "$ROOT/scripts/test-android-target-access.cjs"
+
+java com.sun.tools.javac.Main -encoding UTF-8 -source 8 -target 8 -d "$BUILD" \
+  "$ROOT/android/src/app/passengercount/TrackInterruption.java" \
+  "$ROOT/android/src/app/passengercount/TrackJournal.java" \
+  "$ROOT/tests/native/TrackInterruptionTest.java"
+java -cp "$BUILD" app.passengercount.TrackInterruptionTest

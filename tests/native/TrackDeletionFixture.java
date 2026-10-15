@@ -12,7 +12,12 @@ public final class MainActivity extends Context {
     int starts, stops;
     MainActivity(File directory, SharedPreferences prefs) { super(directory, prefs); }
     void runOnUiThread(Runnable r) { r.run(); }
-    void startPendingTrack() { starts++; }
+    static final Set<MainActivity> resumedActivities = new HashSet<>();
+    boolean destroyed, retryTrackOnResume, locationAllowed = true;
+    boolean hasLocation() { return locationAllowed; }
+    void startForegroundService(Intent intent) { starts++; }
+    void startService(Intent intent) { starts++; }
+    /* START_PENDING */
     final class DeviceStorage {
         /* BRIDGE_METHODS */
     }
@@ -28,11 +33,15 @@ public final class MainActivity extends Context {
     }
     static MainActivity fresh() throws IOException {
         TrackService.session = null; TrackService.running = null;
-        return new MainActivity(Files.createTempDirectory("synthetic-tracks-").toFile(), new SharedPreferences());
+        MainActivity activity = new MainActivity(Files.createTempDirectory("synthetic-tracks-").toFile(), new SharedPreferences());
+        resumedActivities.clear(); resumedActivities.add(activity);
+        return activity;
     }
     MainActivity restart() {
         TrackService.session = null; prefs.restart();
-        return new MainActivity(directory, prefs);
+        MainActivity activity = new MainActivity(directory, prefs);
+        resumedActivities.clear(); resumedActivities.add(activity);
+        return activity;
     }
     public static void main(String[] args) throws Exception {
         for (boolean active : new boolean[]{false, true}) {
@@ -232,6 +241,62 @@ public final class MainActivity extends Context {
             check(service.foreground == 1 && service.updates == 1 && service.stopCalls == 0, "current continuation establishes foreground for " + action);
             check(service.recording.id.equals(wanted.id) && service.recording.token.equals(wanted.token), "only current generation records for " + action);
         }
+        for (boolean brokenReceipt : new boolean[]{false, true}) {
+            MainActivity interrupted = fresh();
+            TrackSession.Request wanted = TrackService.session(interrupted).start("A");
+            if (brokenReceipt) new File(interrupted.directory, "track-A.jsonl").mkdir();
+            else seed(interrupted.directory, "A");
+            TrackService denied = new TrackService(interrupted.directory, interrupted.prefs);
+            TrackService.running = denied; denied.listener = new Object();
+            denied.foregroundDenial = new ForegroundServiceStartNotAllowedException();
+            boolean receiptFailed = false;
+            try {
+                check(denied.onStartCommand(null, 0, 7) == TrackService.START_NOT_STICKY,
+                    "known null restart denial stops rather than crash-looping");
+            } catch (IllegalStateException expected) {
+                receiptFailed = expected.getCause() instanceof IOException && brokenReceipt;
+            }
+            check(receiptFailed == brokenReceipt, "failed interruption write remains an explicit failure");
+            check(denied.stopCalls == 1 && denied.manager.removals == 1 && denied.updates == 0 && denied.recording == null,
+                "denied restart stops without location updates even if evidence write fails");
+            check(TrackService.session(interrupted).accepts(wanted), "denial retains durable session/generation");
+            if (!brokenReceipt) {
+                String evidence = new String(Files.readAllBytes(new File(interrupted.directory,"track-A.jsonl").toPath()), StandardCharsets.UTF_8);
+                check(evidence.startsWith("{\"nativeId\":\"fixture\""), "existing GPS bytes retained");
+                check(evidence.contains("foreground_start_denied") && records(interrupted.directory,"A") == 2,
+                    "denial is a durable distinct journal entry");
+                interrupted = interrupted.restart();
+                check(TrackService.session(interrupted).accepts(wanted), "cold restart still retains intended survey");
+                resumedActivities.clear(); interrupted.new DeviceStorage().startTracking("A");
+                check(interrupted.starts == 0, "background bridge cannot retry forbidden start");
+                check(TrackService.session(interrupted).accepts(wanted), "deferred start keeps same generation");
+                resumedActivities.add(interrupted); interrupted.startPendingTrack();
+                check(interrupted.starts == 1, "foreground Activity can request normal recovery");
+                TrackService recovered = new TrackService(interrupted.directory,interrupted.prefs);
+                TrackService.running = recovered;
+                check(recovered.onStartCommand(new Intent(TrackService.ACTION_START,"A",wanted.token),0,8) == TrackService.START_STICKY
+                    && recovered.updates == 1, "permitted explicit recovery starts real update path");
+                check(records(interrupted.directory,"A") == 2, "recovery does not erase or manufacture journal fixes");
+                check(interrupted.new DeviceStorage().deleteTrack("A") && records(interrupted.directory,"A") == 0,
+                    "ordinary deletion removes interruption and fixes together");
+            }
+        }
+        for (boolean explicit : new boolean[]{false, true}) {
+            MainActivity unexpected = fresh(); TrackSession.Request wanted = TrackService.session(unexpected).start("A");
+            TrackService unexpectedService = new TrackService(unexpected.directory, unexpected.prefs);
+            RuntimeException exception = explicit ? new ForegroundServiceStartNotAllowedException() : new IllegalStateException("other failure");
+            unexpectedService.foregroundDenial = exception;
+            boolean propagated = false;
+            try { unexpectedService.onStartCommand(explicit ? new Intent(TrackService.ACTION_START,"A",wanted.token) : null,0,9); }
+            catch (RuntimeException expected) { propagated = expected == exception; }
+            check(propagated && records(unexpected.directory,"A") == 0,
+                "explicit/unrelated failures are not mislabeled as recovered sticky denials");
+        }
+        MainActivity invisible = fresh(); resumedActivities.clear();
+        invisible.new DeviceStorage().startTracking("A");
+        check(invisible.starts == 0 && TrackService.session(invisible).request().valid(), "invisible start remains pending");
+        resumedActivities.add(invisible); invisible.destroyed = true; invisible.startPendingTrack();
+        check(invisible.starts == 0, "destroyed bridge host cannot launch service");
         MainActivity stopping = fresh();
         TrackSession.Request pending = TrackService.session(stopping).start("A");
         TrackService service = new TrackService(stopping.directory, stopping.prefs); TrackService.running = service;
@@ -304,9 +369,15 @@ class TrackService extends Context {
 }
 
 class Intent {
-    final String action, id, token;
+    String action, id, token;
+    Intent(Context context, Class<?> service) {}
+    Intent setAction(String value) { action=value; return this; }
+    Intent putExtra(String key, String value) { if (key.equals(TrackService.EXTRA_ID)) id=value; else token=value; return this; }
     Intent(String action, String id, String token) { this.action = action; this.id = id; this.token = token; }
     String getAction() { return action; }
     String getStringExtra(String key) { return key.equals(TrackService.EXTRA_ID) ? id : token; }
 }
 
+
+class Build { static class VERSION { static int SDK_INT = 35; } }
+class ForegroundServiceStartNotAllowedException extends IllegalStateException {}
