@@ -1,4 +1,4 @@
-import { hkTimestamp, validTrackInterruptions } from "./fieldkit.js";
+import { hkTimestamp, validTrackInterruptions, trackTimestamp, compareTrackTimes } from "./fieldkit.js";
 
 const LIMIT = 20000;
 const measurementKey = (p) => JSON.stringify([
@@ -82,8 +82,16 @@ export function mergeNativeTrack(track, points) {
   // A foreground fix may already be newer than the background journal tail.
   // Use journal order for equal-time native points, including evicted points
   // replayed after cursor invalidation. Untagged foreground ties stay after them.
-  merged.sort((a, b) => (Date.parse(a.time) - Date.parse(b.time)) ||
-    ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity)));
+  // Parse once per point, not on every comparison of a large retained track.
+  const times = new Map(merged.map(p => [p, trackTimestamp(p.time)]));
+  merged.sort((a, b) => {
+    const left = times.get(a), right = times.get(b);
+    const precise = left && right ? compareTrackTimes(left, right) : NaN;
+    // Valid instants use the same exact comparison as GPX boundaries. Retain
+    // legacy handling for malformed timestamps rather than discarding evidence.
+    const timeOrder = Number.isNaN(precise) ? Date.parse(a.time) - Date.parse(b.time) : precise;
+    return timeOrder || ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity));
+  });
   return merged.slice(-LIMIT);
 }
 

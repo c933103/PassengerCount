@@ -303,3 +303,36 @@ test('GPX compares sub-millisecond instants exactly across offsets, arbitrary fr
     assert.equal(JSON.stringify(s), before);
   }
 });
+
+
+test('mixed retained/native fractional fixes reconcile in exact order before GPX segmentation', () => {
+  for (const afterTime of ['2024-02-29T08:00:00.5001234568Z', '2024-02-29T13:30:00.500123456800+05:30']) {
+    const s = survey(), beforePoint = { ...point('before', 0, { time: '2024-02-29T08:00:00.5001234566Z' }) };
+    delete beforePoint.nativeId;
+    s.track = [beforePoint];
+    s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt: '2024-02-29T08:00:00.5001234567Z' }];
+    const originalBefore = JSON.stringify(beforePoint), originalEvents = JSON.stringify(s.trackInterruptions);
+    const reader = bridge({ one: [point('after', 1, { time: afterTime })] });
+    assert.equal(importNativeTrack(s, reader, () => true), true);
+    assert.deepEqual(s.track.map(p => p.time), [beforePoint.time, afterTime]);
+    assert.equal(JSON.stringify(s.track[0]), originalBefore);
+    assert.equal(JSON.stringify(s.trackInterruptions), originalEvents);
+    assert.equal((makeGpx(s).match(/<trkseg>/g) || []).length, 2);
+    const saved = JSON.stringify(s);
+    s.nativeTrackCursor = '';
+    assert.equal(importNativeTrack(s, reader, () => true), true);
+    assert.equal(JSON.stringify(s), saved, 'replaying the journal retains order, identity and evidence');
+  }
+});
+
+test('native merge keeps equal-instant journal tie order across fractional spelling and offsets', () => {
+  const foreground = point('foreground', 0, { time: '2024-02-29T08:00:00.5000Z' });
+  delete foreground.nativeId;
+  const a = point('A', 1, { time: '2024-02-29T16:00:00.5+08:00', nativeOrder: 20 });
+  const b = point('B', 2, { time: '2024-02-29T03:00:00.5000000000-05:00', nativeOrder: 10 });
+  const originals = JSON.stringify([foreground, a, b]);
+  const merged = mergeNativeTrack([foreground], [a, b]);
+  assert.deepEqual(merged.map(p => p.nativeId), ['B', 'A', undefined]);
+  assert.deepEqual(merged.map(p => p.time), [b.time, a.time, foreground.time]);
+  assert.equal(JSON.stringify([foreground, a, b]), originals);
+});

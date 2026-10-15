@@ -47,7 +47,7 @@ function escapeXml(value) {
 
 // Date.parse also accepts year-only strings and normalizes impossible dates.
 // Boundaries need an actual full timestamp; never infer one from partial data.
-function trackTimestamp(value) {
+export function trackTimestamp(value) {
   if (typeof value !== "string") return null;
   const match = /^(\d{4}-\d{2}-\d{2})T((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)(?:\.(\d+))?(Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.exec(value);
   if (!match) return null;
@@ -60,7 +60,7 @@ function trackTimestamp(value) {
   return { second, fraction: (match[3] || "").replace(/0+$/, "") };
 }
 
-function compareTrackTimes(a, b) {
+export function compareTrackTimes(a, b) {
   if (a.second !== b.second) return a.second < b.second ? -1 : 1;
   // With trailing zeroes removed, lexical decimal ordering is exact even
   // for unequal lengths; a shorter equal prefix represents the smaller value.
