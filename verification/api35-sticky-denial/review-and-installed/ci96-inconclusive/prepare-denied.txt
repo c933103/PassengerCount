@@ -1,0 +1,7 @@
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-denied","pid":4122,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"61931777e9fe71f7e6c6c508ebdb1530aeae063e7f6e96c43b72f8a0b58ee176","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_RESULT: assertions=8
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-denied assertions=8 pid=4122
+
+INSTRUMENTATION_CODE: -1

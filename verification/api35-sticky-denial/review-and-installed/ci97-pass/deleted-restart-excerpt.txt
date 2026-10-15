@@ -1,0 +1,4 @@
+10-15 10:45:51.893  4780  4780 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-deleted pid=4780
+10-15 10:45:51.917   563  1646 I ActivityManager: Process app.passengercount (pid 4780) has died: fg +50 FGS 
+10-15 10:45:51.922   563  1646 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+10-15 10:45:52.929   563   599 I ActivityManager: Start proc 4983:app.passengercount/u0a209 for service {app.passengercount/app.passengercount.TrackService}

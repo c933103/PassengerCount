@@ -1,0 +1,7 @@
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"recover-denied","pid":4085,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"15d3c2ed11fd40c2cd0be64f5f290f8dfb803bf5b247ef8847c6791cbd4a5dcc","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_RESULT: assertions=12
+INSTRUMENTATION_RESULT: stream=PHASE_PASS recover-denied assertions=12 pid=4085
+
+INSTRUMENTATION_CODE: -1

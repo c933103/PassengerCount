@@ -1,0 +1,1 @@
+PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim

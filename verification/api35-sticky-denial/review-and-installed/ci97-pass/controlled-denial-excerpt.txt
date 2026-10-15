@@ -1,0 +1,25 @@
+10-15 10:45:07.015  4085  4085 I PassengerJournalTest: DENIAL_AFTER_DETACH pid=4085
+10-15 10:45:07.025  4085  4085 E PassengerTrack: Background tracking restart denied; interruption saved; reopen the active survey
+10-15 10:45:07.025  4085  4085 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:54)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:50)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Parcel.readParcelableInternal(Parcel.java:5075)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Parcel.readParcelable(Parcel.java:5057)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3237)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Parcel.createException(Parcel.java:3226)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Parcel.readException(Parcel.java:3209)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Parcel.readException(Parcel.java:3151)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.app.IActivityManager$Stub$Proxy.setServiceForeground(IActivityManager.java:7193)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.app.Service.startForeground(Service.java:776)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at app.passengercount.TrackService.onStartCommand(TrackService.java:145)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at app.passengercount.JournalLifecycleInstrumentation.lambda$prepareDeniedRestart$14$app-passengercount-JournalLifecycleInstrumentation(JournalLifecycleInstrumentation.java:393)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at app.passengercount.JournalLifecycleInstrumentation$$ExternalSyntheticLambda4.run(D8$$SyntheticClass:0)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Handler.handleCallback(Handler.java:959)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Looper.loopOnce(Looper.java:232)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.os.Looper.loop(Looper.java:317)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at android.app.ActivityThread.main(ActivityThread.java:8705)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at java.lang.reflect.Method.invoke(Native Method)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+10-15 10:45:07.025  4085  4085 E PassengerTrack: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:886)
+10-15 10:45:07.025  4085  4085 I PassengerJournalTest: DENIAL_HANDLED pid=4085
