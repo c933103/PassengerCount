@@ -1,0 +1,4 @@
+87b6399f31112314243ea0ac222abfb7c0d4b70b9d13b8ddafcbdebf1f3735fe  fieldkit.js
+d834a71860bce01879e4ec59f98f59d0fe3a895fe8f59974012737ea6d3f080f  tests/native-track.test.js
+5c0e6475408fb2eb097e7e53d6109dac9e06437e79a2f32ac04d3144b69a85aa  tests/android-harness.test.js
+0c761e78d41b54758d263abbe1585e54eb2febb035025ee7c0d58375b06d1fe4  scripts/test-android-installed.sh
