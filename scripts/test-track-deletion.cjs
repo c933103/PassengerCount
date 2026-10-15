@@ -18,7 +18,8 @@ try {
   const service = fs.readFileSync(path.join(root, 'android/src/app/passengercount/TrackService.java'), 'utf8');
   const fixture = fs.readFileSync(path.join(root, 'tests/native/TrackDeletionFixture.java'), 'utf8')
     .replace('/* BRIDGE_METHODS */', ['public boolean deleteTrack(', 'public void startTracking(', 'public String getTrackPage(', 'public String getTrack('].map(x => method(activity, x)).join('\n'))
-    .replace('/* SERVICE_METHODS */', ['public int onStartCommand(', 'static synchronized TrackSession session(', 'static void finishStop(', 'static String safeId(', 'static File trackFile(', 'static boolean isDeleted(', 'static boolean deleteTrack('].map(x => method(service, x)).join('\n'));
+    .replace('/* START_PENDING */', method(activity, 'private void startPendingTrack('))
+    .replace('/* SERVICE_METHODS */', ['public int onStartCommand(', 'private static final class Api31', 'static synchronized TrackSession session(', 'static void finishStop(', 'static String safeId(', 'static File trackFile(', 'static boolean isDeleted(', 'static boolean deleteTrack('].map(x => method(service, x)).join('\n'));
   const sources = [write('MainActivity.java', fixture)];
   sources.push(write('android/system/ErrnoException.java', 'package android.system; public class ErrnoException extends Exception {}'));
   // Match public SDK names; an invented O_DIRECTORY stub hid an Android build error.
@@ -51,6 +52,7 @@ try {
         try { channels.remove(fd).close(); if (failClose) throw new ErrnoException(); } catch (IOException e) { throw new ErrnoException(); }
       }
     }`));
+  sources.push(write('android/util/Log.java', 'package android.util; public class Log { public static int errors; public static int e(String tag, String message, Throwable error) { errors++; return 0; } }'));
   sources.push(write('org/json/JSONException.java', 'package org.json; public class JSONException extends RuntimeException {}'));
   sources.push(write('org/json/JSONObject.java', `package org.json;
     public class JSONObject { private String raw="{}"; public JSONObject() {} public JSONObject(String s) { raw=s; }
@@ -59,7 +61,7 @@ try {
   sources.push(write('org/json/JSONArray.java', `package org.json; import java.util.*;
     public class JSONArray { private final List<Object> items=new ArrayList<>(); public JSONArray put(Object x) { items.add(x);return this; }
       public String toString() { return items.toString(); } }`));
-  for (const name of ['TrackDeletion', 'TrackSession', 'TrackJournal']) sources.push(path.join(root, `android/src/app/passengercount/${name}.java`));
+  for (const name of ['TrackDeletion', 'TrackSession', 'TrackJournal', 'TrackInterruption']) sources.push(path.join(root, `android/src/app/passengercount/${name}.java`));
   const run = args => { const r = spawnSync('java', args, { stdio: 'inherit' }); if (r.error) throw r.error; if (r.status) process.exitCode = r.status; return r.status === 0; };
   if (run(['com.sun.tools.javac.Main', '-encoding', 'UTF-8', '-source', '8', '-target', '8', '-d', build, ...sources]))
     run([`-Djava.io.tmpdir=${build}`, '-cp', build, 'app.passengercount.MainActivity']);

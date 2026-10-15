@@ -141,9 +141,47 @@ public final class TrackService extends Service {
             return START_NOT_STICKY;
         }
         recording = requested;
-        startForeground(19, notification());
+        try {
+            startForeground(19, notification());
+        } catch (IllegalStateException denied) {
+            // Android can revoke the retained FGS eligibility while our process
+            // is absent. Only handle that specific null-intent restart denial;
+            // unrelated failures and explicit deliveries still propagate.
+            if (intent != null || Build.VERSION.SDK_INT < 31
+                    || !Api31.isForegroundStartDenied(denied)) throw denied;
+            recording = null;
+            try { manager.removeUpdates(listener); } catch (Exception ignored) {}
+            boolean receiptSaved = false;
+            try {
+                synchronized (control) {
+                    if (control.accepts(requested)) {
+                        TrackInterruption.append(trackFile(this, requested.id), System.currentTimeMillis());
+                        receiptSaved = true;
+                    }
+                }
+            } catch (IOException failedReceipt) {
+                // A failed durable receipt must never be reported as recovered.
+                failedReceipt.addSuppressed(denied);
+                throw new IllegalStateException("Cannot save tracking interruption", failedReceipt);
+            } finally {
+                // Preserve the requested survey/token, but do not retry a
+                // forbidden background start or keep a crash/restart loop alive.
+                stopSelf(startId);
+            }
+            android.util.Log.e("PassengerTrack", receiptSaved
+                ? "Background tracking restart denied; interruption saved; reopen the active survey"
+                : "Background tracking restart denied for a superseded session; stopped stale delivery", denied);
+            return START_NOT_STICKY;
+        }
         beginUpdates();
         return START_STICKY;
+    }
+
+    // Isolate the API31 exception reference from older Android runtimes.
+    private static final class Api31 {
+        static boolean isForegroundStartDenied(IllegalStateException failure) {
+            return failure instanceof ForegroundServiceStartNotAllowedException;
+        }
     }
 
     private boolean hasLocation() {

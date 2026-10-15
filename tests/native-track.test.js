@@ -136,3 +136,57 @@ test("failed final drain keeps its cursor retryable and reports failure", () => 
   assert.equal(importNativeTrack(s, reader, () => true), true);
   assert.equal(s.track[0].nativeId, "A");
 });
+
+const interruption = (id = 'denied-1', time = '2026-10-15T09:09:43.160Z') => ({
+  nativeId: id, event: 'foreground_start_denied', timestamp: Date.parse(time),
+});
+test('interruption evidence is durable and replay-idempotent without inventing a GPS fix', () => {
+  const s = survey(), reader = bridge({ one: [point('before'), interruption()] }, 1);
+  let saved;
+  assert.equal(importNativeTrack(s, reader, () => { saved = JSON.stringify(s); return true; }), true);
+  assert.equal(s.track.length, 1);
+  assert.deepEqual(s.trackInterruptions, [{ nativeId: 'denied-1', reason: 'foreground_start_denied', observedAt: '2026-10-15T09:09:43.160Z' }]);
+  const restarted = JSON.parse(saved);
+  restarted.nativeTrackCursor = '';
+  importNativeTrack(restarted, reader, () => true);
+  assert.deepEqual(restarted.trackInterruptions, s.trackInterruptions);
+  assert.equal(restarted.track.length, 1);
+});
+test('failed workspace write rolls back interruption, point and shared journal cursor together', () => {
+  const s = survey(), reader = bridge({ one: [point('before'), interruption()] });
+  const before = JSON.stringify(s);
+  assert.equal(importNativeTrack(s, reader, () => false), false);
+  assert.equal(JSON.stringify(s), before);
+  assert.throws(() => importNativeTrack(s, reader, () => { throw Error('storage unavailable'); }), /storage unavailable/);
+  assert.equal(JSON.stringify(s), before);
+  assert.equal(importNativeTrack(s, reader, () => true), true);
+  assert.equal(s.nativeTrackCursor, '2');
+  assert.equal(s.trackInterruptions.length, 1);
+});
+test('malformed interruption cannot be silently consumed by a new cursor', () => {
+  for (const invalid of [{ ...interruption(), timestamp: null }, { ...interruption(), timestamp: 1e100 }, { ...interruption(), nativeId: '' }]) {
+    const s = survey();
+    assert.throws(() => importNativeTrack(s, bridge({ one: [invalid] }), () => assert.fail('must not persist')), /Invalid native tracking interruption/);
+    assert.equal(s.nativeTrackCursor, undefined);
+    assert.equal(s.trackInterruptions, undefined);
+  }
+});
+test('later native fixes preserve the historical denial instead of claiming its missing interval', () => {
+  const s = survey(), journal = [interruption()], reader = bridge({ one: journal });
+  importNativeTrack(s, reader, () => true);
+  journal.push(point('after', 0, { time: '2026-10-15T09:20:00Z' }));
+  importNativeTrack(s, reader, () => true);
+  assert.equal(s.trackInterruptions.length, 1);
+  assert.equal(s.trackInterruptions[0].resumedAt, undefined);
+  assert.equal(s.trackInterruptions[0].startedAt, undefined);
+  assert.equal(s.track.length, 1);
+});
+test('GPX exposes denial evidence and separates points across the observation without synthetic coordinates', () => {
+  const s = survey(), reader = bridge({ one: [point('before', 0, { time: '2026-10-15T09:09:00Z' }), interruption(), point('after', 0, { time: '2026-10-15T09:20:00Z' })] });
+  importNativeTrack(s, reader, () => true);
+  const gpx = makeGpx(s);
+  assert.equal((gpx.match(/<trkpt /g) || []).length, 2);
+  assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+  assert.match(gpx, /<pc:tracking_interruption observed_at="2026-10-15T09:09:43.160Z">foreground_start_denied<\/pc:tracking_interruption>/);
+  assert.doesNotMatch(gpx, /resumed_at|gap_start/);
+});

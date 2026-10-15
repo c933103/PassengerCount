@@ -48,6 +48,9 @@ function escapeXml(value) {
 export function makeGpx(s) {
   const points = Array.isArray(s?.track) ? s.track : [];
   const title = `${s?.route?.route || "trip"} ${s?.date || ""}`.trim();
+  const interruptions = (s?.trackInterruptions || []).filter((event) =>
+    event.reason === "foreground_start_denied" && Number.isFinite(Date.parse(event.observedAt)));
+  let previousTime = null;
   const body = points
     .filter((p) =>
       p?.lat != null &&
@@ -66,10 +69,18 @@ export function makeGpx(s) {
         extensions.push(`<pc:heading_deg>${Number(p.heading)}</pc:heading_deg>`);
       if (p.source)
         extensions.push(`<pc:source>${escapeXml(p.source)}</pc:source>`);
-      return `<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lng).toFixed(7)}"><time>${escapeXml(p.time)}</time>${extensions.length ? `<extensions>${extensions.join("")}</extensions>` : ""}</trkpt>`;
+      const currentTime = Date.parse(p.time);
+      const split = previousTime !== null && interruptions.some((event) => {
+        const time = Date.parse(event.observedAt);
+        return previousTime < time && time <= currentTime;
+      });
+      previousTime = currentTime;
+      return `${split ? "</trkseg><trkseg>" : ""}<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lng).toFixed(7)}"><time>${escapeXml(p.time)}</time>${extensions.length ? `<extensions>${extensions.join("")}</extensions>` : ""}</trkpt>`;
     })
     .join("");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="PassengerCount" xmlns="http://www.topografix.com/GPX/1/1" xmlns:pc="https://passengercount.app/gpx/1"><metadata><name>${escapeXml(title)}</name></metadata><trk><name>${escapeXml(title)}</name><trkseg>${body}</trkseg></trk></gpx>\n`;
+  const interruptionEvidence = interruptions.length ? "<extensions>" + interruptions.map((event) =>
+    `<pc:tracking_interruption observed_at="${escapeXml(event.observedAt)}">foreground_start_denied</pc:tracking_interruption>`).join("") + "</extensions>" : "";
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="PassengerCount" xmlns="http://www.topografix.com/GPX/1/1" xmlns:pc="https://passengercount.app/gpx/1"><metadata><name>${escapeXml(title)}</name>${interruptionEvidence}</metadata><trk><name>${escapeXml(title)}</name><trkseg>${body}</trkseg></trk></gpx>\n`;
 }
 
 export function parseVehicleProfiles(text) {

@@ -16,6 +16,26 @@ function normalize(p) {
   };
 }
 
+// Interruption records share the same journal/cursor as fixes, but are never
+// converted to coordinates. The timestamp is when denial was observed; its
+// missing-GPS interval and eventual recovery time remain unknown.
+export function mergeNativeInterruptions(previous = [], records = []) {
+  const merged = previous.map((event) => ({ ...event }));
+  const seen = new Set(merged.map((event) => event.nativeId));
+  for (const record of records) {
+    if (record?.event !== "foreground_start_denied") continue;
+    if (typeof record.nativeId !== "string" || !record.nativeId ||
+        !Number.isFinite(record.timestamp) || record.timestamp <= 0 ||
+        !Number.isFinite(new Date(record.timestamp).getTime()))
+      throw Error("Invalid native tracking interruption");
+    if (seen.has(record.nativeId)) continue;
+    merged.push({ nativeId: record.nativeId, reason: record.event,
+      observedAt: new Date(record.timestamp).toISOString() });
+    seen.add(record.nativeId);
+  }
+  return merged;
+}
+
 // Native IDs identify journal records, not timestamps or approximate locations.
 // Match old/foreground points once by the entire stored measurement when upgrading.
 export function mergeNativeTrack(track, points) {
@@ -71,12 +91,15 @@ export function importNativeTrack(s, bridge, persist) {
   for (;;) {
     const previousTrack = s.track;
     const previousCursor = s.nativeTrackCursor;
+    const previousInterruptions = s.trackInterruptions;
     const raw = paged ? bridge.getTrackPage(s.id, previousCursor || "") : bridge.getTrack(s.id);
     if (!raw) return false;
     const page = JSON.parse(raw);
     const points = paged ? page.points : page;
     if (!Array.isArray(points) || (paged && typeof page.cursor !== "string")) return false;
+    const interruptions = mergeNativeInterruptions(s.trackInterruptions, points);
     s.track = mergeNativeTrack(s.track, points);
+    if (interruptions.length) s.trackInterruptions = interruptions;
     if (paged) s.nativeTrackCursor = page.cursor;
     // Track and cursor belong to the same durable workspace write. Never ack
     // journal consumption in memory after a failed storage commit.
@@ -85,6 +108,8 @@ export function importNativeTrack(s, bridge, persist) {
     finally {
       if (!saved) {
         s.track = previousTrack;
+        if (previousInterruptions === undefined) delete s.trackInterruptions;
+        else s.trackInterruptions = previousInterruptions;
         if (previousCursor === undefined) delete s.nativeTrackCursor;
         else s.nativeTrackCursor = previousCursor;
       }

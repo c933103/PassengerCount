@@ -29,6 +29,9 @@ public final class MainActivity extends Activity {
     private volatile Runnable pendingLegacyExport;
     private int pendingLegacyPermission = -1;
     private boolean destroyed;
+    // Main-thread lifecycle state, shared with test/bridge hosts in this process.
+    private static final java.util.Set<MainActivity> resumedActivities =
+        java.util.Collections.newSetFromMap(new java.util.WeakHashMap<MainActivity, Boolean>());
     private boolean choosingDirectory;
     private WebView web;
     private GeolocationPermissions.Callback locationCallback;
@@ -322,6 +325,9 @@ public final class MainActivity extends Activity {
         }
     }
     private void startPendingTrack() {
+        // A WebView callback queued while visible can arrive after Home/lock.
+        // Keep the durable intent and wait for a visible Activity to request it.
+        if (destroyed || resumedActivities.isEmpty()) return;
         TrackSession.Request request = TrackService.session(this).request();
         if (!TrackService.session(this).accepts(request) || !hasLocation()) return;
         Intent intent = new Intent(this, TrackService.class)
@@ -478,6 +484,7 @@ public final class MainActivity extends Activity {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
     @Override protected void onPause() {
+        resumedActivities.remove(this);
         exportSession.detach(exportChanged);
         super.onPause();
         if (web != null) web.onPause();
@@ -485,6 +492,7 @@ public final class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         if (destroyed) return;
+        resumedActivities.add(this);
         exportSession.attach(exportChanged);
         if (web != null) web.onResume();
         // A live older Activity can return after a newer one is dismissed, or
@@ -492,6 +500,7 @@ public final class MainActivity extends Activity {
         emitExportState();
     }
     @Override protected void onDestroy() {
+        resumedActivities.remove(this);
         destroyed = true;
         exportSession.detach(exportChanged);
         pendingLegacyExport = null;

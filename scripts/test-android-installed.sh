@@ -212,6 +212,33 @@ phase receipts-recover
 phase receipts-final
 launch_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
+activity_state before-denied 2 "$oldpid"
+phase prepare-denied attached
+background_home
+activity_state background-denied 4 "$oldpid"
+detached denied "$oldpid"
+denial_done=false
+for ((i=0;i<45;i++)); do
+  adb logcat -d -v threadtime > "$OUT/logcat-controlled-denial.txt"
+  if grep -q "PHASE_FAIL controlled-" "$OUT/logcat-controlled-denial.txt"; then
+    echo 'Controlled policy-denial phase failed'; exit 1
+  fi
+  if grep -q "DENIAL_HANDLED pid=$oldpid" "$OUT/logcat-controlled-denial.txt"; then
+    adb shell dumpsys activity services "$PACKAGE" > "$OUT/services-controlled-denial.txt"
+    if ! grep -q 'ServiceRecord.*app.passengercount/.TrackService' "$OUT/services-controlled-denial.txt"; then denial_done=true; break; fi
+  fi
+  sleep 1
+done
+$denial_done || { echo 'Controlled policy denial was not observed'; exit 1; }
+grep -q "DENIAL_AFTER_DETACH pid=$oldpid" "$OUT/logcat-controlled-denial.txt"
+grep -q 'ForegroundServiceStartNotAllowedException' "$OUT/logcat-controlled-denial.txt"
+[[ "$(adb shell pidof "$PACKAGE" | tr -d '\r')" == "$oldpid" ]]
+phase verify-denied attached
+launch_home
+activity_state recovery-denied 2 "$oldpid"
+phase recover-denied attached
+launch_home
+oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 activity_state before-valid 2 "$oldpid"
 phase prepare-valid attached
 background_home

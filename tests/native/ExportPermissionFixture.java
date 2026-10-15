@@ -66,6 +66,14 @@ public final class MainActivity extends Activity {
         disk.edit().putString("result", SUCCESS).commit(); return disk;
     }
     public static void main(String[] args) throws Exception {
+        scenario("tracking visibility follows actual Activity lifecycle", () -> {
+            MainActivity a = new MainActivity(previousSuccess());
+            check(resumedActivities.contains(a), "resumed Activity allows foreground request");
+            a.onPause(); check(!resumedActivities.contains(a), "paused Activity cannot authorize background retry");
+            a.onResume(); check(resumedActivities.contains(a), "visible return restores foreground request eligibility");
+            a.onDestroy(); check(!resumedActivities.contains(a), "destroyed Activity loses visibility");
+            a.onResume(); check(!resumedActivities.contains(a), "stale resume after destruction cannot authorize start");
+        });
         for (int api : new int[]{26, 28}) {
             Build.VERSION.SDK_INT = api;
             String label = "API " + api + " ";
