@@ -1,0 +1,2 @@
+PASS: 1500 deterministic mixed-source permutations; 19500 points checked; exact chronological order, stable equal-instant journal ties, malformed slots/data, unchanged inputs and replay idempotence.
+Seed=0x15a5c0de; 5 offsets, 9 fractional spellings through 30 digits, 4 malformed forms; BigInt only in independent host oracle. No production/gate change.
