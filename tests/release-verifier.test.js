@@ -7,11 +7,11 @@ test("offline release verifier rejects unsafe APKs and wrong upgrade lineage", (
     "-m", "unittest", "discover", "-s", "tests", "-p", "test_release_verifier.py",
   ], {
     encoding: "utf8",
-    timeout: 30_000,
+    timeout: 120_000,
     maxBuffer: 512 * 1024,
   });
   assert.equal(result.error, undefined, String(result.error));
   assert.equal(result.status, 0,
     `Release verifier regressions failed:\n${result.stdout}\n${result.stderr}`);
-  assert.match(result.stderr, /Ran 24 tests/);
+  assert.match(result.stderr, /Ran 32 tests/);
 });

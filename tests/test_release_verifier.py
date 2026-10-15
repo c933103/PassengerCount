@@ -5,9 +5,10 @@ import os
 import stat
 import tempfile
 from pathlib import Path
-import re
+import shutil
+import subprocess
+import sys
 import unittest
-from unittest import mock
 import hashlib
 import json
 import zipfile
@@ -212,123 +213,228 @@ targetSdkVersion:'35'
             rv.validate_policy(policy, provenance)
 
 
-    def test_complete_synthetic_release_gate_uses_only_snapshot_bytes(self):
-        # Contract integration: mock signer/aapt transcripts are NOT actual
-        # original-key acceptance. This catches broken CLI/helper wiring.
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            with zipfile.ZipFile(io.BytesIO(ALIGNED)) as source:
-                entries = [(name, source.read(name)) for name in source.namelist()]
-            candidate_bytes = zipped(entries + [
-                ("META-INF/MANIFEST.MF", b"signature manifest"),
-                ("META-INF/ORIGINAL.SF", b"signature file"),
-                ("META-INF/ORIGINAL.RSA", b"signer certificate")])
-            ci_ephemeral = zipped(entries)
-            previous_bytes = zipped([("AndroidManifest.xml", b"1.10"),
-                                     ("classes.dex", b"old-dex")])
-            artifact = zipped([("aligned.apk", ALIGNED),
-                               ("PassengerCount.apk", ci_ephemeral)])
-            artifact_path = root / "accepted-ci.zip"
-            candidate_path = root / "candidate.apk"
-            previous_path = root / "previous.apk"
-            artifact_path.write_bytes(artifact)
-            candidate_path.write_bytes(candidate_bytes)
-            previous_path.write_bytes(previous_bytes)
-            digest = lambda data: hashlib.sha256(data).hexdigest()
-            policy = {
-                "accepted_main_commit": "ed0a10a8bd61f9be7348cf6e3b980013acdecad3",
-                "accepted_tree": "2af449ab36a4d895ad2e8bcb2e323a596097d025",
-                "ci_run": 38332107783, "ci_artifact_id": 11782629978,
-                "ci_artifact_zip_sha256": digest(artifact),
-                "aligned_apk_sha256": digest(ALIGNED),
-                "ci_ephemeral_apk_sha256": digest(ci_ephemeral),
-                "previous_apk_sha256": digest(previous_bytes),
-                "original_certificate_sha256": ORIGINAL_CERT,
-                "package": "app.passengercount", "version_name": "1.11",
-                "version_code": 12, "min_sdk": 26, "target_sdk": 35,
-            }
-            provenance = {
-                "certificate_sha256": ORIGINAL_CERT,
-                "delivered_apk_sha256": digest(previous_bytes),
-                "package": "app.passengercount",
-                "candidate_version": "1.11", "candidate_version_code": 12,
-                "delivered_version": "1.10", "delivered_code": 11,
-            }
-            policy_file = root / "policy.json"
-            provenance_file = root / "provenance.json"
-            policy_file.write_text(json.dumps(policy))
-            provenance_file.write_text(json.dumps(provenance))
-            sdk = root / "sdk"
-            tools = sdk / "build-tools" / "35.0.0"
-            tools.mkdir(parents=True)
-            for name in ("aapt2", "apksigner"):
-                stub = tools / name
-                stub.write_text("trusted tool placeholder; never executed")
-                stub.chmod(0o700)
-            calls = []
+# The copied CLI is byte-for-byte the production source. Only adjacent policy
+# files and SDK executables are synthetic; no production bypass flags exist.
+STUB_SOURCE = r'''import hashlib
+import json
+import os
+from pathlib import Path
+import stat
+import sys
+import time
 
-            def fake_tool(args, label):
-                self.assertIn(args[0], (str(tools / "aapt2"),
-                                        str(tools / "apksigner")))
-                snapshot_path = Path(args[-1])
-                self.assertEqual(snapshot_path.stat().st_mode & 0o777, 0o600)
-                expected = candidate_bytes if "1.11" in label else previous_bytes
-                self.assertEqual(snapshot_path.read_bytes(), expected)
-                calls.append(label)
-                if label == "Android 1.11 APK signature":
-                    candidate_path.write_bytes(b"mutated-original-file-during-verification")
-                if "signature" in label:
-                    return self.fake_apksigner()
-                if "1.11" in label:
-                    return ("package: name='app.passengercount' versionCode='12' "
-                            "versionName='1.11'\nsdkVersion:'26'\ntargetSdkVersion:'35'\n")
-                return "package: name='app.passengercount' versionCode='11' versionName='1.10'\n"
+sdk = Path(__file__).resolve().parents[2]
+config = json.loads((sdk / "stub-config.json").read_text())
+tool = Path(__file__).name
+snapshot = Path(sys.argv[-1])
+kind = snapshot.stem
+stage = tool + ":" + kind
+expected_args = (["verify", "--verbose", "--print-certs", "--min-sdk-version", "26"]
+                 if tool == "apksigner" else ["dump", "badging"])
+assert sys.argv[1:-1] == expected_args, "incorrect SDK invocation"
+assert kind in ("candidate", "previous"), "incorrect snapshot name"
+assert snapshot != Path(config[kind + "_path"]), "mutable caller path used"
+assert stat.S_IMODE(snapshot.stat().st_mode) == 0o600, "snapshot is not private"
+assert stat.S_IMODE(snapshot.parent.stat().st_mode) == 0o700, "directory is not private"
+assert hashlib.sha256(snapshot.read_bytes()).hexdigest() == config[kind + "_sha"], "snapshot changed"
+assert set(os.environ) <= {"PATH", "JAVA_HOME", "LANG", "LC_ALL"}, "unexpected inherited environment"
+assert os.environ["PATH"] == config["path"], "runtime PATH missing"
+assert os.environ["JAVA_HOME"] == config["java_home"], "runtime JAVA_HOME missing"
+assert os.environ["LANG"] == os.environ["LC_ALL"] == "C", "non-deterministic locale"
+with (sdk / "calls.jsonl").open("a") as log:
+    log.write(json.dumps({"stage": stage}) + "\n")
+if config.get("mutate") and stage == "apksigner:candidate":
+    for name in ("candidate", "previous"):
+        Path(config[name + "_path"]).write_bytes(b"synthetic caller mutation")
+if config.get("stage") == stage:
+    mode = config["mode"]
+    if mode == "exit":
+        print("synthetic SDK failure", file=sys.stderr)
+        sys.exit(7)
+    if mode == "invalid":
+        print("synthetic malformed transcript")
+        sys.exit(0)
+    if mode in ("stdout", "stderr"):
+        print("x" * (128 * 1024 + 1), file=getattr(sys, mode))
+        sys.exit(0)
+    if mode == "timeout":
+        time.sleep(60)
+if tool == "apksigner":
+    print("Verifies")
+    print("Verified using v2 scheme (APK Signature Scheme v2): true")
+    print("Verified using v3 scheme (APK Signature Scheme v3): true")
+    print("Number of signers: 1")
+    print("Signer #1 certificate SHA-256 digest: " + config["certificate"])
+else:
+    code, version = (12, "1.11") if kind == "candidate" else (11, "1.10")
+    print(f"package: name='app.passengercount' versionCode='{code}' versionName='{version}'")
+    print("sdkVersion:'26'")
+    print("targetSdkVersion:'35'")
+'''
 
-            with mock.patch.object(rv, "POLICY_FILE", policy_file), \
-                 mock.patch.object(rv, "OLD_PROVENANCE_FILE", provenance_file), \
-                 mock.patch.object(rv, "run_verified_tool", side_effect=fake_tool):
-                report = rv.run_verification(artifact_path, candidate_path, previous_path, sdk)
-            self.assertEqual(len(calls), 4)
-            self.assertEqual(report["candidate_apk_sha256"], digest(candidate_bytes))
-            self.assertEqual(report["compared_non_signature_apk_entries"], len(entries))
-            self.assertFalse(report["published"])
-            self.assertFalse(report["physical_device_upgrade_verified"])
 
-    def test_tampered_ci_zip_rejected_before_any_sdk_execution(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            provenance = {
-                "certificate_sha256": ORIGINAL_CERT,
-                "delivered_apk_sha256": "1" * 64,
-                "package": "app.passengercount",
-                "candidate_version": "1.11", "candidate_version_code": 12,
-                "delivered_version": "1.10", "delivered_code": 11,
-            }
-            policy = {
-                "accepted_main_commit": "ed0a10a8bd61f9be7348cf6e3b980013acdecad3",
-                "accepted_tree": "2af449ab36a4d895ad2e8bcb2e323a596097d025",
-                "ci_run": 38332107783, "ci_artifact_id": 11782629978,
-                "ci_artifact_zip_sha256": "2" * 64,
-                "aligned_apk_sha256": "3" * 64,
-                "ci_ephemeral_apk_sha256": "4" * 64,
-                "previous_apk_sha256": "1" * 64,
-                "original_certificate_sha256": ORIGINAL_CERT,
-                "package": "app.passengercount", "version_name": "1.11",
-                "version_code": 12, "min_sdk": 26, "target_sdk": 35,
-            }
-            policy_file = root / "policy.json"
-            provenance_file = root / "prior.json"
-            artifact_file = root / "tampered.zip"
-            policy_file.write_text(json.dumps(policy))
-            provenance_file.write_text(json.dumps(provenance))
-            artifact_file.write_bytes(b"tampered downloaded artifact")
-            with mock.patch.object(rv, "POLICY_FILE", policy_file), \
-                 mock.patch.object(rv, "OLD_PROVENANCE_FILE", provenance_file), \
-                 mock.patch.object(rv, "run_verified_tool") as invoked:
-                with self.assertRaisesRegex(rv.VerificationError, "CI artifact ZIP differs"):
-                    rv.run_verification(artifact_file, root / "nonexistent.apk",
-                                        root / "nonexistent-old.apk", root)
-                invoked.assert_not_called()
+class ReleaseVerifierCliTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.cli = self.root / "scripts" / MODULE.name
+        self.cli.parent.mkdir()
+        shutil.copyfile(MODULE, self.cli)
+        self.assertEqual(self.cli.read_bytes(), MODULE.read_bytes())
+        releases = self.root / "verification" / "releases"
+        releases.mkdir(parents=True)
+        with zipfile.ZipFile(io.BytesIO(ALIGNED)) as archive:
+            self.entries = [(name, archive.read(name)) for name in archive.namelist()]
+        self.candidate_bytes = zipped(self.entries + [
+            ("META-INF/MANIFEST.MF", b"synthetic manifest"),
+            ("META-INF/ORIGINAL.SF", b"synthetic signature"),
+            ("META-INF/ORIGINAL.RSA", b"synthetic certificate")])
+        previous_bytes = zipped([("AndroidManifest.xml", b"1.10"),
+                                 ("classes.dex", b"old-dex")])
+        # This artifact contains a tripwire executable. The CLI must never run it.
+        self.artifact = self.root / "accepted-ci.zip"
+        self.artifact.write_bytes(zipped([
+            ("aligned.apk", ALIGNED), ("PassengerCount.apk", ALIGNED),
+            ("signing-tools/apksigner", b"untrusted artifact tool; never execute")]))
+        self.candidate = self.root / "candidate.apk"
+        self.previous = self.root / "previous.apk"
+        self.candidate.write_bytes(self.candidate_bytes)
+        self.previous.write_bytes(previous_bytes)
+        digest = lambda data: hashlib.sha256(data).hexdigest()
+        policy = json.loads(rv.POLICY_FILE.read_text())
+        policy.update(ci_artifact_zip_sha256=digest(self.artifact.read_bytes()),
+                      aligned_apk_sha256=digest(ALIGNED),
+                      ci_ephemeral_apk_sha256=digest(ALIGNED),
+                      previous_apk_sha256=digest(previous_bytes),
+                      original_certificate_sha256="7" * 64)
+        provenance = json.loads(rv.OLD_PROVENANCE_FILE.read_text())
+        provenance.update(certificate_sha256=policy["original_certificate_sha256"],
+                          delivered_apk_sha256=policy["previous_apk_sha256"])
+        (releases / rv.POLICY_FILE.name).write_text(json.dumps(policy))
+        (releases / rv.OLD_PROVENANCE_FILE.name).write_text(json.dumps(provenance))
+        self.sdk = self.root / "sdk"
+        self.tools = self.sdk / "build-tools" / "35.0.0"
+        self.tools.mkdir(parents=True)
+        for name in ("apksigner", "aapt2"):
+            executable = self.tools / name
+            executable.write_text("#!" + sys.executable + "\n" + STUB_SOURCE)
+            executable.chmod(0o700)
+        self.config = {
+            "candidate_path": str(self.candidate), "previous_path": str(self.previous),
+            "candidate_sha": digest(self.candidate_bytes),
+            "previous_sha": digest(previous_bytes),
+            "certificate": policy["original_certificate_sha256"],
+            "path": os.defpath, "java_home": str(self.root / "synthetic-jdk"),
+        }
+        # Build a fresh environment. Never copy real credentials into a fixture.
+        self.environment = {"PATH": self.config["path"],
+                            "JAVA_HOME": self.config["java_home"]}
+        for name in ("LOCAL_SIGNING_STORE_PASSWORD", "LOCAL_SIGNING_KEY_PASSWORD",
+                     "SIGNING_STORE_PASSWORD", "SIGNING_KEY_PASSWORD", "SIGNING_KEYSTORE",
+                     "GITHUB_TOKEN", "AWS_ACCESS_KEY_ID", "JAVA_TOOL_OPTIONS",
+                     "_JAVA_OPTIONS", "JDK_JAVA_OPTIONS", "PYTHONPATH", "BASH_ENV"):
+            self.environment[name] = "synthetic-test-only"
+
+    def run_cli(self, **settings):
+        config = dict(self.config, **settings)
+        (self.sdk / "stub-config.json").write_text(json.dumps(config))
+        self.log = self.sdk / "calls.jsonl"
+        self.log.unlink(missing_ok=True)
+        return subprocess.run([
+            sys.executable, "-I", str(self.cli),
+            "--ci-artifact", str(self.artifact), "--candidate", str(self.candidate),
+            "--previous", str(self.previous), "--android-home", str(self.sdk),
+        ], capture_output=True, text=True, check=False, timeout=50,
+            env=self.environment, cwd=self.root)
+
+    def calls(self):
+        return ([json.loads(line)["stage"] for line in self.log.read_text().splitlines()]
+                if self.log.exists() else [])
+
+    def assert_failed(self, result, message):
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("RELEASE_VERIFICATION_FAILED:", result.stderr)
+        self.assertIn(message, result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_cli_accepts_synthetic_gate_with_sanitized_environment(self):
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+        report = json.loads(result.stdout)
+        self.assertEqual(report["candidate_apk_sha256"], self.config["candidate_sha"])
+        self.assertEqual(report["compared_non_signature_apk_entries"], len(self.entries))
+        self.assertEqual(report["result"], "release_binary_checks_passed_only")
+        self.assertFalse(report["published"])
+        self.assertFalse(report["physical_device_upgrade_verified"])
+        self.assertEqual(self.calls(), ["apksigner:candidate", "apksigner:previous",
+                                       "aapt2:candidate", "aapt2:previous"])
+
+    def test_cli_uses_snapshots_after_mutation_of_both_caller_files(self):
+        result = self.run_cli(mutate=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["candidate_apk_sha256"], self.config["candidate_sha"])
+        self.assertEqual(report["previous_apk_sha256"], self.config["previous_sha"])
+        self.assertEqual(self.candidate.read_bytes(), b"synthetic caller mutation")
+        self.assertEqual(self.previous.read_bytes(), b"synthetic caller mutation")
+        self.assertEqual(len(self.calls()), 4)
+
+    def test_cli_rejects_real_nonzero_tool_exits_at_each_stage(self):
+        stages = ["apksigner:candidate", "apksigner:previous", "aapt2:candidate", "aapt2:previous"]
+        for index, stage in enumerate(stages):
+            with self.subTest(stage=stage):
+                self.assert_failed(self.run_cli(stage=stage, mode="exit"), "failed (exit 7)")
+                self.assertEqual(self.calls(), stages[:index + 1])
+
+    def test_cli_rejects_real_invalid_signer_transcripts(self):
+        for kind in ("candidate", "previous"):
+            with self.subTest(kind=kind):
+                self.assert_failed(self.run_cli(stage="apksigner:" + kind, mode="invalid"),
+                                   "did not report successful verification")
+
+    def test_cli_rejects_real_invalid_manifest_transcripts(self):
+        for kind, expected in (("candidate", "Cannot unambiguously parse"),
+                               ("previous", "Previous APK identity does not match")):
+            with self.subTest(kind=kind):
+                self.assert_failed(self.run_cli(stage="aapt2:" + kind, mode="invalid"), expected)
+
+    def test_cli_rejects_excessive_stdout_and_stderr(self):
+        for stream in ("stdout", "stderr"):
+            with self.subTest(stream=stream):
+                self.assert_failed(self.run_cli(stage="apksigner:candidate", mode=stream),
+                                   "produced excessive output")
+
+    def test_cli_enforces_real_production_timeout(self):
+        # Exercise the unchanged 35-second production timeout; no patched clock,
+        # subprocess helper, or test-only CLI override can satisfy this control.
+        self.assert_failed(self.run_cli(stage="apksigner:candidate", mode="timeout"),
+                           "unavailable or timed out")
+        self.assertEqual(self.calls(), ["apksigner:candidate"])
+
+    def test_cli_rejects_unusable_executables(self):
+        signer = self.tools / "apksigner"
+        signer.chmod(0o600)
+        self.assert_failed(self.run_cli(), "not executable")
+        self.assertEqual(self.calls(), [])
+        signer.chmod(0o700)
+        signer.write_text("synthetic invalid executable format\n")
+        self.assert_failed(self.run_cli(), "unavailable or timed out")
+        self.assertEqual(self.calls(), [])
+
+    def test_cli_rejects_tampered_ci_before_any_sdk_execution(self):
+        self.artifact.write_bytes(self.artifact.read_bytes() + b"tampered")
+        self.assert_failed(self.run_cli(), "CI artifact ZIP differs")
+        self.assertEqual(self.calls(), [])
+
+    def test_cli_rejects_changed_payload_before_any_sdk_execution(self):
+        self.candidate.write_bytes(zipped([
+            (name, b"changed-dex" if name == "classes.dex" else data)
+            for name, data in self.entries]))
+        self.assert_failed(self.run_cli(), "APK payload changed: classes.dex")
+        self.assertEqual(self.calls(), [])
 
 
 if __name__ == "__main__":

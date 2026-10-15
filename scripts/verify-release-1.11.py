@@ -156,10 +156,22 @@ def parse_badging(output, expected_package, expected_code, expected_name, min_sd
             f"Wrong Android SDK bounds: min={mins}, target={targets}")
 
 
+def verification_environment():
+    """Pass only SDK runtime configuration, never the signing environment."""
+    # apksigner needs Java and basic launcher utilities. Do not inherit HOME,
+    # signing variables, JVM injection hooks, loader hooks or unrelated tokens.
+    environment = {"PATH": os.environ.get("PATH", os.defpath),
+                   "LANG": "C", "LC_ALL": "C"}
+    if os.environ.get("JAVA_HOME"):
+        environment["JAVA_HOME"] = os.environ["JAVA_HOME"]
+    return environment
+
+
 def run_verified_tool(args, label):
     try:
         proc = subprocess.run(args, shell=False, capture_output=True, text=True,
-                              timeout=35, check=False, errors="replace")
+                              timeout=35, check=False, errors="replace",
+                              env=verification_environment())
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise VerificationError(f"{label} unavailable or timed out: {exc}") from exc
     require(len(proc.stdout) <= MAX_CAPTURE and len(proc.stderr) <= MAX_CAPTURE,
