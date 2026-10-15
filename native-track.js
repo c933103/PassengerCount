@@ -20,8 +20,14 @@ function normalize(p) {
 // converted to coordinates. The timestamp is when denial was observed; its
 // missing-GPS interval and eventual recovery time remain unknown.
 export function mergeNativeInterruptions(previous = [], records = []) {
-  const merged = previous.map((event) => ({ ...event }));
-  const seen = new Set(merged.map((event) => event.nativeId));
+  // Preserve malformed prior metadata for structured backup, but do not let it
+  // block valid new journal points or be mistaken for an acknowledged receipt.
+  const prior = Array.isArray(previous) ? previous : [previous];
+  const merged = prior.map((event) => event && typeof event === "object"
+    ? (Array.isArray(event) ? [...event] : { ...event }) : event);
+  const seen = new Set(merged.filter((event) => event?.reason === "foreground_start_denied" &&
+    typeof event?.observedAt === "string" && Number.isFinite(Date.parse(event.observedAt)))
+    .map((event) => event.nativeId));
   for (const record of records) {
     if (record?.event !== "foreground_start_denied") continue;
     if (typeof record.nativeId !== "string" || !record.nativeId ||

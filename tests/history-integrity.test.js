@@ -352,3 +352,18 @@ test("denied-restart evidence survives edits, Undo/Redo, save/load and structure
   assert.equal(f.s.track.length, 0, "interruption is never a synthetic fix");
   assert.match(makeExportBundle(f.s, null).gpx, /tracking_interruption/);
 });
+
+
+test("view preserves active tracking and does not restart a denied service; resume requests tracking", () => {
+  for (const running of [true, false]) {
+    const f = fixture();
+    if (!running) f.run('window.PassengerCountAndroid.stopTrackingAndDrain(state.currentId)');
+    f.calls.length = 0;
+    f.run('openSurvey(state.currentId, "record")');
+    assert.equal(f.calls.some(call => call.startsWith("start:") || call.startsWith("stop:")), false);
+    assert.equal(f.nativeId(), running ? f.s.id : null, "view leaves native session state untouched");
+    assert.equal(f.s.status, "in_progress", "view does not rewrite survey status");
+    f.run('openSurvey(state.currentId, "resume")');
+    assert.equal(f.calls.filter(call => call === "start:synthetic-A").length, 1);
+  }
+});

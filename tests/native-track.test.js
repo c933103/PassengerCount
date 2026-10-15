@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { importNativeTrack, mergeNativeTrack } from "../native-track.js";
-import { makeGpx } from "../fieldkit.js";
+import { makeGpx, validTrackInterruptions } from "../fieldkit.js";
 
 const point = (id, n = 0, extra = {}) => ({ nativeId: id, lat: 22 + n / 10000, lng: 114,
   time: new Date(1700000000000 + n * 1000).toISOString(), accuracy: 4, speed: 2,
@@ -189,4 +189,26 @@ test('GPX exposes denial evidence and separates points across the observation wi
   assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
   assert.match(gpx, /<pc:tracking_interruption observed_at="2026-10-15T09:09:43.160Z">foreground_start_denied<\/pc:tracking_interruption>/);
   assert.doesNotMatch(gpx, /resumed_at|gap_start/);
+});
+
+
+test('malformed stored interruption metadata cannot block valid journal points or GPX', () => {
+  for (const previous of [{ unexpected: true }, null, "invalid", [null, 7, {}, { reason: 'foreground_start_denied', observedAt: null }]]) {
+    const s = survey(), original = structuredClone(previous);
+    s.trackInterruptions = previous;
+    s.track = [point('before', 0, { time: '2026-10-15T09:09:00Z' })];
+    assert.equal((makeGpx(s).match(/<trkpt /g) || []).length, 1);
+    assert.deepEqual(s.trackInterruptions, original, 'export does not mutate malformed evidence');
+    importNativeTrack(s, bridge({ one: [interruption(), point('after', 0, { time: '2026-10-15T09:20:00Z' })] }), () => true);
+    assert.equal(s.track.length, 2);
+    assert.equal(s.nativeTrackCursor, '2');
+    assert.equal(validTrackInterruptions(s).length, 1);
+    assert.deepEqual(s.trackInterruptions.slice(0, -1), Array.isArray(original) ? original : [original], 'structured evidence remains available');
+    const gpx = makeGpx(s);
+    assert.equal((gpx.match(/<trkpt /g) || []).length, 2);
+    assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+    assert.equal((gpx.match(/<pc:tracking_interruption /g) || []).length, 1);
+    importNativeTrack(s, bridge({ one: [interruption()] }), () => true);
+    assert.equal(validTrackInterruptions(s).length, 1, 'valid denial remains replay-idempotent');
+  }
 });

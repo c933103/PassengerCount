@@ -30,3 +30,9 @@ Base: `c61f6c2bb9c45eb1665814b3ac2d08525534ec75`. The exact implementation and t
 
 Packaged web/native inputs changed, so old APK/source-bundle hashes do not describe this patch. No release build or signing claim is made.
 
+
+## Review hardening after the initial publication
+
+The initial hosted run [38720075745](https://github.com/c933103/PassengerCount/actions/runs/38720075745), on head `cc11734bcf8e4a6391a9c89847f440a461052e9f`, passed Node and native checks but failed the new browser negative: the pre-existing `showScreen` path started an in-progress survey even in View. Android build/installed phases were skipped. The assertion was retained; View now only reconciles an in-progress survey without starting or stopping its native session. Paired actual-handler regressions cover running and previously denied/stopped sessions. Setup/count and explicit Resume continue to request tracking; Home retains its previous stop behavior.
+
+Malformed stored interruption objects/null entries are retained for structured backup, while UI/GPX select only valid observations and preserve valid GPS points. Invalid newly read journal events still prevent cursor consumption. This addresses source-review findings without silently dropping old metadata. Latest local focused suite: 82/82, plus 8/8 recording-lifecycle controls; native code is unchanged from the passing initial check. Current-head hosted CI and review must be recorded separately below/on the PR. The immutable archive above describes the initial patch/local snapshot, not these later changes.

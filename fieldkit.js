@@ -45,11 +45,19 @@ function escapeXml(value) {
     .replaceAll("'", "&apos;");
 }
 
+// Stored/imported metadata is untrusted. Select only recognizable observations
+// for display/GPX without mutating the original structured evidence.
+export function validTrackInterruptions(s) {
+  return (Array.isArray(s?.trackInterruptions) ? s.trackInterruptions : []).filter((event) =>
+    event && typeof event === "object" && !Array.isArray(event) &&
+    event.reason === "foreground_start_denied" && typeof event.observedAt === "string" &&
+    Number.isFinite(Date.parse(event.observedAt)));
+}
+
 export function makeGpx(s) {
   const points = Array.isArray(s?.track) ? s.track : [];
   const title = `${s?.route?.route || "trip"} ${s?.date || ""}`.trim();
-  const interruptions = (s?.trackInterruptions || []).filter((event) =>
-    event.reason === "foreground_start_denied" && Number.isFinite(Date.parse(event.observedAt)));
+  const interruptions = validTrackInterruptions(s);
   let previousTime = null;
   const body = points
     .filter((p) =>

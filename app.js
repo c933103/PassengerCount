@@ -33,6 +33,7 @@ import { deleteRecords } from "./record-deletion.js";
 import {
   hkTimestamp,
   makeGpx,
+  validTrackInterruptions,
   parseVehicleProfiles,
   matchVehicle,
   tripMetrics,
@@ -408,8 +409,11 @@ function showScreen(next) {
     $(key + "Screen").hidden = key !== next;
   const s = cur();
   if (s) s.screen = next;
-  if (next !== "home" && s?.status === "in_progress") startNativeTracking(s);
-  else if (!stopNativeTracking(s)) error(t("recordFailed"));
+  if ((next === "setup" || next === "count") && s?.status === "in_progress") startNativeTracking(s);
+  else if (next === "record" && s?.status === "in_progress") {
+    // View reconciles evidence without changing a live or interrupted session.
+    if (!syncNativeTrack(s)) error(t("recordFailed"));
+  } else if (!stopNativeTracking(s)) error(t("recordFailed"));
   const host =
     next === "count" && s
       ? $("countMapHost")
@@ -462,7 +466,7 @@ function updateRecordSelection() {
   });
 }
 function trackingWarning(s) {
-  const interruption = s?.trackInterruptions?.at(-1);
+  const interruption = validTrackInterruptions(s).at(-1);
   return interruption ? t("trackingInterrupted", { at: interruption.observedAt }) : "";
 }
 function renderHome() {

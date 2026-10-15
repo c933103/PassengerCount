@@ -1079,7 +1079,7 @@ const data = {
   assert.equal((exportedGpx.gpx.match(/<trkpt /g) || []).length, 4);
   await context.close();
   // A denied native restart remains visible through Home/View, recovery and export.
-  const deniedTrip = { ...structuredClone(nativeTrackTemplate), id: "denied-track", status: "in_progress", track: [] };
+  const deniedTrip = { ...structuredClone(nativeTrackTemplate), id: "denied-track", status: "in_progress", track: [], trackInterruptions: [null, { unexpected: true }] };
   delete deniedTrip.nativeTrackCursor;
   const deniedState = { ...trackState, language: "en", surveys: [deniedTrip], currentId: null, screen: "home" };
   const deniedJournal = [journal[0], { nativeId: "denial-browser", event: "foreground_start_denied", timestamp: Date.parse("2026-09-15T06:00:00.500Z") }, journal[1]];
@@ -1089,7 +1089,7 @@ const data = {
   assert.match(await page.locator("#completedMessage").innerText(), /missing points cannot be recovered/);
   assert.deepEqual(await page.evaluate(() => window.__trackStarts), [], "viewing denial cannot start a stopped service");
   await page.locator("#gpx").click(); await flush();
-  assert.equal(current().trackInterruptions.length, 1);
+  assert.equal(current().trackInterruptions.filter(e => e?.reason === "foreground_start_denied").length, 1);
   assert.equal(current().track.length, 2);
   assert.equal((exportedGpx.gpx.match(/<trkseg>/g) || []).length, 2);
   assert.match(exportedGpx.gpx, /tracking_interruption observed_at=/);
@@ -1100,7 +1100,7 @@ const data = {
   const startsBeforeReturn = await page.evaluate(() => window.__trackStarts.length);
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange"))); await flush();
   assert.equal(await page.evaluate(() => window.__trackStarts.length), startsBeforeReturn + 1, "visible return retries active native tracking");
-  assert.equal(current().trackInterruptions.length, 1, "recovery does not erase gap evidence");
+  assert.equal(current().trackInterruptions.filter(e => e?.reason === "foreground_start_denied").length, 1, "recovery does not erase gap evidence");
   await context.close();
   // PC-001: exercise the actual pause/abort/complete, cold-recovery and export UI.
   for (const [status, button] of [["paused", "pause"], ["aborted", "abort"], ["completed", "complete"]]) {
