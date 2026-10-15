@@ -82,16 +82,17 @@ export function mergeNativeTrack(track, points) {
   // A foreground fix may already be newer than the background journal tail.
   // Use journal order for equal-time native points, including evicted points
   // replayed after cursor invalidation. Untagged foreground ties stay after them.
-  // Parse once per point, not on every comparison of a large retained track.
+  // Malformed timestamps cannot participate in chronological comparisons.
+  // Keep those observations in their slots and sort only validated fixes;
+  // mixing precise instants with Date.parse fallback is non-transitive.
   const times = new Map(merged.map(p => [p, trackTimestamp(p.time)]));
-  merged.sort((a, b) => {
-    const left = times.get(a), right = times.get(b);
-    const precise = left && right ? compareTrackTimes(left, right) : NaN;
-    // Valid instants use the same exact comparison as GPX boundaries. Retain
-    // legacy handling for malformed timestamps rather than discarding evidence.
-    const timeOrder = Number.isNaN(precise) ? Date.parse(a.time) - Date.parse(b.time) : precise;
-    return timeOrder || ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity));
-  });
+  const ordered = merged.filter(p => times.get(p) !== null).sort((a, b) =>
+    compareTrackTimes(times.get(a), times.get(b)) ||
+      ((a.nativeOrder ?? Infinity) - (b.nativeOrder ?? Infinity)));
+  let next = 0;
+  for (let i = 0; i < merged.length; i++) {
+    if (times.get(merged[i]) !== null) merged[i] = ordered[next++];
+  }
   return merged.slice(-LIMIT);
 }
 

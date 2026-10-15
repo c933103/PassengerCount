@@ -336,3 +336,30 @@ test('native merge keeps equal-instant journal tie order across fractional spell
   assert.deepEqual(merged.map(p => p.time), [b.time, a.time, foreground.time]);
   assert.equal(JSON.stringify([foreground, a, b]), originals);
 });
+
+
+test('malformed timestamp slots cannot reverse valid fractional fixes during reconciliation', () => {
+  const beforeTime = '2024-02-29T08:00:00.5001234566Z';
+  const afterTime = '2024-02-29T08:00:00.5001234568Z';
+  const observedAt = '2024-02-29T08:00:00.5001234567Z';
+  const orders = [[0,1,2], [0,2,1], [1,0,2], [1,2,0], [2,0,1], [2,1,0]];
+  for (const invalidTime of ['2024-02-29T08:00:00.500z', '2027', '2026-02-30T08:00:00Z', 'invalid']) {
+    for (const order of orders) {
+      const source = [point('before', 0, { time: beforeTime, nativeOrder: 2 }), point('invalid', 1, { time: invalidTime, nativeOrder: 1 }), point('after', 2, { time: afterTime, nativeOrder: 0 })];
+      const retained = order.slice(0, 2).map(i => { const p = { ...source[i] }; delete p.nativeId; return p; });
+      const incoming = [source[order[2]]];
+      const original = JSON.stringify([retained, incoming]);
+      const merged = mergeNativeTrack(retained, incoming);
+      const validTimes = merged.filter(p => p.time !== invalidTime).map(p => p.time);
+      assert.deepEqual(validTimes, [beforeTime, afterTime]);
+      assert.equal(merged.findIndex(p => p.time === invalidTime), order.indexOf(1), 'malformed observation retains its merged-input slot');
+      assert.equal(JSON.stringify([retained, incoming]), original);
+      const s = { track: merged, trackInterruptions: [{ reason: 'foreground_start_denied', observedAt }] };
+      const gpx = makeGpx(s);
+      assert.equal((gpx.match(/<trkpt /g) || []).length, 3);
+      assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+      assert.ok(gpx.includes(`<time>${invalidTime}</time>`));
+      assert.deepEqual(mergeNativeTrack(merged, incoming), merged, 'replay does not change ordering or evidence');
+    }
+  }
+});
