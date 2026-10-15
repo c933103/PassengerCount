@@ -48,12 +48,23 @@ function escapeXml(value) {
 // Date.parse also accepts year-only strings and normalizes impossible dates.
 // Boundaries need an actual full timestamp; never infer one from partial data.
 function trackTimestamp(value) {
-  if (typeof value !== "string") return NaN;
-  const match = /^(\d{4}-\d{2}-\d{2})T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.exec(value);
-  if (!match) return NaN;
+  if (typeof value !== "string") return null;
+  const match = /^(\d{4}-\d{2}-\d{2})T((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d)(?:\.(\d+))?(Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.exec(value);
+  if (!match) return null;
   const date = Date.parse(`${match[1]}T00:00:00Z`);
-  if (!Number.isFinite(date) || new Date(date).toISOString().slice(0, 10) !== match[1]) return NaN;
-  return Date.parse(value);
+  if (!Number.isFinite(date) || new Date(date).toISOString().slice(0, 10) !== match[1]) return null;
+  const second = Date.parse(`${match[1]}T${match[2]}${match[4]}`);
+  if (!Number.isFinite(second)) return null;
+  // Date only normalizes the whole second/offset. Keep arbitrary decimal
+  // precision as text, without Number rounding or a newer BigInt dependency.
+  return { second, fraction: (match[3] || "").replace(/0+$/, "") };
+}
+
+function compareTrackTimes(a, b) {
+  if (a.second !== b.second) return a.second < b.second ? -1 : 1;
+  // With trailing zeroes removed, lexical decimal ordering is exact even
+  // for unequal lengths; a shorter equal prefix represents the smaller value.
+  return a.fraction === b.fraction ? 0 : a.fraction < b.fraction ? -1 : 1;
 }
 
 // Stored/imported metadata is untrusted. Select only recognizable observations
@@ -62,7 +73,7 @@ export function validTrackInterruptions(s) {
   return (Array.isArray(s?.trackInterruptions) ? s.trackInterruptions : []).filter((event) =>
     event && typeof event === "object" && !Array.isArray(event) &&
     event.reason === "foreground_start_denied" && typeof event.observedAt === "string" &&
-    Number.isFinite(trackTimestamp(event.observedAt)));
+    trackTimestamp(event.observedAt) !== null);
 }
 
 export function makeGpx(s) {
@@ -89,13 +100,13 @@ export function makeGpx(s) {
       if (p.source)
         extensions.push(`<pc:source>${escapeXml(p.source)}</pc:source>`);
       const currentTime = trackTimestamp(p.time);
-      const split = Number.isFinite(currentTime) && previousTime !== null && interruptions.some((event) => {
+      const split = currentTime !== null && previousTime !== null && interruptions.some((event) => {
         const time = trackTimestamp(event.observedAt);
-        return previousTime < time && time <= currentTime;
+        return compareTrackTimes(previousTime, time) < 0 && compareTrackTimes(time, currentTime) <= 0;
       });
       // Keep an invalid retained timestamp in the export as-is, but never let
       // it erase the last usable boundary and reconnect valid fixes across a gap.
-      if (Number.isFinite(currentTime)) previousTime = currentTime;
+      if (currentTime !== null) previousTime = currentTime;
       return `${split ? "</trkseg><trkseg>" : ""}<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lng).toFixed(7)}"><time>${escapeXml(p.time)}</time>${extensions.length ? `<extensions>${extensions.join("")}</extensions>` : ""}</trkpt>`;
     })
     .join("");

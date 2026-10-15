@@ -270,3 +270,36 @@ test('long fractional observation timestamps remain visible and split valid poin
     assert.equal(JSON.stringify(s), before);
   }
 });
+
+
+test('GPX compares sub-millisecond instants exactly across offsets, arbitrary fractions and equality', () => {
+  const cases = [
+    // Same second and millisecond: the accepted fractional tail determines order.
+    ['2024-02-29T08:00:00.5001234566Z', '2024-02-29T08:00:00.5001234567Z', '2024-02-29T08:00:00.5001234568Z', 2],
+    ['2024-02-29T16:00:00.5001234566+08:00', '2024-02-29T03:00:00.5001234567-05:00', '2024-02-29T13:30:00.5001234568+05:30', 2],
+    // Exact event equality at the later point splits; equality at the prior point does not.
+    ['2024-02-29T08:00:00.5Z', '2024-02-29T08:00:00.5000000001Z', '2024-02-29T16:00:00.5000000001000+08:00', 2],
+    ['2024-02-29T16:00:00.5000+08:00', '2024-02-29T03:00:00.5-05:00', '2024-02-29T08:00:00.5000000001Z', 1],
+    ['2024-02-29T08:00:00Z', '2024-02-29T08:00:00.0000Z', '2024-02-29T08:00:00.0001Z', 1],
+    ['2024-02-29T08:00:00.5000000001Z', '2024-02-29T08:00:00.5000000002Z', '2024-02-29T08:00:00.50000000015Z', 1],
+    // Whole-second comparison also works before epoch and across calendar/offset rollover.
+    ['1969-12-31T23:59:59.999999999Z', '1970-01-01T00:00:00Z', '1970-01-01T05:30:00.000000001+05:30', 2],
+  ];
+  for (const length of [1, 3, 10, 20, 100, 1000]) {
+    const tail = '0'.repeat(length);
+    cases.push([`2024-02-29T08:00:00.${tail}1Z`, `2024-02-29T08:00:00.${tail}2Z`, `2024-02-29T08:00:00.${tail}3Z`, 2]);
+  }
+  for (const [beforeTime, observedAt, afterTime, segments] of cases) {
+    const s = survey();
+    s.track = [point('before', 0, { time: beforeTime }), point('after', 1, { time: afterTime })];
+    s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt }];
+    const before = JSON.stringify(s), gpx = makeGpx(s);
+    assert.equal(validTrackInterruptions(s).length, 1);
+    assert.equal((gpx.match(/<trkpt /g) || []).length, 2);
+    assert.equal((gpx.match(/<trkseg>/g) || []).length, segments, JSON.stringify([beforeTime, observedAt, afterTime]));
+    assert.ok(gpx.includes(`<time>${beforeTime}</time>`));
+    assert.ok(gpx.includes(`<time>${afterTime}</time>`));
+    assert.ok(gpx.includes(`observed_at="${observedAt}"`));
+    assert.equal(JSON.stringify(s), before);
+  }
+});
