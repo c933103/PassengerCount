@@ -3,6 +3,7 @@ import importlib.util
 import io
 import os
 import stat
+import struct
 import tempfile
 from pathlib import Path
 import shutil
@@ -21,11 +22,19 @@ SPEC.loader.exec_module(rv)
 ORIGINAL_CERT = "ce0a702a8515a3e5cfa03ba55ce2bd6279eb060cebcab9ac9aa4a4614a8667c8"
 
 
-def zipped(entries):
+def zipped(entries, resource_compression=zipfile.ZIP_STORED, resource_misalignment=0):
     b = io.BytesIO()
     with zipfile.ZipFile(b, "w", compression=zipfile.ZIP_DEFLATED) as z:
         for name, payload in entries:
-            z.writestr(name, payload)
+            if name == "resources.arsc":
+                info = zipfile.ZipInfo(name)
+                info.compress_type = resource_compression
+                offset = b.tell() + 30 + len(name.encode("utf-8"))
+                padding = (-offset + resource_misalignment) % 4
+                info.extra = struct.pack("<HH", 0xcafe, padding) + b"\x00" * padding
+                z.writestr(info, payload)
+            else:
+                z.writestr(name, payload)
     return b.getvalue()
 
 
@@ -39,6 +48,86 @@ ALIGNED = zipped([
 
 
 class ReleaseVerifierTests(unittest.TestCase):
+    def test_resource_layout_accepts_stored_aligned_data(self):
+        offset = rv.verify_candidate_resource_layout(ALIGNED)
+        self.assertEqual(offset % 4, 0)
+        self.assertEqual(ALIGNED[offset:offset + len(b"resources-original")], b"resources-original")
+
+    def test_resource_layout_rejects_recompressed_identical_payload(self):
+        with zipfile.ZipFile(io.BytesIO(ALIGNED)) as archive:
+            entries = [(name, archive.read(name)) for name in archive.namelist()]
+        candidate = zipped(entries, resource_compression=zipfile.ZIP_DEFLATED)
+        self.assertEqual(rv.verify_payload_identity(ALIGNED, candidate), 5)
+        with self.assertRaisesRegex(rv.VerificationError, "stored uncompressed"):
+            rv.verify_candidate_resource_layout(candidate)
+
+    def test_resource_layout_rejects_all_three_misaligned_offsets(self):
+        with zipfile.ZipFile(io.BytesIO(ALIGNED)) as archive:
+            entries = [(name, archive.read(name)) for name in archive.namelist()]
+        for remainder in (1, 2, 3):
+            with self.subTest(remainder=remainder):
+                candidate = zipped(entries, resource_misalignment=remainder)
+                self.assertEqual(rv.verify_payload_identity(ALIGNED, candidate), 5)
+                with self.assertRaisesRegex(rv.VerificationError, "4-byte boundary"):
+                    rv.verify_candidate_resource_layout(candidate)
+
+    def test_resource_layout_rejects_local_compression_disagreement(self):
+        candidate = bytearray(ALIGNED)
+        with zipfile.ZipFile(io.BytesIO(candidate)) as archive:
+            offset = archive.getinfo("resources.arsc").header_offset
+        struct.pack_into("<H", candidate, offset + 8, zipfile.ZIP_DEFLATED)
+        with self.assertRaisesRegex(rv.VerificationError, "compression metadata"):
+            rv.verify_candidate_resource_layout(candidate)
+
+    def test_resource_layout_uses_local_extra_length_not_central_extra(self):
+        with zipfile.ZipFile(io.BytesIO(ALIGNED)) as archive:
+            entries = [(name, archive.read(name)) for name in archive.namelist()]
+        for remainder in (0, 1):
+            with self.subTest(remainder=remainder):
+                candidate = bytearray(zipped(entries, resource_misalignment=remainder))
+                with zipfile.ZipFile(io.BytesIO(candidate)) as archive:
+                    central = candidate.index(b"resources.arsc", archive.start_dir) - 46
+                    local = archive.getinfo("resources.arsc").header_offset
+                name_size, extra_size = struct.unpack_from("<HH", candidate, central + 28)
+                start = central + 46 + name_size
+                del candidate[start:start + extra_size]
+                struct.pack_into("<H", candidate, central + 30, 0)
+                end = candidate.rindex(b"PK\x05\x06")
+                old_size = struct.unpack_from("<I", candidate, end + 12)[0]
+                struct.pack_into("<I", candidate, end + 12, old_size - extra_size)
+                # Local padding remains, although the central-directory extra
+                # field is now empty. Both APKs retain exactly the same payload.
+                self.assertGreater(struct.unpack_from("<H", candidate, local + 28)[0], 0)
+                self.assertEqual(rv.verify_payload_identity(ALIGNED, candidate), 5)
+                if remainder == 0:
+                    offset = rv.verify_candidate_resource_layout(candidate)
+                    self.assertEqual(candidate[offset:offset + 18], b"resources-original")
+                else:
+                    with self.assertRaisesRegex(rv.VerificationError, "4-byte boundary"):
+                        rv.verify_candidate_resource_layout(candidate)
+
+    def test_resource_layout_rejects_malformed_local_header_fields(self):
+        with zipfile.ZipFile(io.BytesIO(ALIGNED)) as archive:
+            local = archive.getinfo("resources.arsc").header_offset
+        for position, value, expected in (
+                (0, b"BAD!", "compression metadata"),
+                (26, struct.pack("<H", 1), "local data layout"),
+                (26, struct.pack("<H", 65535), "local data layout"),
+                (28, struct.pack("<H", 65535), "local data layout")):
+            with self.subTest(position=position, value=value):
+                candidate = bytearray(ALIGNED)
+                candidate[local + position:local + position + len(value)] = value
+                with self.assertRaisesRegex(rv.VerificationError, expected):
+                    rv.verify_candidate_resource_layout(candidate)
+
+    def test_resource_layout_rejects_truncated_local_header(self):
+        candidate = bytearray(ALIGNED)
+        with zipfile.ZipFile(io.BytesIO(candidate)) as archive:
+            central = candidate.index(b"resources.arsc", archive.start_dir) - 46
+        struct.pack_into("<I", candidate, central + 42, len(candidate) - 20)
+        with self.assertRaisesRegex(rv.VerificationError, "local header is truncated"):
+            rv.verify_candidate_resource_layout(candidate)
+
     def test_identical_payload_allows_signature_entries_only(self):
         candidate = zipped([
             ("AndroidManifest.xml", b"manifest-original"),
@@ -369,6 +458,8 @@ class ReleaseVerifierCliTests(unittest.TestCase):
         self.assertEqual(report["result"], "release_binary_checks_passed_only")
         self.assertFalse(report["published"])
         self.assertFalse(report["physical_device_upgrade_verified"])
+        self.assertTrue(report["resources_arsc_stored_and_4_byte_aligned"])
+        self.assertEqual(report["resources_arsc_data_offset"] % 4, 0)
         self.assertEqual(self.calls(), ["apksigner:candidate", "apksigner:previous",
                                        "aapt2:candidate", "aapt2:previous"])
 
@@ -435,6 +526,20 @@ class ReleaseVerifierCliTests(unittest.TestCase):
             for name, data in self.entries]))
         self.assert_failed(self.run_cli(), "APK payload changed: classes.dex")
         self.assertEqual(self.calls(), [])
+
+    def test_cli_rejects_recompressed_resource_before_any_sdk_execution(self):
+        self.candidate.write_bytes(zipped(self.entries, resource_compression=zipfile.ZIP_DEFLATED))
+        self.assertEqual(rv.verify_payload_identity(ALIGNED, self.candidate.read_bytes()), len(self.entries))
+        self.assert_failed(self.run_cli(), "stored uncompressed")
+        self.assertEqual(self.calls(), [])
+
+    def test_cli_rejects_misaligned_resource_before_any_sdk_execution(self):
+        for remainder in (1, 2, 3):
+            with self.subTest(remainder=remainder):
+                self.candidate.write_bytes(zipped(self.entries, resource_misalignment=remainder))
+                self.assertEqual(rv.verify_payload_identity(ALIGNED, self.candidate.read_bytes()), len(self.entries))
+                self.assert_failed(self.run_cli(), "4-byte boundary")
+                self.assertEqual(self.calls(), [])
 
 
 if __name__ == "__main__":
