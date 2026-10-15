@@ -212,6 +212,26 @@ phase receipts-recover
 phase receipts-final
 launch_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
+activity_state before-valid 2 "$oldpid"
+phase prepare-valid attached
+background_home
+activity_state background-valid 4 "$oldpid"
+crash_observe valid "$oldpid"
+phase verify-valid attached
+launch_home
+oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
+activity_state before-deleted 2 "$oldpid"
+phase prepare-deleted attached
+background_home
+activity_state background-deleted 4 "$oldpid"
+crash_observe deleted "$oldpid"
+# The tombstoned service must already be gone; this cold invocation checks durable
+# bytes and retries cleanup, not the automatic restart itself.
+phase verify-deleted
+# Keep the original sticky controls ahead of intentional policy demotion and
+# its extra delay, so the recovery fixture cannot shelter their boot-time race.
+launch_home
+oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 activity_state before-denied 2 "$oldpid"
 phase prepare-denied attached
 background_home
@@ -244,23 +264,5 @@ phase verify-denied attached
 launch_home
 activity_state recovery-denied 2 "$oldpid"
 phase recover-denied attached
-launch_home
-oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
-activity_state before-valid 2 "$oldpid"
-phase prepare-valid attached
-background_home
-activity_state background-valid 4 "$oldpid"
-crash_observe valid "$oldpid"
-phase verify-valid attached
-launch_home
-oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
-activity_state before-deleted 2 "$oldpid"
-phase prepare-deleted attached
-background_home
-activity_state background-deleted 4 "$oldpid"
-crash_observe deleted "$oldpid"
-# The tombstoned service must already be gone; this cold invocation checks durable
-# bytes and retries cleanup, not the automatic restart itself.
-phase verify-deleted
 printf 'PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim\n' | tee "$OUT/result.txt"
 

@@ -243,7 +243,7 @@ test('partial or impossible historical observation dates cannot suppress a valid
 });
 
 test('valid leap-day, timezone offsets and fractional seconds retain their original GPX spelling', () => {
-  for (const after of ['2024-02-29T03:00:01-05:00', '2024-02-29T13:30:01.1+05:30', '2024-02-29T08:00:01.123456Z', '2024-02-29T08:00:01.123456789Z']) {
+  for (const after of ['2024-02-29T03:00:01-05:00', '2024-02-29T13:30:01.1+05:30', '2024-02-29T08:00:01.123456Z', '2024-02-29T08:00:01.123456789Z', '2024-02-29T08:00:01.1234567890Z', '2024-02-29T13:30:01.12345678901234567890+05:30']) {
     const s = survey();
     s.track = [point('before', 0, { time: '2024-02-29T16:00:00+08:00' }), point('after', 1, { time: after })];
     s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt: '2024-02-29T08:00:00.500Z' }];
@@ -252,6 +252,21 @@ test('valid leap-day, timezone offsets and fractional seconds retain their origi
     assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
     assert.ok(gpx.includes(`<time>${after}</time>`));
     assert.ok(gpx.includes('<time>2024-02-29T16:00:00+08:00</time>'));
+    assert.equal(JSON.stringify(s), before);
+  }
+});
+
+
+test('long fractional observation timestamps remain visible and split valid points without rewriting evidence', () => {
+  for (const observedAt of ['2024-02-29T08:00:00.5001234567Z', '2024-02-29T13:30:00.50012345678901234567+05:30']) {
+    const s = survey();
+    s.track = [point('before', 0, { time: '2024-02-29T08:00:00Z' }), point('after', 1, { time: '2024-02-29T08:00:01.1234567890123Z' })];
+    s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt }];
+    const before = JSON.stringify(s), gpx = makeGpx(s);
+    assert.equal(validTrackInterruptions(s).length, 1);
+    assert.equal((gpx.match(/<trkpt /g) || []).length, 2);
+    assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+    assert.ok(gpx.includes(`observed_at="${observedAt}"`));
     assert.equal(JSON.stringify(s), before);
   }
 });
