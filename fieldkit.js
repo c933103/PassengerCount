@@ -78,11 +78,13 @@ export function makeGpx(s) {
       if (p.source)
         extensions.push(`<pc:source>${escapeXml(p.source)}</pc:source>`);
       const currentTime = Date.parse(p.time);
-      const split = previousTime !== null && interruptions.some((event) => {
+      const split = Number.isFinite(currentTime) && previousTime !== null && interruptions.some((event) => {
         const time = Date.parse(event.observedAt);
         return previousTime < time && time <= currentTime;
       });
-      previousTime = currentTime;
+      // Keep an invalid retained timestamp in the export as-is, but never let
+      // it erase the last usable boundary and reconnect valid fixes across a gap.
+      if (Number.isFinite(currentTime)) previousTime = currentTime;
       return `${split ? "</trkseg><trkseg>" : ""}<trkpt lat="${Number(p.lat).toFixed(7)}" lon="${Number(p.lng).toFixed(7)}"><time>${escapeXml(p.time)}</time>${extensions.length ? `<extensions>${extensions.join("")}</extensions>` : ""}</trkpt>`;
     })
     .join("");

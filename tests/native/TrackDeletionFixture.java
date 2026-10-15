@@ -13,7 +13,7 @@ public final class MainActivity extends Context {
     MainActivity(File directory, SharedPreferences prefs) { super(directory, prefs); }
     void runOnUiThread(Runnable r) { r.run(); }
     static final Set<MainActivity> resumedActivities = new HashSet<>();
-    boolean destroyed, locationAllowed = true;
+    boolean destroyed, retryTrackOnResume, locationAllowed = true;
     boolean hasLocation() { return locationAllowed; }
     void startForegroundService(Intent intent) { starts++; }
     void startService(Intent intent) { starts++; }

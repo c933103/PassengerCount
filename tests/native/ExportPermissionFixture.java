@@ -34,8 +34,16 @@ public final class MainActivity extends Activity {
     void exportResult(boolean ok, String path) { reports++; storeExportResult(ok ? SUCCESS : FAILURE, ok); }
     final List<String> events = Collections.synchronizedList(new ArrayList<>());
     void emit(String event, String json) { if (!destroyed) events.add(json); }
-    boolean hasLocation() { return false; }
-    void startPendingTrack() { throw new AssertionError("export must not start location tracking"); }
+    boolean locationGranted;
+    int trackingStarts;
+    TrackSession.Request wantedTrack = new TrackSession.Request("", "");
+    final TrackSession trackingControl = new TrackSession(new TrackSession.Store() {
+        public TrackSession.Request read() { return wantedTrack; }
+        public boolean write(TrackSession.Request request) { wantedTrack = request; return true; }
+    });
+    boolean hasLocation() { return locationGranted; }
+    void startForegroundService(Intent intent) { trackingStarts++; }
+    void startService(Intent intent) { trackingStarts++; }
     void queue(String name) { queueExport(() -> { saved.add(name); exportResult(true, name); }); }
     void reply(int code, boolean grant) {
         granted = grant;
@@ -66,6 +74,34 @@ public final class MainActivity extends Activity {
         disk.edit().putString("result", SUCCESS).commit(); return disk;
     }
     public static void main(String[] args) throws Exception {
+        for (boolean cancel : new boolean[]{false, true}) {
+            scenario("location result before resume retries only a still-wanted session: " + cancel, () -> {
+                MainActivity a = new MainActivity(previousSuccess());
+                try {
+                    a.trackingControl.start("synthetic-location");
+                    a.onPause(); a.locationGranted = true;
+                    a.locationCallback = (origin, allowed, retain) -> check(allowed, "location grant delivered");
+                    a.onRequestPermissionsResult(LOCATION, new String[0], new int[0]);
+                    check(a.trackingStarts == 0 && a.retryTrackOnResume, "paused grant defers actual production launch");
+                    if (cancel) a.trackingControl.stop("synthetic-location");
+                    a.onResume();
+                    check(a.trackingStarts == (cancel ? 0 : 1) && !a.retryTrackOnResume, "resume rechecks durable intent and consumes deferred request");
+                    a.onPause(); a.onResume();
+                    check(a.trackingStarts == (cancel ? 0 : 1), "later resume without a deferred launch does not restart tracking");
+                } finally { a.onDestroy(); }
+            });
+        }
+        scenario("denied location and destroyed Activity cannot resume pending tracking", () -> {
+            MainActivity a = new MainActivity(previousSuccess());
+            a.trackingControl.start("synthetic-location"); a.onPause();
+            a.locationCallback = (origin, allowed, retain) -> check(!allowed, "denial delivered");
+            a.onRequestPermissionsResult(LOCATION, new String[0], new int[0]); a.onResume();
+            check(a.trackingStarts == 0 && !a.retryTrackOnResume, "permission denial cannot start tracking");
+            a.onPause(); a.locationGranted = true; a.startPendingTrack();
+            check(a.retryTrackOnResume, "test has a deferred production launch");
+            a.onDestroy(); a.onResume();
+            check(a.trackingStarts == 0 && !a.retryTrackOnResume, "destroyed Activity cancels deferred launch");
+        });
         scenario("tracking visibility follows actual Activity lifecycle", () -> {
             MainActivity a = new MainActivity(previousSuccess());
             check(resumedActivities.contains(a), "resumed Activity allows foreground request");
@@ -455,6 +491,15 @@ public final class MainActivity extends Activity {
         }
         System.out.println(assertions + " assertions; " + failures + " failing scenarios");
         if (failures > 0) System.exit(1);
+    }
+    static final class TrackService {
+        static final String ACTION_START = "start", EXTRA_ID = "id", EXTRA_TOKEN = "token";
+        static TrackSession session(MainActivity activity) { return activity.trackingControl; }
+    }
+    static final class Intent {
+        Intent(MainActivity activity, Class<?> target) {}
+        Intent setAction(String action) { return this; }
+        Intent putExtra(String key, String value) { return this; }
     }
     static final class Build { static final class VERSION { static int SDK_INT; } }
     static final class Manifest { static final class permission {

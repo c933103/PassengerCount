@@ -212,3 +212,18 @@ test('malformed stored interruption metadata cannot block valid journal points o
     assert.equal(validTrackInterruptions(s).length, 1, 'valid denial remains replay-idempotent');
   }
 });
+
+
+test('malformed retained point time cannot erase a valid GPX interruption boundary', () => {
+  const s = survey();
+  s.track = [point('before', 0, { time: '2026-10-15T09:09:00Z' }),
+    point('invalid', 1, { time: 'not-a-timestamp' }),
+    point('after', 2, { time: '2026-10-15T09:20:00Z' })];
+  s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt: '2026-10-15T09:09:43.160Z' }];
+  const before = JSON.stringify(s), gpx = makeGpx(s);
+  assert.equal((gpx.match(/<trkpt /g) || []).length, 3, 'all existing coordinate evidence is retained');
+  assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+  assert.match(gpx, /not-a-timestamp/);
+  assert.match(gpx, /<\/trkseg><trkseg><trkpt[^]*2026-10-15T09:20:00Z/);
+  assert.equal(JSON.stringify(s), before, 'export cannot rewrite source timestamps');
+});

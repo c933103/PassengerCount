@@ -29,6 +29,7 @@ public final class MainActivity extends Activity {
     private volatile Runnable pendingLegacyExport;
     private int pendingLegacyPermission = -1;
     private boolean destroyed;
+    private boolean retryTrackOnResume;
     // Main-thread lifecycle state, shared with test/bridge hosts in this process.
     private static final java.util.Set<MainActivity> resumedActivities =
         java.util.Collections.newSetFromMap(new java.util.WeakHashMap<MainActivity, Boolean>());
@@ -326,8 +327,11 @@ public final class MainActivity extends Activity {
     }
     private void startPendingTrack() {
         // A WebView callback queued while visible can arrive after Home/lock.
-        // Keep the durable intent and wait for a visible Activity to request it.
-        if (destroyed || resumedActivities.isEmpty()) return;
+        // Retain a deferred launch, including permission results delivered before
+        // onResume, and recheck its durable ownership only once visible again.
+        if (destroyed) { retryTrackOnResume = false; return; }
+        if (resumedActivities.isEmpty()) { retryTrackOnResume = true; return; }
+        retryTrackOnResume = false;
         TrackSession.Request request = TrackService.session(this).request();
         if (!TrackService.session(this).accepts(request) || !hasLocation()) return;
         Intent intent = new Intent(this, TrackService.class)
@@ -493,6 +497,7 @@ public final class MainActivity extends Activity {
         super.onResume();
         if (destroyed) return;
         resumedActivities.add(this);
+        if (retryTrackOnResume) startPendingTrack();
         exportSession.attach(exportChanged);
         if (web != null) web.onResume();
         // A live older Activity can return after a newer one is dismissed, or
@@ -502,6 +507,7 @@ public final class MainActivity extends Activity {
     @Override protected void onDestroy() {
         resumedActivities.remove(this);
         destroyed = true;
+        retryTrackOnResume = false;
         exportSession.detach(exportChanged);
         pendingLegacyExport = null;
         pendingLegacyPermission = -1;

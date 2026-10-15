@@ -219,7 +219,14 @@ activity_state background-denied 4 "$oldpid"
 detached denied "$oldpid"
 denial_done=false
 for ((i=0;i<45;i++)); do
-  adb logcat -d -v threadtime > "$OUT/logcat-controlled-denial.txt"
+  if adb logcat -d -v threadtime > "$OUT/logcat-controlled-denial.txt" 2> "$OUT/logcat-controlled-denial.stderr"; then
+    :
+  else
+    code=$?
+    echo "CONTROLLED_DENIAL_OBSERVATION_FAILED: adb logcat exit=$code; installed outcome is unverified" | tee "$OUT/blocker.txt" >&2
+    cat "$OUT/logcat-controlled-denial.stderr" >&2
+    exit "$code"
+  fi
   if grep -q "PHASE_FAIL controlled-" "$OUT/logcat-controlled-denial.txt"; then
     echo 'Controlled policy-denial phase failed'; exit 1
   fi
