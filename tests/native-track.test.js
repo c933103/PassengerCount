@@ -214,16 +214,44 @@ test('malformed stored interruption metadata cannot block valid journal points o
 });
 
 
-test('malformed retained point time cannot erase a valid GPX interruption boundary', () => {
-  const s = survey();
-  s.track = [point('before', 0, { time: '2026-10-15T09:09:00Z' }),
-    point('invalid', 1, { time: 'not-a-timestamp' }),
-    point('after', 2, { time: '2026-10-15T09:20:00Z' })];
-  s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt: '2026-10-15T09:09:43.160Z' }];
-  const before = JSON.stringify(s), gpx = makeGpx(s);
-  assert.equal((gpx.match(/<trkpt /g) || []).length, 3, 'all existing coordinate evidence is retained');
-  assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
-  assert.match(gpx, /not-a-timestamp/);
-  assert.match(gpx, /<\/trkseg><trkseg><trkpt[^]*2026-10-15T09:20:00Z/);
-  assert.equal(JSON.stringify(s), before, 'export cannot rewrite source timestamps');
+test('partial and impossible retained timestamps never determine GPX interruption placement', () => {
+  for (const invalid of ['not-a-timestamp', '2027', '2026-02-30', '2027-02-30T09:10:00Z', '2026-10-15T25:00:00Z']) {
+    const s = survey();
+    s.track = [point('before', 0, { time: '2026-10-15T17:09:00+08:00' }),
+      point('invalid', 1, { time: invalid }),
+      point('after', 2, { time: '2026-10-15T09:20:00.123456789Z' })];
+    s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt: '2026-10-15T09:09:43.160Z' }];
+    const before = JSON.stringify(s), gpx = makeGpx(s);
+    assert.equal((gpx.match(/<trkpt /g) || []).length, 3, 'all existing coordinate evidence is retained');
+    assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+    assert.match(gpx, /<\/trkseg><trkseg><trkpt lat="22.0002000"/, 'only the valid post-denial fix places the boundary');
+    assert.equal(JSON.stringify(s), before, 'export cannot rewrite source timestamps');
+  }
+});
+
+test('partial or impossible historical observation dates cannot suppress a valid journal receipt', () => {
+  for (const invalid of ['2027', '2026-02-30T10:00:00Z']) {
+    const s = survey();
+    const old = { nativeId: 'denied-1', reason: 'foreground_start_denied', observedAt: invalid };
+    s.trackInterruptions = [old];
+    assert.equal(validTrackInterruptions(s).length, 0);
+    importNativeTrack(s, bridge({ one: [interruption()] }), () => true);
+    assert.deepEqual(s.trackInterruptions[0], old, 'malformed original remains in structured evidence');
+    assert.equal(validTrackInterruptions(s).length, 1, 'valid journal observation remains importable');
+    assert.equal(s.nativeTrackCursor, '1');
+  }
+});
+
+test('valid leap-day, timezone offsets and fractional seconds retain their original GPX spelling', () => {
+  for (const after of ['2024-02-29T03:00:01-05:00', '2024-02-29T13:30:01.1+05:30', '2024-02-29T08:00:01.123456Z', '2024-02-29T08:00:01.123456789Z']) {
+    const s = survey();
+    s.track = [point('before', 0, { time: '2024-02-29T16:00:00+08:00' }), point('after', 1, { time: after })];
+    s.trackInterruptions = [{ nativeId: 'denied', reason: 'foreground_start_denied', observedAt: '2024-02-29T08:00:00.500Z' }];
+    const before = JSON.stringify(s), gpx = makeGpx(s);
+    assert.equal((gpx.match(/<trkpt /g) || []).length, 2);
+    assert.equal((gpx.match(/<trkseg>/g) || []).length, 2);
+    assert.ok(gpx.includes(`<time>${after}</time>`));
+    assert.ok(gpx.includes('<time>2024-02-29T16:00:00+08:00</time>'));
+    assert.equal(JSON.stringify(s), before);
+  }
 });

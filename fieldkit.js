@@ -45,13 +45,24 @@ function escapeXml(value) {
     .replaceAll("'", "&apos;");
 }
 
+// Date.parse also accepts year-only strings and normalizes impossible dates.
+// Boundaries need an actual full timestamp; never infer one from partial data.
+function trackTimestamp(value) {
+  if (typeof value !== "string") return NaN;
+  const match = /^(\d{4}-\d{2}-\d{2})T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,9})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.exec(value);
+  if (!match) return NaN;
+  const date = Date.parse(`${match[1]}T00:00:00Z`);
+  if (!Number.isFinite(date) || new Date(date).toISOString().slice(0, 10) !== match[1]) return NaN;
+  return Date.parse(value);
+}
+
 // Stored/imported metadata is untrusted. Select only recognizable observations
 // for display/GPX without mutating the original structured evidence.
 export function validTrackInterruptions(s) {
   return (Array.isArray(s?.trackInterruptions) ? s.trackInterruptions : []).filter((event) =>
     event && typeof event === "object" && !Array.isArray(event) &&
     event.reason === "foreground_start_denied" && typeof event.observedAt === "string" &&
-    Number.isFinite(Date.parse(event.observedAt)));
+    Number.isFinite(trackTimestamp(event.observedAt)));
 }
 
 export function makeGpx(s) {
@@ -77,9 +88,9 @@ export function makeGpx(s) {
         extensions.push(`<pc:heading_deg>${Number(p.heading)}</pc:heading_deg>`);
       if (p.source)
         extensions.push(`<pc:source>${escapeXml(p.source)}</pc:source>`);
-      const currentTime = Date.parse(p.time);
+      const currentTime = trackTimestamp(p.time);
       const split = Number.isFinite(currentTime) && previousTime !== null && interruptions.some((event) => {
-        const time = Date.parse(event.observedAt);
+        const time = trackTimestamp(event.observedAt);
         return previousTime < time && time <= currentTime;
       });
       // Keep an invalid retained timestamp in the export as-is, but never let

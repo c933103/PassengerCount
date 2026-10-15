@@ -1,4 +1,4 @@
-import { hkTimestamp } from "./fieldkit.js";
+import { hkTimestamp, validTrackInterruptions } from "./fieldkit.js";
 
 const LIMIT = 20000;
 const measurementKey = (p) => JSON.stringify([
@@ -25,8 +25,7 @@ export function mergeNativeInterruptions(previous = [], records = []) {
   const prior = Array.isArray(previous) ? previous : [previous];
   const merged = prior.map((event) => event && typeof event === "object"
     ? (Array.isArray(event) ? [...event] : { ...event }) : event);
-  const seen = new Set(merged.filter((event) => event?.reason === "foreground_start_denied" &&
-    typeof event?.observedAt === "string" && Number.isFinite(Date.parse(event.observedAt)))
+  const seen = new Set(validTrackInterruptions({ trackInterruptions: merged })
     .map((event) => event.nativeId));
   for (const record of records) {
     if (record?.event !== "foreground_start_denied") continue;
