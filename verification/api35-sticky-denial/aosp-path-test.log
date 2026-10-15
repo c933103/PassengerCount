@@ -1,0 +1,8 @@
+PASS absent UID during pending restart is demoted by shared pass
+PASS UID exists but package process absent is also demoted
+PASS live unrestricted process keeps foreground eligibility
+PASS live restricted process is demoted as intended
+PASS on-top entry skips background demotion
+PASS ended visible entry is removed before demotion
+PASS without shared pass no demotion occurs in this model
+7 source-path assertions passed; not an installed-device result
