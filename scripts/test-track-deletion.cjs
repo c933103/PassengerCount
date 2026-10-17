@@ -19,6 +19,7 @@ try {
   const fixture = fs.readFileSync(path.join(root, 'tests/native/TrackDeletionFixture.java'), 'utf8')
     .replace('/* BRIDGE_METHODS */', ['public boolean deleteTrack(', 'public void startTracking(', 'public String getTrackPage(', 'public String getTrack('].map(x => method(activity, x)).join('\n'))
     .replace('/* BLOCKED_IN_DELETION */', method(fs.readFileSync(path.join(root, 'tests/android/JournalLifecycleInstrumentation.java'), 'utf8'), 'private boolean blockedInDeletion('))
+    .replace('/* BLOCKED_IN_REMOTE_PROVIDER */', method(fs.readFileSync(path.join(root, 'tests/android/JournalLifecycleInstrumentation.java'), 'utf8'), 'private static boolean blockedInRemoteProvider('))
     .replace('/* START_PENDING */', method(activity, 'private void startPendingTrack('))
     .replace('/* SERVICE_METHODS */', ['public int onStartCommand(', 'private static final class Api31', 'static synchronized TrackSession session(', 'static void finishStop(', 'static String safeId(', 'static File trackFile(', 'static boolean isDeleted(', 'static boolean deleteTrack('].map(x => method(service, x)).join('\n'));
   const sources = [write('MainActivity.java', fixture), path.join(root, 'tests/native/TrackIpcShims.java')];

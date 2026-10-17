@@ -178,3 +178,16 @@ remains unclassified, and the original failure stays binding. Each instrument
 command now retains the exact invocation and actual exit code without retry or
 assertion relaxation. Service-only resilience and actual UI IPC still require
 fresh installed execution.
+
+
+Run [110](https://github.com/c933103/PassengerCount/actions/runs/39012074259) passed
+all thirteen original installed phases and 23 actual UI-process IPC basics
+assertions. The ordinary service-only sticky restart restored a new foreground
+tracker with retained TOP eligibility; the tombstone control also passed.
+[Verified retained evidence](https://github.com/c933103/PassengerCount/tree/51021a0f94e2709b42f4ad597ad16a7d73dabe70/verification/api35-restart-race/run110)
+also preserves the failed IPC append-drain observer and another measured
+all-process-absence denial. The observer's case-sensitive thread-name assumption
+is replaced by BLOCKED state plus production-provider, framework-transport and
+Binder-dispatch stack proof, with runtime frame diagnostics and twelve host
+negative/positive controls. Drain, owner/UI death and the stronger service-only
+independent-FGS interleaving still require installed results.

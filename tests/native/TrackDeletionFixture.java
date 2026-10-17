@@ -19,6 +19,7 @@ public final class MainActivity extends Context {
     void startService(Intent intent) { starts++; }
     /* START_PENDING */
     /* BLOCKED_IN_DELETION */
+    /* BLOCKED_IN_REMOTE_PROVIDER */
     final class DeviceStorage {
         /* BRIDGE_METHODS */
     }
@@ -45,6 +46,21 @@ public final class MainActivity extends Context {
         return activity;
     }
     public static void main(String[] args) throws Exception {
+        StackTraceElement provider=new StackTraceElement("app.passengercount.TrackProvider","call","TrackProvider.java",24);
+        StackTraceElement transport=new StackTraceElement("android.content.ContentProvider$Transport","call","ContentProvider.java",1);
+        StackTraceElement binder=new StackTraceElement("android.os.Binder","execTransactInternal","Binder.java",1);
+        StackTraceElement[] remote={provider,transport,binder};
+        check(blockedInRemoteProvider(Thread.State.BLOCKED,remote), "remote blocked provider is recognized independently of thread naming");
+        check(blockedInRemoteProvider(Thread.State.BLOCKED,new StackTraceElement[]{provider,transport,
+            new StackTraceElement("android.os.Binder","execTransact","Binder.java",1)}), "outer Binder dispatch is also recognized");
+        for(Thread.State state:Thread.State.values()) if(state!=Thread.State.BLOCKED)
+            check(!blockedInRemoteProvider(state,remote), "nonblocked remote frame does not prove append barrier: "+state);
+        check(!blockedInRemoteProvider(Thread.State.BLOCKED,new StackTraceElement[]{provider}), "local provider monitor cannot masquerade as IPC");
+        check(!blockedInRemoteProvider(Thread.State.BLOCKED,new StackTraceElement[]{provider,transport}), "transport without Binder dispatch is not remote proof");
+        check(!blockedInRemoteProvider(Thread.State.BLOCKED,new StackTraceElement[]{transport,binder}), "unrelated blocked Binder does not prove production entry");
+        check(!blockedInRemoteProvider(Thread.State.BLOCKED,new StackTraceElement[]{provider,binder}), "missing provider transport is rejected");
+        check(!blockedInRemoteProvider(Thread.State.BLOCKED,new StackTraceElement[]{provider,transport,
+            new StackTraceElement("android.os.Binder","toString","Binder.java",1)}), "unrelated Binder method is not remote dispatch");
         for (boolean active : new boolean[]{false, true}) {
             MainActivity a = fresh(); DeviceStorage bridge = a.new DeviceStorage();
             seed(a.directory, "A"); seed(a.directory, "B");

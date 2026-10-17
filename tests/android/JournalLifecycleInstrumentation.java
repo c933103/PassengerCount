@@ -264,19 +264,40 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
         saveState(state());
         check(bridge.get(KEY) != null, "real preferences commit");
     }
+    private static boolean blockedInRemoteProvider(Thread.State state, StackTraceElement[] frames) {
+        // Thread names are implementation details (API35 commonly uses lowercase
+        // binder:). Require actual remote dispatch and the production barrier.
+        if (state != Thread.State.BLOCKED) return false;
+        boolean provider=false, transport=false, binder=false;
+        for (StackTraceElement frame : frames) {
+            String type=frame.getClassName(), method=frame.getMethodName();
+            if (type.equals("app.passengercount.TrackProvider") && method.equals("call")) provider=true;
+            if (type.equals("android.content.ContentProvider$Transport") && method.equals("call")) transport=true;
+            if (type.equals("android.os.Binder") && (method.equals("execTransact") || method.equals("execTransactInternal"))) binder=true;
+        }
+        return provider && transport && binder;
+    }
+    private boolean observeRemoteProvider(Map.Entry<Thread,StackTraceElement[]> entry, Set<String> observed) {
+        Thread thread=entry.getKey(); Thread.State state=thread.getState();
+        for (StackTraceElement frame : entry.getValue()) {
+            if (frame.getClassName().equals("app.passengercount.TrackProvider") && frame.getMethodName().equals("call")) {
+                if (observed.add(thread.getId()+":"+state)) Log.i(TAG, "IPC_PROVIDER_STACK thread="+thread.getName()
+                    +" state="+state+" frames="+Arrays.toString(entry.getValue()));
+                break;
+            }
+        }
+        return blockedInRemoteProvider(state, entry.getValue());
+    }
     private void preparePipeObserver() {
         if (signal("pipe-entered").exists()) check(signal("pipe-entered").delete(), "clear synthetic pipe signal");
         new Thread(() -> {
+            Set<String> observed = new HashSet<>();
             long deadline = SystemClock.elapsedRealtime() + 45000;
             while (SystemClock.elapsedRealtime() < deadline) {
                 for (Map.Entry<Thread,StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
-                    if (!entry.getKey().getName().startsWith("Binder:") || entry.getKey().getState() != Thread.State.BLOCKED) continue;
-                    for (StackTraceElement frame : entry.getValue()) {
-                        if (frame.getClassName().equals("app.passengercount.TrackProvider") && frame.getMethodName().equals("call")) {
-                            try { signalWrite("pipe-entered"); } catch (IOException e) { Log.e(TAG,"PHASE_FAIL pipe-signal",e); }
-                            return;
-                        }
-                    }
+                    if (!observeRemoteProvider(entry, observed)) continue;
+                    try { signalWrite("pipe-entered"); } catch (IOException e) { Log.e(TAG,"PHASE_FAIL pipe-signal",e); }
+                    return;
                 }
                 SystemClock.sleep(20);
             }
@@ -358,23 +379,20 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
             } catch (Throwable e) { Log.e(TAG, "PHASE_FAIL ipc-writer", e); }
         }, "fixture-accepted-writer");
         Thread observer = new Thread(() -> {
+            Set<String> observed = new HashSet<>();
             long deadline = SystemClock.elapsedRealtime() + 45000;
             while (SystemClock.elapsedRealtime() < deadline) {
                 for (Map.Entry<Thread,StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
-                    if (!entry.getKey().getName().startsWith("Binder:") || entry.getKey().getState() != Thread.State.BLOCKED) continue;
-                    for (StackTraceElement frame : entry.getValue()) {
-                        if (frame.getClassName().equals("app.passengercount.TrackProvider") && frame.getMethodName().equals("call")) {
-                            try {
-                                signalWrite("entered");
-                                if (death) {
-                                    signalWrite("dead");
-                                    Log.i(TAG, "IPC_OWNER_DIES_BEFORE_ACK pid=" + Process.myPid());
-                                    Process.killProcess(Process.myPid());
-                                }
-                            } catch (IOException e) { Log.e(TAG, "PHASE_FAIL ipc-signal", e); }
-                            return;
+                    if (!observeRemoteProvider(entry, observed)) continue;
+                    try {
+                        signalWrite("entered");
+                        if (death) {
+                            signalWrite("dead");
+                            Log.i(TAG, "IPC_OWNER_DIES_BEFORE_ACK pid=" + Process.myPid());
+                            Process.killProcess(Process.myPid());
                         }
-                    }
+                    } catch (IOException e) { Log.e(TAG, "PHASE_FAIL ipc-signal", e); }
+                    return;
                 }
                 SystemClock.sleep(20);
             }
