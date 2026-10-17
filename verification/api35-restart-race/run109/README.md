@@ -1,0 +1,7 @@
+# Run109: actual split-process all-absence denial
+
+The independent fresh diagnostic reproduced the retained automatic-restart denial on the new split-process APK. The UI PID 2553 and tracker PID 2703 both died. The shell recorded exact no-match pidof status with empty stdout/stderr before the independent helper entered foreground. START_FOREGROUND cleanup followed; ActivityManager started replacement tracker PID 3753, whose foreground promotion was denied. The classifier records the measured interleaving, and the original failure stayed binding.
+
+The original installed gate separately failed its bootstrap command with an empty output file, before any target fixture result. Its wrapper reported exit 1 but discarded the actual command exit. Retained logcat contains no target process start or instrumentation exception. The same bootstrap command passed in the second emulator. The original cause remains unclassified: this is not evidence of a new product restart defect, nor a basis for accepting the original gate. The next harness retains each exact command and its real exit code, with no automatic phase retry or acceptance relaxation.
+
+Node/native/browser and both APK builds passed. Service-only survival, real UI Binder and UI-death pipe-release fixtures were not reached. Both downloaded artifact ZIPs were SHA-256 verified. Safe excerpts contain only synthetic process/lifecycle evidence; unrelated emulator logs and session/workspace contents are omitted. Earlier failures remain preserved.

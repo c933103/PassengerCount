@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-17",
+  "run": "https://github.com/c933103/PassengerCount/actions/runs/39011421519",
+  "jobId": 117334577980,
+  "head": "620aed4de0b00c1b5b3c6c39e559ed642492e711",
+  "testedMergeCommit": "ada7852d63338c7b734bcf3e41c8c07bc8fffd24",
+  "testedTree": "a80622820b3b47063a89121d2c91ceed7a0170bc",
+  "aggregate": "failure",
+  "passed": [
+    "410 Node tests",
+    "native suite including 292 IPC/deletion assertions",
+    "browser checks",
+    "production/test APK builds",
+    "separate diagnostic bootstrap and prepare-race"
+  ],
+  "original": {
+    "result": "failed bootstrap command",
+    "bootstrapBytes": 0,
+    "wrapperExit": 1,
+    "actualCommandExit": "not retained by prior wrapper",
+    "classification": "Unclassified command/transport failure; no target start or instrumentation exception found in retained logcat; no original fixture result established"
+  },
+  "diagnostic": {
+    "result": "automatic-restart-denied",
+    "exit": 1,
+    "scope": "all package processes absent",
+    "uiPid": 2553,
+    "oldTrackerPid": 2703,
+    "newTrackerPid": 3753,
+    "interleaved": true,
+    "cleanupDuringAbsence": true,
+    "triggerBeforeCleanup": true,
+    "absenceObservation": "pidof returned exactly 1 with empty stdout/stderr and ActivityManager recorded both UI/tracker deaths before helper",
+    "originalForegroundReasons": "PROC_STATE_TOP start and while-in-use; see diagnostic-before-eligibility.txt and race-before-services.txt in diagnostic artifact"
+  },
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+  "apkSha256": {
+    "PassengerCount.apk": "c93ebb1755028eb0cfa377633214114581606affc853e19a219d3c83a63378eb",
+    "PassengerCount-lifecycle-tests.apk": "dcef8a181184da29bafe747a945ad3faf36181d14eba1ee17bcf3dd09038b335"
+  },
+  "artifacts": [
+    {
+      "scope": "original",
+      "id": 12093400872,
+      "bytes": 706848,
+      "sha256": "185137848c1f370c5e9e7fa5be6a3d1bddbec37dce04f0bfd6e0c6c745820f38"
+    },
+    {
+      "scope": "diagnostic",
+      "id": 12093460824,
+      "bytes": 2995810,
+      "sha256": "6710785339c7d49085b34502b1ae076884a42812aba55f3053d27d110da71365"
+    }
+  ],
+  "limits": [
+    "No service-only controlled sample or UI Binder/pipe fixture reached in this run.",
+    "All-process absence denial now reproduced on actual split-process APK, not just earlier same-process main.",
+    "No system_server stack identifies exact cleanup caller.",
+    "Original bootstrap cause remains unknown; do not label command failure a product restart failure or silently retry it.",
+    "No merge/release acceptance."
+  ],
+  "retainedFileSha256": {
+    "README.md": "4d6d939a30070257a4fa047682b0ef021fcb142a8008220494ba0f2106511164",
+    "diagnostic-before-eligibility.txt": "88fb94f36c1b146897e144b2019255d0f2179b4ab05e3ca6de8b0aca3e43a4d3",
+    "diagnostic-race-excerpt.txt": "a695d08f805096f191ca3dccf12478029f893533fd44d880e301f5bf3d2efc6f",
+    "original-bootstrap.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "race-process-scope.txt": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "race-result.json": "74decc5f7b7240cd8e6b18e791da77f3f41e24081d1920f2f7792b0261d6af61",
+    "source.txt": "b6f947f7db394aef37c6caadb9e58a894c5ec02a46f302d4f33203eac76996d5"
+  }
+}

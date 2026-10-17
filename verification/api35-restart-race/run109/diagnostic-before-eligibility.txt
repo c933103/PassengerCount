@@ -1,0 +1,33 @@
+  * ServiceRecord{8e540ba u0 app.passengercount/.TrackService c:app.passengercount}
+    app=ProcessRecord{6c56123 2703:app.passengercount:tracking/u0a209}
+    mAllowWiu_noBinding=PROC_STATE_TOP
+    mAllowWiu_inBindService=DENIED
+    mAllowWiu_byBindings=DENIED
+    getFgsAllowWiu_legacy=PROC_STATE_TOP
+    getFgsAllowWiu_new=PROC_STATE_TOP
+    getFgsAllowWiu_forStart=PROC_STATE_TOP
+    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP
+    mAllowStart_noBinding=PROC_STATE_TOP
+    mAllowStart_inBindService=DENIED
+    mAllowStart_byBindings=DENIED
+    getFgsAllowStart_legacy=PROC_STATE_TOP
+    getFgsAllowStart_new=PROC_STATE_TOP
+    getFgsAllowStart=PROC_STATE_TOP
+    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)
+  * ServiceRecord{e4be5 u0 app.passengercount/org.chromium.content.app.SandboxedProcessService0:0 c:app.passengercount}
+    app=ProcessRecord{c1044c2 2608:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a209i1}
+    mAllowWiu_noBinding=DENIED
+    mAllowWiu_inBindService=PROC_STATE_TOP
+    mAllowWiu_byBindings=DENIED
+    getFgsAllowWiu_legacy=PROC_STATE_TOP
+    getFgsAllowWiu_new=DENIED
+    getFgsAllowWiu_forStart=DENIED
+    getFgsAllowWiu_forCapabilities=DENIED
+    mAllowStart_noBinding=DENIED
+    mAllowStart_inBindService=PROC_STATE_TOP
+    mAllowStart_byBindings=DENIED
+    getFgsAllowStart_legacy=PROC_STATE_TOP
+    getFgsAllowStart_new=DENIED
+    getFgsAllowStart=DENIED
+    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { cmp=app.passengercount/org.chromium.content.app.SandboxedProcessService0:0 (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:34; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:true]

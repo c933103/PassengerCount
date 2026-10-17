@@ -1,0 +1,11 @@
+10-17 06:55:32.086  2703  2703 I PassengerJournalTest: ALL_PACKAGE_KILL pid=2553 name=app.passengercount
+10-17 06:55:32.086  2703  2703 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=2703
+10-17 06:55:32.316   561  1539 I ActivityManager: Process app.passengercount (pid 2553) has died: prev LAST
+10-17 06:55:32.328   561  1678 I ActivityManager: Process app.passengercount:tracking (pid 2703) has died: prcp FGS 
+10-17 06:55:32.329   561  1678 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 10000ms for start-requested
+10-17 06:55:32.829  2504  2504 I PassengerRaceTrigger: RACE_TRIGGER_ENTER pid=2504 uid=10210
+10-17 06:55:33.009  2504  2504 I PassengerRaceTrigger: RACE_TRIGGER_FOREGROUND pid=2504 uid=10210
+10-17 06:55:33.023   561   595 E AppOps  : Operation not started: uid=10209 pkg=app.passengercount(null) op=START_FOREGROUND
+10-17 06:55:33.373   561   596 I ActivityManager: Start proc 3753:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}
+10-17 06:55:33.488   561  1676 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
+10-17 06:55:33.509  3753  3753 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
