@@ -1,0 +1,26 @@
+[
+  {
+    "version": "api35",
+    "sourceSha256": "53c46c8b932221d3d1223c26b9d873b1b718b3d2f80ee2a0114092360a87664d",
+    "exit": 0,
+    "lastLine": "7 source-path assertions passed; not an installed-device result"
+  },
+  {
+    "version": "android15-release",
+    "sourceSha256": "53c46c8b932221d3d1223c26b9d873b1b718b3d2f80ee2a0114092360a87664d",
+    "exit": 0,
+    "lastLine": "7 source-path assertions passed; not an installed-device result"
+  },
+  {
+    "version": "android16-release",
+    "sourceSha256": "64df5e8de4b4d99572f139ab27fe49ef6b542d0daf6b75304b4a3ae41204eedc",
+    "exit": 0,
+    "lastLine": "7 source-path assertions passed; not an installed-device result"
+  },
+  {
+    "version": "main",
+    "sourceSha256": "57ffe6d837f0fc68b8c42e8067478de46fea0be03cb792af28df860d3eb38d0f",
+    "exit": 0,
+    "lastLine": "7 source-path assertions passed; not an installed-device result"
+  }
+]

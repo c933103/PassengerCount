@@ -1,0 +1,22 @@
+--- a/services/core/java/com/android/server/am/ActiveServices.java
++++ b/services/core/java/com/android/server/am/ActiveServices.java
+@@ -2114,9 +2114,16 @@
+      */
+     private boolean isForegroundServiceAllowedInBackgroundRestricted(int uid, String packageName) {
+         final UidRecord uidRec = mAm.mProcessList.getUidRecordLOSP(uid);
+-        ProcessRecord app = null;
+-        return uidRec != null && ((app = uidRec.getProcessInPackage(packageName)) != null)
+-                && isForegroundServiceAllowedInBackgroundRestricted(app);
++        final ProcessRecord app = uidRec == null ? null : uidRec.getProcessInPackage(packageName);
++        if (app != null) {
++            return isForegroundServiceAllowedInBackgroundRestricted(app);
++        }
++        // A process can be absent during a pending sticky restart. Absence is
++        // not itself background restriction; preserve the saved authorization
++        // for unrestricted packages, but still demote actually restricted apps.
++        // Fail closed if the package restriction state is unavailable.
++        final AppStateTracker tracker = getAppStateTracker();
++        return tracker != null && !tracker.isAppBackgroundRestricted(uid, packageName);
+     }
+ 
+     /*

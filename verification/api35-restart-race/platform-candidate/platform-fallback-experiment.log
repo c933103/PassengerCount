@@ -1,0 +1,13 @@
+PASS absent mode 0 retains unrestricted package eligibility
+PASS absent mode 0 still demotes actually restricted package
+PASS absent mode 0 fails closed for unknown restriction state
+PASS absent mode 1 retains unrestricted package eligibility
+PASS absent mode 1 still demotes actually restricted package
+PASS absent mode 1 fails closed for unknown restriction state
+PASS live eligible process path unchanged, tracker=false
+PASS live ineligible process path unchanged, tracker=false
+PASS live eligible process path unchanged, tracker=true
+PASS live ineligible process path unchanged, tracker=true
+PASS live eligible process path unchanged, tracker=null
+PASS live ineligible process path unchanged, tracker=null
+12 candidate predicate controls passed; not an Android build/device result
