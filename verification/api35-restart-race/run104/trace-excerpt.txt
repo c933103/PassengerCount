@@ -1,0 +1,15 @@
+56435: 10-17 05:31:30.839  4097  4097 I Process : Sending signal. PID: 4097 SIG: 9
+56447: 10-17 05:31:30.997   568  1667 I ActivityManager: Process app.passengercount (pid 4097) has died: fg +50 FGS 
+56450: 10-17 05:31:30.998   568  1667 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+56465: 10-17 05:31:31.038   568   598 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 9960ms for mem-pressure-event
+56506: 10-17 05:31:31.292   568  1615 I ActivityManager: Background started FGS: Allowed [callingPackage: com.google.android.inputmethod.latin; callingUid: 10152; uidState: IMPB; uidBFSL: n/a; intent: Intent { cmp=com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.libs.dataservice.superpacks.SuperpacksForegroundTaskService }; code:CURRENT_INPUT_METHOD; tempAllowListReason:<null>; targetSdkVersion:34; callerTargetSdkVersion:34; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+56507: 10-17 05:31:31.323  1361  1361 I SuperpacksForegroundTaskService: SuperpacksForegroundTaskService.onStartCommand():43 SuperpacksForegroundTaskService.onStartCommand(): 1
+56508: 10-17 05:31:31.327   568  1618 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.libs.dataservice.superpacks.SuperpacksForegroundTaskService
+56510: 10-17 05:31:31.328   568   599 E AppOps  : Operation not started: uid=10209 pkg=app.passengercount(null) op=START_FOREGROUND
+56797: 10-17 05:31:33.055   568   598 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 0ms for mem-pressure-event
+56833: 10-17 05:31:33.158   568   600 I ActivityManager: Start proc 4429:app.passengercount/u0a209 for service {app.passengercount/app.passengercount.TrackService}
+56900: 10-17 05:31:33.685   568  1618 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service app.passengercount/.TrackService
+56901: 10-17 05:31:33.700   568  1618 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]
+56902: 10-17 05:31:33.700   568  1618 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
+56905: 10-17 05:31:33.740  4429  4429 E PassengerTrack: Background tracking restart denied; interruption saved; reopen the active survey
+56906: 10-17 05:31:33.740  4429  4429 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
