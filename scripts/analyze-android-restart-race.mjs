@@ -29,7 +29,9 @@ export function analyzeRestartRace(log, services, oldPid, kind = 'race') {
   let outcome = 'inconclusive';
   if (!invalid && denied >= 0) outcome = 'automatic-restart-denied';
   else if (!invalid && foreground) outcome = 'foreground-restored';
-  if (kind === 'race' && !interleaved) outcome = 'interleaving-unverified';
+  // A missed trigger window cannot erase an independently observed target denial.
+  if (kind === 'race' && !interleaved && outcome !== 'automatic-restart-denied')
+    outcome = 'interleaving-unverified';
   return {outcome, oldPid: String(oldPid), newPid, interleaved,
     cleanupDuringAbsence: reset > death && reset < start,
     triggerBeforeCleanup: entering > death && entering < reset && reset < start,

@@ -122,3 +122,14 @@ test('actual shell rejects transport stderr even with a zero command exit',()=>{
   assert.match(r.stderr,/RACE_OBSERVATION_UNVERIFIED/);
   assert.doesNotMatch(r.calls,/phase verify-race/);
 });
+
+test('a late helper cannot downgrade the target denial to a timing miss',()=>{
+  const r=classify([death,died,scheduled,cleanup,start,denied,entering,promoted],'');
+  assert.equal(r.outcome,'automatic-restart-denied');assert.equal(r.interleaved,false);
+});
+test('actual shell returns failure for a target denial even if helper misses the window',()=>{
+  const r=runShell([death,died,scheduled,cleanup,start,denied,entering,promoted],'');
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.equal(r.result.interleaved,false);
+  assert.doesNotMatch(r.calls,/phase verify-race/);
+});

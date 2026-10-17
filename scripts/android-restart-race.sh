@@ -59,7 +59,7 @@ restart_race() {
     else code=$?; fi
     # A measured automatic-restart policy denial is a failure, never a pass.
     if [[ "$code" == 1 ]]; then
-      echo 'RACE_AUTOMATIC_RESTART_FAILED: independent FGS transition preceded denied target restart'
+      echo 'RACE_AUTOMATIC_RESTART_FAILED: target restart denied; use interleaved flag for trigger attribution'
       cat "$OUT/race-result.json"
       return 1
     fi

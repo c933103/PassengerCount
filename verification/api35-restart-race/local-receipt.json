@@ -5,21 +5,21 @@
   "inputSha256": {
     ".github/workflows/v19-validate.yml": "c7ffe5adb3b4b563ef73c4d3a0d2d3b40e2280338f5b321eec3639eead3a1a41",
     "scripts/test-android-installed.sh": "42af0f8bc24a421c2be6a0ffd7138b8a45af1c5ecb572a290b578a121b3a867c",
-    "scripts/analyze-android-restart-race.mjs": "3bc32bf4e8a0d93de510fb876bd70cc3e08ad0a8d40de56abf1d6ef169df1d9c",
-    "scripts/android-restart-race.sh": "a184d4726aafcc6cb4551895be94bf77baa0da3cecf9c9f4bdc9c7baafa25f5d",
+    "scripts/analyze-android-restart-race.mjs": "5fd3a044ad641d6eee7b0e9ab6b273d5e150fc913cb8b76172c55a5b54ee8b3d",
+    "scripts/android-restart-race.sh": "3514cdd0bb03f013429ea6058e9970965bc1813561a87f5f71ef6468e1f18f6d",
     "tests/android/AndroidManifest.xml": "796faa2703661b61633c56523041fd091ad927781e74c331b0bc747789d6e3ed",
     "tests/android/JournalLifecycleInstrumentation.java": "a0e6450d3ee7d609684a6d70210aa55995c9f6a255cec7fa2470872e7253bc3c",
     "tests/android/RestartRaceTriggerService.java": "ef7c0c4a459abc428fd2053d22312c2316da8bedb04e1fdc7c216f144ade797a",
-    "tests/android-restart-race.test.js": "ea22f7930b78c3d251fdbf4703e8c45550983b11a37380610b7659456c5e4828",
-    "tests/android/README.md": "610b7d445ac9116f1944ba4c7ca01335ee32b620e1f0115e911f4508350d72f9"
+    "tests/android-restart-race.test.js": "1fcc578160df66233960f423461256c014483a7c93aec36f3b30da994f2f2d33",
+    "tests/android/README.md": "eb13153d3ae2acc1972f74a5efe00b1b6dc0c719c77da7e86b482ec4328bda7a"
   },
   "checks": [
     {
       "command": "npm test",
       "result": "passed",
       "counts": {
-        "tests": 366,
-        "pass": 366,
+        "tests": 368,
+        "pass": 368,
         "fail": 0
       }
     },
@@ -30,7 +30,7 @@
     {
       "command": "node --test tests/android-restart-race.test.js",
       "result": "passed",
-      "tests": 25
+      "tests": 27
     },
     {
       "command": "bash -n scripts/android-restart-race.sh scripts/test-android-installed.sh",
@@ -89,5 +89,10 @@
       "exit": 0,
       "lastLine": "7 source-path assertions passed; not an installed-device result"
     }
-  ]
+  ],
+  "reviewCorrection": {
+    "finding": "4301562948",
+    "change": "Observed target denial remains failure even when the independent helper misses the causal window.",
+    "controls": "Added classifier and actual-shell late-trigger denial regressions."
+  }
 }

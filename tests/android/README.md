@@ -67,7 +67,9 @@ null-intent callback, or instrumentation is involved in that restart window.
   state, and then the existing real GPS/session/journal verification. This is
   one successful sample, not closure of the intermittent defect. GPS verification
   runs after reattachment; pre-reattachment GPS delivery is not claimed.
-- Exit 1 reports an observed automatic-restart denial and keeps the job failed.
+- Exit 1 reports an observed automatic-restart denial and keeps the job failed,
+  even when the helper missed the window. The separate interleaving flag controls
+  whether that failure can be associated with the test trigger.
 - Exit 2 reports missed timing or incomplete observation. It is inconclusive,
   never a passing automatic-restart test. No platform delay is altered to force
   the window and no retry hides a failed sample.
