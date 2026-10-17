@@ -68,10 +68,10 @@ test('no helper requirement for historical natural control; no app-op cleanup al
 const root=fileURLToPath(new URL('../',import.meta.url));
 const shell=fs.readFileSync(new URL('../scripts/android-restart-race.sh',import.meta.url),'utf8')
   .replace(/\bSECONDS\b/g,'fixtureClock').replace('fixtureClock+75','fixtureClock+5');
-function runShell(events,dump=service,transportError=false) {
+function runShell(events,dump=service,transportError=false,warmReady=true) {
   const out=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-'));
   try {
-    fs.writeFileSync(path.join(out,'input.log'),events.join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
+    fs.writeFileSync(path.join(out,'input.log'),(warmReady?['10-15 09:09:30.000 333 333 I PassengerRaceTrigger: RACE_WARM_READY pid=333 uid=10210',...events]:events).join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
     const r=spawnSync('bash',['-c',`set -euo pipefail
 ROOT=${JSON.stringify(root)}; OUT=${JSON.stringify(out)}; CI=true; EMU_PID=99; SERIAL=emulator-5556; PACKAGE=app.passengercount
 fixtureClock=0
@@ -100,7 +100,7 @@ restart_race
 test('actual shell requires foreground proof before GPS verification reattaches',()=>{
   const r=runShell([death,died,scheduled,entering,promoted,start]);
   assert.equal(r.status,0,r.stdout+r.stderr);assert.equal(r.result.outcome,'foreground-restored');
-  assert.ok(r.calls.indexOf('phase verify-race attached')>r.calls.indexOf('adb shell am start-foreground-service'));
+  assert.ok(r.calls.indexOf('phase verify-race attached')>r.calls.lastIndexOf('adb shell am start-foreground-service'));
 });
 test('actual shell returns failure immediately on denied restart without reattaching',()=>{
   const r=runShell([death,died,scheduled,entering,promoted,cleanup,start,denied],'');
@@ -132,4 +132,17 @@ test('actual shell returns failure for a target denial even if helper misses the
   assert.equal(r.status,1,r.stdout+r.stderr);
   assert.equal(r.result.interleaved,false);
   assert.doesNotMatch(r.calls,/phase verify-race/);
+});
+
+test('helper warm-up uses an FGS and is proven complete before target launch',()=>{
+ const r=runShell([death,died,scheduled,entering,promoted,start]);
+ assert.equal(r.status,0);
+ assert.match(r.calls,/adb shell am start-foreground-service .*app.passengercount.tests.WARM/);
+ assert.doesNotMatch(r.calls,/adb shell am startservice/);
+ assert.ok(r.calls.indexOf('adb logcat -d -v threadtime')<r.calls.indexOf('launch_home'));
+});
+test('missing helper warm completion is inconclusive before touching the target',()=>{
+ const r=runShell([death,died,scheduled,entering,promoted,start],service,false,false);
+ assert.equal(r.status,2);assert.match(r.stdout,/RACE_WARM_UNVERIFIED/);
+ assert.doesNotMatch(r.calls,/launch_home|phase prepare-race/);
 });

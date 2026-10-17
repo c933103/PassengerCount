@@ -20,8 +20,14 @@ mkdir -p "$OUT"
 printf '%s\n' "$original_code" > "$OUT/original-validation-exit-code.txt"
 cp "$ORIGINAL/source.txt" "$OUT/original-validation-source.txt"
 printf 'Original lifecycle exit=%s remains FAILED; starting independent diagnostic\n' "$original_code"
-if PASSENGER_RESTART_RACE_ONLY=1 bash "$ROOT/scripts/test-android-installed.sh"; then
-  diagnostic_code=0
+# Device access can change after the first emulator exits. Reuse exactly the
+# existing hosted-runner check/grant, preserving the original evidence directory.
+if bash "$ROOT/scripts/ensure-android-kvm.sh" diagnostic; then
+  if PASSENGER_RESTART_RACE_ONLY=1 bash "$ROOT/scripts/test-android-installed.sh"; then
+    diagnostic_code=0
+  else
+    diagnostic_code=$?
+  fi
 else
   diagnostic_code=$?
 fi

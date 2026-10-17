@@ -3,26 +3,27 @@
   "date": "2026-10-17",
   "scope": "Opt-in diagnostic; automatic-restart requirement still open; no production change",
   "inputSha256": {
-    ".github/workflows/v19-validate.yml": "608d5d8f26aaa78b23984899a0e2dff337c8ea859b2e73cf3a33c376aba2cd22",
+    ".github/workflows/v19-validate.yml": "64035511fd6363979435bb204e0732c940b9645fccba5e567775b225f288e8a1",
     "scripts/test-android-installed.sh": "fd0ea6119de8ff337dea1e12a967cb38ff3349338bfd6a2538cb2994a7abb2d2",
     "scripts/analyze-android-restart-race.mjs": "5fd3a044ad641d6eee7b0e9ab6b273d5e150fc913cb8b76172c55a5b54ee8b3d",
-    "scripts/android-restart-race.sh": "3514cdd0bb03f013429ea6058e9970965bc1813561a87f5f71ef6468e1f18f6d",
+    "scripts/android-restart-race.sh": "d0cf78cff93b0511caa13cdf91314da8befab43dbe0c6438e948103777dee2a7",
     "tests/android/AndroidManifest.xml": "796faa2703661b61633c56523041fd091ad927781e74c331b0bc747789d6e3ed",
     "tests/android/JournalLifecycleInstrumentation.java": "a0e6450d3ee7d609684a6d70210aa55995c9f6a255cec7fa2470872e7253bc3c",
-    "tests/android/RestartRaceTriggerService.java": "ef7c0c4a459abc428fd2053d22312c2316da8bedb04e1fdc7c216f144ade797a",
-    "tests/android-restart-race.test.js": "cc09bf1de5eb17c4330411715b37823779181966c7f3d1eac86d5b4dd7f94f98",
-    "tests/android/README.md": "1c50ebfb1d6a9458339cde1ebf5546c61c99f379d1350a46a9978baee3461764",
-    "scripts/test-android-restart-after-failure.sh": "c6fb387d42dccc392d8c0d689e7a4b3d8e60e923686f9df0f1c5e547dceace8c",
-    "tests/android-restart-after-failure.test.js": "bdb38dc7d06405f7607f91dcec8f1d787b625daf30534e3431a6c858633d9e81",
-    "verification/api35-restart-race/README.md": "3bb35f3ecf8dbe45ee7aa6411990566adfc856162452150c11fc83374bd9eee5"
+    "tests/android/RestartRaceTriggerService.java": "77e963aba109acc30646fb289706b3bae53d8e5ddfbdf1d30690db6a8224e4e7",
+    "tests/android-restart-race.test.js": "0693a3506dca075f6ce8f7a3d5e55c24b0346258d8c817a02a1c6441b2ebd4e9",
+    "tests/android/README.md": "bbe1334e063594743869d63aae6cd20df1d3b833af965c406f85030ed8648528",
+    "scripts/test-android-restart-after-failure.sh": "f0948b06086d2d9ed00f5a39ec3feb1da4809be807bac19d1260971a61a91165",
+    "tests/android-restart-after-failure.test.js": "fa687914f9e03bcb5e9f8d4a4d5b4d28b7fe05a2e8de1ffe779c1e98efeb24f4",
+    "verification/api35-restart-race/README.md": "7793d41f2e994fb91c7199d283526234d77af912676b8da11ee0fb7570734b8e",
+    "scripts/ensure-android-kvm.sh": "d130dc589b7c6999e2888dd15c5dba34b1107768c0791dda96120f398491005e"
   },
   "checks": [
     {
       "command": "npm test",
       "result": "passed",
       "counts": {
-        "tests": 377,
-        "pass": 377,
+        "tests": 381,
+        "pass": 381,
         "fail": 0
       }
     },
@@ -57,8 +58,13 @@
     {
       "command": "node --test tests/android-restart-after-failure.test.js tests/android-restart-race.test.js",
       "result": "passed",
-      "tests": 36,
+      "tests": 40,
       "scope": "Actual failure-path wrapper and race shell/classifier with host doubles; independent diagnostic success/denial/inconclusive exits preserve original failure evidence; not Android execution."
+    },
+    {
+      "command": "API35 test Java recompile and d8 after helper warm-up correction",
+      "result": "passed",
+      "scope": "Unsigned local compile/dex; stock d8 warns API35 exceeds supported API34."
     }
   ],
   "priorAttempts": [
@@ -108,5 +114,14 @@
     "reason": "Runs104/105 both failed the original gate before the appended probe could execute.",
     "change": "Separate opt-in workflow step runs bootstrap+probe on a second fresh owned emulator, with independent evidence/exit. Original failure stays binding, no continue-on-error or original-gate retry.",
     "hostedStatus": "new failure-path wiring pending exact-head hosted CI"
+  },
+  "setupCorrection": {
+    "observedRun": 39007438327,
+    "failures": [
+      "API35 rejects ordinary background helper warm-start",
+      "Second emulator found required KVM access unavailable"
+    ],
+    "change": "Legitimate helper FGS warm-up with pre-target completion proof; reuse existing runner-only KVM preflight before each owned emulator.",
+    "scope": "No production source/permission change, no KVM ACL scope expansion, no software-emulation fallback."
   }
 }

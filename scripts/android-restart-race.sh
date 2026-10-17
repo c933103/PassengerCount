@@ -16,8 +16,15 @@ restart_race() {
   local component=app.passengercount.tests/app.passengercount.RestartRaceTriggerService
   # Warm a different UID before starting PassengerCount's foreground session.
   # It has no location permission, binding, shared UID or production component.
-  race_capture "$OUT/race-warm.txt" shell am startservice -n "$component" -a app.passengercount.tests.WARM
+  race_capture "$OUT/race-warm.txt" shell am start-foreground-service -n "$component" -a app.passengercount.tests.WARM
   if grep -Eq 'Error|Exception|Permission Denial' "$OUT/race-warm.txt"; then return 2; fi
+  local warm_deadline=$((SECONDS+10)) warmed=false
+  while ((SECONDS<warm_deadline)); do
+    race_capture "$OUT/race-warm-logcat.txt" logcat -d -v threadtime
+    if grep -q 'PassengerRaceTrigger: RACE_WARM_READY pid=' "$OUT/race-warm-logcat.txt"; then warmed=true; break; fi
+    sleep 0.05
+  done
+  $warmed || { echo 'RACE_WARM_UNVERIFIED'; return 2; }
   launch_home
   local oldpid
   oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"

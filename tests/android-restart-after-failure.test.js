@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 const runner=fs.readFileSync(new URL('../scripts/test-android-restart-after-failure.sh',import.meta.url),'utf8');
-function run({original=1,diagnostic=0,optIn='1',missing=false,mutate=false}={}) {
+function run({original=1,diagnostic=0,optIn='1',missing=false,mutate=false,kvmExit=0}={}) {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'pc-post-failure-'));
   try {
     const originalDir=path.join(root,'android/build/lifecycle-evidence');
@@ -14,6 +14,11 @@ function run({original=1,diagnostic=0,optIn='1',missing=false,mutate=false}={}) 
     fs.writeFileSync(path.join(originalDir,'source.txt'),'original-commit\noriginal-tree\n');
     fs.writeFileSync(path.join(originalDir,'logcat-final.txt'),'ORIGINAL FAILURE TRACE\n');
     fs.writeFileSync(path.join(root,'scripts/test-android-restart-after-failure.sh'),runner);
+    fs.writeFileSync(path.join(root,'scripts/ensure-android-kvm.sh'),`#!/bin/bash
+[[ "$1" == diagnostic ]] || exit 9
+printf 'KVM fixture check\\n'
+exit ${kvmExit}
+`);
     fs.writeFileSync(path.join(root,'scripts/test-android-installed.sh'),`#!/bin/bash
 set -euo pipefail
 [[ "$PASSENGER_RESTART_RACE_ONLY" == 1 && "$PASSENGER_RESTART_RACE" == 1 ]]
@@ -54,4 +59,19 @@ test('diagnostic mode bootstraps fresh data, uses separate evidence, then exits 
  const dispatch=s.slice(s.indexOf('\nphase bootstrap\n'),s.indexOf('\nphase basics attached\n'));
  assert.match(dispatch,/phase bootstrap\nif \[\[ "\$\{PASSENGER_RESTART_RACE_ONLY:-0\}" == 1 \]\]/);
  assert.match(dispatch,/restart_race\n  exit 0\nfi\nlaunch_home/);
+});
+
+test('second-emulator KVM preflight failure stays separate and preserves original failure',()=>{
+ const r=run({kvmExit:2});assert.equal(r.status,2);assert.equal(r.ran,false);
+ assert.equal(r.originalCode,'1\n');assert.equal(r.originalLog,'ORIGINAL FAILURE TRACE\n');
+ assert.equal(r.diagnosticCode,'2\n');assert.match(r.stdout,/KVM fixture check/);
+});
+test('both emulator paths reuse the narrowly scoped existing KVM preflight',()=>{
+ const workflow=fs.readFileSync(new URL('../.github/workflows/v19-validate.yml',import.meta.url),'utf8');
+ const kvm=fs.readFileSync(new URL('../scripts/ensure-android-kvm.sh',import.meta.url),'utf8');
+ assert.match(workflow,/run: bash scripts\/ensure-android-kvm.sh lifecycle/);
+ assert.match(runner,/bash "\$ROOT\/scripts\/ensure-android-kvm.sh" diagnostic/);
+ assert.match(kvm,/RUNNER_ENVIRONMENT:-.*github-hosted/);
+ assert.match(kvm,/sudo -n setfacl -m "u:\$\(id -un\):rw" \/dev\/kvm/);
+ assert.doesNotMatch(kvm,/chmod|udev|0666/);
 });

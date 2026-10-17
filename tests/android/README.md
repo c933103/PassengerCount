@@ -61,6 +61,11 @@ component, location permission, UID sharing, binding, policy setting, battery
 exemption or background-location grant changes. The helper receives no target
 journal, session token or location. It is used only on the fresh owned emulator.
 The shell's foreground-start privilege applies to the **test package only**.
+Helper warm-up is also a brief legitimate FGS start, followed by foreground stop
+and a completion marker **before the target session starts**; an ordinary
+background `startService` warm-up is not allowed on this image. The second-emulator
+path reruns the same narrowly scoped hosted-runner KVM access check as the first,
+writing only its separate diagnostic receipt.
 
 After a real TOP start and background transition, the target instrumentation
 fully detaches and kills its process exactly as in the original control. The

@@ -103,3 +103,12 @@ step, and the job remains failed even if the diagnostic observes success.
 Failure-path host regressions exercise success/denial/inconclusive diagnostic
 exits while preserving the original nonzero receipt and trace. Android execution
 of this additional path remains a separate hosted observation.
+
+Run [106](https://github.com/c933103/PassengerCount/actions/runs/39007438327)
+passed all 13 original installed phases, then exposed two diagnostic setup
+failures: ordinary background helper warm-start was rejected, and KVM access was
+unavailable when the second emulator path began. Both exits remained 2 and the
+aggregate stayed failed. No controlled race observation is claimed. The helper
+now warms through a short test-package FGS and proves warm completion before the
+target starts. Both emulator paths reuse the existing runner-only KVM preflight;
+no device permission scope, acceleration requirement or target permission expands.
