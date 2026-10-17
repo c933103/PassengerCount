@@ -1,0 +1,5 @@
+10-17 06:32:28.841   554   589 I ActivityManager: Start proc 2097:app.passengercount/u0a209 for added application app.passengercount
+10-17 06:32:34.784   554   589 I ActivityManager: Start proc 2633:app.passengercount/u0a209 for next-top-activity {app.passengercount/app.passengercount.MainActivity}
+10-17 06:32:42.100   554   589 I ActivityManager: Start proc 3022:app.passengercount:tracking/u0a209 for content provider {app.passengercount/app.passengercount.TrackProvider}
+10-17 06:32:53.666  2633  3066 E PassengerJournalTest: PHASE_FAIL prepare-race
+10-17 06:32:53.666  2633  3066 E PassengerJournalTest: java.lang.AssertionError: Timed out: real foreground service starts pcit-crash-race

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-17",
+  "run": "https://github.com/c933103/PassengerCount/actions/runs/39010001390",
+  "jobId": 117330345078,
+  "head": "8fe8c6afd75b984a281a08051864d90b3d6215d1",
+  "testedMergeCommit": "ba3c6a4f1e1fd7c4fa54b2b2a51fcb7fa7ccd5d2",
+  "testedTree": "9c5be82fa3042532feef0dfad3d452708f7d6498",
+  "result": "failure",
+  "classification": "Installed harness process-targeting failure before death/interleaving; no new candidate restart outcome established",
+  "passed": [
+    "385 Node tests",
+    "native suite including 291 IPC/deletion assertions",
+    "browser checks",
+    "production APK build",
+    "test APK build",
+    "original bootstrap",
+    "separate diagnostic bootstrap"
+  ],
+  "failed": [
+    "original basics timeout locating local TrackService; instrumentation PID 2609 was UI while provider PID 2824 was tracking",
+    "separate diagnostic prepare-race timeout; instrumentation PID 2633 was UI while provider PID 3022 was tracking"
+  ],
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+  "apkSha256": {
+    "target": "67f3b9cf502b97d3cded863ea2d3e17c1b933610c2ed95a61ea570be8611c640",
+    "tests": "193634fd86bd735884a915ed5967b9dbdb339247936042407d4f9b133f0ac924"
+  },
+  "artifacts": [
+    {
+      "scope": "original",
+      "id": 12092975818,
+      "bytes": 1591572,
+      "sha256": "e7d2cc84d8e8bf01f79dcedfbc818a422de76ba01fc722c54f378febd807c95b"
+    },
+    {
+      "scope": "diagnostic",
+      "id": 12092955806,
+      "bytes": 2199909,
+      "sha256": "425da9ef532a1d5bc6cc6bca949e5bddb54f583256011f29202e2e8add03cb7b"
+    }
+  ],
+  "preservedAcceptance": "Original failure remains binding; run107 actual automatic-restart denials remain unchanged; rerun corrected exact-head gates.",
+  "safeExcerptSha256": {
+    "diagnostic-prepare-race.txt": "c0a8b560109ba0a1ea6c390c0db7fa0578ec31486cd67bd0741ccb90acba424e",
+    "diagnostic-process-targeting.txt": "33dd08267b19e5cf1a7c34346a5a273a61e0212bffed5ed928e7e1eb62dabde2",
+    "original-basics.txt": "ffee1e4d935cd6aa3336ea25c035dbbed93abc756375ee481559449b8834aef5",
+    "original-process-targeting.txt": "655baac50882a8c365a679cd4b187bcdccc418db5e02a0ace74f838d1b266016"
+  }
+}
