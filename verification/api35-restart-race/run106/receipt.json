@@ -1,0 +1,35 @@
+{
+  "run_id": 39007438327,
+  "run_number": 106,
+  "attempt": 1,
+  "job_id": 117322671211,
+  "workflow": "https://github.com/c933103/PassengerCount/actions/runs/39007438327",
+  "head": "9cc5f708c3e9aca62da267b45bb3de9bc8fe775e",
+  "tested_merge_commit": "941e84bb03a91b28dbd68e34b29df2f20c15dade",
+  "tested_tree": "7da7fb7553601f339a7d8b9a1eef4edcfe61a764",
+  "aggregate": "failure",
+  "original_13_phases": "passed",
+  "appended_probe": "exit2: helper ordinary background warm-start rejected before race preparation",
+  "separate_diagnostic": "exit2: required KVM access unavailable before second emulator launch",
+  "causal_result": "controlled interleaving unobserved; setup failures are not product restart-denial observations",
+  "original_failure_history": "Runs104/105 and PR17 failure remain open; this passing original control does not erase them",
+  "artifacts": [
+    {
+      "label": "original",
+      "id": 12091343870,
+      "zip_sha256": "ea229058eb3387326d341ff762956f4ddcaaf9628403373e7bc90fa559281aa3",
+      "zip_bytes": 6449790
+    },
+    {
+      "label": "diagnostic",
+      "id": 12091403858,
+      "zip_sha256": "ba373312f3ad53c0329adaecbdd56fb3a0646827db258608d05f828571dc54df",
+      "zip_bytes": 2953
+    }
+  ],
+  "setup_error": "Error: app is in background uid null\n",
+  "second_diagnostic_blocker": "KVM is unavailable to this runner; installed validation is blocked\n",
+  "original_evidence_preserved": true,
+  "apk_sha256": "ca303dbe5771eacf86a637baef68f0e800b7aa6e8e51326830e185a4a376e6a5",
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys"
+}
