@@ -83,3 +83,23 @@ See `local-receipt.json` for exact input hashes and results. Browser and install
 Android checks remain separate required hosted observations. Host classifier
 checks cannot establish automatic restart on Android. The run instructions and
 exit classifications are in [the test guide](../../tests/android/README.md#opt-in-independent-fgs-restart-race-probe).
+
+## Fresh hosted observations and failure-path wiring
+
+Runs [104](https://github.com/c933103/PassengerCount/actions/runs/39006305699)
+and [105](https://github.com/c933103/PassengerCount/actions/runs/39006630427)
+failed the original valid sticky restart gate on unchanged production before the
+probe ran. Both observed target START_FOREGROUND cleanup during process absence,
+then service-triggered process creation and denied foreground promotion. Run104
+also observed a keyboard FGS entry in the absent-process window; run105's keyboard
+FGS entries preceded death. Neither captures the framework cleanup caller.
+[Run104 retained evidence](https://github.com/c933103/PassengerCount/tree/d4c61ca3018b95ce3406037d6b30685f91a131d3/verification/api35-restart-race/run104)
+is immutable; these failures remain binding and are not retried away.
+
+The workflow now permits a separate opt-in diagnostic step after an original
+installed-step failure. It uses a new disposable emulator and independent
+evidence/exit status. It does not replace, rerun, or suppress the original failed
+step, and the job remains failed even if the diagnostic observes success.
+Failure-path host regressions exercise success/denial/inconclusive diagnostic
+exits while preserving the original nonzero receipt and trace. Android execution
+of this additional path remains a separate hosted observation.

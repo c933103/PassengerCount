@@ -45,8 +45,15 @@ Host regressions separately check harness reliability: `scripts/test-android-tar
 Use a pull-request head branch under `probe/api35-sticky-restart/`, or dispatch
 `v19-validate.yml` on the desired ref with `restart_race=true`. The existing
 validate job runs the normal build and **all original 13 installed phases first**.
-The opt-in then adds `prepare-race` and (only after measured foreground recovery)
-`verify-race`. Ordinary PRs and main pushes do not run this probe.
+If those gates pass, the opt-in adds `prepare-race` and (only after measured
+foreground recovery) `verify-race`. If the installed step fails first, a separately
+labeled workflow step boots a **second fresh emulator** and runs only bootstrap
+plus the diagnostic. The failed original step remains binding: there is no
+`continue-on-error`, result substitution, or retry of its gates. The separate
+`restart-race-evidence` artifact includes its own exit status and copies the
+original failure/source receipt; the wrapper verifies all original evidence is
+unchanged. The diagnostic cannot turn a failed job green. Ordinary PRs and main
+pushes do not run this probe.
 
 The separate test APK declares its own `FOREGROUND_SERVICE` normal permission and
 an exported, short-lived `shortService` trigger. No production manifest, APK

@@ -104,10 +104,27 @@ jobs:
             echo 'EMULATOR_DEPENDENCY_READY: libpulse.so.0 resolves; emulator -version and -accel-check remain required'
           } 2>&1 | tee android/build/lifecycle-evidence/emulator-dependency.txt
       - name: Validate installed journal lifecycle on API35
+        id: installed
         timeout-minutes: 12
         env:
           PASSENGER_RESTART_RACE: ${{ ((github.event_name == 'workflow_dispatch' && inputs.restart_race) || startsWith(github.head_ref, 'probe/api35-sticky-restart/')) && '1' || '0' }}
         run: bash scripts/test-android-installed.sh
+      # Keep the failed original step binding. A second fresh emulator may
+      # still collect the opt-in controlled race without retrying that gate.
+      - name: Diagnostic only - probe after original failure
+        id: restart_diagnostic
+        if: ${{ !cancelled() && steps.installed.outcome == 'failure' && ((github.event_name == 'workflow_dispatch' && inputs.restart_race) || startsWith(github.head_ref, 'probe/api35-sticky-restart/')) }}
+        timeout-minutes: 8
+        env:
+          PASSENGER_RESTART_RACE: '1'
+        run: bash scripts/test-android-restart-after-failure.sh
+      - name: Preserve separate restart diagnostic evidence
+        if: ${{ always() && steps.restart_diagnostic.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: PassengerCount-API35-restart-diagnostic-${{ github.sha }}
+          path: android/build/restart-race-evidence
+          if-no-files-found: warn
       - name: Preserve installed lifecycle evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -10,12 +10,22 @@ AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
 ADB="$ANDROID_HOME/platform-tools/adb"
 EMULATOR="$ANDROID_HOME/emulator/emulator"
 IMAGE='system-images;android-35;google_apis;x86_64'
-OUT="$ROOT/android/build/lifecycle-evidence"
+# Diagnostic-only mode runs on a second fresh owned emulator after a failed
+# original job step. It has a separate evidence destination and cannot replace
+# the original gate's exit code or artifacts.
+case "${PASSENGER_RESTART_RACE_ONLY:-0}" in
+  0) OUT="$ROOT/android/build/lifecycle-evidence" ;;
+  1)
+    [[ "${PASSENGER_RESTART_RACE:-0}" == 1 ]] || { echo 'Diagnostic-only mode requires explicit race opt-in'; exit 2; }
+    OUT="$ROOT/android/build/restart-race-evidence"
+    ;;
+  *) echo 'Unknown diagnostic mode'; exit 2 ;;
+esac
 mkdir -p "$OUT"
 TEMP="$(mktemp -d "$RUNNER_TEMP/passenger-api35.XXXXXX")"
 export ANDROID_AVD_HOME="$TEMP/avds"
 mkdir -p "$ANDROID_AVD_HOME"
-NAME="passenger_lifecycle_${GITHUB_RUN_ID:-ci}_${GITHUB_RUN_ATTEMPT:-1}"
+NAME="passenger_lifecycle_${GITHUB_RUN_ID:-ci}_${GITHUB_RUN_ATTEMPT:-1}_${PASSENGER_RESTART_RACE_ONLY:-0}"
 SERIAL=emulator-5556
 PACKAGE=app.passengercount
 RUNNER=app.passengercount.tests/app.passengercount.JournalLifecycleInstrumentation
@@ -204,6 +214,12 @@ crash_observe() {
 }
 
 phase bootstrap
+if [[ "${PASSENGER_RESTART_RACE_ONLY:-0}" == 1 ]]; then
+  printf 'DIAGNOSTIC ONLY: original lifecycle failure remains binding; this run does not execute or replace its acceptance gates\n' > "$OUT/diagnostic-only.txt"
+  source "$ROOT/scripts/android-restart-race.sh"
+  restart_race
+  exit 0
+fi
 launch_home
 phase basics attached
 phase recover

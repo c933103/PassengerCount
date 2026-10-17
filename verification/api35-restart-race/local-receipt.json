@@ -3,23 +3,26 @@
   "date": "2026-10-17",
   "scope": "Opt-in diagnostic; automatic-restart requirement still open; no production change",
   "inputSha256": {
-    ".github/workflows/v19-validate.yml": "c7ffe5adb3b4b563ef73c4d3a0d2d3b40e2280338f5b321eec3639eead3a1a41",
-    "scripts/test-android-installed.sh": "42af0f8bc24a421c2be6a0ffd7138b8a45af1c5ecb572a290b578a121b3a867c",
+    ".github/workflows/v19-validate.yml": "608d5d8f26aaa78b23984899a0e2dff337c8ea859b2e73cf3a33c376aba2cd22",
+    "scripts/test-android-installed.sh": "fd0ea6119de8ff337dea1e12a967cb38ff3349338bfd6a2538cb2994a7abb2d2",
     "scripts/analyze-android-restart-race.mjs": "5fd3a044ad641d6eee7b0e9ab6b273d5e150fc913cb8b76172c55a5b54ee8b3d",
     "scripts/android-restart-race.sh": "3514cdd0bb03f013429ea6058e9970965bc1813561a87f5f71ef6468e1f18f6d",
     "tests/android/AndroidManifest.xml": "796faa2703661b61633c56523041fd091ad927781e74c331b0bc747789d6e3ed",
     "tests/android/JournalLifecycleInstrumentation.java": "a0e6450d3ee7d609684a6d70210aa55995c9f6a255cec7fa2470872e7253bc3c",
     "tests/android/RestartRaceTriggerService.java": "ef7c0c4a459abc428fd2053d22312c2316da8bedb04e1fdc7c216f144ade797a",
-    "tests/android-restart-race.test.js": "1fcc578160df66233960f423461256c014483a7c93aec36f3b30da994f2f2d33",
-    "tests/android/README.md": "eb13153d3ae2acc1972f74a5efe00b1b6dc0c719c77da7e86b482ec4328bda7a"
+    "tests/android-restart-race.test.js": "cc09bf1de5eb17c4330411715b37823779181966c7f3d1eac86d5b4dd7f94f98",
+    "tests/android/README.md": "1c50ebfb1d6a9458339cde1ebf5546c61c99f379d1350a46a9978baee3461764",
+    "scripts/test-android-restart-after-failure.sh": "c6fb387d42dccc392d8c0d689e7a4b3d8e60e923686f9df0f1c5e547dceace8c",
+    "tests/android-restart-after-failure.test.js": "bdb38dc7d06405f7607f91dcec8f1d787b625daf30534e3431a6c858633d9e81",
+    "verification/api35-restart-race/README.md": "3bb35f3ecf8dbe45ee7aa6411990566adfc856162452150c11fc83374bd9eee5"
   },
   "checks": [
     {
       "command": "npm test",
       "result": "passed",
       "counts": {
-        "tests": 368,
-        "pass": 368,
+        "tests": 377,
+        "pass": 377,
         "fail": 0
       }
     },
@@ -50,6 +53,12 @@
       "command": "installed API35 emulator probe",
       "result": "not run locally",
       "reason": "No /dev/kvm or installed emulator in this runtime; hosted run required."
+    },
+    {
+      "command": "node --test tests/android-restart-after-failure.test.js tests/android-restart-race.test.js",
+      "result": "passed",
+      "tests": 36,
+      "scope": "Actual failure-path wrapper and race shell/classifier with host doubles; independent diagnostic success/denial/inconclusive exits preserve original failure evidence; not Android execution."
     }
   ],
   "priorAttempts": [
@@ -94,5 +103,10 @@
     "finding": "4301562948",
     "change": "Observed target denial remains failure even when the independent helper misses the causal window.",
     "controls": "Added classifier and actual-shell late-trigger denial regressions."
+  },
+  "postFailureDiagnostic": {
+    "reason": "Runs104/105 both failed the original gate before the appended probe could execute.",
+    "change": "Separate opt-in workflow step runs bootstrap+probe on a second fresh owned emulator, with independent evidence/exit. Original failure stays binding, no continue-on-error or original-gate retry.",
+    "hostedStatus": "new failure-path wiring pending exact-head hosted CI"
   }
 }

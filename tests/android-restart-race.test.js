@@ -112,7 +112,7 @@ test('actual shell preserves a missed interleaving as unverified, not success',(
 });
 test('opt-in probe remains after every original installed phase',()=>{
   const installed=fs.readFileSync(new URL('../scripts/test-android-installed.sh',import.meta.url),'utf8');
-  assert.ok(installed.indexOf('source "$ROOT/scripts/android-restart-race.sh"')>installed.indexOf('phase recover-denied attached'));
+  assert.ok(installed.lastIndexOf('source "$ROOT/scripts/android-restart-race.sh"')>installed.indexOf('phase recover-denied attached'));
   assert.match(installed,/if \[\[ "\$\{PASSENGER_RESTART_RACE:-0\}" == 1 \]\]/);
 });
 
