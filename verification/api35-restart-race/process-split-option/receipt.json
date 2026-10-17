@@ -1,0 +1,11 @@
+{
+  "baseCommit": "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+  "command": "java com.sun.tools.javac.Main -d investigation/split-session/classes android/src/app/passengercount/TrackSession.java investigation/split-session/SplitSessionBoundaryExperiment.java && java -cp investigation/split-session/classes app.passengercount.SplitSessionBoundaryExperiment",
+  "result": "passed: 6 source-level controls",
+  "scope": "Independent in-process controller monitors, not Android multi-process execution; demonstrates why a manifest-only split does not preserve existing drain barrier",
+  "sha256": {
+    "android/src/app/passengercount/TrackSession.java": "93e59e638caa965125f5475bd651b663fae863c54cca33d396f2fe817b3f9c3b",
+    "investigation/split-session/SplitSessionBoundaryExperiment.java": "dd47eae2913de3a20929ea64f421f90d7270ca5e3ed90f252ca89739c7dc4d53",
+    "investigation/split-session/result.txt": "8243dbcd6c24e71dae34e14a65a5974226d4ab67d08ce90064aaa0b30a42e4ad"
+  }
+}

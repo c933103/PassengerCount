@@ -1,0 +1,7 @@
+PASS accepted append entered with controller lock, shared=true
+PASS single controller blocks stop until accepted append drains
+PASS bounded threads finished without hidden error, shared=true
+PASS accepted append entered with controller lock, shared=false
+PASS two controllers let acknowledged stop return before accepted append finishes
+PASS bounded threads finished without hidden error, shared=false
+6 controls passed against unchanged TrackSession; independent monitor boundary only, not an installed-process test
