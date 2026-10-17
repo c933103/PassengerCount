@@ -1,0 +1,7 @@
+# Run110: original gates and UI IPC basics passed; drain observer unresolved
+
+All thirteen original installed phases passed. Ordinary detached service-only death restarted tracker PID 4510 as 4809, retaining TOP start/while-in-use eligibility; reattached verification observed real GPS and session continuity. The tombstoned tracker restarted as PID 5083 then stopped as required. The supported UI instrumentation relay worked and actual UI-process remote start/page/legacy read/token reuse/stop/delete/byte-cap basics passed 23 assertions.
+
+The next deterministic IPC fixture confirmed real UI start and its held accepted append, then timed out waiting for an observed blocked Binder provider call. Its name-based observer accepts only uppercase Binder:, while retained Android logs use lowercase binder:. This is an unreliable test predicate, not proof that append ordering failed. The corrected predicate requires BLOCKED state and actual production-provider/framework-transport/Binder-dispatch stack frames, with local/nonblocked/unrelated-frame negatives and runtime stack evidence. Its installed outcome is still required.
+
+The independent fresh diagnostic again reproduced the all-package-processes-absent automatic-restart denial on the split APK. The aggregate remains failed. The stronger independent-FGS service-only sample and owner/UI-death IPC fixtures were not reached. Both downloaded artifact ZIPs were SHA-256 verified. Compact excerpts omit synthetic workspace/session contents and unrelated emulator logs.

@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-17",
+  "run": "https://github.com/c933103/PassengerCount/actions/runs/39012074259",
+  "jobId": 117336544309,
+  "head": "cad97d57685e4b7a123b780f5c9ab026440f7bcf",
+  "testedMergeCommit": "2c8699f289e8ee6c21968d21191e579fe9776ba5",
+  "testedTree": "d5eb7d9885d1d3abe2fa57e64c9300785a953f9f",
+  "aggregate": "failure",
+  "passed": [
+    "411 Node tests",
+    "native suite including 292 IPC assertions",
+    "browser checks",
+    "APK builds",
+    "all original 13 installed phases",
+    "real UI-process IPC basics: 23 assertions, owner 5264/UI 5601, explicit separate UI completion and detachment",
+    "ordinary detached service-only sticky restart 4510 to 4809 with retained TOP eligibility and real GPS/session verification after reattachment",
+    "tombstoned sticky service restart 4809 to 5083 then automatic stop"
+  ],
+  "failed": [
+    "IPC append-drain observer timed out after real held append signal; no drain/owner-death/UI-death pass claimed",
+    "separate fresh all-package-processes-absent diagnostic reproduced measured automatic-restart denial: owner 2797 to 3884"
+  ],
+  "observerFinding": "Both fixture observers require case-sensitive Binder: names. Retained Android logs use binder:. Naming is not a reliable remote-dispatch contract; replacement matcher requires BLOCKED state plus production provider, framework transport and Binder dispatch frames. Exact cause remains to be confirmed by rerun stack evidence.",
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+  "apkSha256": {
+    "PassengerCount.apk": "b05c1437c83d514e217bee84b9c02089b29c6b6fc88a897449de7d2aea788bda",
+    "PassengerCount-lifecycle-tests.apk": "9bcc793895a0068d559d4bb8ab0954d40f53da8d20431b7f280eeb689dc9e021"
+  },
+  "artifacts": [
+    {
+      "scope": "original",
+      "id": 12093800455,
+      "bytes": 9354879,
+      "sha256": "468390a7c4a20992177e00ffd905d6488251b614f66031d6b5cc1daebbee04f6"
+    },
+    {
+      "scope": "diagnostic",
+      "id": 12092924980,
+      "bytes": 3043059,
+      "sha256": "b70f7689e4d5072402ffae8265888d6f511aa20510a86ae65cee0a0ffb1cb7a9"
+    }
+  ],
+  "limits": [
+    "Original natural service-only restart passed; the added independent-FGS service-only interleaving was not reached.",
+    "No actual IPC owner-death or blocked reliable-pipe/UI-death result established.",
+    "All-process absence failure remains binding; no merge/release acceptance.",
+    "No source-only/host matcher result substitutes for installed execution."
+  ],
+  "retainedFileSha256": {
+    "diagnostic-race-excerpt.txt": "c8ebc4727955643d156574c74cb549ea941f596e9c086c218a12a032c9e0e0fd",
+    "diagnostic-race-process-scope.txt": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "diagnostic-race-result.json": "7d492ec2411505d415be4142184eac635b606e1f4da85b9007183a00f780806f",
+    "original-deleted-restart.txt": "0158beb49c8c5c0b02cbf04d9e1d679d7826fff8ee92040e88c0d1a09d8a88a1",
+    "original-phase-results.txt": "30f6523f860f670b651d33b4bbfdd1640ef861b28e16188036fd6af29e7346af",
+    "original-valid-foreground.txt": "2e6e21792b7eb0da946e2e8dbf773e488e6e8cda5af6d88d58ac97d6b240de91",
+    "original-valid-restart.txt": "5fe20c588cb2212fb6ae330838867670313c4da7830dc4d78a610d31e2fe93e9",
+    "pid-deleted.txt": "2d077f1121e57d518134c21182d93c3b5497e294a4bd3825c6f6928435397595",
+    "pid-valid.txt": "9b91429f09c9466b1981469c4f4ae1d3e493d99856d3b572c39cea312e8c4018",
+    "ui-ipc-result-excerpt.txt": "21f1976c9d52d5f0b7ab270c58152456eba4740f0082ef5bf88343d0777a8e66"
+  }
+}

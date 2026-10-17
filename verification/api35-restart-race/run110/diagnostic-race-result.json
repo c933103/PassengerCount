@@ -1,0 +1,20 @@
+{
+  "outcome": "automatic-restart-denied",
+  "process": "app.passengercount:tracking",
+  "oldPid": "2797",
+  "newPid": "3884",
+  "interleaved": true,
+  "cleanupDuringAbsence": true,
+  "triggerBeforeCleanup": true,
+  "foreground": false,
+  "lines": {
+    "marker": 41442,
+    "death": 45512,
+    "scheduled": 45514,
+    "entering": 45990,
+    "promoted": 45993,
+    "reset": 45994,
+    "start": 47363,
+    "denied": 47496
+  }
+}

@@ -1,0 +1,5 @@
+10-17 07:06:26.159   562  1822 I ActivityManager: Process app.passengercount:tracking (pid 4809) has died: prcp FGS 
+10-17 07:06:26.159   562  1822 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+10-17 07:06:26.173   562   597 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 9986ms for mem-pressure-event
+10-17 07:06:26.358   562   597 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 801ms for mem-pressure-event
+10-17 07:06:27.167   562   599 I ActivityManager: Start proc 5083:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}

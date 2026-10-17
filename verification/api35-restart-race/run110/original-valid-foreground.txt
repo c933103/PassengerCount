@@ -1,0 +1,18 @@
+  * ServiceRecord{45573ea u0 app.passengercount/.TrackService c:app.passengercount}
+    processName=app.passengercount:tracking
+    app=ProcessRecord{5621953 4809:app.passengercount:tracking/u0a209}
+    mAllowWiu_noBinding=PROC_STATE_TOP
+    mAllowWiu_inBindService=DENIED
+    mAllowWiu_byBindings=DENIED
+    getFgsAllowWiu_legacy=PROC_STATE_TOP
+    getFgsAllowWiu_new=PROC_STATE_TOP
+    getFgsAllowWiu_forStart=PROC_STATE_TOP
+    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP
+    mAllowStart_noBinding=PROC_STATE_TOP
+    mAllowStart_inBindService=DENIED
+    mAllowStart_byBindings=DENIED
+    getFgsAllowStart_legacy=PROC_STATE_TOP
+    getFgsAllowStart_new=PROC_STATE_TOP
+    getFgsAllowStart=PROC_STATE_TOP
+    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)
+ startCommandResult=1

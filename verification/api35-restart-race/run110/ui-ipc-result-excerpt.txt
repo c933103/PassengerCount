@@ -1,0 +1,9 @@
+10-17 07:07:02.021  5601  5613 I PassengerJournalTest: IPC_UI_ENTER phase=ipc-basics pid=5601
+10-17 07:07:12.001  5601  5613 I PassengerJournalTest: ipc {"uiPid":5601,"ownerPid":5264}
+10-17 07:07:12.002  5601  5613 I PassengerJournalTest: PHASE_PASS ipc-basics assertions=23 pid=5601
+10-17 07:07:12.002  5601  5613 I PassengerJournalTest: PHASE_DETACHED ipc-basics pid=5601
+10-17 07:07:13.209  5800  5813 I PassengerJournalTest: IPC_UI_ENTER phase=ipc-drain pid=5800
+10-17 07:07:18.532  5800  5813 I PassengerJournalTest: PASS real UI starts owner before held append
+10-17 07:07:18.633  5800  5813 I PassengerJournalTest: PASS remote accepted append holds monitor
+10-17 07:07:28.660  5800  5813 E PassengerJournalTest: PHASE_FAIL ipc-drain
+10-17 07:07:28.660  5800  5813 E PassengerJournalTest: java.lang.AssertionError: Timed out: actual owner Binder thread reached session monitor

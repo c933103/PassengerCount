@@ -1,0 +1,56 @@
+## bootstrap
+INSTRUMENTATION_RESULT: assertions=7
+INSTRUMENTATION_RESULT: stream=PHASE_PASS bootstrap assertions=7 pid=2182
+INSTRUMENTATION_CODE: -1
+## basics
+INSTRUMENTATION_RESULT: assertions=51
+INSTRUMENTATION_RESULT: stream=PHASE_PASS basics assertions=51 pid=2951
+INSTRUMENTATION_CODE: -1
+## recover
+INSTRUMENTATION_RESULT: assertions=16
+INSTRUMENTATION_RESULT: stream=PHASE_PASS recover assertions=16 pid=3920
+INSTRUMENTATION_CODE: -1
+## receipts-prepare
+INSTRUMENTATION_RESULT: assertions=11
+INSTRUMENTATION_RESULT: stream=PHASE_PASS receipts-prepare assertions=11 pid=4039
+INSTRUMENTATION_CODE: -1
+## receipts-recover
+INSTRUMENTATION_RESULT: assertions=16
+INSTRUMENTATION_RESULT: stream=PHASE_PASS receipts-recover assertions=16 pid=4129
+INSTRUMENTATION_CODE: -1
+## receipts-final
+INSTRUMENTATION_RESULT: assertions=12
+INSTRUMENTATION_RESULT: stream=PHASE_PASS receipts-final assertions=12 pid=4240
+INSTRUMENTATION_CODE: -1
+## prepare-valid
+INSTRUMENTATION_RESULT: assertions=12
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-valid assertions=12 pid=4510
+INSTRUMENTATION_CODE: -1
+## verify-valid
+INSTRUMENTATION_RESULT: assertions=14
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-valid assertions=14 pid=4809
+INSTRUMENTATION_CODE: -1
+## prepare-deleted
+INSTRUMENTATION_RESULT: assertions=14
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-deleted assertions=14 pid=4809
+INSTRUMENTATION_CODE: -1
+## verify-deleted
+INSTRUMENTATION_RESULT: assertions=14
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-deleted assertions=14 pid=5116
+INSTRUMENTATION_CODE: -1
+## prepare-denied
+INSTRUMENTATION_RESULT: assertions=10
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-denied assertions=10 pid=5264
+INSTRUMENTATION_CODE: -1
+## verify-denied
+INSTRUMENTATION_RESULT: assertions=12
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-denied assertions=12 pid=5264
+INSTRUMENTATION_CODE: -1
+## recover-denied
+INSTRUMENTATION_RESULT: assertions=14
+INSTRUMENTATION_RESULT: stream=PHASE_PASS recover-denied assertions=14 pid=5264
+INSTRUMENTATION_CODE: -1
+## prepare-ipc-barrier
+INSTRUMENTATION_RESULT: assertions=5
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-ipc-barrier assertions=5 pid=5264
+INSTRUMENTATION_CODE: -1
