@@ -166,3 +166,15 @@ default/explicit-Activity process declarations leave all three resolved componen
 processes unchanged. A supported multi-process test relay requires independent
 UI execution/detachment evidence. Both original and appended installed gates must
 run again on the corrected exact head.
+
+
+Run [109](https://github.com/c933103/PassengerCount/actions/runs/39011421519) now
+reproduced all-package-processes-absent denial on the actual split-process APK:
+UI and owner deaths, measured helper interleaving, eligibility cleanup, then
+replacement owner foreground denial. Its [verified retained evidence](https://github.com/c933103/PassengerCount/tree/564a3360fc954f46ee7875db0de1d526cfea23f9/verification/api35-restart-race/run109)
+keeps that limitation concrete. The original installed path separately failed
+its bootstrap command with zero output before a target fixture result; its cause
+remains unclassified, and the original failure stays binding. Each instrument
+command now retains the exact invocation and actual exit code without retry or
+assertion relaxation. Service-only resilience and actual UI IPC still require
+fresh installed execution.

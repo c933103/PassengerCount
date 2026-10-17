@@ -122,9 +122,15 @@ phase() {
   [[ "$name" != bootstrap ]] || runner=$UI_RUNNER
   local opts=()
   [[ "$mode" != attached ]] || opts+=(--no-restart)
-  if ! timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$runner" \
-    > "$OUT/$name.txt" 2>&1; then
-    echo "INSTALLED_PHASE_COMMAND_FAILED: $name" >&2
+  local command_code
+  printf '%q ' timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$runner" \
+    > "$OUT/$name-command.txt"
+  printf '\n' >> "$OUT/$name-command.txt"
+  if timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$runner" \
+    > "$OUT/$name.txt" 2>&1; then command_code=0; else command_code=$?; fi
+  printf '%s\n' "$command_code" > "$OUT/$name-command-exit-code.txt"
+  if [[ "$command_code" != 0 ]]; then
+    echo "INSTALLED_PHASE_COMMAND_FAILED: $name exit=$command_code" >&2
     cat "$OUT/$name.txt" >&2
     exit 1
   fi

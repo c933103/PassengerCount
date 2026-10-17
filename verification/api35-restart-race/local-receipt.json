@@ -1,5 +1,5 @@
 {
-  "baseCommit": "8fe8c6afd75b984a281a08051864d90b3d6215d1",
+  "baseCommit": "620aed4de0b00c1b5b3c6c39e559ed642492e711",
   "date": "2026-10-17",
   "scope": "Candidate bounded production correction: separate tracking process with acknowledged private IPC; all-process absence automatic-restart requirement remains open",
   "inputSha256": {
@@ -11,7 +11,7 @@
     "android/src/app/passengercount/TrackService.java": "76b571db920e5515cb075222134a3d75ea3500ce07b681f3e9236524b4a7d305",
     "scripts/analyze-android-restart-race.mjs": "68176fca73a406e19d93b63d46e59e2b215b1c45207878ea47c72509bcd91cdc",
     "scripts/android-restart-race.sh": "0c6526682c4fe3ac8e2b71f593e1dcadfe1d0e28c17954d072db83e5f98a7d49",
-    "scripts/test-android-installed.sh": "e8ac2ddc60a07ceb5227a294ce5b15533eb723505c80104d10517ec251db4771",
+    "scripts/test-android-installed.sh": "6384d6b124040732161cf310b915c34667859b80b790597b27e233de1277e82c",
     "scripts/test-track-deletion.cjs": "3d551d75c1116e182c783e959d5f7fe7d8a5960f35274807990d172698f2c58c",
     "tests/android-restart-race.test.js": "604c9a8da2d3891d5ac5a7ad46978a91734192ad34fab097516ef96965409057",
     "tests/android/AndroidManifest.xml": "5550215cc443d667a6e9ea2c39762d4a272cfb556b9ae03c71d5f383ee6708b7",
@@ -22,18 +22,18 @@
     "tests/native/TrackDeletionFixture.java": "58ec0c2b14cee3ea11684a1dd1ef6b4732a22e57845dde692294a0b4365e6d64",
     "tests/native/TrackIpcShims.java": "6aad01dd1bf0099726e4cce529f3d4ce760df092cd734b9494966e4b6fd308c5",
     "tests/native/TrackJournalTest.java": "774860e1c0d6e3ba0ebb4583bc85782f0d173295574e44edf5bb23c5358b6521",
-    "verification/api35-restart-race/README.md": "b169d9d7b0a99f9a8ce0bf1409fe3addeaaa9ac794af9017f3052e4242b9591a",
-    "tests/android-harness.test.js": "7ec68cb2829b0df981c2801c293959e941de2f9ad6970dc3d76c560b61b610ad",
+    "verification/api35-restart-race/README.md": "58ad42772be1361cea9965f26e59ed680bb59e730a1d9b00d0a9a117f24ccf76",
+    "tests/android-harness.test.js": "74c49f8d0406ff63a2af76db90c04c19801db840dce9a10044e45439cac1574e",
     "verification/api35-restart-race/process-layout-receipt.json": "62a551cb9bc8365d61c7dcfd2a6c27c739ec03437657fa922485fd1e429b47a0"
   },
   "checks": [
     {
       "command": "npm test",
       "result": "passed",
-      "tests": 410,
-      "pass": 410,
+      "tests": 411,
+      "pass": 411,
       "fail": 0,
-      "scope": "Final full candidate aggregate, including six UI absence and fourteen UI relay regressions"
+      "scope": "Final full aggregate after exact instrumentation-command exit retention"
     },
     {
       "command": "bash scripts/test-native-track.sh",
@@ -43,7 +43,7 @@
     {
       "command": "node --test tests/android-restart-race.test.js tests/android-harness.test.js tests/android-restart-after-failure.test.js",
       "result": "passed",
-      "tests": 103
+      "tests": 104
     },
     {
       "command": "SDK35 production/test Java compilation, both production aapt2 manifest links/dumps, test manifest link and d8 dex",
@@ -62,19 +62,19 @@
     },
     {
       "command": "installed API35 process split, Binder drain/death, pipe/UI death, service-only and all-process death races",
-      "result": "pending hosted CI",
-      "reason": "No local KVM/emulator; use existing authorized hosted workflow"
+      "result": "all-package-death denial reproduced on split APK; original gate and IPC/service-only scenarios remain unverified",
+      "reason": "Run109 original bootstrap command failed with zero output; fresh exact-head hosted gate required"
     },
     {
       "command": "browser checks",
-      "result": "passed on published 8fe8c6a in run108; new head pending",
+      "result": "passed on 620aed4 in run109; newest head pending",
       "reason": "No web source change; exact-head hosted workflow still required"
     },
     {
       "command": "node scripts/test-track-deletion.cjs; focused shell/classifier/failure-path tests after observer correction",
       "result": "passed",
       "assertions": 292,
-      "nodeTests": 103,
+      "nodeTests": 104,
       "scope": "Provider barrier observer; strict process-scope negatives; ordered same-PID UI relay completion; UI-only absence transport failures. SDK35 test recompile/dex passed."
     },
     {
@@ -87,13 +87,15 @@
   "preservedFailures": {
     "run107": "https://github.com/c933103/PassengerCount/actions/runs/39008116648",
     "evidence": "https://github.com/c933103/PassengerCount/tree/b05aababba2580231587357e079f46152f49f015/verification/api35-restart-race/run107",
-    "result": "Two independent controlled automatic-restart denials; original 13 phases passed before first appended failure; separate diagnostic also failed"
+    "result": "Two independent controlled automatic-restart denials; original 13 phases passed before first appended failure; separate diagnostic also failed",
+    "run109": "https://github.com/c933103/PassengerCount/tree/564a3360fc954f46ee7875db0de1d526cfea23f9/verification/api35-restart-race/run109"
   },
   "acceptance": "No merge/release approval: the candidate may improve target-service-only or UI-only death, but all-process-absent denial remains a binding failure. Prior failure is not replaced by diagnostic success.",
   "permissions": "No new production permission, watchdog, persistent binding, hidden Activity or policy bypass; existing tracking data paths retained.",
   "harnessCorrection": {
     "change": "Respect API35 --no-restart application-default process selection; supported declared UI instrumentation relay detaches owner before cross-process tests. Require independent ordered same-PID UI entry/pass/detachment; provider barrier observer and exact OS absence evidence.",
     "run108": "Both installed paths failed before death/interleaving on wrong-process owner fixture; no new product restart result.",
-    "evidence": "https://github.com/c933103/PassengerCount/tree/5c2a83b88ec9835e47d3995cb51c028c71878577/verification/api35-restart-race/run108"
+    "evidence": "https://github.com/c933103/PassengerCount/tree/5c2a83b88ec9835e47d3995cb51c028c71878577/verification/api35-restart-race/run108",
+    "run109": "Retain each exact command and actual exit code; no automatic phase retry or acceptance relaxation. Original empty-bootstrap failure remains unclassified."
   }
 }

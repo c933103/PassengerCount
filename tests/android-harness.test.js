@@ -168,7 +168,7 @@ phase ${name} ${mode}
 echo "COMPLETE pid=\${IPC_UI_PID:-none}"
 `;
     const result=spawnSync('bash',['-c',script],{encoding:'utf8',timeout:5000});
-    return {status:result.status,output:result.stdout+result.stderr,command:fs.readFileSync(path.join(dir,'command'),'utf8')};
+    return {status:result.status,output:result.stdout+result.stderr,command:fs.readFileSync(path.join(dir,'command'),'utf8'),commandExit:Number(fs.readFileSync(path.join(dir,name+'-command-exit-code.txt'),'utf8'))};
   } finally {fs.rmSync(dir,{recursive:true,force:true});}
 }
 test('UI relay waits for same-PID UI execution and detachment after owner completion',()=>{
@@ -212,4 +212,10 @@ ui_absent
 `],{encoding:'utf8',timeout:5000});
     assert.equal(r.status,expected,r.stdout+r.stderr);
   } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('instrument command failures retain the real exit status without retrying or passing',()=>{
+  const r=phaseFixture({commandCode:137});assert.equal(r.status,1,r.output);
+  assert.equal(r.commandExit,137);assert.match(r.output,/INSTALLED_PHASE_COMMAND_FAILED: ipc-basics exit=137/);
+  assert.doesNotMatch(r.output,/COMPLETE/);
 });
