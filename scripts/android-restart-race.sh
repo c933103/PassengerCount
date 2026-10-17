@@ -13,6 +13,8 @@ restart_race() {
   [[ "${CI:-}" == true && -n "${EMU_PID:-}" && "${SERIAL:-}" == emulator-5556 ]] || {
     echo 'RACE_ENVIRONMENT_UNVERIFIED: use test-android-installed.sh'; return 2;
   }
+  local kind=${1:-race} process=${TRACK_PROCESS:-$PACKAGE}
+  [[ "$kind" == race || "$kind" == split ]] || return 2
   local component=app.passengercount.tests/app.passengercount.RestartRaceTriggerService
   # Warm a different UID before starting PassengerCount's foreground session.
   # It has no location permission, binding, shared UID or production component.
@@ -30,26 +32,43 @@ restart_race() {
   oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
   [[ "$oldpid" =~ ^[0-9]+$ ]] || { echo 'RACE_OLD_PID_UNVERIFIED'; return 2; }
   activity_state before-race 2 "$oldpid"
-  phase prepare-race attached
+  local ui_pid=$oldpid
+  phase "prepare-$kind" attached
+  oldpid="$(adb shell pidof "$process" | tr -d '\r')"
+  [[ "$oldpid" =~ ^[0-9]+$ ]] || return 2
   background_home
-  activity_state background-race 4 "$oldpid"
+  activity_state background-race 4 "$oldpid" "$process"
   race_capture "$OUT/race-before-services.txt" shell dumpsys activity services "$PACKAGE"
-  detached race "$oldpid"
+  detached race "$oldpid" "$process"
   printf '%s\n' "$oldpid" > "$OUT/race-old-pid.txt"
   local deadline=$((SECONDS+20)) scheduled=false
   # Trigger on actual restart scheduling after this death, not a timer guessed
   # from instrumentation duration. No stopForeground/policy toggle on the target.
   while ((SECONDS<deadline)); do
     race_capture "$OUT/race-logcat.txt" logcat -d -v threadtime
-    if awk -v pid="$oldpid" '
-      index($0,"PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=" pid) { marker=1 }
-      marker && index($0,"ActivityManager: Process app.passengercount (pid " pid ") has died:") { death=1 }
+    if awk -v pid="$oldpid" -v process="$process" -v kind="$kind" '
+      index($0,"PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-" kind " pid=" pid) { marker=1 }
+      marker && index($0,"ActivityManager: Process " process " (pid " pid ") has died:") { death=1 }
       death && /ActivityManager: Scheduling restart of crashed service app.passengercount\/\.TrackService / { found=1 }
       END { exit !found }
     ' "$OUT/race-logcat.txt"; then scheduled=true; break; fi
     sleep 0.05
   done
   $scheduled || { echo 'RACE_RESTART_SCHEDULING_UNVERIFIED'; return 2; }
+  if [[ "$process" != "$PACKAGE" ]]; then
+    if [[ "$kind" == split ]]; then
+      [[ "$(adb shell pidof "$PACKAGE" | tr -d '\r')" == "$ui_pid" ]] || {
+        echo 'RACE_UI_SURVIVAL_UNVERIFIED'; return 2;
+      }
+      printf 'UI_SURVIVED_SERVICE_DEATH pid=%s\n' "$ui_pid" > "$OUT/race-process-scope.txt"
+    else
+      # pidof exits 1 for no matches. Any returned PID invalidates this scope.
+      local remaining
+      remaining="$(adb shell pidof "$PACKAGE" "$process" | tr -d '\r' || true)"
+      [[ -z "$remaining" ]] || { echo 'RACE_ALL_PROCESS_ABSENCE_UNVERIFIED'; return 2; }
+      printf 'ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n' > "$OUT/race-process-scope.txt"
+    fi
+  fi
   # Shell gets its own foreground-start exemption; it is used only for the other
   # package. The tested target is restarted solely by ActivityManager.
   race_capture "$OUT/race-trigger.txt" shell am start-foreground-service -n "$component" -a app.passengercount.tests.TRIGGER
@@ -60,7 +79,7 @@ restart_race() {
     race_capture "$OUT/race-logcat.txt" logcat -d -v threadtime
     race_capture "$OUT/race-services.txt" shell dumpsys activity services "$PACKAGE"
     if node "$ROOT/scripts/analyze-android-restart-race.mjs" \
-      "$OUT/race-logcat.txt" "$OUT/race-services.txt" "$oldpid" > "$OUT/race-result.json"; then
+      "$OUT/race-logcat.txt" "$OUT/race-services.txt" "$oldpid" "$kind" "$process" > "$OUT/race-result.json"; then
       code=0
       break
     else code=$?; fi
@@ -80,7 +99,10 @@ restart_race() {
   # No reattachment until shell proved the new target service was foreground
   # after the independent trigger. This next phase checks real GPS, journal and
   # session continuity; it does not prove pre-reattachment GPS delivery.
-  phase verify-race attached
+  if [[ "$kind" == split ]]; then
+    [[ "$(adb shell pidof "$PACKAGE" | tr -d '\r')" == "$ui_pid" ]] || return 2
+  fi
+  phase "verify-$kind" attached
   echo 'PASS: one measured independent-FGS / automatic-restart sample; known intermittent failure remains open' \
     > "$OUT/race-result.txt"
 }

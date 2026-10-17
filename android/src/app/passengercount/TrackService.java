@@ -51,10 +51,12 @@ public final class TrackService extends Service {
         TrackService service = running;
         if (service == null) return;
         TrackSession control = session(service);
-        if (control.accepts(control.request())) return;
-        service.recording = null;
-        try { service.manager.removeUpdates(service.listener); } catch (Exception ignored) {}
-        service.stopSelf();
+        synchronized (control) {
+            if (control.accepts(control.request())) return;
+            service.recording = null;
+            try { service.manager.removeUpdates(service.listener); } catch (Exception ignored) {}
+            service.stopSelf();
+        }
     }
 
     static String safeId(String id) {

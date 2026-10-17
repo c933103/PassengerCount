@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.json.*;
 
 /** Test APK only. Loads production classes from the installed target APK, not copies. */
-public final class JournalLifecycleInstrumentation extends Instrumentation {
+public class JournalLifecycleInstrumentation extends Instrumentation {
     private static final String KEY = "passenger-count:workspace:v2";
     private static final String PREFIX = "pcit-";
     private static final String TAG = "PassengerJournalTest";
@@ -52,6 +52,11 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             target = getTargetContext();
             check(target.getPackageName().equals("app.passengercount"), "exact target package");
             check(android.os.Build.VERSION.SDK_INT == 35, "bounded API35 runtime");
+            if (android.app.Application.getProcessName().endsWith(":tracking")
+                    && System.getProperty("passenger.test.web-suffix") == null) {
+                main(() -> WebView.setDataDirectorySuffix("lifecycle-tracking"));
+                System.setProperty("passenger.test.web-suffix", "set");
+            }
             createBridgeAndPage();
             event("runtime", new JSONObject().put("phase", phase).put("pid", Process.myPid())
                 .put("fingerprint", android.os.Build.FINGERPRINT)
@@ -60,6 +65,16 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
                 .put("recordDeletionSha256", hash(asset("record-deletion.js")))
                 .put("storageSha256", hash(asset("storage.js"))));
             if (phase.equals("bootstrap")) bootstrap();
+            else if (phase.equals("ipc-basics")) ipcBasics();
+            else if (phase.equals("prepare-ipc-barrier")) prepareIpcBarrier(false);
+            else if (phase.equals("prepare-ipc-death")) prepareIpcBarrier(true);
+            else if (phase.equals("ipc-drain")) ipcBarrier(false);
+            else if (phase.equals("ipc-death")) ipcBarrier(true);
+            else if (phase.equals("prepare-ipc-pipe")) preparePipeObserver();
+            else if (phase.equals("ipc-prepare-ui-death")) prepareUiDeath();
+            else if (phase.equals("verify-ui-death")) verifyUiDeath();
+            else if (phase.equals("prepare-split")) prepareCrash(false, "crash-split");
+            else if (phase.equals("verify-split")) verifyValidRestart();
             else if (phase.equals("basics")) basics();
             else if (phase.equals("recover")) recover();
             else if (phase.equals("receipts-prepare")) receiptsPrepare();
@@ -77,10 +92,21 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             else throw new AssertionError("Unknown phase " + phase);
             check(interceptedRequests == 0, "test document made no network request");
             main(() -> { web.destroy(); web=null; });
-            if (phase.equals("prepare-valid") || phase.equals("prepare-deleted") || phase.equals("prepare-race")) {
+            if (phase.equals("prepare-valid") || phase.equals("prepare-deleted") || phase.equals("prepare-race") || phase.equals("prepare-split")) {
                 // --no-restart completion detaches without force-stop. The shell
                 // verifies that detached state before this test-only SIGKILL.
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    if (phase.equals("prepare-race")) {
+                        // Explicit all-package-processes-absent negative control.
+                        // Same-UID normal process kill; no force-stop or policy exemption.
+                        ActivityManager am = (ActivityManager) target.getSystemService(Context.ACTIVITY_SERVICE);
+                        for (ActivityManager.RunningAppProcessInfo process : am.getRunningAppProcesses()) {
+                            if (process.uid == Process.myUid() && process.pid != Process.myPid()) {
+                                Log.i(TAG, "ALL_PACKAGE_KILL pid=" + process.pid + " name=" + process.processName);
+                                Process.killProcess(process.pid);
+                            }
+                        }
+                    }
                     Log.i(TAG, "SIGKILL_AFTER_DETACH " + phase + " pid=" + Process.myPid());
                     Process.killProcess(Process.myPid());
                 }, 8000);
@@ -187,6 +213,193 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             check(!f.getName().startsWith("track-"), "fresh emulator contains no pre-existing journal");
         saveState(state());
         check(bridge.get(KEY) != null, "real preferences commit");
+    }
+    private void preparePipeObserver() {
+        if (signal("pipe-entered").exists()) check(signal("pipe-entered").delete(), "clear synthetic pipe signal");
+        new Thread(() -> {
+            long deadline = SystemClock.elapsedRealtime() + 45000;
+            while (SystemClock.elapsedRealtime() < deadline) {
+                for (Map.Entry<Thread,StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
+                    if (!entry.getKey().getName().startsWith("Binder:") || entry.getKey().getState() != Thread.State.BLOCKED) continue;
+                    for (StackTraceElement frame : entry.getValue()) {
+                        if (frame.getClassName().equals("app.passengercount.TrackProvider") && frame.getMethodName().equals("call")) {
+                            try { signalWrite("pipe-entered"); } catch (IOException e) { Log.e(TAG,"PHASE_FAIL pipe-signal",e); }
+                            return;
+                        }
+                    }
+                }
+                SystemClock.sleep(20);
+            }
+            Log.e(TAG,"PHASE_FAIL pipe-binder-not-observed");
+        }, "fixture-pipe-observer").start();
+    }
+    private void prepareUiDeath() throws Exception {
+        String id = PREFIX + "ui-death";
+        bridge.startTracking(id);
+        await("UI starts separate tracker before UI death", () -> remoteServicePid() > 0 && lines(journal(id)) > 0, 20000);
+        try (FileOutputStream out = new FileOutputStream(signal("ui-death"))) {
+            String evidence = remoteServicePid() + " " + lines(journal(id));
+            out.write(evidence.getBytes(StandardCharsets.UTF_8)); out.getFD().sync();
+        }
+        String pipeId = PREFIX + "ui-pipe";
+        String row = "{\"label\":\"" + new String(new char[60000]).replace('\0', 'x') + "\"}\n";
+        try (FileOutputStream out = new FileOutputStream(journal(pipeId))) {
+            for (int i=0;i<10;i++) out.write(row.getBytes(StandardCharsets.UTF_8));
+            out.getFD().sync();
+        }
+        final android.content.ContentProviderClient heldOwner = target.getContentResolver()
+            .acquireUnstableContentProviderClient("app.passengercount.tracking");
+        check(heldOwner != null, "acquire ordinary unstable snapshot owner");
+        final android.os.ParcelFileDescriptor heldSnapshot = heldOwner.openFile(new android.net.Uri.Builder()
+            .scheme("content").authority("app.passengercount.tracking").appendPath(pipeId).build(), "r");
+        check(heldSnapshot != null, "open actual reliable snapshot pipe");
+        // Deliberately do not read: the large snapshot blocks its writer while
+        // holding the production journal barrier. A real second Binder read
+        // must block there; only UI process death should release the pipe.
+        new Thread(() -> {
+            long deadline = SystemClock.elapsedRealtime() + 15000;
+            while (!signal("pipe-entered").exists() && SystemClock.elapsedRealtime() < deadline) {
+                bridge.getTrackPage(id, "");
+                SystemClock.sleep(20);
+            }
+        }, "fixture-blocked-page").start();
+        await("actual Binder read blocked behind streaming snapshot", () -> signal("pipe-entered").exists(), 10000);
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            check(heldSnapshot.getFd() >= 0 && heldOwner != null, "snapshot references retained until process death");
+            Log.i(TAG, "UI_SIGKILL_AFTER_DETACH pid=" + Process.myPid());
+            Process.killProcess(Process.myPid());
+        }, 8000);
+    }
+    private void verifyUiDeath() throws Exception {
+        String[] evidence = new String(java.nio.file.Files.readAllBytes(signal("ui-death").toPath()), StandardCharsets.UTF_8).split(" ");
+        String id = PREFIX + "ui-death";
+        check(Process.myPid() == Integer.parseInt(evidence[0]) && foreground(), "tracker process survives UI death without restart");
+        check(lines(journal(id)) > Integer.parseInt(evidence[1]), "UI death releases snapshot barrier and real GPS appends before verification");
+        check(bridge.stopTrackingAndDrain(id), "stop surviving tracker through owner IPC");
+        await("surviving tracker stopped", () -> service() == null, 5000);
+    }
+    private File signal(String name) { return new File(target.getFilesDir(), "pcit-ipc-" + name); }
+    private void signalWrite(String name) throws IOException {
+        try (FileOutputStream out = new FileOutputStream(signal(name))) { out.write(1); out.getFD().sync(); }
+    }
+    private void prepareIpcBarrier(boolean death) throws Exception {
+        String id = PREFIX + (death ? "ipc-death" : "ipc-drain");
+        for (String name : new String[]{"ready", "entered", "release", "dead"})
+            if (signal(name).exists()) check(signal(name).delete(), "clear only synthetic IPC signal");
+        seed(id); start(id);
+        Object control = session(), request = TargetAccess.call(control, "request");
+        // Finish/detach first. The held production append monitor must be reached
+        // by a real Binder thread from the UI, not a copied in-process controller.
+        Thread writer = new Thread(() -> {
+            SystemClock.sleep(2000);
+            try {
+                TargetAccess.call(control, "append", request, (Runnable) () -> {
+                    try {
+                        signalWrite("ready");
+                        long deadline = SystemClock.elapsedRealtime() + 45000;
+                        while (!signal("release").exists() && SystemClock.elapsedRealtime() < deadline) SystemClock.sleep(20);
+                        if (!signal("release").exists()) throw new AssertionError("IPC release timeout");
+                        seed(id);
+                    } catch (Exception e) { throw new RuntimeException(e); }
+                });
+            } catch (Throwable e) { Log.e(TAG, "PHASE_FAIL ipc-writer", e); }
+        }, "fixture-accepted-writer");
+        Thread observer = new Thread(() -> {
+            long deadline = SystemClock.elapsedRealtime() + 45000;
+            while (SystemClock.elapsedRealtime() < deadline) {
+                for (Map.Entry<Thread,StackTraceElement[]> entry : Thread.getAllStackTraces().entrySet()) {
+                    if (!entry.getKey().getName().startsWith("Binder:") || entry.getKey().getState() != Thread.State.BLOCKED) continue;
+                    for (StackTraceElement frame : entry.getValue()) {
+                        if (frame.getClassName().equals("app.passengercount.TrackProvider") && frame.getMethodName().equals("call")) {
+                            try {
+                                signalWrite("entered");
+                                if (death) {
+                                    signalWrite("dead");
+                                    Log.i(TAG, "IPC_OWNER_DIES_BEFORE_ACK pid=" + Process.myPid());
+                                    Process.killProcess(Process.myPid());
+                                }
+                            } catch (IOException e) { Log.e(TAG, "PHASE_FAIL ipc-signal", e); }
+                            return;
+                        }
+                    }
+                }
+                SystemClock.sleep(20);
+            }
+            Log.e(TAG, "PHASE_FAIL ipc-binder-not-observed");
+        }, "fixture-binder-observer");
+        writer.start(); observer.start();
+    }
+    private void ipcBarrier(boolean death) throws Exception {
+        check(android.app.Application.getProcessName().equals("app.passengercount"), "IPC caller is actual UI process");
+        String id = PREFIX + (death ? "ipc-death" : "ipc-drain");
+        await("remote accepted append holds monitor", () -> signal("ready").exists(), 10000);
+        AtomicReference<Boolean> acknowledged = new AtomicReference<>();
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread deleting = new Thread(() -> {
+            try { acknowledged.set(bridge.deleteTrack(id)); } catch (Throwable e) { failure.set(e); }
+        }, "fixture-ui-delete");
+        deleting.start();
+        await("actual owner Binder thread reached session monitor", () -> signal("entered").exists(), 10000);
+        if (!death) {
+            check(acknowledged.get() == null && failure.get() == null, "remote deletion cannot acknowledge before append fsync");
+            signalWrite("release");
+        }
+        deleting.join(10000);
+        check(!deleting.isAlive() && failure.get() == null, "IPC call terminates without crashing UI");
+        if (death) {
+            check(signal("dead").exists() && Boolean.FALSE.equals(acknowledged.get()), "provider death is unacknowledged, never replayed as success");
+            check(journal(id).exists(), "failed in-flight delete preserves pending journal");
+        } else {
+            check(Boolean.TRUE.equals(acknowledged.get()) && !journal(id).exists(), "ack follows remote append drain and durable deletion");
+            SystemClock.sleep(3500);
+            check(!journal(id).exists(), "late remote GPS cannot recreate deleted journal");
+        }
+        event("ipc-barrier", new JSONObject().put("uiPid", Process.myPid()).put("ownerDeath", death));
+    }
+    private void ipcBasics() throws Exception {
+        check(android.app.Application.getProcessName().equals("app.passengercount"), "bridge runs in actual UI process");
+        String id = PREFIX + "ipc-owner";
+        bridge.startTracking(id);
+        await("UI bridge starts remote foreground owner", () -> remoteServicePid() > 0, 10000);
+        int owner = remoteServicePid();
+        check(owner != Process.myPid(), "tracking owner has a different process ID");
+        Object wanted = TargetAccess.callStatic(clientClass(), "request", target);
+        String token = (String) TargetAccess.field(wanted, "token");
+        await("remote owner receives real GPS", () -> lines(journal(id)) > 0, 25000);
+        check(new JSONObject(bridge.getTrackPage(id, "")).getJSONArray("points").length() > 0,
+            "bounded IPC page returns owner journal");
+        check(new JSONArray(bridge.getTrack(id)).length() > 0, "reliable legacy stream returns owner snapshot");
+        bridge.startTracking(id); waitForIdleSync();
+        check(TargetAccess.field(TargetAccess.callStatic(clientClass(), "request", target), "token").equals(token),
+            "repeated cross-process start preserves durable generation");
+        check(bridge.stopTrackingAndDrain(id), "cross-process stop acknowledged after owner barrier");
+        String stopped = hash(journal(id));
+        SystemClock.sleep(4000);
+        check(hash(journal(id)).equals(stopped), "no GPS append after cross-process stop acknowledgement");
+        check(bridge.deleteTrack(id), "cross-process directory-sync deletion acknowledged");
+        check(!journal(id).exists() && bridge.getTrack(id).equals("[]"), "owner tombstone blocks UI replay");
+        bridge.startTracking(id); waitForIdleSync(); SystemClock.sleep(300);
+        check(remoteServicePid() == 0 && !journal(id).exists(), "UI cannot revive deleted generation");
+        String large = PREFIX + "ipc-large";
+        String row = "{\"label\":\"" + new String(new char[60000]).replace('\0','x') + "\"}\n";
+        try (FileOutputStream out = new FileOutputStream(journal(large))) {
+            for (int i=0;i<3;i++) out.write(row.getBytes(StandardCharsets.UTF_8));
+            out.getFD().sync();
+        }
+        String payload = bridge.getTrackPage(large, "");
+        JSONObject firstPage = new JSONObject(payload);
+        check(payload.length()*2 < 300000 && firstPage.getJSONArray("points").length()==2 && firstPage.getBoolean("more"),
+            "serialized Binder page includes JSON and native identity overhead within bound");
+        JSONObject nextPage = new JSONObject(bridge.getTrackPage(large, firstPage.getString("cursor")));
+        check(nextPage.getJSONArray("points").length()==1 && !nextPage.getBoolean("more"), "byte-bounded IPC page has no lost record");
+        check(bridge.deleteTrack(large), "large synthetic journal cleanup acknowledged");
+        event("ipc", new JSONObject().put("uiPid", Process.myPid()).put("ownerPid", owner));
+    }
+    private int remoteServicePid() {
+        ActivityManager manager = (ActivityManager) target.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(100))
+            if (info.service.getClassName().equals(TrackService.class.getName()) && info.foreground) return info.pid;
+        return 0;
     }
     private void basics() throws Exception {
         String a = PREFIX + "stopped-A", b = PREFIX + "stopped-B";
@@ -489,6 +702,18 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
 
     private void start(String id) throws Exception {
         bridge.startTracking(id);
+        if (android.app.Application.getProcessName().endsWith(":tracking")) {
+            // Owner-side lifecycle fixtures cannot borrow the UI process's static
+            // resumed-Activity set. Their explicit start still occurs only after
+            // shell has proved the real UI is TOP. Cross-process bridge start is
+            // separately exercised by ipc-basics in the actual UI process.
+            Object wanted = TargetAccess.callStatic(clientClass(), "request", target);
+            check(wanted != null, "owner IPC start acknowledged");
+            main(() -> target.startForegroundService(new Intent(target, TrackService.class)
+                .setAction(serviceString("ACTION_START"))
+                .putExtra(serviceString("EXTRA_ID"), (String) TargetAccess.field(wanted, "id"))
+                .putExtra(serviceString("EXTRA_TOKEN"), (String) TargetAccess.field(wanted, "token"))));
+        }
         await("real foreground service starts "+id,()->service()!=null && foreground(),10000);
         check(TargetAccess.field(TargetAccess.call(session(), "request"), "id").equals(id), "requested ID owns native session");
     }
@@ -529,6 +754,7 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             if (frame.getClassName().equals("app.passengercount.TrackDeletion") && frame.getMethodName().equals("delete")) return true;
         return false;
     }
+    private Class<?> clientClass() throws Exception { return Class.forName("app.passengercount.TrackClient", true, TrackService.class.getClassLoader()); }
     private Object session() throws Exception { return TargetAccess.callStatic(TrackService.class, "session", target); }
     private boolean accepts(Object control,Object request) throws Exception { return (Boolean) TargetAccess.call(control, "accepts", request); }
     private String serviceString(String name) throws Exception { return (String) TargetAccess.staticField(TrackService.class, name); }

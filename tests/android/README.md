@@ -1,6 +1,6 @@
 # API35 installed journal lifecycle validation
 
-Test-only instrumentation targets the current `app.passengercount` APK. The test APK is compiled against target classes but packages only instrumentation/test-access classes and the separate-package race trigger described below. It reuses the current CI job's ephemeral validation signer, not a production key. No production manifest change, debug flag, extra exported component or runtime hook is introduced. All nonpublic target methods, fields and session/request types are accessed through test-side reflection: identical Java package names do not grant package access across the separate defining classloaders used by `--no-restart`.
+Test-only instrumentation targets the current `app.passengercount` APK. The test APK is compiled against target classes but packages only instrumentation/test-access classes and the separate-package race trigger described below. It reuses the current CI job's ephemeral validation signer, not a production key. The process-split candidate changes only private production process/provider declarations; instrumentation adds no production debug flag, exported component, permission or runtime hook. All nonpublic target methods, fields and session/request types are accessed through test-side reflection: identical Java package names do not grant package access across the separate defining classloaders used by `--no-restart`.
 
 Run after the normal `android/build.sh` within the existing ephemeral validation job:
 
@@ -13,7 +13,7 @@ The runner must already permit hardware acceleration through `/dev/kvm`. The scr
 
 ## Boundaries exercised
 
-- Exact packaged `record-deletion.js` and `storage.js` execute in a test-only WebView with network loads blocked before document load. They call the unchanged real DeviceStorage bridge with real SharedPreferences and app-private files. This is not a replacement UI test; the production UI has separate browser coverage.
+- Exact packaged `record-deletion.js` and `storage.js` execute in a test-only WebView with network loads blocked before document load. They call the current real DeviceStorage bridge with real SharedPreferences and app-private files. This is not a replacement UI test; the production UI has separate browser coverage.
 - The bridge host has the real target context attached without invoking MainActivity.onCreate, so it cannot trigger catalogue refresh. A fresh synthetic local catalogue is saved to the app's existing IndexedDB before the shell launches the normal empty Home Activity for process/foreground setup; this suppresses its automatic weekly download by the normal freshness contract. No Upload operation is called.
 - Stopped deletion, actual LocationManager GPS callbacks, append-drain synchronization, late callback rejection, unrelated active-session continuation, malformed/symlink paths, real cleanup obstruction and durable pending selection/retry. The deterministic native drain test requires its deletion worker to be BLOCKED with production `TrackDeletion.delete` on the stack while an accepted writer holds the real session monitor. It does not infer native entry from WebView scheduling or worker liveness. Exact-JS coordinator completion is checked separately after that native drain.
 - Cold-process recovery from the obstruction; constructed post-unlink/pre-final-save recovery. No injected power-loss/fsync failure is claimed.
@@ -56,8 +56,7 @@ unchanged. The diagnostic cannot turn a failed job green. Ordinary PRs and main
 pushes do not run this probe.
 
 The separate test APK declares its own `FOREGROUND_SERVICE` normal permission and
-an exported, short-lived `shortService` trigger. No production manifest, APK
-component, location permission, UID sharing, binding, policy setting, battery
+an exported, short-lived `shortService` trigger. The helper adds no production location permission, UID sharing, binding, policy setting, battery
 exemption or background-location grant changes. The helper receives no target
 journal, session token or location. It is used only on the fresh owned emulator.
 The shell's foreground-start privilege applies to the **test package only**.
@@ -92,3 +91,27 @@ supporting evidence, not a captured internal framework stack. Original phase
 results stay separate from the diagnostic. Node regressions execute the actual
 shell and classifier with success, denial, transport failure, stale-state and
 missed-window controls.
+
+
+## Process-split candidate coverage
+
+The production tracker/provider now share `:tracking`; the UI retains the default
+process. The original 13 phases remain in order, with the lifecycle instrumentation
+explicitly targeting the owner process. Bootstrap still seeds the real UI WebView;
+the owner fixture uses a separate test-only WebView data-directory suffix. Owner
+reflection tests use an explicit foreground-service delivery while the shell proves
+the actual UI is TOP; the separate UI fixture checks the real bridge start path.
+
+Added installed phases cover real cross-process start/token reuse, paged/legacy
+reads, stop/deletion, large serialized page bounds, a Binder call demonstrably
+blocked on the owner append monitor, owner death while that call awaits its reply,
+and ongoing GPS in the unchanged tracker PID after UI-only death releases a deliberately blocked reliable-pipe snapshot. Host transport
+doubles separately cover lost replies after durable start/stop, no automatic replay,
+pipe interruption, stale A-stop/B-start and final-check/cleanup ordering. Host tests
+do not establish Binder, installed-process or policy behavior.
+
+The controlled `split` sample kills only the tracker and requires the original UI
+PID to survive. The subsequent `race` sample explicitly kills both package processes
+and proves absence before the independent helper FGS. Each has separate artifacts;
+a denial in either keeps the job failed. The latter is a retained platform-boundary
+negative control, not permission to merge an otherwise failed aggregate.

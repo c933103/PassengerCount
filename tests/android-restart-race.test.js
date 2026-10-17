@@ -146,3 +146,25 @@ test('missing helper warm completion is inconclusive before touching the target'
  assert.equal(r.status,2);assert.match(r.stdout,/RACE_WARM_UNVERIFIED/);
  assert.doesNotMatch(r.calls,/launch_home|phase prepare-race/);
 });
+
+for (const kind of ['split','race']) test('tracking-process '+kind+' classifier cannot mistake the surviving UI for a service restart',()=>{
+  const events=[death.replace('prepare-race','prepare-'+kind),died.replace('app.passengercount (','app.passengercount:tracking ('),scheduled,entering,promoted,start.replace(':app.passengercount/',':app.passengercount:tracking/')];
+  const dump=service.replace(':app.passengercount/',':app.passengercount:tracking/');
+  assert.equal(analyzeRestartRace(events.join('\n'),dump,111,kind,'app.passengercount:tracking').outcome,'foreground-restored');
+  assert.equal(analyzeRestartRace(events.join('\n'),service,111,kind,'app.passengercount:tracking').outcome,'inconclusive');
+  const wrongStart=events.map(x=>x.replace('222:app.passengercount:tracking/','222:app.passengercount/'));
+  assert.equal(analyzeRestartRace(wrongStart.join('\n'),dump,111,kind,'app.passengercount:tracking').outcome,'interleaving-unverified');
+});
+test('split-process helper still fails on an observed target denial',()=>{
+  const events=[death.replace('prepare-race','prepare-split'),died.replace('app.passengercount (','app.passengercount:tracking ('),scheduled,entering,promoted,start.replace(':app.passengercount/',':app.passengercount:tracking/'),denied];
+  assert.equal(analyzeRestartRace(events.join('\n'),'',111,'split','app.passengercount:tracking').outcome,'automatic-restart-denied');
+});
+test('process-split harness keeps independent all-process absence gate after service-only race',()=>{
+  const installed=fs.readFileSync(new URL('../scripts/test-android-installed.sh',import.meta.url),'utf8');
+  assert.match(installed,/OUT="\$original_out\/service-only-race"/);
+  assert.ok(installed.indexOf('restart_race split')<installed.lastIndexOf('restart_race\nfi'));
+  assert.match(shell,/RACE_UI_SURVIVAL_UNVERIFIED/);
+  assert.match(shell,/RACE_ALL_PROCESS_ABSENCE_UNVERIFIED/);
+  const instrument=fs.readFileSync(new URL('./android/JournalLifecycleInstrumentation.java',import.meta.url),'utf8');
+  assert.match(instrument,/phase\.equals\("prepare-race"\)[\s\S]*ALL_PACKAGE_KILL/);
+});

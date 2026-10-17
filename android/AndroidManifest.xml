@@ -8,7 +8,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-feature android:name="android.hardware.location" android:required="false" />
     <application android:label="PassengerCount" android:icon="@drawable/ic_launcher" android:theme="@style/AppTheme" android:allowBackup="false" android:usesCleartextTraffic="false" android:supportsRtl="true">
-        <service android:name=".TrackService" android:exported="false" android:foregroundServiceType="location" />
+        <service android:name=".TrackService" android:process=":tracking" android:exported="false" android:foregroundServiceType="location" />
+        <provider android:name=".TrackProvider" android:authorities="app.passengercount.tracking"
+            android:process=":tracking" android:exported="false" android:grantUriPermissions="false" />
         <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -3,10 +3,52 @@
 ## Outcome and unchanged acceptance
 
 The automatic background tracking restart requirement remains open and release
-remains blocked. This change supplies an opt-in installed race probe; it is not a
-production remedy. Main `77fcc7685ceb4652c6089c14360fc166ebbe778d` preserves data and
-allows visible-user recovery after denial, but that does not satisfy automatic
-restart. No production source, permissions, signing material or release changes.
+remains blocked. PR19 now includes a **candidate bounded production correction**:
+normal separate tracking process and acknowledged private IPC. Installed results
+for this candidate are pending; a successful service-only death sample would not
+resolve the explicitly retained all-package-processes-absent failure.
+
+Main `77fcc7685ceb4652c6089c14360fc166ebbe778d` preserves data and allows visible-user
+recovery after denial, but that does not satisfy automatic restart. Run107 on the
+prior diagnostic-only head reproduced controlled denial twice; its immutable
+[receipts and safe excerpts](https://github.com/c933103/PassengerCount/tree/b05aababba2580231587357e079f46152f49f015/verification/api35-restart-race/run107)
+remain binding. No production permission, signing material, or release change.
+
+## Separate-process candidate
+
+TrackService and a non-exported, same-UID TrackProvider run in `:tracking`.
+Only that owner reads/writes tracking preferences and owns the journal monitor.
+MainActivity uses synchronous private calls for start/request/stop/delete/pages.
+Acknowledgement follows durable work under the same append/fsync barrier; lost
+replies return failure/unknown without automatic mutation replay. Cleanup checks
+the latest session and stops under that same monitor. Existing tracking files,
+tokens, tombstones and directory-sync semantics are retained.
+
+Each client uses a short-lived
+[unstable provider reference](https://developer.android.com/reference/android/content/ContentResolver#acquireUnstableContentProviderClient(java.lang.String)):
+normal provider death must not cascade into killing its UI client. No persistent
+binding, watchdog, hidden Activity, background-location permission or restart
+loop is added. Pages are byte-bounded as well as record-bounded. Legacy full reads
+use the dedicated [openFile](https://developer.android.com/reference/android/content/ContentProvider#openFile(android.net.Uri,%20java.lang.String))
+reliable-pipe return, with the owner monitor held through snapshot streaming.
+Transport/read errors do not become empty successful snapshots.
+
+The supported benefit is conditional: if the normal UI process remains alive,
+the framework predicate can still find the package process during tracker death.
+If the UI dies alone, the separate tracker can continue. If both package processes
+are absent, this APK does not repair framework eligibility reset. The probe retains
+that all-processes-absent scenario as a failing/inconclusive binding gate, not a
+success expectation silently replaced by service-only death. Process separation
+also costs memory and remains subject to ordinary Android/OEM process policy.
+
+Installed harness adaptation retains the original 13 behavioral phases and order,
+with owner reflection now attached explicitly to `:tracking`, independent real-UI
+TOP proof, and distinct service PID observations. Test-only WebView storage has a
+separate suffix. Actual UI-process bridge tests then exercise remote start/read,
+stop/deletion, Binder blocking behind an accepted append, owner death before reply,
+and UI-only death. The service-only controlled race has separate evidence before
+the all-processes-absent controlled race. No instrumentation remains attached and
+no IPC/Activity starts target during either restart window.
 
 Original failure: [PR17 diagnosis](https://github.com/c933103/PassengerCount/pull/17#issuecomment-6189425602)
 and [run 38710322909](https://github.com/c933103/PassengerCount/actions/runs/38710322909).

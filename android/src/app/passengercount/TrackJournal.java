@@ -10,6 +10,8 @@ import java.util.List;
 final class TrackJournal {
     static final int PAGE_RECORDS = 256;
     static final int MAX_LINE_BYTES = 65536;
+    // Bound IPC payloads as well as record count; a page always fits at least one line.
+    static final int PAGE_BYTES = 131072;
     static final class Entry {
         final String json, legacyId;
         final long offset;
@@ -41,6 +43,10 @@ final class TrackJournal {
         return null; // A concurrent/partial append must be retried, never consumed.
     }
     static Page read(File path, String cursor) throws IOException {
+        return read(path, cursor, PAGE_RECORDS);
+    }
+    static Page read(File path, String cursor, int limit) throws IOException {
+        if (limit < 1 || limit > PAGE_RECORDS) throw new IOException("Invalid page limit");
         Page page = new Page();
         if (!path.isFile()) return page;
         try (RandomAccessFile file = new RandomAccessFile(path, "r")) {
@@ -58,16 +64,22 @@ final class TrackJournal {
                 }
             } catch (RuntimeException ignored) { /* absent/invalid cursor: replay safely by ID */ }
             file.seek(offset);
-            while (page.entries.size() < PAGE_RECORDS) {
+            int consumed = 0;
+            boolean byteLimit = false;
+            while (page.entries.size() < limit) {
                 long start = file.getFilePointer();
                 byte[] bytes = line(file);
                 if (bytes == null) break;
                 long end = file.getFilePointer();
+                if (!page.entries.isEmpty() && consumed + bytes.length > PAGE_BYTES) {
+                    file.seek(start); byteLimit = true; break;
+                }
+                consumed += bytes.length;
                 String hash = digest(bytes);
                 page.entries.add(new Entry(new String(bytes, StandardCharsets.UTF_8), "legacy:" + start + ":" + hash, start));
                 page.cursor = end + ":" + start + ":" + hash;
             }
-            page.more = page.entries.size() == PAGE_RECORDS && file.getFilePointer() < file.length();
+            page.more = (page.entries.size() == limit || byteLimit) && file.getFilePointer() < file.length();
         }
         return page;
     }

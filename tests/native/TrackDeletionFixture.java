@@ -302,6 +302,62 @@ public final class MainActivity extends Context {
         TrackService service = new TrackService(stopping.directory, stopping.prefs); TrackService.running = service;
         check(service.onStartCommand(new Intent(TrackService.ACTION_STOP, "A", pending.token), 0, 3) == TrackService.START_NOT_STICKY, "matching stop is not sticky");
         check(service.foreground == 0 && service.updates == 0 && service.stopCalls > 0, "matching stop has no location restart");
+        MainActivity ipc = fresh(); seed(ipc.directory,"ipc");
+        int callsBefore=ContentProviderClient.calls, closedBefore=ContentProviderClient.closed;
+        ContentProviderClient.failBefore=true;
+        check(!TrackClient.start(ipc,"ipc"), "transport death before mutation is not acknowledged");
+        check(!TrackService.session(ipc).request().valid(), "failed transport did not invent a session");
+        check(ContentProviderClient.calls==callsBefore+1 && ContentProviderClient.closed==closedBefore+1,
+            "failed call closes unstable reference without automatic retry");
+        ContentProviderClient.failBefore=false; ContentProviderClient.failAfter=true;
+        check(!TrackClient.start(ipc,"ipc"), "lost reply after durable commit stays unacknowledged");
+        TrackSession.Request committed=TrackService.session(ipc).request();
+        check(committed.valid(), "ambiguous operation may already have committed");
+        ContentProviderClient.failAfter=false;
+        check(TrackClient.start(ipc,"ipc") && TrackClient.request(ipc).token.equals(committed.token),
+            "explicit retry reconciles same durable generation");
+        ContentResolver.unavailable=true;
+        check(!TrackClient.stop(ipc,"ipc") && !TrackClient.delete(ipc,"ipc"), "unavailable owner cannot acknowledge stop or deletion");
+        check(TrackClient.page(ipc,"ipc","").equals("") && TrackClient.legacy(ipc,"ipc").equals(""),
+            "unavailable owner cannot fabricate an empty successful read");
+        ContentResolver.unavailable=false;
+        Binder.uid=101;
+        check(!TrackClient.delete(ipc,"ipc") && records(ipc.directory,"ipc")==1, "other UID rejected before mutation");
+        Binder.uid=100;
+        check(TrackClient.stop(ipc,"ipc") && !TrackService.session(ipc).accepts(committed), "real owner stop invalidates accepted generation");
+        check(TrackClient.legacy(ipc,"ipc").contains("synthetic") == false
+            && TrackClient.legacy(ipc,"ipc").contains("fixture"), "legacy reliable stream returns journal bytes");
+        TrackSession.Request newer = TrackService.session(ipc).start("B");
+        check(TrackClient.stop(ipc,"ipc") && TrackService.session(ipc).accepts(newer), "stale IPC stop A preserves B");
+        ContentProviderClient.failAfter=true;
+        callsBefore=ContentProviderClient.calls;
+        check(!TrackClient.stop(ipc,"B") && !TrackService.session(ipc).request().valid(), "lost stop reply is unknown despite durable invalidation");
+        check(ContentProviderClient.calls==callsBefore+1, "unknown stop is never automatically replayed");
+        ContentProviderClient.failAfter=false;
+        ParcelFileDescriptor.failWrite=true;
+        check(TrackClient.legacy(ipc,"ipc").equals(""), "interrupted reliable pipe cannot acknowledge partial snapshot");
+        ParcelFileDescriptor.failWrite=false;
+        MainActivity ordering = fresh();
+        TrackService oldService = new TrackService(ordering.directory,ordering.prefs);
+        TrackService.running = oldService;
+        TrackSession orderingControl = TrackService.session(ordering);
+        CountDownLatch cleanupEntered = new CountDownLatch(1), cleanupRelease = new CountDownLatch(1), startCommitted = new CountDownLatch(1);
+        oldService.manager.beforeRemove = () -> {
+            check(Thread.holdsLock(orderingControl), "cleanup owns the same session monitor through stopSelf");
+            cleanupEntered.countDown();
+            try { cleanupRelease.await(); } catch(InterruptedException e) { throw new AssertionError(e); }
+        };
+        Thread cleanup = new Thread(TrackService::finishStop);
+        Thread nextStart = new Thread(() -> { TrackClient.start(ordering,"new");startCommitted.countDown(); });
+        cleanup.start();check(cleanupEntered.await(2,TimeUnit.SECONDS), "cleanup reached listener removal");
+        nextStart.start();
+        check(!startCommitted.await(100,TimeUnit.MILLISECONDS), "new start cannot commit between final check and stopSelf");
+        cleanupRelease.countDown();cleanup.join(2000);nextStart.join(2000);
+        check(startCommitted.getCount()==0 && TrackClient.request(ordering).id.equals("new"), "later start remains durable after old cleanup");
+        TrackSession.Request nextRequest=TrackClient.request(ordering);
+        oldService.manager.beforeRemove=null;
+        check(oldService.onStartCommand(new Intent(TrackService.ACTION_START,nextRequest.id,nextRequest.token),0,20)==TrackService.START_STICKY,
+            "later explicit delivery establishes the new recording");
         System.out.println("TrackDeletion: " + assertions + " assertions passed (production bridge/session/journal, synthetic host files)");
     }
 }
@@ -309,6 +365,7 @@ class Context {
     static final int MODE_PRIVATE = 0;
     final File directory; final SharedPreferences prefs;
     Context(File directory, SharedPreferences prefs) { this.directory = directory; this.prefs = prefs; }
+    ContentResolver getContentResolver() { return new ContentResolver(this); }
     Context getApplicationContext() { return this; }
     SharedPreferences getSharedPreferences(String name, int mode) { return prefs; }
     File getFilesDir() { return directory; }
@@ -358,7 +415,7 @@ class TrackService extends Context {
     static TrackService running;
     TrackSession.Request recording;
     Object listener;
-    static class Manager { int removals; void removeUpdates(Object listener) { removals++; } }
+    static class Manager { int removals; Runnable beforeRemove; void removeUpdates(Object listener) { if(beforeRemove!=null)beforeRemove.run();removals++; } }
     Manager manager = new Manager(); int stopCalls;
     void stopSelf() {
         if (foregroundRequired)

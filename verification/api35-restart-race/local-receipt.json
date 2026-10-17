@@ -1,127 +1,78 @@
 {
-  "baseCommit": "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+  "baseCommit": "bd18cb2eb4d45a6d1fa6c74d50bad07ac31d5889",
   "date": "2026-10-17",
-  "scope": "Opt-in diagnostic; automatic-restart requirement still open; no production change",
+  "scope": "Candidate bounded production correction: separate tracking process with acknowledged private IPC; all-process absence automatic-restart requirement remains open",
   "inputSha256": {
-    ".github/workflows/v19-validate.yml": "64035511fd6363979435bb204e0732c940b9645fccba5e567775b225f288e8a1",
-    "scripts/test-android-installed.sh": "fd0ea6119de8ff337dea1e12a967cb38ff3349338bfd6a2538cb2994a7abb2d2",
-    "scripts/analyze-android-restart-race.mjs": "5fd3a044ad641d6eee7b0e9ab6b273d5e150fc913cb8b76172c55a5b54ee8b3d",
-    "scripts/android-restart-race.sh": "d0cf78cff93b0511caa13cdf91314da8befab43dbe0c6438e948103777dee2a7",
-    "tests/android/AndroidManifest.xml": "796faa2703661b61633c56523041fd091ad927781e74c331b0bc747789d6e3ed",
-    "tests/android/JournalLifecycleInstrumentation.java": "a0e6450d3ee7d609684a6d70210aa55995c9f6a255cec7fa2470872e7253bc3c",
-    "tests/android/RestartRaceTriggerService.java": "77e963aba109acc30646fb289706b3bae53d8e5ddfbdf1d30690db6a8224e4e7",
-    "tests/android-restart-race.test.js": "0693a3506dca075f6ce8f7a3d5e55c24b0346258d8c817a02a1c6441b2ebd4e9",
-    "tests/android/README.md": "bbe1334e063594743869d63aae6cd20df1d3b833af965c406f85030ed8648528",
-    "scripts/test-android-restart-after-failure.sh": "f0948b06086d2d9ed00f5a39ec3feb1da4809be807bac19d1260971a61a91165",
-    "tests/android-restart-after-failure.test.js": "fa687914f9e03bcb5e9f8d4a4d5b4d28b7fe05a2e8de1ffe779c1e98efeb24f4",
-    "verification/api35-restart-race/README.md": "7793d41f2e994fb91c7199d283526234d77af912676b8da11ee0fb7570734b8e",
-    "scripts/ensure-android-kvm.sh": "d130dc589b7c6999e2888dd15c5dba34b1107768c0791dda96120f398491005e"
+    "android/AndroidManifest.xml": "2954d6ce349dc5c190a9688dbd645b062eea78fdc3d5c700141b9adc78f5daf1",
+    "android/src/app/passengercount/MainActivity.java": "9439def9e0e5497edeffee4d06acfc2d71b062b7b3c3a7018a435a1a6471cae5",
+    "android/src/app/passengercount/TrackClient.java": "9c7aa2cb62dd41200ae046ad40a46ede89226adbf9743b2d0524221af63c20c6",
+    "android/src/app/passengercount/TrackJournal.java": "743f73afe912561bddad958fc105fbaa1f5272894ad35f5c580622be96361776",
+    "android/src/app/passengercount/TrackProvider.java": "96e0688e609e3a56d5e00f6eb47b33c9b707a673751e5a5399df7f9fa4111724",
+    "android/src/app/passengercount/TrackService.java": "76b571db920e5515cb075222134a3d75ea3500ce07b681f3e9236524b4a7d305",
+    "scripts/analyze-android-restart-race.mjs": "68176fca73a406e19d93b63d46e59e2b215b1c45207878ea47c72509bcd91cdc",
+    "scripts/android-restart-race.sh": "b96d593dfe1670700338c144ae95c0dd794e80c33eda8f60f13ecbcf18812966",
+    "scripts/test-android-installed.sh": "60056cac4771cc0d320988963b7552005331812fc307da10b8c3172ae91566b3",
+    "scripts/test-track-deletion.cjs": "85be2d14a85cc05474c274e4eec7b93fc2137d4319f0c4819570c6df9dfd18b0",
+    "tests/android-restart-race.test.js": "8779aa5bdd9843dd8f7308d0b697b9d3037650022dd94c922ca119cbdc322949",
+    "tests/android/AndroidManifest.xml": "c4fe1830e8c9f6a560d190785017f45e70e89ee922591edfd163aa8706463b7a",
+    "tests/android/JournalLifecycleInstrumentation.java": "595330a0a3632122fbd6efa2d4786a38f34beff2697f2ed13a8c9a9c45518c5e",
+    "tests/android/README.md": "0affe18134a869808ca840cb1ed3c5ba7d694821fcb7ff16b8f4e727b801b82d",
+    "tests/android/UiLifecycleInstrumentation.java": "b9be474625767680e4b5b7e7eeaf88b4839ad5c351d5b5eda9706e453c9a229f",
+    "tests/native/ExportPermissionFixture.java": "106eb3fe23c3112b02ff4024c69e073b0e2448005cc6ac54c3856afd2145d1b1",
+    "tests/native/TrackDeletionFixture.java": "e7d30e613cc5a7f16e45b92c0278541c6583b153822ed3fc1c774512bb6677c1",
+    "tests/native/TrackIpcShims.java": "6aad01dd1bf0099726e4cce529f3d4ce760df092cd734b9494966e4b6fd308c5",
+    "tests/native/TrackJournalTest.java": "774860e1c0d6e3ba0ebb4583bc85782f0d173295574e44edf5bb23c5358b6521",
+    "verification/api35-restart-race/README.md": "4c475bd8facc151125c4cda0c122418b0e9e0b2bec55977f510068131af452ab"
   },
   "checks": [
     {
       "command": "npm test",
       "result": "passed",
-      "counts": {
-        "tests": 381,
-        "pass": 381,
-        "fail": 0
-      }
+      "tests": 385,
+      "pass": 385,
+      "fail": 0
     },
     {
-      "command": "npm run test:native",
+      "command": "bash scripts/test-native-track.sh",
+      "result": "passed",
+      "details": "TrackJournal 102; TrackSession 26; ExportStorage 928; TrackDeletion/IPC 291; TargetAccess 14; interruption 22 assertions; export permission fixture passed"
+    },
+    {
+      "command": "node --test tests/android-restart-race.test.js tests/android-harness.test.js tests/android-restart-after-failure.test.js",
+      "result": "passed",
+      "tests": 78
+    },
+    {
+      "command": "SDK35 production/test Java compilation, test aapt2 manifest link and d8 dex",
+      "result": "passed",
+      "limitations": "Unsigned local compile; stock d8 warns API35 exceeds supported API34"
+    },
+    {
+      "command": "bash -n scripts/test-android-installed.sh scripts/android-restart-race.sh; git diff --check",
       "result": "passed"
     },
     {
-      "command": "node --test tests/android-restart-race.test.js",
+      "command": "root independent node scripts/test-track-deletion.cjs",
       "result": "passed",
-      "tests": 27
+      "assertions": 291,
+      "scope": "Synthetic host transport/files; bounded source review also completed; no installed claim"
     },
     {
-      "command": "bash -n scripts/android-restart-race.sh scripts/test-android-installed.sh",
-      "result": "passed"
+      "command": "installed API35 process split, Binder drain/death, pipe/UI death, service-only and all-process death races",
+      "result": "pending hosted CI",
+      "reason": "No local KVM/emulator; use existing authorized hosted workflow"
     },
     {
-      "command": "API35 production/test Java compilation, test d8 dex, aapt2 manifest link",
-      "result": "passed",
-      "scope": "Unsigned compilation/link only; JDK21 compiler module, SDK platform35 revision2, build-tools35.0.0; stock d8 warns API35 exceeds its supported API34."
-    },
-    {
-      "command": "CHROME_PATH=/usr/bin/chromium npm run test:browser",
-      "result": "blocked before browser assertions",
-      "reason": "Chromium socket creation is not permitted in this runtime."
-    },
-    {
-      "command": "installed API35 emulator probe",
-      "result": "not run locally",
-      "reason": "No /dev/kvm or installed emulator in this runtime; hosted run required."
-    },
-    {
-      "command": "node --test tests/android-restart-after-failure.test.js tests/android-restart-race.test.js",
-      "result": "passed",
-      "tests": 40,
-      "scope": "Actual failure-path wrapper and race shell/classifier with host doubles; independent diagnostic success/denial/inconclusive exits preserve original failure evidence; not Android execution."
-    },
-    {
-      "command": "API35 test Java recompile and d8 after helper warm-up correction",
-      "result": "passed",
-      "scope": "Unsigned local compile/dex; stock d8 warns API35 exceeds supported API34."
+      "command": "browser checks",
+      "result": "pending hosted CI",
+      "reason": "Local Chromium socket creation previously blocked; no browser source change"
     }
   ],
-  "priorAttempts": [
-    {
-      "command": "npm ci",
-      "result": "failed: default cache path absent",
-      "resolution": "Same lockfile succeeded with temporary writable npm cache."
-    },
-    {
-      "command": "initial npm test while independent setup was active",
-      "result": "312/313 reported, native-track.test.js subprocess failed without diagnostic cause",
-      "resolution": "Unchanged tests subsequently passed; failed observation retained locally, no cause asserted."
-    }
-  ],
-  "sourcePathControls": [
-    {
-      "version": "api35",
-      "sourceSha256": "53c46c8b932221d3d1223c26b9d873b1b718b3d2f80ee2a0114092360a87664d",
-      "exit": 0,
-      "lastLine": "7 source-path assertions passed; not an installed-device result"
-    },
-    {
-      "version": "android15-release",
-      "sourceSha256": "53c46c8b932221d3d1223c26b9d873b1b718b3d2f80ee2a0114092360a87664d",
-      "exit": 0,
-      "lastLine": "7 source-path assertions passed; not an installed-device result"
-    },
-    {
-      "version": "android16-release",
-      "sourceSha256": "64df5e8de4b4d99572f139ab27fe49ef6b542d0daf6b75304b4a3ae41204eedc",
-      "exit": 0,
-      "lastLine": "7 source-path assertions passed; not an installed-device result"
-    },
-    {
-      "version": "main",
-      "sourceSha256": "57ffe6d837f0fc68b8c42e8067478de46fea0be03cb792af28df860d3eb38d0f",
-      "exit": 0,
-      "lastLine": "7 source-path assertions passed; not an installed-device result"
-    }
-  ],
-  "reviewCorrection": {
-    "finding": "4301562948",
-    "change": "Observed target denial remains failure even when the independent helper misses the causal window.",
-    "controls": "Added classifier and actual-shell late-trigger denial regressions."
+  "preservedFailures": {
+    "run107": "https://github.com/c933103/PassengerCount/actions/runs/39008116648",
+    "evidence": "https://github.com/c933103/PassengerCount/tree/b05aababba2580231587357e079f46152f49f015/verification/api35-restart-race/run107",
+    "result": "Two independent controlled automatic-restart denials; original 13 phases passed before first appended failure; separate diagnostic also failed"
   },
-  "postFailureDiagnostic": {
-    "reason": "Runs104/105 both failed the original gate before the appended probe could execute.",
-    "change": "Separate opt-in workflow step runs bootstrap+probe on a second fresh owned emulator, with independent evidence/exit. Original failure stays binding, no continue-on-error or original-gate retry.",
-    "hostedStatus": "new failure-path wiring pending exact-head hosted CI"
-  },
-  "setupCorrection": {
-    "observedRun": 39007438327,
-    "failures": [
-      "API35 rejects ordinary background helper warm-start",
-      "Second emulator found required KVM access unavailable"
-    ],
-    "change": "Legitimate helper FGS warm-up with pre-target completion proof; reuse existing runner-only KVM preflight before each owned emulator.",
-    "scope": "No production source/permission change, no KVM ACL scope expansion, no software-emulation fallback."
-  }
+  "acceptance": "No merge/release approval: the candidate may improve target-service-only or UI-only death, but all-process-absent denial remains a binding failure. Prior failure is not replaced by diagnostic success.",
+  "permissions": "No new production permission, watchdog, persistent binding, hidden Activity or policy bypass; existing tracking data paths retained."
 }
