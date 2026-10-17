@@ -1,0 +1,83 @@
+{
+  "run_id": 39008116648,
+  "run_number": 107,
+  "workflow": "https://github.com/c933103/PassengerCount/actions/runs/39008116648",
+  "head": "bd18cb2eb4d45a6d1fa6c74d50bad07ac31d5889",
+  "tested_merge_commit": "3a2e844f78084b457d9bd33d0aac82ffdce3c604",
+  "tested_tree": "b8c81691b34b6b3acbca7d6219897df3a7fd493b",
+  "production_base_unchanged": "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+  "job_id": 117324657842,
+  "aggregate": "failure",
+  "original_13_phases": "passed",
+  "controlled_race_samples": [
+    {
+      "label": "original",
+      "artifact_id": 12091992173,
+      "zip_sha256": "852545c4d243e566049172bab8d060b50ccbf7d0c4810250cdb9a81bbd60ba1f",
+      "zip_bytes": 8474320,
+      "source_sha256": "8d930208078099d66f3b3de4d54dd42b5f0556fbdaadab3fa4039a019d2cd39a",
+      "excerpt_sha256": "89dc455d0b549bdaee07825e0e457f44dd16629650a5191cef5e052140ce52a0",
+      "exit": 1,
+      "classification": {
+        "outcome": "automatic-restart-denied",
+        "oldPid": "4883",
+        "newPid": "5359",
+        "interleaved": true,
+        "cleanupDuringAbsence": true,
+        "triggerBeforeCleanup": true,
+        "foreground": false,
+        "lines": {
+          "marker": 69902,
+          "death": 69904,
+          "scheduled": 69906,
+          "entering": 69938,
+          "promoted": 69941,
+          "reset": 69940,
+          "start": 70018,
+          "denied": 70038
+        }
+      },
+      "initial_fg_start_reason": "PROC_STATE_TOP",
+      "initial_while_in_use_reason": "PROC_STATE_TOP"
+    },
+    {
+      "label": "diagnostic",
+      "artifact_id": 12091613293,
+      "zip_sha256": "74450550bfacadf1315cfd4f1a4941599caa3a06530d7aee3935f7a4e40ff312",
+      "zip_bytes": 2901589,
+      "source_sha256": "1dffb2f807674f31203623f2d3e5a6bc25e505db058652770c5925e178021d07",
+      "excerpt_sha256": "55f015207164c2972b196a3ac88472e7d5e17c76d005256cef8ab8ba5821361d",
+      "exit": 1,
+      "classification": {
+        "outcome": "automatic-restart-denied",
+        "oldPid": "2611",
+        "newPid": "3595",
+        "interleaved": true,
+        "cleanupDuringAbsence": true,
+        "triggerBeforeCleanup": true,
+        "foreground": false,
+        "lines": {
+          "marker": 39587,
+          "death": 40149,
+          "scheduled": 40150,
+          "entering": 40749,
+          "promoted": 40763,
+          "reset": 40765,
+          "start": 41403,
+          "denied": 41511
+        }
+      },
+      "initial_fg_start_reason": "PROC_STATE_TOP",
+      "initial_while_in_use_reason": "PROC_STATE_TOP"
+    }
+  ],
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+  "apk_sha256": "843fe6e5551f405d38a2bea52c97684b1b306f8b825a3b6afce8788e0bb796a4",
+  "test_apk_sha256": "b692ca402e869694a198e1bca332970c5bf742cc203667118848ec828b8ab4e1",
+  "limits": [
+    "No framework stack identifies the exact cleanup caller.",
+    "First sample cleanup occurs during helper startForeground binder call, before its success-return log; second sample cleanup follows that return log.",
+    "No post-restart GPS result claimed because promotion was denied and verification did not reattach.",
+    "Framework candidate remains source-only; no production remedy or release acceptance."
+  ]
+}

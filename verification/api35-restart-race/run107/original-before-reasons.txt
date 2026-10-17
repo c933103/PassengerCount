@@ -1,0 +1,9 @@
+    app=ProcessRecord{c72b000 4883:app.passengercount/u0a209}
+    mAllowWiu_noBinding=PROC_STATE_TOP
+    mAllowWiu_inBindService=DENIED
+    mAllowWiu_byBindings=DENIED
+    mAllowStart_noBinding=PROC_STATE_TOP
+    mAllowStart_inBindService=DENIED
+    mAllowStart_byBindings=DENIED
+    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)
+    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1

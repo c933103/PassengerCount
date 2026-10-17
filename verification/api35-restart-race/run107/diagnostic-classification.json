@@ -1,0 +1,19 @@
+{
+  "outcome": "automatic-restart-denied",
+  "oldPid": "2611",
+  "newPid": "3595",
+  "interleaved": true,
+  "cleanupDuringAbsence": true,
+  "triggerBeforeCleanup": true,
+  "foreground": false,
+  "lines": {
+    "marker": 39587,
+    "death": 40149,
+    "scheduled": 40150,
+    "entering": 40749,
+    "promoted": 40763,
+    "reset": 40765,
+    "start": 41403,
+    "denied": 41511
+  }
+}
