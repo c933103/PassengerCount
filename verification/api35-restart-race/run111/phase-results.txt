@@ -1,0 +1,97 @@
+# bootstrap.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"bootstrap","pid":2323,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":false,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS bootstrap assertions=7 pid=2323
+
+# basics.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"basics","pid":2883,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS basics assertions=51 pid=2883
+
+# recover.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"recover","pid":3801,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":false,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS recover assertions=16 pid=3801
+
+# receipts-prepare.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"receipts-prepare","pid":3966,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":false,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS receipts-prepare assertions=11 pid=3966
+
+# receipts-recover.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"receipts-recover","pid":4154,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":false,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS receipts-recover assertions=16 pid=4154
+
+# receipts-final.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"receipts-final","pid":4240,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":false,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS receipts-final assertions=12 pid=4240
+
+# prepare-valid.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-valid","pid":4419,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-valid assertions=12 pid=4419
+
+# verify-valid.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"verify-valid","pid":4777,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-valid assertions=14 pid=4777
+
+# prepare-deleted.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-deleted","pid":4777,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-deleted assertions=14 pid=4777
+
+# verify-deleted.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"verify-deleted","pid":5188,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":false,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-deleted assertions=14 pid=5188
+
+# prepare-denied.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-denied","pid":5352,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-denied assertions=10 pid=5352
+
+# verify-denied.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"verify-denied","pid":5352,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-denied assertions=12 pid=5352
+
+# recover-denied.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"recover-denied","pid":5352,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS recover-denied assertions=14 pid=5352
+
+# prepare-ipc-barrier.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-ipc-barrier","pid":5352,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-ipc-barrier assertions=5 pid=5352
+
+# prepare-ipc-death.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-ipc-death","pid":5352,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-ipc-death assertions=9 pid=5352
+
+# prepare-ipc-pipe.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-ipc-pipe","pid":6144,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-ipc-pipe assertions=5 pid=6144
+
+# verify-ui-death.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"verify-ui-death","pid":6144,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-ui-death assertions=9 pid=6144
+
+# prepare-race.txt
+command exit=0
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-race","pid":6660,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-race assertions=12 pid=6660
+
+# service-only-race/prepare-split.txt
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"prepare-split","pid":6144,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-split assertions=12 pid=6144
+
+# service-only-race/verify-split.txt
+INSTRUMENTATION_STATUS: stream=runtime {"phase":"verify-split","pid":6660,"fingerprint":"google\/sdk_gphone64_x86_64\/emu64xa:15\/AE3A.240806.043\/12960925:userdebug\/dev-keys","separateTargetLoader":true,"apkSha256":"317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762","recordDeletionSha256":"24f3e627ef41bd5563c1490c4e7468d8454314748f26107863ce3d58ee5e1a05","storageSha256":"a25bbaf6b2642094fbbb54bf3b7da215ab7595672673174e3891c456f5d29df9"}
+INSTRUMENTATION_RESULT: stream=PHASE_PASS verify-split assertions=14 pid=6660

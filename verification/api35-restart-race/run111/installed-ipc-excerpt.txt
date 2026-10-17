@@ -1,0 +1,163 @@
+Source: original/logcat-final.txt; SHA256 83bf40cf682cd02590fd8e52dc6677aa84438ef7543de8cb862d7cdabc0684d2
+line 77208 (zero-based): 10-17 07:22:49.376  5619  5634 I PassengerJournalTest: IPC_UI_ENTER phase=ipc-basics pid=5619
+line 77209 (zero-based): 10-17 07:22:49.376  5619  5634 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 77331 (zero-based): 10-17 07:22:50.464  5619  5634 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 77332 (zero-based): 10-17 07:22:50.493  5619  5634 I PassengerJournalTest: PASS real visible UI Home finished native startup
+line 77338 (zero-based): 10-17 07:22:50.548  5619  5634 I PassengerJournalTest: PASS bridge runs in actual UI process
+line 77345 (zero-based): 10-17 07:22:51.396  5619  5634 I PassengerJournalTest: PASS UI bridge starts remote foreground owner
+line 77346 (zero-based): 10-17 07:22:51.396  5619  5634 I PassengerJournalTest: PASS tracking owner has a different process ID
+line 77456 (zero-based): 10-17 07:22:55.715  5619  5634 I PassengerJournalTest: PASS remote owner receives real GPS
+line 77457 (zero-based): 10-17 07:22:55.717  5619  5634 I PassengerJournalTest: PASS bounded IPC page returns owner journal
+line 77458 (zero-based): 10-17 07:22:55.718  5619  5634 I PassengerJournalTest: PASS reliable legacy stream returns owner snapshot
+line 77459 (zero-based): 10-17 07:22:55.720  5619  5634 I PassengerJournalTest: PASS repeated cross-process start preserves durable generation
+line 77460 (zero-based): 10-17 07:22:55.722  5619  5634 I PassengerJournalTest: PASS cross-process stop acknowledged after owner barrier
+line 77517 (zero-based): 10-17 07:22:59.722  5619  5634 I PassengerJournalTest: PASS no GPS append after cross-process stop acknowledgement
+line 77519 (zero-based): 10-17 07:22:59.726  5619  5634 I PassengerJournalTest: PASS cross-process directory-sync deletion acknowledged
+line 77520 (zero-based): 10-17 07:22:59.727  5619  5634 I PassengerJournalTest: PASS owner tombstone blocks UI replay
+line 77528 (zero-based): 10-17 07:23:00.028  5619  5634 I PassengerJournalTest: PASS UI cannot revive deleted generation
+line 77553 (zero-based): 10-17 07:23:00.262  5619  5634 I PassengerJournalTest: PASS serialized Binder page includes JSON and native identity overhead within bound
+line 77554 (zero-based): 10-17 07:23:00.345  5619  5634 I PassengerJournalTest: PASS byte-bounded IPC page has no lost record
+line 77555 (zero-based): 10-17 07:23:00.348  5619  5634 I PassengerJournalTest: PASS large synthetic journal cleanup acknowledged
+line 77557 (zero-based): 10-17 07:23:00.348  5619  5634 I PassengerJournalTest: PASS test document made no network request
+line 77558 (zero-based): 10-17 07:23:00.351  5619  5634 I PassengerJournalTest: PHASE_PASS ipc-basics assertions=23 pid=5619
+line 77559 (zero-based): 10-17 07:23:00.352  5619  5634 I PassengerJournalTest: PHASE_DETACHED ipc-basics pid=5619
+line 77583 (zero-based): 10-17 07:23:01.069  5352  5778 I PassengerJournalTest: PASS exact target package
+line 77584 (zero-based): 10-17 07:23:01.069  5352  5778 I PassengerJournalTest: PASS bounded API35 runtime
+line 77585 (zero-based): 10-17 07:23:01.069  5352  5778 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 77612 (zero-based): 10-17 07:23:01.239  5352  5778 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 77614 (zero-based): 10-17 07:23:01.247  5352  5778 I PassengerJournalTest: PASS test document made no network request
+line 77641 (zero-based): 10-17 07:23:01.418  5352  5813 I PassengerJournalTest: PASS exact target package
+line 77642 (zero-based): 10-17 07:23:01.418  5352  5813 I PassengerJournalTest: PASS bounded API35 runtime
+line 77754 (zero-based): 10-17 07:23:01.520  5352  5813 I PassengerJournalTest: PASS old UI PID absent before instrumentation relay
+line 77889 (zero-based): 10-17 07:23:01.731  5819  5831 I PassengerJournalTest: PASS exact target package
+line 77890 (zero-based): 10-17 07:23:01.731  5819  5831 I PassengerJournalTest: PASS bounded API35 runtime
+line 77892 (zero-based): 10-17 07:23:01.731  5819  5831 I PassengerJournalTest: PASS actual UI process executes remote IPC fixtures
+line 77897 (zero-based): 10-17 07:23:01.753  5352  5813 I PassengerJournalTest: PASS declared UI instrumentation started
+line 77917 (zero-based): 10-17 07:23:01.844  5819  5831 I PassengerJournalTest: PASS owner relay fully detached before UI test
+line 77918 (zero-based): 10-17 07:23:01.844  5819  5831 I PassengerJournalTest: IPC_UI_ENTER phase=ipc-drain pid=5819
+line 77919 (zero-based): 10-17 07:23:01.844  5819  5831 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 78038 (zero-based): 10-17 07:23:02.776  5819  5831 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 78040 (zero-based): 10-17 07:23:02.790  5819  5831 I PassengerJournalTest: PASS real visible UI Home finished native startup
+line 78049 (zero-based): 10-17 07:23:02.864  5819  5831 I PassengerJournalTest: PASS IPC caller is actual UI process
+line 78240 (zero-based): 10-17 07:23:06.755  5819  5831 I PassengerJournalTest: PASS real UI starts owner before held append
+line 78242 (zero-based): 10-17 07:23:06.857  5819  5831 I PassengerJournalTest: PASS remote accepted append holds monitor
+line 78243 (zero-based): 10-17 07:23:06.862  5352  5799 I PassengerJournalTest: IPC_PROVIDER_STACK thread=binder:5352_1 state=BLOCKED frames=[app.passengercount.TrackProvider.call(TrackProvider.java:22), android.content.ContentProvider.call(ContentProvider.java:2704), android.content.ContentProvider$Transport.call(ContentProvider.java:633), android.content.ContentProviderNative.onTransact(ContentProviderNative.java:307), android.os.Binder.execTransactInternal(Binder.java:1500), android.os.Binder.execTransact(Binder.java:1444)]
+line 78248 (zero-based): 10-17 07:23:06.957  5819  5831 I PassengerJournalTest: PASS actual owner Binder thread reached session monitor
+line 78249 (zero-based): 10-17 07:23:06.957  5819  5831 I PassengerJournalTest: PASS remote deletion cannot acknowledge before append fsync
+line 78251 (zero-based): 10-17 07:23:06.982  5819  5831 I PassengerJournalTest: PASS IPC call terminates without crashing UI
+line 78252 (zero-based): 10-17 07:23:06.982  5819  5831 I PassengerJournalTest: PASS ack follows remote append drain and durable deletion
+line 78294 (zero-based): 10-17 07:23:10.482  5819  5831 I PassengerJournalTest: PASS late remote GPS cannot recreate deleted journal
+line 78296 (zero-based): 10-17 07:23:10.482  5819  5831 I PassengerJournalTest: PASS test document made no network request
+line 78297 (zero-based): 10-17 07:23:10.485  5819  5831 I PassengerJournalTest: PHASE_PASS ipc-drain assertions=16 pid=5819
+line 78298 (zero-based): 10-17 07:23:10.485  5819  5831 I PassengerJournalTest: PHASE_DETACHED ipc-drain pid=5819
+line 78315 (zero-based): 10-17 07:23:10.759  5352  5976 I PassengerJournalTest: PASS exact target package
+line 78316 (zero-based): 10-17 07:23:10.759  5352  5976 I PassengerJournalTest: PASS bounded API35 runtime
+line 78317 (zero-based): 10-17 07:23:10.760  5352  5976 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 78356 (zero-based): 10-17 07:23:10.942  5352  5976 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 78358 (zero-based): 10-17 07:23:10.947  5352  5976 I PassengerJournalTest: PASS clear only synthetic IPC signal
+line 78359 (zero-based): 10-17 07:23:10.948  5352  5976 I PassengerJournalTest: PASS clear only synthetic IPC signal
+line 78360 (zero-based): 10-17 07:23:10.948  5352  5976 I PassengerJournalTest: PASS clear only synthetic IPC signal
+line 78361 (zero-based): 10-17 07:23:10.948  5352  5976 I PassengerJournalTest: PASS clear only synthetic IPC signal
+line 78362 (zero-based): 10-17 07:23:10.949  5352  5976 I PassengerJournalTest: PASS test document made no network request
+line 78387 (zero-based): 10-17 07:23:11.120  5352  6011 I PassengerJournalTest: PASS exact target package
+line 78388 (zero-based): 10-17 07:23:11.120  5352  6011 I PassengerJournalTest: PASS bounded API35 runtime
+line 78512 (zero-based): 10-17 07:23:11.221  5352  6011 I PassengerJournalTest: PASS old UI PID absent before instrumentation relay
+line 78594 (zero-based): 10-17 07:23:11.325  6016  6029 I PassengerJournalTest: PASS exact target package
+line 78595 (zero-based): 10-17 07:23:11.325  6016  6029 I PassengerJournalTest: PASS bounded API35 runtime
+line 78596 (zero-based): 10-17 07:23:11.325  6016  6029 I PassengerJournalTest: PASS actual UI process executes remote IPC fixtures
+line 78599 (zero-based): 10-17 07:23:11.337  5352  6011 I PassengerJournalTest: PASS declared UI instrumentation started
+line 78632 (zero-based): 10-17 07:23:11.438  6016  6029 I PassengerJournalTest: PASS owner relay fully detached before UI test
+line 78633 (zero-based): 10-17 07:23:11.438  6016  6029 I PassengerJournalTest: IPC_UI_ENTER phase=ipc-death pid=6016
+line 78634 (zero-based): 10-17 07:23:11.438  6016  6029 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 78732 (zero-based): 10-17 07:23:12.232  6016  6029 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 78733 (zero-based): 10-17 07:23:12.233  6016  6029 I PassengerJournalTest: PASS real visible UI Home finished native startup
+line 78740 (zero-based): 10-17 07:23:12.258  6016  6029 I PassengerJournalTest: PASS IPC caller is actual UI process
+line 78741 (zero-based): 10-17 07:23:12.263  5352  5998 I PassengerJournalTest: IPC_PROVIDER_STACK thread=binder:5352_1 state=RUNNABLE frames=[java.io.FileDescriptor.sync(Native Method), android.os.FileUtils.sync(FileUtils.java:278), android.app.SharedPreferencesImpl.writeToFile(SharedPreferencesImpl.java:815), android.app.SharedPreferencesImpl.-$$Nest$mwriteToFile(Unknown Source:0), android.app.SharedPreferencesImpl$1.run(SharedPreferencesImpl.java:680), android.app.SharedPreferencesImpl.enqueueDiskWrite(SharedPreferencesImpl.java:699), android.app.SharedPreferencesImpl.-$$Nest$menqueueDiskWrite(Unknown Source:0), android.app.SharedPreferencesImpl$EditorImpl.commit(SharedPreferencesImpl.java:612), app.passengercount.TrackService$1.write(TrackService.java:42), app.passengercount.TrackSession.start(TrackSession.java:26), app.passengercount.TrackProvider.call(TrackProvider.java:25), android.content.ContentProvider.call(ContentProvider.java:2704), android.content.ContentProvider$Transport.call(ContentProvider.java:633), android.content.ContentProviderNative.onTransact(ContentProviderNative.java:307), android.os.Binder.execTransactInternal(Binder.java:1500), android.os.Binder.execTransact(Binder.java:1444)]
+line 78901 (zero-based): 10-17 07:23:17.882  6016  6029 I PassengerJournalTest: PASS real UI starts owner before held append
+line 78902 (zero-based): 10-17 07:23:17.986  6016  6029 I PassengerJournalTest: PASS remote accepted append holds monitor
+line 78903 (zero-based): 10-17 07:23:17.995  5352  5998 I PassengerJournalTest: IPC_PROVIDER_STACK thread=binder:5352_4 state=BLOCKED frames=[app.passengercount.TrackProvider.call(TrackProvider.java:22), android.content.ContentProvider.call(ContentProvider.java:2704), android.content.ContentProvider$Transport.call(ContentProvider.java:633), android.content.ContentProviderNative.onTransact(ContentProviderNative.java:307), android.os.Binder.execTransactInternal(Binder.java:1500), android.os.Binder.execTransact(Binder.java:1444)]
+line 78904 (zero-based): 10-17 07:23:18.002  5352  5998 I PassengerJournalTest: IPC_OWNER_DIES_BEFORE_ACK pid=5352
+line 78913 (zero-based): 10-17 07:23:18.023   566   661 I ActivityManager: Process app.passengercount:tracking (pid 5352) has died: fg  BTOP
+line 78925 (zero-based): 10-17 07:23:18.086  6016  6029 I PassengerJournalTest: PASS actual owner Binder thread reached session monitor
+line 78926 (zero-based): 10-17 07:23:18.086  6016  6029 I PassengerJournalTest: PASS IPC call terminates without crashing UI
+line 78927 (zero-based): 10-17 07:23:18.086  6016  6029 I PassengerJournalTest: PASS provider death is unacknowledged, never replayed as success
+line 78928 (zero-based): 10-17 07:23:18.086  6016  6029 I PassengerJournalTest: PASS failed in-flight delete preserves pending journal
+line 78930 (zero-based): 10-17 07:23:18.087  6016  6029 I PassengerJournalTest: PASS test document made no network request
+line 78931 (zero-based): 10-17 07:23:18.087  6016  6029 I PassengerJournalTest: PHASE_PASS ipc-death assertions=15 pid=6016
+line 78932 (zero-based): 10-17 07:23:18.088  6016  6029 I PassengerJournalTest: PHASE_DETACHED ipc-death pid=6016
+line 79049 (zero-based): 10-17 07:23:20.966  6144  6170 I PassengerJournalTest: PASS exact target package
+line 79050 (zero-based): 10-17 07:23:20.966  6144  6170 I PassengerJournalTest: PASS bounded API35 runtime
+line 79051 (zero-based): 10-17 07:23:20.967  6144  6170 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 79133 (zero-based): 10-17 07:23:21.270  6144  6170 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 79135 (zero-based): 10-17 07:23:21.276  6144  6170 I PassengerJournalTest: PASS test document made no network request
+line 79163 (zero-based): 10-17 07:23:21.446  6144  6234 I PassengerJournalTest: PASS exact target package
+line 79164 (zero-based): 10-17 07:23:21.446  6144  6234 I PassengerJournalTest: PASS bounded API35 runtime
+line 79270 (zero-based): 10-17 07:23:21.551  6144  6234 I PassengerJournalTest: PASS old UI PID absent before instrumentation relay
+line 79371 (zero-based): 10-17 07:23:21.688  6240  6251 I PassengerJournalTest: PASS exact target package
+line 79372 (zero-based): 10-17 07:23:21.688  6240  6251 I PassengerJournalTest: PASS bounded API35 runtime
+line 79373 (zero-based): 10-17 07:23:21.688  6240  6251 I PassengerJournalTest: PASS actual UI process executes remote IPC fixtures
+line 79394 (zero-based): 10-17 07:23:21.771  6144  6234 I PassengerJournalTest: PASS declared UI instrumentation started
+line 79403 (zero-based): 10-17 07:23:21.792  6240  6251 I PassengerJournalTest: PASS owner relay fully detached before UI test
+line 79404 (zero-based): 10-17 07:23:21.792  6240  6251 I PassengerJournalTest: IPC_UI_ENTER phase=ipc-prepare-ui-death pid=6240
+line 79405 (zero-based): 10-17 07:23:21.792  6240  6251 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 79509 (zero-based): 10-17 07:23:22.776  6144  6221 I PassengerJournalTest: IPC_PROVIDER_STACK thread=binder:6144_1 state=RUNNABLE frames=[java.io.FileDescriptor.sync(Native Method), android.os.FileUtils.sync(FileUtils.java:278), android.app.SharedPreferencesImpl.writeToFile(SharedPreferencesImpl.java:815), android.app.SharedPreferencesImpl.-$$Nest$mwriteToFile(Unknown Source:0), android.app.SharedPreferencesImpl$1.run(SharedPreferencesImpl.java:680), android.app.SharedPreferencesImpl.enqueueDiskWrite(SharedPreferencesImpl.java:699), android.app.SharedPreferencesImpl.-$$Nest$menqueueDiskWrite(Unknown Source:0), android.app.SharedPreferencesImpl$EditorImpl.commit(SharedPreferencesImpl.java:612), app.passengercount.TrackService$1.write(TrackService.java:42), app.passengercount.TrackSession.stop(TrackSession.java:37), app.passengercount.TrackProvider.call(TrackProvider.java:32), android.content.ContentProvider.call(ContentProvider.java:2704), android.content.ContentProvider$Transport.call(ContentProvider.java:633), android.content.ContentProviderNative.onTransact(ContentProviderNative.java:307), android.os.Binder.execTransactInternal(Binder.java:1500), android.os.Binder.execTransact(Binder.java:1444)]
+line 79553 (zero-based): 10-17 07:23:23.950  6240  6251 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 79555 (zero-based): 10-17 07:23:24.129  6240  6251 I PassengerJournalTest: PASS real visible UI Home finished native startup
+line 79632 (zero-based): 10-17 07:23:27.885  6240  6251 I PassengerJournalTest: PASS UI starts separate tracker before UI death
+line 79633 (zero-based): 10-17 07:23:27.889  6240  6251 I PassengerJournalTest: PASS acquire ordinary unstable snapshot owner
+line 79634 (zero-based): 10-17 07:23:27.890  6240  6251 I PassengerJournalTest: PASS open actual reliable snapshot pipe
+line 79635 (zero-based): 10-17 07:23:27.895  6144  6221 I PassengerJournalTest: IPC_PROVIDER_STACK thread=binder:6144_3 state=BLOCKED frames=[app.passengercount.TrackProvider.call(TrackProvider.java:22), android.content.ContentProvider.call(ContentProvider.java:2704), android.content.ContentProvider$Transport.call(ContentProvider.java:633), android.content.ContentProviderNative.onTransact(ContentProviderNative.java:307), android.os.Binder.execTransactInternal(Binder.java:1500), android.os.Binder.execTransact(Binder.java:1444)]
+line 79640 (zero-based): 10-17 07:23:27.991  6240  6251 I PassengerJournalTest: PASS actual Binder read blocked behind streaming snapshot
+line 79641 (zero-based): 10-17 07:23:27.991  6240  6251 I PassengerJournalTest: PASS test document made no network request
+line 79642 (zero-based): 10-17 07:23:27.991  6240  6251 I PassengerJournalTest: PHASE_PASS ipc-prepare-ui-death assertions=12 pid=6240
+line 79643 (zero-based): 10-17 07:23:27.992  6240  6251 I PassengerJournalTest: PHASE_DETACHED ipc-prepare-ui-death pid=6240
+line 79895 (zero-based): 10-17 07:23:35.995  6240  6240 I PassengerJournalTest: PASS snapshot references retained until process death
+line 79896 (zero-based): 10-17 07:23:35.995  6240  6240 I PassengerJournalTest: UI_SIGKILL_AFTER_DETACH pid=6240
+line 79906 (zero-based): 10-17 07:23:36.015   566  1671 I ActivityManager: Process app.passengercount (pid 6240) has died: prev LAST
+line 80007 (zero-based): 10-17 07:23:43.093  6144  6399 I PassengerJournalTest: PASS exact target package
+line 80008 (zero-based): 10-17 07:23:43.093  6144  6399 I PassengerJournalTest: PASS bounded API35 runtime
+line 80009 (zero-based): 10-17 07:23:43.093  6144  6399 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 80036 (zero-based): 10-17 07:23:43.268  6144  6399 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 80038 (zero-based): 10-17 07:23:43.274  6144  6399 I PassengerJournalTest: PASS tracker process survives UI death without restart
+line 80039 (zero-based): 10-17 07:23:43.274  6144  6399 I PassengerJournalTest: PASS UI death releases snapshot barrier and real GPS appends before verification
+line 80040 (zero-based): 10-17 07:23:43.276  6144  6399 I PassengerJournalTest: PASS stop surviving tracker through owner IPC
+line 80064 (zero-based): 10-17 07:23:43.379  6144  6399 I PassengerJournalTest: PASS surviving tracker stopped
+line 80065 (zero-based): 10-17 07:23:43.379  6144  6399 I PassengerJournalTest: PASS test document made no network request
+line 80338 (zero-based): 10-17 07:23:46.560  6144  6548 I PassengerJournalTest: PASS exact target package
+line 80339 (zero-based): 10-17 07:23:46.560  6144  6548 I PassengerJournalTest: PASS bounded API35 runtime
+line 80340 (zero-based): 10-17 07:23:46.560  6144  6548 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 80367 (zero-based): 10-17 07:23:46.733  6144  6548 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 80369 (zero-based): 10-17 07:23:46.742  6144  6548 I PassengerJournalTest: PASS owner IPC start acknowledged
+line 80375 (zero-based): 10-17 07:23:46.751  6144  6548 I PassengerJournalTest: PASS real foreground service starts pcit-crash-split
+line 80376 (zero-based): 10-17 07:23:46.752  6144  6548 I PassengerJournalTest: PASS requested ID owns native session
+line 80454 (zero-based): 10-17 07:23:50.968  6144  6548 I PassengerJournalTest: PASS crash control receives real GPS
+line 80455 (zero-based): 10-17 07:23:50.970  6144  6548 I PassengerJournalTest: PASS actual workspace commit
+line 80456 (zero-based): 10-17 07:23:50.976  6144  6548 I PassengerJournalTest: PASS durable crash evidence
+line 80457 (zero-based): 10-17 07:23:50.977  6144  6548 I PassengerJournalTest: PASS real service remains foreground before instrumentation detaches
+line 80459 (zero-based): 10-17 07:23:50.977  6144  6548 I PassengerJournalTest: PASS test document made no network request
+line 80820 (zero-based): 10-17 07:24:00.800  6660  6694 I PassengerJournalTest: PASS exact target package
+line 80821 (zero-based): 10-17 07:24:00.800  6660  6694 I PassengerJournalTest: PASS bounded API35 runtime
+line 80822 (zero-based): 10-17 07:24:00.800  6660  6694 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 80928 (zero-based): 10-17 07:24:01.185  6660  6694 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 80930 (zero-based): 10-17 07:24:01.195  6660  6694 I PassengerJournalTest: PASS system restarted a different process
+line 80931 (zero-based): 10-17 07:24:01.195  6660  6694 I PassengerJournalTest: PASS durable valid session/token survives actual death
+line 80932 (zero-based): 10-17 07:24:01.198  6660  6694 I PassengerJournalTest: PASS positive control resumes real foreground service
+line 80933 (zero-based): 10-17 07:24:01.198  6660  6694 I PassengerJournalTest: PASS stale-A fixture marker
+line 80960 (zero-based): 10-17 07:24:01.457  6660  6694 I PassengerJournalTest: PASS stale tombstoned A start preserves accepted B
+line 81003 (zero-based): 10-17 07:24:04.973  6660  6694 I PassengerJournalTest: PASS restarted B receives GPS
+line 81004 (zero-based): 10-17 07:24:04.975  6660  6694 I PassengerJournalTest: PASS stop positive control
+line 81028 (zero-based): 10-17 07:24:05.078  6660  6694 I PassengerJournalTest: PASS positive control stops
+line 81029 (zero-based): 10-17 07:24:05.078  6660  6694 I PassengerJournalTest: PASS actual workspace commit
+line 81031 (zero-based): 10-17 07:24:05.079  6660  6694 I PassengerJournalTest: PASS test document made no network request
+line 81158 (zero-based): 10-17 07:24:07.695  6660  6781 I PassengerJournalTest: PASS exact target package
+line 81159 (zero-based): 10-17 07:24:07.695  6660  6781 I PassengerJournalTest: PASS bounded API35 runtime
+line 81160 (zero-based): 10-17 07:24:07.695  6660  6781 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+line 81188 (zero-based): 10-17 07:24:07.866  6660  6781 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+line 81190 (zero-based): 10-17 07:24:07.875  6660  6781 I PassengerJournalTest: PASS owner IPC start acknowledged
+line 81192 (zero-based): 10-17 07:24:07.881  6660  6781 I PassengerJournalTest: PASS real foreground service starts pcit-crash-race
+line 81193 (zero-based): 10-17 07:24:07.881  6660  6781 I PassengerJournalTest: PASS requested ID owns native session
+line 81276 (zero-based): 10-17 07:24:11.896  6660  6781 I PassengerJournalTest: PASS crash control receives real GPS
+line 81277 (zero-based): 10-17 07:24:11.896  6660  6781 I PassengerJournalTest: PASS actual workspace commit
+line 81278 (zero-based): 10-17 07:24:11.897  6660  6781 I PassengerJournalTest: PASS durable crash evidence
+line 81279 (zero-based): 10-17 07:24:11.898  6660  6781 I PassengerJournalTest: PASS real service remains foreground before instrumentation detaches
+line 81281 (zero-based): 10-17 07:24:11.898  6660  6781 I PassengerJournalTest: PASS test document made no network request

@@ -1,0 +1,6 @@
+2026-10-17T07:24:21.5819839Z RACE_AUTOMATIC_RESTART_FAILED: target restart denied; use interleaved flag for trigger attribution
+2026-10-17T07:24:23.1564361Z ##[error]Process completed with exit code 1.
+2026-10-17T07:24:23.3071835Z Original lifecycle exit=1 remains FAILED; starting independent diagnostic
+2026-10-17T07:26:07.8456285Z RACE_OBSERVATION_UNVERIFIED: logcat -d -v threadtime
+2026-10-17T07:26:11.1217015Z Original lifecycle remains FAILED (exit=1); independent diagnostic exit=2
+2026-10-17T07:26:11.1222973Z ##[error]Process completed with exit code 2.

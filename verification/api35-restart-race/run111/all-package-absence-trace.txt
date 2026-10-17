@@ -1,0 +1,37 @@
+Source: run111-original/race-logcat.txt; SHA256 a73f5ed40b0fef7ad5b22b2f1c410c6144b68a2276bc803ef60494507cee962f
+Line numbers are zero-based and match classifier offsets.
+81523: 10-17 07:24:19.900  6660  6660 I PassengerJournalTest: ALL_PACKAGE_KILL pid=6449 name=app.passengercount
+81525: 10-17 07:24:19.900  6660  6660 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=6660
+81527: 10-17 07:24:19.913   566  1668 I ActivityManager: Process app.passengercount (pid 6449) has died: prev LAST
+81538: 10-17 07:24:19.919   566  1666 I ActivityManager: Process app.passengercount:tracking (pid 6660) has died: prcp FGS 
+81539: 10-17 07:24:19.920   566  1666 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+81640: 10-17 07:24:20.320   566  1666 I ActivityManager: Background started FGS: Allowed [callingPackage: com.android.shell; callingUid: 2000; uidState: CEM ; uidBFSL: n/a; intent: Intent { act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService }; code:SYSTEM_UID; tempAllowListReason:<,reasonCode:SYSTEM_ALLOW_LISTED,duration:9223372036854775807,callingUid:-1>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+81641: 10-17 07:24:20.329  6428  6428 I PassengerRaceTrigger: RACE_TRIGGER_ENTER pid=6428 uid=10210
+81643: 10-17 07:24:20.333  6428  6428 I PassengerRaceTrigger: RACE_TRIGGER_FOREGROUND pid=6428 uid=10210
+81647: 10-17 07:24:20.928   566   601 I ActivityManager: Start proc 6897:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}
+81663: 10-17 07:24:20.976   566  1666 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service app.passengercount/.TrackService
+81664: 10-17 07:24:20.977   566  1666 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]
+81665: 10-17 07:24:20.977   566  1666 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
+81667: 10-17 07:24:20.981  6897  6897 E PassengerTrack: Background tracking restart denied; interruption saved; reopen the active survey
+81668: 10-17 07:24:20.981  6897  6897 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService
+81669: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:54)
+81670: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:50)
+81671: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Parcel.readParcelableInternal(Parcel.java:5075)
+81672: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Parcel.readParcelable(Parcel.java:5057)
+81673: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3237)
+81674: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Parcel.createException(Parcel.java:3226)
+81675: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Parcel.readException(Parcel.java:3209)
+81676: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Parcel.readException(Parcel.java:3151)
+81677: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.IActivityManager$Stub$Proxy.setServiceForeground(IActivityManager.java:7193)
+81678: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.Service.startForeground(Service.java:776)
+81679: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at app.passengercount.TrackService.onStartCommand(TrackService.java:147)
+81680: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.ActivityThread.handleServiceArgs(ActivityThread.java:5147)
+81681: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.ActivityThread.-$$Nest$mhandleServiceArgs(Unknown Source:0)
+81682: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2469)
+81683: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+81684: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Looper.loopOnce(Looper.java:232)
+81685: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.os.Looper.loop(Looper.java:317)
+81686: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at android.app.ActivityThread.main(ActivityThread.java:8705)
+81687: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at java.lang.reflect.Method.invoke(Native Method)
+81688: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+81689: 10-17 07:24:20.981  6897  6897 E PassengerTrack: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:886)

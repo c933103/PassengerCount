@@ -1,0 +1,20 @@
+{
+  "outcome": "interleaving-unverified",
+  "process": "app.passengercount:tracking",
+  "oldPid": "2861",
+  "newPid": "3760",
+  "interleaved": false,
+  "cleanupDuringAbsence": false,
+  "triggerBeforeCleanup": false,
+  "foreground": true,
+  "lines": {
+    "marker": 42508,
+    "death": 42611,
+    "scheduled": 42612,
+    "entering": 43738,
+    "promoted": 43827,
+    "reset": -1,
+    "start": 43777,
+    "denied": -1
+  }
+}

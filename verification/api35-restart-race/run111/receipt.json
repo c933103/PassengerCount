@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-17",
+  "run": "https://github.com/c933103/PassengerCount/actions/runs/39013057272",
+  "jobId": 117339471185,
+  "head": "052fbb20ed7edd6f849681bf60e2862176b40aaf",
+  "testedMergeCommit": "b5c18a709e830500afe16632352078d66d5a8639",
+  "testedTree": "616c0fb8ae8e07bc980f71245b1ec1ea590b5e7f",
+  "aggregate": "failure",
+  "originalExitCode": 1,
+  "independentDiagnosticExitCode": 2,
+  "codexReview": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6231134515",
+  "passed": [
+    "411 Node tests",
+    "native suite including 304 IPC/deletion assertions",
+    "browser checks",
+    "APK builds",
+    "all original 13 installed lifecycle phases",
+    "actual UI IPC basics: 23 assertions",
+    "actual Binder append/drain: 16 assertions",
+    "owner death before deletion acknowledgement, UI survival and unknown reply: 15 assertions",
+    "UI-only death releases blocked reliable pipe; same tracker PID 6144; GPS appended before reattachment: 9 verification assertions",
+    "measured independent-FGS service-only death: 6144 to 6660, surviving UI 6449, foreground restored before reattachment, GPS/session/journal verification: 14 assertions"
+  ],
+  "failed": [
+    "all-package-process absence: measured independent-FGS interleaving, automatic tracker 6660 to 6897 restart denied"
+  ],
+  "inconclusive": [
+    "independent fresh diagnostic: last complete observation missed helper timing; subsequent logcat capture failed; exit 2"
+  ],
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+  "apkSha256": {
+    "PassengerCount.apk": "317c8141a11ed4f12dc1f3f3c1b787b76ea4985ebda6127d4b357c2613de9762",
+    "PassengerCount-lifecycle-tests.apk": "4bba3a26e49420ffabe8e083a9fb046e3d75266fb1b12f8776112837d294cde5"
+  },
+  "artifacts": [
+    {
+      "scope": "original",
+      "id": 12094320863,
+      "bytes": 20312781,
+      "sha256": "65aeb74eafbddc008e8d89552b764171c993c6fb86808b299ff0804495d226a2"
+    },
+    {
+      "scope": "diagnostic",
+      "id": 12093389294,
+      "bytes": 3103663,
+      "sha256": "ca62ec0dc4d54a11ae8bb419477aaa210195b85b3c733559554826d307dff7f6"
+    }
+  ],
+  "serviceOnly": {
+    "outcome": "foreground-restored",
+    "process": "app.passengercount:tracking",
+    "oldPid": "6144",
+    "newPid": "6660",
+    "interleaved": true,
+    "cleanupDuringAbsence": false,
+    "triggerBeforeCleanup": false,
+    "foreground": true,
+    "lines": {
+      "marker": 80686,
+      "death": 80688,
+      "scheduled": 80689,
+      "entering": 80720,
+      "promoted": 80722,
+      "reset": -1,
+      "start": 80748,
+      "denied": -1
+    }
+  },
+  "allPackageAbsence": {
+    "outcome": "automatic-restart-denied",
+    "process": "app.passengercount:tracking",
+    "oldPid": "6660",
+    "newPid": "6897",
+    "interleaved": true,
+    "cleanupDuringAbsence": false,
+    "triggerBeforeCleanup": false,
+    "foreground": false,
+    "lines": {
+      "marker": 81525,
+      "death": 81538,
+      "scheduled": 81539,
+      "entering": 81641,
+      "promoted": 81643,
+      "reset": -1,
+      "start": 81647,
+      "denied": 81665
+    }
+  },
+  "limits": [
+    "No cleanup signature or system_server caller stack observed in run111; earlier reset evidence remains separate.",
+    "Service-only real GPS verified after reattachment; UI-death GPS continuation verified before reattachment.",
+    "Post-durable-start/stop lost reply controls are host fault injection; installed owner-death fixture kills before deletion acknowledgement.",
+    "Original required gate remains failed. No merge, release, new production permission, hidden activity, watchdog or policy bypass.",
+    "No physical-device/API26/power-loss/original-signer upgrade, memory benchmark or universal OS/OEM kill-recovery claim."
+  ],
+  "retainedFileSha256": {
+    "README.md": "15489801cc355db0dc9574b2227cf129828059236e41daa3d6dd654e32d79ffb",
+    "all-package-absence-classification.json": "395492e7a19d6c8c66868ec4ae12ca0e7ea488dbcc02d9b6f61a6dd5ad8e66a5",
+    "all-package-absence-eligibility-and-process-excerpt.txt": "4d98b69489dbd32d0cc39084f9e6767452072f9c1ee236b03e49039807f36166",
+    "all-package-absence-process-scope.txt": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "all-package-absence-trace.txt": "f560893e983adc6d14d080544d4cc52f9f293c1e0285cb5ad46b2f12e893fbdf",
+    "diagnostic-exit-codes.txt": "ad2de3f3c6a4359d643ae55943230ca886662addac2084684f2a6b4e265a8f86",
+    "diagnostic-last-classification.json": "2d161905c2f0aab19219505646bd59c0ee613d210edc6433bfce2f69c0c6a83d",
+    "installed-ipc-excerpt.txt": "93325cfddc888b45d1e1467bab0f3136badc90c836da9109ef119539e5e13d16",
+    "job-outcome-excerpt.txt": "eb316b396222ee6eea861acc641e68b09db7d7a96d55c00fc1892a315bf6fa6e",
+    "original-natural-restarts.txt": "1d4b4b7f2834d3d165d0cf66d4734f83dbfa0168fe56829b4d657edd5e028490",
+    "phase-results.txt": "8b328d55ab0c71bde38d758e6b84f709b7624b518fbc9ba4693ab55c17a53b25",
+    "service-only-classification.json": "20a4014eec371cf38e3b586ee6ef51ea15369a0f4c41c063543dfebf07488c9a",
+    "service-only-eligibility-and-process-excerpt.txt": "1ffb3367f59772794ea590e5b00880b109c53c18dd343d12ae9882aa993feb56",
+    "service-only-process-scope.txt": "597f0afd8732b79ca48d893eb26b90fbe2c5f4b678ee3b523f7e5aec84fbacbf",
+    "service-only-trace.txt": "69797473a82ddb0b35b69c8db6a239a047c58a6c86f3beb4a4f37c5389bbfc66"
+  }
+}

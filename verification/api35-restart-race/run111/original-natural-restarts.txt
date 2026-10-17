@@ -1,0 +1,5 @@
+valid 4419 -> 4777
+deleted 4777 -> 5142
+
+10-17 07:21:46.411   566   601 I ActivityManager: Start proc 4777:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}
+10-17 07:22:12.014   566   601 I ActivityManager: Start proc 5142:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}

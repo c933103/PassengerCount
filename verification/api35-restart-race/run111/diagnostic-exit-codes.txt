@@ -1,0 +1,2 @@
+original-validation-exit-code=1
+independent-diagnostic-exit-code=2

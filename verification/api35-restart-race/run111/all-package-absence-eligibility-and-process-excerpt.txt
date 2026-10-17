@@ -1,0 +1,54 @@
+# race-before-services.txt; SHA256 55fb5b837aa9f80d603dd17f09824202bc218f4251e1d4212057ee1ad07e849f
+  * ServiceRecord{b86e3f0 u0 app.passengercount/.TrackService c:app.passengercount}
+    app=ProcessRecord{a89474b 6660:app.passengercount:tracking/u0a209}
+    mAllowWiu_noBinding=PROC_STATE_TOP
+    mAllowWiu_inBindService=DENIED
+    mAllowWiu_byBindings=DENIED
+    getFgsAllowWiu_legacy=PROC_STATE_TOP
+    getFgsAllowWiu_new=PROC_STATE_TOP
+    getFgsAllowWiu_forStart=PROC_STATE_TOP
+    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP
+    mAllowStart_noBinding=PROC_STATE_TOP
+    mAllowStart_inBindService=DENIED
+    mAllowStart_byBindings=DENIED
+    getFgsAllowStart_legacy=PROC_STATE_TOP
+    getFgsAllowStart_new=PROC_STATE_TOP
+    getFgsAllowStart=PROC_STATE_TOP
+    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)
+    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1
+
+# race-services.txt; SHA256 c64833445b3b7c0cde59837cca0d5fc2214105eebe5ad3ccdcf788031f902dd4
+No TrackService record in snapshot.
+
+# instrumentation-detached-activity-before-race.txt; SHA256 af024679f2c396f68f6f4474eb26a64f8b2815e3234e2a6ef384a3f7673c341e
+  *APP* UID 10209 ProcessRecord{b146915 6449:app.passengercount/u0a209}
+    pid=6449
+    curProcState=2 mRepProcState=2 setProcState=2 lastStateTime=-2s113ms
+  *APP* UID 10209 ProcessRecord{a89474b 6660:app.passengercount:tracking/u0a209}
+    pid=6660
+    curProcState=19 mRepProcState=19 setProcState=19 lastStateTime=-2s106ms
+  *APP* UID 99025 ProcessRecord{6a1ba56 6480:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a209i25}
+    pid=6480
+    curProcState=3 mRepProcState=3 setProcState=3 lastStateTime=-2s113ms
+
+# instrumentation-detached-activity-background-race.txt; SHA256 e1e812c7991402870332e4bf8d46b790b301b744dccb449ae8649ada67970905
+  *APP* UID 10209 ProcessRecord{b146915 6449:app.passengercount/u0a209}
+    pid=6449
+    curProcState=15 mRepProcState=15 setProcState=15 lastStateTime=-606ms
+  *APP* UID 10209 ProcessRecord{a89474b 6660:app.passengercount:tracking/u0a209}
+    pid=6660
+    curProcState=4 mRepProcState=4 setProcState=4 lastStateTime=-5s96ms
+  *APP* UID 99025 ProcessRecord{6a1ba56 6480:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a209i25}
+    pid=6480
+    curProcState=15 mRepProcState=15 setProcState=15 lastStateTime=-607ms
+
+# instrumentation-detached-race.txt; SHA256 ada1bee5c81f4e066ae958f9b57579254923555bb0079a2e1b90cdc75ed7c6f1
+  *APP* UID 10209 ProcessRecord{b146915 6449:app.passengercount/u0a209}
+    pid=6449
+    curProcState=15 mRepProcState=15 setProcState=15 lastStateTime=-642ms
+  *APP* UID 10209 ProcessRecord{a89474b 6660:app.passengercount:tracking/u0a209}
+    pid=6660
+    curProcState=4 mRepProcState=4 setProcState=4 lastStateTime=-5s132ms
+  *APP* UID 99025 ProcessRecord{6a1ba56 6480:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a209i25}
+    pid=6480
+    curProcState=15 mRepProcState=15 setProcState=15 lastStateTime=-643ms

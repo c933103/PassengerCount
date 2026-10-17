@@ -1,0 +1,20 @@
+{
+  "outcome": "foreground-restored",
+  "process": "app.passengercount:tracking",
+  "oldPid": "6144",
+  "newPid": "6660",
+  "interleaved": true,
+  "cleanupDuringAbsence": false,
+  "triggerBeforeCleanup": false,
+  "foreground": true,
+  "lines": {
+    "marker": 80686,
+    "death": 80688,
+    "scheduled": 80689,
+    "entering": 80720,
+    "promoted": 80722,
+    "reset": -1,
+    "start": 80748,
+    "denied": -1
+  }
+}
