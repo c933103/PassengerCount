@@ -63,9 +63,14 @@ restart_race() {
       printf 'UI_SURVIVED_SERVICE_DEATH pid=%s\n' "$ui_pid" > "$OUT/race-process-scope.txt"
     else
       # pidof exits 1 for no matches. Any returned PID invalidates this scope.
-      local remaining
-      remaining="$(adb shell pidof "$PACKAGE" "$process" | tr -d '\r' || true)"
-      [[ -z "$remaining" ]] || { echo 'RACE_ALL_PROCESS_ABSENCE_UNVERIFIED'; return 2; }
+      local absence_code
+      if adb shell pidof "$PACKAGE" "$process" > "$OUT/race-absent-pids.txt" 2> "$OUT/race-absent-pids.stderr"; then
+        absence_code=0
+      else absence_code=$?; fi
+      if [[ "$absence_code" != 1 || -s "$OUT/race-absent-pids.txt" || -s "$OUT/race-absent-pids.stderr" ]] \
+        || ! grep -Fq "ActivityManager: Process $PACKAGE (pid $ui_pid) has died:" "$OUT/race-logcat.txt"; then
+        echo 'RACE_ALL_PROCESS_ABSENCE_UNVERIFIED'; return 2;
+      fi
       printf 'ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n' > "$OUT/race-process-scope.txt"
     fi
   fi

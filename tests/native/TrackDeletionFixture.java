@@ -18,6 +18,7 @@ public final class MainActivity extends Context {
     void startForegroundService(Intent intent) { starts++; }
     void startService(Intent intent) { starts++; }
     /* START_PENDING */
+    /* BLOCKED_IN_DELETION */
     final class DeviceStorage {
         /* BRIDGE_METHODS */
     }
@@ -137,7 +138,11 @@ public final class MainActivity extends Context {
         }));
         Thread remover = new Thread(() -> { deleted[0] = concurrent.new DeviceStorage().deleteTrack("A"); finished.countDown(); });
         writer.start(); check(writing.await(2, TimeUnit.SECONDS), "accepted writer inside barrier");
-        remover.start(); check(!finished.await(100, TimeUnit.MILLISECONDS), "cleanup waits for accepted append drain");
+        remover.start();
+        long blockedDeadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(2);
+        while(!concurrent.blockedInDeletion(remover) && System.nanoTime()<blockedDeadline) Thread.yield();
+        check(concurrent.blockedInDeletion(remover), "installed barrier observer recognizes actual provider-owned monitor");
+        check(!finished.await(100, TimeUnit.MILLISECONDS), "cleanup waits for accepted append drain");
         release.countDown(); check(finished.await(2, TimeUnit.SECONDS), "cleanup finishes after writer");
         writer.join(); remover.join();
         check(deleted[0] && records(concurrent.directory, "A") == 0, "drained tail removed from disk");

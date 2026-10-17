@@ -15,7 +15,7 @@ The runner must already permit hardware acceleration through `/dev/kvm`. The scr
 
 - Exact packaged `record-deletion.js` and `storage.js` execute in a test-only WebView with network loads blocked before document load. They call the current real DeviceStorage bridge with real SharedPreferences and app-private files. This is not a replacement UI test; the production UI has separate browser coverage.
 - The bridge host has the real target context attached without invoking MainActivity.onCreate, so it cannot trigger catalogue refresh. A fresh synthetic local catalogue is saved to the app's existing IndexedDB before the shell launches the normal empty Home Activity for process/foreground setup; this suppresses its automatic weekly download by the normal freshness contract. No Upload operation is called.
-- Stopped deletion, actual LocationManager GPS callbacks, append-drain synchronization, late callback rejection, unrelated active-session continuation, malformed/symlink paths, real cleanup obstruction and durable pending selection/retry. The deterministic native drain test requires its deletion worker to be BLOCKED with production `TrackDeletion.delete` on the stack while an accepted writer holds the real session monitor. It does not infer native entry from WebView scheduling or worker liveness. Exact-JS coordinator completion is checked separately after that native drain.
+- Stopped deletion, actual LocationManager GPS callbacks, append-drain synchronization, late callback rejection, unrelated active-session continuation, malformed/symlink paths, real cleanup obstruction and durable pending selection/retry. The deterministic native drain test requires its deletion worker to be BLOCKED with production `TrackDeletion.delete` or the outer owner barrier in `TrackProvider.call` on the stack while an accepted writer holds the real session monitor. It does not infer native entry from WebView scheduling or worker liveness. Exact-JS coordinator completion is checked separately after that native drain.
 - Cold-process recovery from the obstruction; constructed post-unlink/pre-final-save recovery. No injected power-loss/fsync failure is claimed.
 - Real detached process death and sticky-service restart: valid-session positive control, then tombstone-before-stop state. The shell requires a changed PID and an ActivityManager process-start record for TrackService, plus correct foreground/stop state and durable data verification.
 
@@ -27,7 +27,7 @@ This is a controlled callback on an existing service, **not** a system sticky re
 
 ## Process-death semantics matter
 
-Normal Android instrumentation finish force-stops the target. That cannot validate sticky restart. Crash phases therefore use Android 15's supported `am instrument --no-restart`, finish instrumentation, and leave a test-only main-thread callback scheduled eight seconds later to SIGKILL its own process. The shell verifies instrumentation detached before death and requires the matching `SIGKILL_AFTER_DETACH` log, a different service-triggered PID after that marker, and the required service state. A PID alone is insufficient: the valid control polls until that restarted process's TrackService is foreground, and the tombstone case polls until the observed service has stopped. It does not call force-stop or treat an instrumentation crash as proof. MainActivity is backgrounded before the crash fixture is prepared so Activity relaunch cannot masquerade as service restart. The production service runs without the test APK after process restart.
+Normal Android instrumentation finish force-stops the target. That cannot validate sticky restart. Crash phases therefore use Android 15's supported `am instrument --no-restart`, finish instrumentation, and leave a test-only main-thread callback scheduled eight seconds later to SIGKILL its own process. The shell verifies instrumentation detached before death and requires the matching `SIGKILL_AFTER_DETACH` log, a different service-triggered PID after that marker, and the required service state. A PID alone is insufficient: the valid control polls until that restarted process's TrackService is foreground, and the tombstone case polls until the observed service has stopped. It does not call force-stop or treat an instrumentation crash as proof. MainActivity is backgrounded after preparation and before the scheduled kill so Activity relaunch cannot masquerade as service restart. The production service runs without the test APK after process restart.
 
 Android 15 framework reference: https://github.com/aosp-mirror/platform_frameworks_base/blob/android-15.0.0_r1/services/core/java/com/android/server/am/ActivityManagerService.java (`finishInstrumentationLocked`, `instr.mNoRestart`). General references: https://developer.android.com/reference/android/app/Instrumentation and https://developer.android.com/tools/adb .
 
@@ -95,8 +95,8 @@ missed-window controls.
 
 ## Process-split candidate coverage
 
-The production tracker/provider now share `:tracking`; the UI retains the default
-process. The original 13 phases remain in order, with the lifecycle instrumentation
+The production tracker/provider and application default share `:tracking`;
+MainActivity explicitly retains its original `app.passengercount` process. The original 13 phases remain in order, with the lifecycle instrumentation
 explicitly targeting the owner process. Bootstrap still seeds the real UI WebView;
 the owner fixture uses a separate test-only WebView data-directory suffix. Owner
 reflection tests use an explicit foreground-service delivery while the shell proves
@@ -115,3 +115,31 @@ PID to survive. The subsequent `race` sample explicitly kills both package proce
 and proves absence before the independent helper FGS. Each has separate artifacts;
 a denial in either keeps the job failed. The latter is a retained platform-boundary
 negative control, not permission to merge an otherwise failed aggregate.
+
+
+### API35 instrumentation targeting and UI relay
+
+Run108 exposed that API35 `--no-restart` uses ApplicationInfo.processName rather
+than the instrumentation's first declared targetProcesses entry. The production
+application default is therefore explicit `:tracking`, with every component's
+resolved process preserved. The actual aapt2-linked manifest contains only the
+existing activity, service and provider; there are no library manifests, receivers
+or custom Application initialization to relocate. The six permissions are unchanged.
+
+Cold bootstrap uses the UI-only instrumentation declaration. Other fixtures attach
+to the existing owner. For real UI IPC checks, the owner runner launches the real
+visible MainActivity in a newly instrumented UI process using the documented
+comma-separated targetProcesses list. It then finishes/detaches itself before
+allowing the UI test to proceed. The UI waits for ordinary Home initialization,
+so its orphan-stop does not race fixture setup. The owner watcher reply only
+confirms the relay; the shell separately requires same-PID UI entry, success and
+post-finish detachment in order. A missing/failed UI result or transport failure
+fails the phase. The service process is uninstrumented during provider-death IPC.
+The owner is initialized through another ordinary visible Home setup afterward,
+before preparing the independent UI-death fixture.
+
+References: [instrumentation process list](https://developer.android.com/guide/topics/manifest/instrumentation-element),
+[API35 process selection and finish](https://android.googlesource.com/platform/frameworks/base/+/android-15.0.0_r1/services/core/java/com/android/server/am/ActivityManagerService.java),
+[secondary process attachment](https://android.googlesource.com/platform/frameworks/base/+/android-15.0.0_r1/services/core/java/com/android/server/am/AppProfiler.java).
+Installed execution remains required; host relay tests cannot establish Android
+Binder or restart behavior.

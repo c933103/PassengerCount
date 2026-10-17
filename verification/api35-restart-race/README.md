@@ -154,3 +154,15 @@ aggregate stayed failed. No controlled race observation is claimed. The helper
 now warms through a short test-package FGS and proves warm completion before the
 target starts. Both emulator paths reuse the existing runner-only KVM preflight;
 no device permission scope, acceleration requirement or target permission expands.
+
+
+Run [108](https://github.com/c933103/PassengerCount/actions/runs/39010001390) passed
+Node/native/browser/build checks and both bootstraps, but both installed paths
+failed before detached death: API35 attached owner-local instrumentation to the
+UI PID despite the declared targetProcesses. This is a harness targeting failure,
+not a new candidate restart result. Its [immutable receipt and safe PID excerpts](https://github.com/c933103/PassengerCount/tree/5c2a83b88ec9835e47d3995cb51c028c71878577/verification/api35-restart-race/run108)
+retain both failures and downloaded artifact hashes. The corrected application
+default/explicit-Activity process declarations leave all three resolved component
+processes unchanged. A supported multi-process test relay requires independent
+UI execution/detachment evidence. Both original and appended installed gates must
+run again on the corrected exact head.

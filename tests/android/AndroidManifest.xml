@@ -7,7 +7,7 @@
             android:exported="true" android:foregroundServiceType="shortService" />
     </application>
     <instrumentation android:name="app.passengercount.JournalLifecycleInstrumentation"
-        android:targetPackage="app.passengercount" android:targetProcesses="app.passengercount:tracking" android:functionalTest="true" />
+        android:targetPackage="app.passengercount" android:targetProcesses="app.passengercount:tracking,app.passengercount" android:functionalTest="true" />
     <instrumentation android:name="app.passengercount.UiLifecycleInstrumentation"
         android:targetPackage="app.passengercount" android:targetProcesses="app.passengercount" android:functionalTest="true" />
 </manifest>

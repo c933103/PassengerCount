@@ -68,31 +68,34 @@ test('no helper requirement for historical natural control; no app-op cleanup al
 const root=fileURLToPath(new URL('../',import.meta.url));
 const shell=fs.readFileSync(new URL('../scripts/android-restart-race.sh',import.meta.url),'utf8')
   .replace(/\bSECONDS\b/g,'fixtureClock').replace('fixtureClock+75','fixtureClock+5');
-function runShell(events,dump=service,transportError=false,warmReady=true) {
+function runShell(events,dump=service,transportError=false,warmReady=true,scope=null) {
   const out=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-'));
   try {
     fs.writeFileSync(path.join(out,'input.log'),(warmReady?['10-15 09:09:30.000 333 333 I PassengerRaceTrigger: RACE_WARM_READY pid=333 uid=10210',...events]:events).join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
     const r=spawnSync('bash',['-c',`set -euo pipefail
 ROOT=${JSON.stringify(root)}; OUT=${JSON.stringify(out)}; CI=true; EMU_PID=99; SERIAL=emulator-5556; PACKAGE=app.passengercount
+${scope ? "TRACK_PROCESS=app.passengercount:tracking" : ""}
 fixtureClock=0
 sleep(){ fixtureClock=$((fixtureClock+1)); }
 launch_home(){ echo launch_home >> "$OUT/calls"; }
 activity_state(){ echo "activity_state $*" >> "$OUT/calls"; }
 detached(){ echo "detached $*" >> "$OUT/calls"; }
 background_home(){ echo background_home >> "$OUT/calls"; }
-phase(){ echo "phase $*" >> "$OUT/calls"; }
+phase(){ echo "phase $*" >> "$OUT/calls"; touch "$OUT/prepared"; }
 adb(){
  echo "adb $*" >> "$OUT/calls"
  ${transportError ? 'if [[ "$*" == "logcat -d -v threadtime" ]]; then echo "error: device offline" >&2; return 0; fi' : ''}
  case "$*" in
-  'shell pidof app.passengercount') echo 111;;
+  'shell pidof app.passengercount') ${scope ? `if [[ ! -f "$OUT/prepared" ]] || [[ "${scope.uiAlive !== false}" == true ]]; then echo 444; else return 1; fi` : 'echo 111'};;
+  'shell pidof app.passengercount:tracking') echo 111;;
+  'shell pidof app.passengercount app.passengercount:tracking') ${scope?.absenceOutput ? `echo ${JSON.stringify(scope.absenceOutput)};` : ''} ${scope?.absenceStderr ? `echo ${JSON.stringify(scope.absenceStderr)} >&2;` : ''} return ${scope?.absenceExit ?? 1};;
   'logcat -d -v threadtime') cat "$OUT/input.log";;
   'shell dumpsys activity services app.passengercount') cat "$OUT/input.services";;
   *) echo 'Starting service: Intent { test fixture }';;
  esac
 }
 ${shell}
-restart_race
+restart_race ${scope?.kind || ""}
 `],{encoding:'utf8',timeout:10000});
     return {...r,calls:fs.readFileSync(path.join(out,'calls'),'utf8'),result:fs.existsSync(path.join(out,'race-result.json'))?JSON.parse(fs.readFileSync(path.join(out,'race-result.json'),'utf8')):null};
   } finally {fs.rmSync(out,{recursive:true,force:true});}
@@ -167,4 +170,30 @@ test('process-split harness keeps independent all-process absence gate after ser
   assert.match(shell,/RACE_ALL_PROCESS_ABSENCE_UNVERIFIED/);
   const instrument=fs.readFileSync(new URL('./android/JournalLifecycleInstrumentation.java',import.meta.url),'utf8');
   assert.match(instrument,/phase\.equals\("prepare-race"\)[\s\S]*ALL_PACKAGE_KILL/);
+});
+
+function splitEvents(kind,denial=false,uiDeath=true) {
+  return [...(uiDeath?['ActivityManager: Process app.passengercount (pid 444) has died: cch CEM']:[]),
+    death.replace('prepare-race','prepare-'+kind),died.replace('app.passengercount (','app.passengercount:tracking ('),
+    scheduled,entering,promoted,start.replace(':app.passengercount/',':app.passengercount:tracking/'),...(denial?[denied]:[])];
+}
+const trackerService=service.replace(':app.passengercount/',':app.passengercount:tracking/');
+test('actual split shell requires original UI PID survival before claiming service-only recovery',()=>{
+  const r=runShell(splitEvents('split'),trackerService,false,true,{kind:'split'});
+  assert.equal(r.status,0,r.stdout+r.stderr);assert.match(r.calls,/phase verify-split attached/);
+  const missing=runShell(splitEvents('split'),trackerService,false,true,{kind:'split',uiAlive:false});
+  assert.equal(missing.status,2,missing.stdout+missing.stderr);assert.doesNotMatch(missing.calls,/phase verify-split/);
+});
+test('actual all-process shell retains denial after proven OS and ActivityManager absence',()=>{
+  const r=runShell(splitEvents('race',true),'',false,true,{kind:'race',uiAlive:false});
+  assert.equal(r.status,1,r.stdout+r.stderr);assert.equal(r.result.outcome,'automatic-restart-denied');
+});
+for(const [label,options,deathObserved] of [
+  ['transport error',{absenceExit:255,absenceStderr:'error: device offline'},true],
+  ['surviving process',{absenceExit:0,absenceOutput:'444'},true],
+  ['missing ActivityManager UI death',{},false],
+]) test('all-process absence cannot be fabricated by '+label,()=>{
+  const r=runShell(splitEvents('race',true,deathObserved),'',false,true,{kind:'race',uiAlive:false,...options});
+  assert.equal(r.status,2,r.stdout+r.stderr);
+  assert.doesNotMatch(r.calls,/app.passengercount.tests.TRIGGER/);
 });

@@ -52,12 +52,23 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
             target = getTargetContext();
             check(target.getPackageName().equals("app.passengercount"), "exact target package");
             check(android.os.Build.VERSION.SDK_INT == 35, "bounded API35 runtime");
+            boolean uiPhase = phase.startsWith("ipc-");
+            boolean ownerProcess = android.app.Application.getProcessName().endsWith(":tracking");
+            if (uiPhase && ownerProcess) { relayToUi(phase); return; }
+            if (uiPhase) {
+                check(android.app.Application.getProcessName().equals("app.passengercount"), "actual UI process executes remote IPC fixtures");
+                signalWrite("relay-ui-" + phase);
+                await("owner relay fully detached before UI test", () -> signal("relay-detached-" + phase).exists(), 10000);
+                Log.i(TAG, "IPC_UI_ENTER phase=" + phase + " pid=" + Process.myPid());
+            }
+            check(uiPhase || phase.equals("bootstrap") || ownerProcess, "owner fixtures run in actual tracking process");
             if (android.app.Application.getProcessName().endsWith(":tracking")
                     && System.getProperty("passenger.test.web-suffix") == null) {
                 main(() -> WebView.setDataDirectorySuffix("lifecycle-tracking"));
                 System.setProperty("passenger.test.web-suffix", "set");
             }
             createBridgeAndPage();
+            if (uiPhase) await("real visible UI Home finished native startup", this::realUiReady, 20000);
             event("runtime", new JSONObject().put("phase", phase).put("pid", Process.myPid())
                 .put("fingerprint", android.os.Build.FINGERPRINT)
                 .put("separateTargetLoader", TargetAccess.class.getClassLoader()!=TrackService.class.getClassLoader())
@@ -113,7 +124,9 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
             }
             result.putString("stream", "PHASE_PASS " + phase + " assertions=" + assertions + " pid=" + Process.myPid() + "\n");
             result.putInt("assertions", assertions);
+            if (uiPhase) Log.i(TAG, result.getString("stream"));
             finish(Activity.RESULT_OK, result);
+            if (uiPhase) Log.i(TAG, "PHASE_DETACHED " + phase + " pid=" + Process.myPid());
         } catch (Throwable failure) {
             Log.e(TAG, "PHASE_FAIL " + phase, failure);
             result.putString("stream", "PHASE_FAIL " + phase + ": " + Log.getStackTraceString(failure));
@@ -121,6 +134,43 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
         }
     }
 
+    private void relayToUi(String phase) throws Exception {
+        // API35 --no-restart attaches only ApplicationInfo.processName. Use the
+        // documented multi-process instrumentation list to instrument a freshly
+        // launched real UI, then detach this owner before any UI test operation.
+        for (String suffix : new String[]{"relay-ui-", "relay-detached-"})
+            if (signal(suffix + phase).exists()) check(signal(suffix + phase).delete(), "clear synthetic relay receipt");
+        ActivityManager manager = (ActivityManager) target.getSystemService(Context.ACTIVITY_SERVICE);
+        Set<Integer> oldUiPids = new HashSet<>();
+        for (ActivityManager.RunningAppProcessInfo process : manager.getRunningAppProcesses())
+            if (process.uid == Process.myUid() && process.processName.equals("app.passengercount")) {
+                oldUiPids.add(process.pid); Process.killProcess(process.pid);
+            }
+        await("old UI PID absent before instrumentation relay", () -> {
+            for (ActivityManager.RunningAppProcessInfo process : manager.getRunningAppProcesses())
+                if (oldUiPids.contains(process.pid)) return false;
+            return true;
+        }, 5000);
+        target.startActivity(new Intent(target, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        await("declared UI instrumentation started", () -> signal("relay-ui-" + phase).exists(), 20000);
+        Bundle result = new Bundle();
+        result.putString("stream", "PHASE_RELAY " + phase + " ownerPid=" + Process.myPid() + "\n");
+        finish(Activity.RESULT_OK, result);
+        signalWrite("relay-detached-" + phase);
+    }
+    private boolean realUiReady() throws Exception {
+        CountDownLatch done = new CountDownLatch(1); AtomicReference<Boolean> ready = new AtomicReference<>(false);
+        main(() -> {
+            Collection<?> resumed = (Collection<?>) TargetAccess.staticField(MainActivity.class, "resumedActivities");
+            if (resumed.isEmpty()) { done.countDown(); return; }
+            Object activity = resumed.iterator().next();
+            WebView actual = (WebView) TargetAccess.field(activity, "web");
+            actual.evaluateJavascript("document.readyState==='complete' && document.body.dataset.screen==='home'", value -> {
+                ready.set("true".equals(value)); done.countDown();
+            });
+        });
+        return done.await(3, TimeUnit.SECONDS) && ready.get();
+    }
     private void createBridgeAndPage() throws Exception {
         // Do not run MainActivity.onCreate: it starts catalogue refresh. The unchanged
         // bridge is attached to the real target context; no production methods are replaced.
@@ -284,15 +334,18 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
     }
     private void prepareIpcBarrier(boolean death) throws Exception {
         String id = PREFIX + (death ? "ipc-death" : "ipc-drain");
-        for (String name : new String[]{"ready", "entered", "release", "dead"})
+        for (String name : new String[]{"ready", "entered", "release", "dead", "ui-ready"})
             if (signal(name).exists()) check(signal(name).delete(), "clear only synthetic IPC signal");
-        seed(id); start(id);
-        Object control = session(), request = TargetAccess.call(control, "request");
+        seed(id);
+        Object control = session();
         // Finish/detach first. The held production append monitor must be reached
         // by a real Binder thread from the UI, not a copied in-process controller.
         Thread writer = new Thread(() -> {
-            SystemClock.sleep(2000);
             try {
+                long readyDeadline = SystemClock.elapsedRealtime() + 45000;
+                while (!signal("ui-ready").exists() && SystemClock.elapsedRealtime() < readyDeadline) SystemClock.sleep(20);
+                if (!signal("ui-ready").exists()) throw new AssertionError("UI IPC start timeout");
+                Object request = TargetAccess.call(control, "request");
                 TargetAccess.call(control, "append", request, (Runnable) () -> {
                     try {
                         signalWrite("ready");
@@ -332,6 +385,9 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
     private void ipcBarrier(boolean death) throws Exception {
         check(android.app.Application.getProcessName().equals("app.passengercount"), "IPC caller is actual UI process");
         String id = PREFIX + (death ? "ipc-death" : "ipc-drain");
+        bridge.startTracking(id);
+        await("real UI starts owner before held append", () -> remoteServicePid() > 0 && lines(journal(id)) > 1, 20000);
+        signalWrite("ui-ready");
         await("remote accepted append holds monitor", () -> signal("ready").exists(), 10000);
         AtomicReference<Boolean> acknowledged = new AtomicReference<>();
         AtomicReference<Throwable> failure = new AtomicReference<>();
@@ -751,7 +807,8 @@ public class JournalLifecycleInstrumentation extends Instrumentation {
     private boolean blockedInDeletion(Thread thread) {
         if (thread.getState()!=Thread.State.BLOCKED) return false;
         for (StackTraceElement frame:thread.getStackTrace())
-            if (frame.getClassName().equals("app.passengercount.TrackDeletion") && frame.getMethodName().equals("delete")) return true;
+            if ((frame.getClassName().equals("app.passengercount.TrackDeletion") && frame.getMethodName().equals("delete"))
+                    || (frame.getClassName().equals("app.passengercount.TrackProvider") && frame.getMethodName().equals("call"))) return true;
         return false;
     }
     private Class<?> clientClass() throws Exception { return Class.forName("app.passengercount.TrackClient", true, TrackService.class.getClassLoader()); }

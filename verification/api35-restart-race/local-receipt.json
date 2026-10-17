@@ -1,49 +1,52 @@
 {
-  "baseCommit": "bd18cb2eb4d45a6d1fa6c74d50bad07ac31d5889",
+  "baseCommit": "8fe8c6afd75b984a281a08051864d90b3d6215d1",
   "date": "2026-10-17",
   "scope": "Candidate bounded production correction: separate tracking process with acknowledged private IPC; all-process absence automatic-restart requirement remains open",
   "inputSha256": {
-    "android/AndroidManifest.xml": "2954d6ce349dc5c190a9688dbd645b062eea78fdc3d5c700141b9adc78f5daf1",
+    "android/AndroidManifest.xml": "1b8e2f0a705cea6a03e7a1cc6f9afd51a8f5dae00770d8332b5a4f2a641e1450",
     "android/src/app/passengercount/MainActivity.java": "9439def9e0e5497edeffee4d06acfc2d71b062b7b3c3a7018a435a1a6471cae5",
     "android/src/app/passengercount/TrackClient.java": "9c7aa2cb62dd41200ae046ad40a46ede89226adbf9743b2d0524221af63c20c6",
     "android/src/app/passengercount/TrackJournal.java": "743f73afe912561bddad958fc105fbaa1f5272894ad35f5c580622be96361776",
     "android/src/app/passengercount/TrackProvider.java": "96e0688e609e3a56d5e00f6eb47b33c9b707a673751e5a5399df7f9fa4111724",
     "android/src/app/passengercount/TrackService.java": "76b571db920e5515cb075222134a3d75ea3500ce07b681f3e9236524b4a7d305",
     "scripts/analyze-android-restart-race.mjs": "68176fca73a406e19d93b63d46e59e2b215b1c45207878ea47c72509bcd91cdc",
-    "scripts/android-restart-race.sh": "b96d593dfe1670700338c144ae95c0dd794e80c33eda8f60f13ecbcf18812966",
-    "scripts/test-android-installed.sh": "60056cac4771cc0d320988963b7552005331812fc307da10b8c3172ae91566b3",
-    "scripts/test-track-deletion.cjs": "85be2d14a85cc05474c274e4eec7b93fc2137d4319f0c4819570c6df9dfd18b0",
-    "tests/android-restart-race.test.js": "8779aa5bdd9843dd8f7308d0b697b9d3037650022dd94c922ca119cbdc322949",
-    "tests/android/AndroidManifest.xml": "c4fe1830e8c9f6a560d190785017f45e70e89ee922591edfd163aa8706463b7a",
-    "tests/android/JournalLifecycleInstrumentation.java": "595330a0a3632122fbd6efa2d4786a38f34beff2697f2ed13a8c9a9c45518c5e",
-    "tests/android/README.md": "0affe18134a869808ca840cb1ed3c5ba7d694821fcb7ff16b8f4e727b801b82d",
+    "scripts/android-restart-race.sh": "0c6526682c4fe3ac8e2b71f593e1dcadfe1d0e28c17954d072db83e5f98a7d49",
+    "scripts/test-android-installed.sh": "e8ac2ddc60a07ceb5227a294ce5b15533eb723505c80104d10517ec251db4771",
+    "scripts/test-track-deletion.cjs": "3d551d75c1116e182c783e959d5f7fe7d8a5960f35274807990d172698f2c58c",
+    "tests/android-restart-race.test.js": "604c9a8da2d3891d5ac5a7ad46978a91734192ad34fab097516ef96965409057",
+    "tests/android/AndroidManifest.xml": "5550215cc443d667a6e9ea2c39762d4a272cfb556b9ae03c71d5f383ee6708b7",
+    "tests/android/JournalLifecycleInstrumentation.java": "9a4e2347df5c62b67983bbb607fe82fabebd8039f8c7d1df13598b5cbf3eaeec",
+    "tests/android/README.md": "c03163a6a8f1694bd03f994f824beb68ab00e8d359801f2ae67f8d587e59377d",
     "tests/android/UiLifecycleInstrumentation.java": "b9be474625767680e4b5b7e7eeaf88b4839ad5c351d5b5eda9706e453c9a229f",
     "tests/native/ExportPermissionFixture.java": "106eb3fe23c3112b02ff4024c69e073b0e2448005cc6ac54c3856afd2145d1b1",
-    "tests/native/TrackDeletionFixture.java": "e7d30e613cc5a7f16e45b92c0278541c6583b153822ed3fc1c774512bb6677c1",
+    "tests/native/TrackDeletionFixture.java": "58ec0c2b14cee3ea11684a1dd1ef6b4732a22e57845dde692294a0b4365e6d64",
     "tests/native/TrackIpcShims.java": "6aad01dd1bf0099726e4cce529f3d4ce760df092cd734b9494966e4b6fd308c5",
     "tests/native/TrackJournalTest.java": "774860e1c0d6e3ba0ebb4583bc85782f0d173295574e44edf5bb23c5358b6521",
-    "verification/api35-restart-race/README.md": "4c475bd8facc151125c4cda0c122418b0e9e0b2bec55977f510068131af452ab"
+    "verification/api35-restart-race/README.md": "b169d9d7b0a99f9a8ce0bf1409fe3addeaaa9ac794af9017f3052e4242b9591a",
+    "tests/android-harness.test.js": "7ec68cb2829b0df981c2801c293959e941de2f9ad6970dc3d76c560b61b610ad",
+    "verification/api35-restart-race/process-layout-receipt.json": "62a551cb9bc8365d61c7dcfd2a6c27c739ec03437657fa922485fd1e429b47a0"
   },
   "checks": [
     {
       "command": "npm test",
       "result": "passed",
-      "tests": 385,
-      "pass": 385,
-      "fail": 0
+      "tests": 410,
+      "pass": 410,
+      "fail": 0,
+      "scope": "Final full candidate aggregate, including six UI absence and fourteen UI relay regressions"
     },
     {
       "command": "bash scripts/test-native-track.sh",
       "result": "passed",
-      "details": "TrackJournal 102; TrackSession 26; ExportStorage 928; TrackDeletion/IPC 291; TargetAccess 14; interruption 22 assertions; export permission fixture passed"
+      "details": "TrackJournal 102; TrackSession 26; ExportStorage 928; TrackDeletion/IPC 292; TargetAccess 14; interruption 22 assertions; export permission fixture passed"
     },
     {
       "command": "node --test tests/android-restart-race.test.js tests/android-harness.test.js tests/android-restart-after-failure.test.js",
       "result": "passed",
-      "tests": 78
+      "tests": 103
     },
     {
-      "command": "SDK35 production/test Java compilation, test aapt2 manifest link and d8 dex",
+      "command": "SDK35 production/test Java compilation, both production aapt2 manifest links/dumps, test manifest link and d8 dex",
       "result": "passed",
       "limitations": "Unsigned local compile; stock d8 warns API35 exceeds supported API34"
     },
@@ -64,8 +67,21 @@
     },
     {
       "command": "browser checks",
-      "result": "pending hosted CI",
-      "reason": "Local Chromium socket creation previously blocked; no browser source change"
+      "result": "passed on published 8fe8c6a in run108; new head pending",
+      "reason": "No web source change; exact-head hosted workflow still required"
+    },
+    {
+      "command": "node scripts/test-track-deletion.cjs; focused shell/classifier/failure-path tests after observer correction",
+      "result": "passed",
+      "assertions": 292,
+      "nodeTests": 103,
+      "scope": "Provider barrier observer; strict process-scope negatives; ordered same-PID UI relay completion; UI-only absence transport failures. SDK35 test recompile/dex passed."
+    },
+    {
+      "command": "one-time aapt2-linked production manifest and Application initialization audit",
+      "result": "passed",
+      "receipt": "process-layout-receipt.json",
+      "scope": "All three resolved production component processes and all six permissions unchanged; no library manifests or custom Application initializer"
     }
   ],
   "preservedFailures": {
@@ -74,5 +90,10 @@
     "result": "Two independent controlled automatic-restart denials; original 13 phases passed before first appended failure; separate diagnostic also failed"
   },
   "acceptance": "No merge/release approval: the candidate may improve target-service-only or UI-only death, but all-process-absent denial remains a binding failure. Prior failure is not replaced by diagnostic success.",
-  "permissions": "No new production permission, watchdog, persistent binding, hidden Activity or policy bypass; existing tracking data paths retained."
+  "permissions": "No new production permission, watchdog, persistent binding, hidden Activity or policy bypass; existing tracking data paths retained.",
+  "harnessCorrection": {
+    "change": "Respect API35 --no-restart application-default process selection; supported declared UI instrumentation relay detaches owner before cross-process tests. Require independent ordered same-PID UI entry/pass/detachment; provider barrier observer and exact OS absence evidence.",
+    "run108": "Both installed paths failed before death/interleaving on wrong-process owner fixture; no new product restart result.",
+    "evidence": "https://github.com/c933103/PassengerCount/tree/5c2a83b88ec9835e47d3995cb51c028c71878577/verification/api35-restart-race/run108"
+  }
 }

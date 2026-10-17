@@ -119,7 +119,7 @@ adb logcat -v threadtime > "$OUT/logcat-live.txt" 2>&1 & LOG_PID=$!
 ) & GPS_PID=$!
 phase() {
   local name=$1 mode=${2:-cold} runner=$RUNNER
-  [[ "$name" != bootstrap && "$name" != ipc-* ]] || runner=$UI_RUNNER
+  [[ "$name" != bootstrap ]] || runner=$UI_RUNNER
   local opts=()
   [[ "$mode" != attached ]] || opts+=(--no-restart)
   if ! timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$runner" \
@@ -129,7 +129,28 @@ phase() {
     exit 1
   fi
   cat "$OUT/$name.txt"
-  grep -q "PHASE_PASS $name " "$OUT/$name.txt"
+  if [[ "$name" == ipc-* ]]; then
+    grep -q "PHASE_RELAY $name " "$OUT/$name.txt"
+    local deadline=$((SECONDS+65)) complete=false
+    while ((SECONDS<deadline)); do
+      adb logcat -d -v threadtime > "$OUT/$name-ui-logcat.txt"
+      if grep -q "PassengerJournalTest: PHASE_FAIL $name" "$OUT/$name-ui-logcat.txt"; then
+        echo "UI_PHASE_FAILED: $name"; exit 1;
+      fi
+      IPC_UI_PID="$(sed -nE "s/.*IPC_UI_ENTER phase=$name pid=([0-9]+).*/\\1/p" "$OUT/$name-ui-logcat.txt" | tail -1)"
+      if [[ "$IPC_UI_PID" =~ ^[0-9]+$ ]] && awk -v phase="$name" -v pid="$IPC_UI_PID" '
+        index($0,"IPC_UI_ENTER phase=" phase " pid=" pid) { entered=NR }
+        entered && $0 ~ ("PassengerJournalTest: PHASE_PASS " phase " assertions=[0-9]+ pid=" pid "$") { passed=NR }
+        passed && $0 ~ ("PassengerJournalTest: PHASE_DETACHED " phase " pid=" pid "$") { detached=NR }
+        END { exit !(entered && passed>entered && detached>passed) }
+      ' "$OUT/$name-ui-logcat.txt"; then complete=true; break; fi
+      sleep 0.2
+    done
+    $complete || { echo "UI_PHASE_UNVERIFIED: $name"; exit 1; }
+    grep "PassengerJournalTest: PHASE_PASS $name " "$OUT/$name-ui-logcat.txt"
+  else
+    grep -q "PHASE_PASS $name " "$OUT/$name.txt"
+  fi
   grep -q 'INSTRUMENTATION_CODE: -1' "$OUT/$name.txt"
   ! grep -q 'PHASE_FAIL\|INSTRUMENTATION_FAILED' "$OUT/$name.txt"
 }
@@ -137,6 +158,14 @@ launch_home() {
   # bootstrap seeded a fresh local-only catalogue and empty Home state first.
   adb shell am start -W -n "$PACKAGE/.MainActivity" > "$OUT/home-launch-$(date +%s).txt"
   sleep 2
+  local deadline=$((SECONDS+20))
+  # Home's ordinary orphan-stop IPC initializes the owner. Never use shell to
+  # enter the private provider or start the production service.
+  while ((SECONDS<deadline)); do
+    if adb shell pidof "$TRACK_PROCESS" > "$OUT/home-owner-pid.txt"; then return 0; fi
+    sleep 0.2
+  done
+  echo 'HOME_OWNER_STARTUP_UNVERIFIED'; exit 1
 }
 background_home() {
   # Prevent Activity relaunch from masquerading as a service-triggered restart.
@@ -144,6 +173,13 @@ background_home() {
   # it behind Home before the scheduled detached SIGKILL, as in ordinary use.
   adb shell input keyevent KEYCODE_HOME
   sleep 1
+}
+ui_absent() {
+  local code
+  if adb shell pidof "$PACKAGE" > "$OUT/ui-death-pids.txt" 2> "$OUT/ui-death-pids.stderr"; then code=0; else code=$?; fi
+  if [[ "$code" == 1 && ! -s "$OUT/ui-death-pids.txt" && ! -s "$OUT/ui-death-pids.stderr" ]]; then return 0; fi
+  if [[ "$code" == 0 && ! -s "$OUT/ui-death-pids.stderr" ]] && grep -Eq '^[0-9]+([[:space:]]+[0-9]+)*[[:space:]]*$' "$OUT/ui-death-pids.txt"; then return 1; fi
+  echo 'UI_PROCESS_OBSERVATION_UNVERIFIED' >&2; return 2
 }
 detached() {
   local kind=$1 oldpid=$2 process=${3:-$PACKAGE} proof="$OUT/instrumentation-detached-$1.txt"
@@ -291,23 +327,28 @@ launch_home
 phase ipc-basics attached
 phase prepare-ipc-barrier attached
 phase ipc-drain attached
-ui_pid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 phase prepare-ipc-death attached
 phase ipc-death attached
+ui_pid=$IPC_UI_PID
 [[ "$(adb shell pidof "$PACKAGE" | tr -d '\r')" == "$ui_pid" ]]
+# A new, visible Home setup initializes the owner after deliberate provider death.
+# The preceding unknown-acknowledgement assertion has already finished.
+launch_home
 phase prepare-ipc-pipe attached
 phase ipc-prepare-ui-death attached
+ui_pid=$IPC_UI_PID
 background_home
 detached ui-death "$ui_pid"
 ui_gone=false
 for ((i=0;i<25;i++)); do
-  if ! adb shell pidof "$PACKAGE" > "$OUT/ui-death-pids.txt"; then ui_gone=true; break; fi
+  if ui_absent; then ui_gone=true; break; else code=$?; [[ "$code" == 1 ]] || exit 2; fi
   sleep 1
 done
 $ui_gone || { echo 'UI_PROCESS_DEATH_UNVERIFIED'; exit 1; }
 sleep 6
 adb logcat -d -v threadtime > "$OUT/ui-death-logcat.txt"
 grep -q "UI_SIGKILL_AFTER_DETACH pid=$ui_pid" "$OUT/ui-death-logcat.txt"
+grep -Fq "ActivityManager: Process $PACKAGE (pid $ui_pid) has died:" "$OUT/ui-death-logcat.txt"
 phase verify-ui-death attached
 printf 'PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim\n' | tee "$OUT/result.txt"
 
