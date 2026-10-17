@@ -1,0 +1,93 @@
+{
+  "baseCommit": "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+  "date": "2026-10-17",
+  "scope": "Opt-in diagnostic; automatic-restart requirement still open; no production change",
+  "inputSha256": {
+    ".github/workflows/v19-validate.yml": "c7ffe5adb3b4b563ef73c4d3a0d2d3b40e2280338f5b321eec3639eead3a1a41",
+    "scripts/test-android-installed.sh": "42af0f8bc24a421c2be6a0ffd7138b8a45af1c5ecb572a290b578a121b3a867c",
+    "scripts/analyze-android-restart-race.mjs": "3bc32bf4e8a0d93de510fb876bd70cc3e08ad0a8d40de56abf1d6ef169df1d9c",
+    "scripts/android-restart-race.sh": "a184d4726aafcc6cb4551895be94bf77baa0da3cecf9c9f4bdc9c7baafa25f5d",
+    "tests/android/AndroidManifest.xml": "796faa2703661b61633c56523041fd091ad927781e74c331b0bc747789d6e3ed",
+    "tests/android/JournalLifecycleInstrumentation.java": "a0e6450d3ee7d609684a6d70210aa55995c9f6a255cec7fa2470872e7253bc3c",
+    "tests/android/RestartRaceTriggerService.java": "ef7c0c4a459abc428fd2053d22312c2316da8bedb04e1fdc7c216f144ade797a",
+    "tests/android-restart-race.test.js": "ea22f7930b78c3d251fdbf4703e8c45550983b11a37380610b7659456c5e4828",
+    "tests/android/README.md": "610b7d445ac9116f1944ba4c7ca01335ee32b620e1f0115e911f4508350d72f9"
+  },
+  "checks": [
+    {
+      "command": "npm test",
+      "result": "passed",
+      "counts": {
+        "tests": 366,
+        "pass": 366,
+        "fail": 0
+      }
+    },
+    {
+      "command": "npm run test:native",
+      "result": "passed"
+    },
+    {
+      "command": "node --test tests/android-restart-race.test.js",
+      "result": "passed",
+      "tests": 25
+    },
+    {
+      "command": "bash -n scripts/android-restart-race.sh scripts/test-android-installed.sh",
+      "result": "passed"
+    },
+    {
+      "command": "API35 production/test Java compilation, test d8 dex, aapt2 manifest link",
+      "result": "passed",
+      "scope": "Unsigned compilation/link only; JDK21 compiler module, SDK platform35 revision2, build-tools35.0.0; stock d8 warns API35 exceeds its supported API34."
+    },
+    {
+      "command": "CHROME_PATH=/usr/bin/chromium npm run test:browser",
+      "result": "blocked before browser assertions",
+      "reason": "Chromium socket creation is not permitted in this runtime."
+    },
+    {
+      "command": "installed API35 emulator probe",
+      "result": "not run locally",
+      "reason": "No /dev/kvm or installed emulator in this runtime; hosted run required."
+    }
+  ],
+  "priorAttempts": [
+    {
+      "command": "npm ci",
+      "result": "failed: default cache path absent",
+      "resolution": "Same lockfile succeeded with temporary writable npm cache."
+    },
+    {
+      "command": "initial npm test while independent setup was active",
+      "result": "312/313 reported, native-track.test.js subprocess failed without diagnostic cause",
+      "resolution": "Unchanged tests subsequently passed; failed observation retained locally, no cause asserted."
+    }
+  ],
+  "sourcePathControls": [
+    {
+      "version": "api35",
+      "sourceSha256": "53c46c8b932221d3d1223c26b9d873b1b718b3d2f80ee2a0114092360a87664d",
+      "exit": 0,
+      "lastLine": "7 source-path assertions passed; not an installed-device result"
+    },
+    {
+      "version": "android15-release",
+      "sourceSha256": "53c46c8b932221d3d1223c26b9d873b1b718b3d2f80ee2a0114092360a87664d",
+      "exit": 0,
+      "lastLine": "7 source-path assertions passed; not an installed-device result"
+    },
+    {
+      "version": "android16-release",
+      "sourceSha256": "64df5e8de4b4d99572f139ab27fe49ef6b542d0daf6b75304b4a3ae41204eedc",
+      "exit": 0,
+      "lastLine": "7 source-path assertions passed; not an installed-device result"
+    },
+    {
+      "version": "main",
+      "sourceSha256": "57ffe6d837f0fc68b8c42e8067478de46fea0be03cb792af28df860d3eb38d0f",
+      "exit": 0,
+      "lastLine": "7 source-path assertions passed; not an installed-device result"
+    }
+  ]
+}

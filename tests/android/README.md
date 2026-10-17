@@ -1,6 +1,6 @@
 # API35 installed journal lifecycle validation
 
-Test-only instrumentation targets the current `app.passengercount` APK. The test APK is compiled against target classes but packages only instrumentation/test-access classes. It reuses the current CI job's ephemeral validation signer, not a production key. No production manifest change, debug flag, extra exported component or runtime hook is introduced. All nonpublic target methods, fields and session/request types are accessed through test-side reflection: identical Java package names do not grant package access across the separate defining classloaders used by `--no-restart`.
+Test-only instrumentation targets the current `app.passengercount` APK. The test APK is compiled against target classes but packages only instrumentation/test-access classes and the separate-package race trigger described below. It reuses the current CI job's ephemeral validation signer, not a production key. No production manifest change, debug flag, extra exported component or runtime hook is introduced. All nonpublic target methods, fields and session/request types are accessed through test-side reflection: identical Java package names do not grant package access across the separate defining classloaders used by `--no-restart`.
 
 Run after the normal `android/build.sh` within the existing ephemeral validation job:
 
@@ -39,3 +39,42 @@ These tests validate this emulator's actual Android filesystem/service behavior.
 
 Host regressions separately check harness reliability: `scripts/test-android-target-access.cjs` loads unchanged production TrackSession and the test access helper in different defining classloaders, demonstrates that direct package access fails, and exercises reflected request/accept/append/stop/field access. `tests/android-harness.test.js` executes the actual shell observation function with bounded synthetic logs and service snapshots, including delayed initialization, stale PID/log and missing-marker negatives. Neither host check is substituted for installed Android execution.
 
+
+## Opt-in independent-FGS restart race probe
+
+Use a pull-request head branch under `probe/api35-sticky-restart/`, or dispatch
+`v19-validate.yml` on the desired ref with `restart_race=true`. The existing
+validate job runs the normal build and **all original 13 installed phases first**.
+The opt-in then adds `prepare-race` and (only after measured foreground recovery)
+`verify-race`. Ordinary PRs and main pushes do not run this probe.
+
+The separate test APK declares its own `FOREGROUND_SERVICE` normal permission and
+an exported, short-lived `shortService` trigger. No production manifest, APK
+component, location permission, UID sharing, binding, policy setting, battery
+exemption or background-location grant changes. The helper receives no target
+journal, session token or location. It is used only on the fresh owned emulator.
+The shell's foreground-start privilege applies to the **test package only**.
+
+After a real TOP start and background transition, the target instrumentation
+fully detaches and kills its process exactly as in the original control. The
+shell observes that death and ActivityManager's restart scheduling, then starts
+the independent test service. Only ActivityManager restarts TrackService. The
+classifier requires the helper's successful foreground transition before the
+new target service process starts. No ordinary `stopForeground`, synthetic
+null-intent callback, or instrumentation is involved in that restart window.
+
+- Exit 0 requires that measured ordering, the new target TrackService foreground
+  state, and then the existing real GPS/session/journal verification. This is
+  one successful sample, not closure of the intermittent defect. GPS verification
+  runs after reattachment; pre-reattachment GPS delivery is not claimed.
+- Exit 1 reports an observed automatic-restart denial and keeps the job failed.
+- Exit 2 reports missed timing or incomplete observation. It is inconclusive,
+  never a passing automatic-restart test. No platform delay is altered to force
+  the window and no retry hides a failed sample.
+
+`race-result.json` records line indices, old/new PID, measured interleaving and
+any START_FOREGROUND cleanup during process absence. That app-op signature is
+supporting evidence, not a captured internal framework stack. Original phase
+results stay separate from the diagnostic. Node regressions execute the actual
+shell and classifier with success, denial, transport failure, stale-state and
+missed-window controls.

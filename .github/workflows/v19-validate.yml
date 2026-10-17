@@ -5,6 +5,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      restart_race:
+        description: 'Probe the independent-FGS / sticky-restart interleaving after the original gates'
+        type: boolean
+        default: false
 jobs:
   validate:
     runs-on: ubuntu-24.04
@@ -100,6 +105,8 @@ jobs:
           } 2>&1 | tee android/build/lifecycle-evidence/emulator-dependency.txt
       - name: Validate installed journal lifecycle on API35
         timeout-minutes: 12
+        env:
+          PASSENGER_RESTART_RACE: ${{ ((github.event_name == 'workflow_dispatch' && inputs.restart_race) || startsWith(github.head_ref, 'probe/api35-sticky-restart/')) && '1' || '0' }}
         run: bash scripts/test-android-installed.sh
       - name: Preserve installed lifecycle evidence
         if: always()

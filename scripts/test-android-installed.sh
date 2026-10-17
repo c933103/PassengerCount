@@ -266,3 +266,10 @@ activity_state recovery-denied 2 "$oldpid"
 phase recover-denied attached
 printf 'PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim\n' | tee "$OUT/result.txt"
 
+
+# Opt-in diagnostic only, after all original controls in their original order.
+# Failure remains aggregate failure; an unhit interleaving is explicitly unverified.
+if [[ "${PASSENGER_RESTART_RACE:-0}" == 1 ]]; then
+  source "$ROOT/scripts/android-restart-race.sh"
+  restart_race
+fi

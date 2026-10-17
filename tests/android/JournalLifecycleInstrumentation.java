@@ -68,6 +68,8 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             else if (phase.equals("prepare-denied")) prepareDeniedRestart();
             else if (phase.equals("verify-denied")) verifyDeniedRestart();
             else if (phase.equals("recover-denied")) recoverDeniedRestart();
+            else if (phase.equals("prepare-race")) prepareCrash(false, "crash-race");
+            else if (phase.equals("verify-race")) verifyValidRestart();
             else if (phase.equals("prepare-valid")) prepareCrash(false);
             else if (phase.equals("verify-valid")) verifyValidRestart();
             else if (phase.equals("prepare-deleted")) prepareCrash(true);
@@ -75,7 +77,7 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
             else throw new AssertionError("Unknown phase " + phase);
             check(interceptedRequests == 0, "test document made no network request");
             main(() -> { web.destroy(); web=null; });
-            if (phase.equals("prepare-valid") || phase.equals("prepare-deleted")) {
+            if (phase.equals("prepare-valid") || phase.equals("prepare-deleted") || phase.equals("prepare-race")) {
                 // --no-restart completion detaches without force-stop. The shell
                 // verifies that detached state before this test-only SIGKILL.
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
@@ -435,7 +437,10 @@ public final class JournalLifecycleInstrumentation extends Instrumentation {
     }
 
     private void prepareCrash(boolean deleted) throws Exception {
-        String id=PREFIX+(deleted?"crash-deleted-A":"crash-valid-B"); seed(id); start(id);
+        prepareCrash(deleted, deleted ? "crash-deleted-A" : "crash-valid-B");
+    }
+    private void prepareCrash(boolean deleted, String suffix) throws Exception {
+        String id=PREFIX+suffix; seed(id); start(id);
         await("crash control receives real GPS",()->lines(journal(id))>1,25000);
         Object current=TargetAccess.call(session(), "request");
         if(deleted) {
