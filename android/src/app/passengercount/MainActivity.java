@@ -259,72 +259,27 @@ public final class MainActivity extends Activity {
         @JavascriptInterface public void chooseExportDirectory() { runOnUiThread(() -> chooseDirectory()); }
         @JavascriptInterface public void resetExportDirectory() { runOnUiThread(() -> storeDirectory(null)); }
         @JavascriptInterface public void startTracking(String surveyId) {
-            String id = surveyId;
-            if (!TrackDeletion.validId(id) || TrackService.isDeleted(MainActivity.this, id) || TrackService.session(MainActivity.this).start(id) == null) return;
+            if (!TrackClient.start(MainActivity.this, surveyId)) return;
             runOnUiThread(() -> startPendingTrack());
         }
         @JavascriptInterface public boolean stopTrackingAndDrain(String surveyId) {
-            String id = TrackService.safeId(surveyId);
-            // append() holds the same lock through fsync. Returning true means
-            // all accepted writes finished and no later callback can append.
-            boolean stopped = TrackService.session(MainActivity.this).stop(id);
-            if (stopped) runOnUiThread(TrackService::finishStop);
-            return stopped;
+            // Only the tracking-process owner can acknowledge the append/fsync barrier.
+            return TrackClient.stop(MainActivity.this, surveyId);
         }
         @JavascriptInterface public void stopTracking(String surveyId) {
             stopTrackingAndDrain(surveyId);
         }
         @JavascriptInterface public boolean deleteTrack(String surveyId) {
-            boolean deleted = TrackService.deleteTrack(MainActivity.this, surveyId);
-            runOnUiThread(TrackService::finishStop);
-            return deleted;
+            return TrackClient.delete(MainActivity.this, surveyId);
         }
         @JavascriptInterface public String getTrackPage(String surveyId, String cursor) {
-            synchronized (TrackService.session(MainActivity.this)) {
-                String id = surveyId;
-                if (!TrackDeletion.validId(id)) return "";
-                if (TrackService.isDeleted(MainActivity.this, id))
-                    return "{\"points\":[],\"cursor\":\"\",\"more\":false}";
-                try {
-                    TrackJournal.Page page = TrackJournal.read(TrackService.trackFile(MainActivity.this, id), cursor);
-                    org.json.JSONArray points = new org.json.JSONArray();
-                    for (TrackJournal.Entry entry : page.entries) {
-                        try {
-                            org.json.JSONObject point = new org.json.JSONObject(entry.json);
-                            if (!(point.opt("nativeId") instanceof String) || point.optString("nativeId").isEmpty())
-                                point.put("nativeId", entry.legacyId);
-                            point.put("nativeOrder", entry.offset);
-                            points.put(point);
-                        } catch (org.json.JSONException ignored) {}
-                    }
-                    org.json.JSONObject result = new org.json.JSONObject();
-                    result.put("points", points);
-                    result.put("cursor", page.cursor);
-                    result.put("more", page.more);
-                    return result.toString();
-                } catch (Exception ignored) { return ""; }
-            }
+            return TrackClient.page(MainActivity.this, surveyId, cursor);
         }
         @JavascriptInterface public String getTrack(String surveyId) {
-            synchronized (TrackService.session(MainActivity.this)) {
-                String id = surveyId;
-                org.json.JSONArray points = new org.json.JSONArray();
-                if (!TrackDeletion.validId(id) || TrackService.isDeleted(MainActivity.this, id)) return points.toString();
-                File file = TrackService.trackFile(MainActivity.this, id);
-                if (!file.isFile()) return points.toString();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        new FileInputStream(file), StandardCharsets.UTF_8))) {
-                    String line;
-                    int count = 0;
-                    while ((line = reader.readLine()) != null && count++ < 20000) {
-                        try { points.put(new org.json.JSONObject(line)); }
-                        catch (org.json.JSONException ignored) {}
-                    }
-                } catch (IOException ignored) {}
-                return points.toString();
-            }
+            return TrackClient.legacy(MainActivity.this, surveyId);
         }
     }
+
     private void startPendingTrack() {
         // A WebView callback queued while visible can arrive after Home/lock.
         // Retain a deferred launch, including permission results delivered before
@@ -332,8 +287,8 @@ public final class MainActivity extends Activity {
         if (destroyed) { retryTrackOnResume = false; return; }
         if (resumedActivities.isEmpty()) { retryTrackOnResume = true; return; }
         retryTrackOnResume = false;
-        TrackSession.Request request = TrackService.session(this).request();
-        if (!TrackService.session(this).accepts(request) || !hasLocation()) return;
+        TrackSession.Request request = TrackClient.request(this);
+        if (request == null || !hasLocation()) return;
         Intent intent = new Intent(this, TrackService.class)
             .setAction(TrackService.ACTION_START)
             .putExtra(TrackService.EXTRA_ID, request.id)

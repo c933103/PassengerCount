@@ -10,14 +10,26 @@ AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
 ADB="$ANDROID_HOME/platform-tools/adb"
 EMULATOR="$ANDROID_HOME/emulator/emulator"
 IMAGE='system-images;android-35;google_apis;x86_64'
-OUT="$ROOT/android/build/lifecycle-evidence"
+# Diagnostic-only mode runs on a second fresh owned emulator after a failed
+# original job step. It has a separate evidence destination and cannot replace
+# the original gate's exit code or artifacts.
+case "${PASSENGER_RESTART_RACE_ONLY:-0}" in
+  0) OUT="$ROOT/android/build/lifecycle-evidence" ;;
+  1)
+    [[ "${PASSENGER_RESTART_RACE:-0}" == 1 ]] || { echo 'Diagnostic-only mode requires explicit race opt-in'; exit 2; }
+    OUT="$ROOT/android/build/restart-race-evidence"
+    ;;
+  *) echo 'Unknown diagnostic mode'; exit 2 ;;
+esac
 mkdir -p "$OUT"
 TEMP="$(mktemp -d "$RUNNER_TEMP/passenger-api35.XXXXXX")"
 export ANDROID_AVD_HOME="$TEMP/avds"
 mkdir -p "$ANDROID_AVD_HOME"
-NAME="passenger_lifecycle_${GITHUB_RUN_ID:-ci}_${GITHUB_RUN_ATTEMPT:-1}"
+NAME="passenger_lifecycle_${GITHUB_RUN_ID:-ci}_${GITHUB_RUN_ATTEMPT:-1}_${PASSENGER_RESTART_RACE_ONLY:-0}"
 SERIAL=emulator-5556
 PACKAGE=app.passengercount
+TRACK_PROCESS=app.passengercount:tracking
+UI_RUNNER=app.passengercount.tests/app.passengercount.UiLifecycleInstrumentation
 RUNNER=app.passengercount.tests/app.passengercount.JournalLifecycleInstrumentation
 EMU_PID= GPS_PID= LOG_PID=
 adb() { "$ADB" -s "$SERIAL" "$@"; }
@@ -106,17 +118,45 @@ adb logcat -v threadtime > "$OUT/logcat-live.txt" 2>&1 & LOG_PID=$!
   done
 ) & GPS_PID=$!
 phase() {
-  local name=$1 mode=${2:-cold}
+  local name=$1 mode=${2:-cold} runner=$RUNNER
+  [[ "$name" != bootstrap ]] || runner=$UI_RUNNER
   local opts=()
   [[ "$mode" != attached ]] || opts+=(--no-restart)
-  if ! timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$RUNNER" \
-    > "$OUT/$name.txt" 2>&1; then
-    echo "INSTALLED_PHASE_COMMAND_FAILED: $name" >&2
+  local command_code
+  printf '%q ' timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$runner" \
+    > "$OUT/$name-command.txt"
+  printf '\n' >> "$OUT/$name-command.txt"
+  if timeout 100s "$ADB" -s "$SERIAL" shell am instrument -w -r "${opts[@]}" -e phase "$name" "$runner" \
+    > "$OUT/$name.txt" 2>&1; then command_code=0; else command_code=$?; fi
+  printf '%s\n' "$command_code" > "$OUT/$name-command-exit-code.txt"
+  if [[ "$command_code" != 0 ]]; then
+    echo "INSTALLED_PHASE_COMMAND_FAILED: $name exit=$command_code" >&2
     cat "$OUT/$name.txt" >&2
     exit 1
   fi
   cat "$OUT/$name.txt"
-  grep -q "PHASE_PASS $name " "$OUT/$name.txt"
+  if [[ "$name" == ipc-* ]]; then
+    grep -q "PHASE_RELAY $name " "$OUT/$name.txt"
+    local deadline=$((SECONDS+65)) complete=false
+    while ((SECONDS<deadline)); do
+      adb logcat -d -v threadtime > "$OUT/$name-ui-logcat.txt"
+      if grep -q "PassengerJournalTest: PHASE_FAIL $name" "$OUT/$name-ui-logcat.txt"; then
+        echo "UI_PHASE_FAILED: $name"; exit 1;
+      fi
+      IPC_UI_PID="$(sed -nE "s/.*IPC_UI_ENTER phase=$name pid=([0-9]+).*/\\1/p" "$OUT/$name-ui-logcat.txt" | tail -1)"
+      if [[ "$IPC_UI_PID" =~ ^[0-9]+$ ]] && awk -v phase="$name" -v pid="$IPC_UI_PID" '
+        index($0,"IPC_UI_ENTER phase=" phase " pid=" pid) { entered=NR }
+        entered && $0 ~ ("PassengerJournalTest: PHASE_PASS " phase " assertions=[0-9]+ pid=" pid "$") { passed=NR }
+        passed && $0 ~ ("PassengerJournalTest: PHASE_DETACHED " phase " pid=" pid "$") { detached=NR }
+        END { exit !(entered && passed>entered && detached>passed) }
+      ' "$OUT/$name-ui-logcat.txt"; then complete=true; break; fi
+      sleep 0.2
+    done
+    $complete || { echo "UI_PHASE_UNVERIFIED: $name"; exit 1; }
+    grep "PassengerJournalTest: PHASE_PASS $name " "$OUT/$name-ui-logcat.txt"
+  else
+    grep -q "PHASE_PASS $name " "$OUT/$name.txt"
+  fi
   grep -q 'INSTRUMENTATION_CODE: -1' "$OUT/$name.txt"
   ! grep -q 'PHASE_FAIL\|INSTRUMENTATION_FAILED' "$OUT/$name.txt"
 }
@@ -124,6 +164,14 @@ launch_home() {
   # bootstrap seeded a fresh local-only catalogue and empty Home state first.
   adb shell am start -W -n "$PACKAGE/.MainActivity" > "$OUT/home-launch-$(date +%s).txt"
   sleep 2
+  local deadline=$((SECONDS+20))
+  # Home's ordinary orphan-stop IPC initializes the owner. Never use shell to
+  # enter the private provider or start the production service.
+  while ((SECONDS<deadline)); do
+    if adb shell pidof "$TRACK_PROCESS" > "$OUT/home-owner-pid.txt"; then return 0; fi
+    sleep 0.2
+  done
+  echo 'HOME_OWNER_STARTUP_UNVERIFIED'; exit 1
 }
 background_home() {
   # Prevent Activity relaunch from masquerading as a service-triggered restart.
@@ -132,8 +180,15 @@ background_home() {
   adb shell input keyevent KEYCODE_HOME
   sleep 1
 }
+ui_absent() {
+  local code
+  if adb shell pidof "$PACKAGE" > "$OUT/ui-death-pids.txt" 2> "$OUT/ui-death-pids.stderr"; then code=0; else code=$?; fi
+  if [[ "$code" == 1 && ! -s "$OUT/ui-death-pids.txt" && ! -s "$OUT/ui-death-pids.stderr" ]]; then return 0; fi
+  if [[ "$code" == 0 && ! -s "$OUT/ui-death-pids.stderr" ]] && grep -Eq '^[0-9]+([[:space:]]+[0-9]+)*[[:space:]]*$' "$OUT/ui-death-pids.txt"; then return 1; fi
+  echo 'UI_PROCESS_OBSERVATION_UNVERIFIED' >&2; return 2
+}
 detached() {
-  local kind=$1 oldpid=$2 proof="$OUT/instrumentation-detached-$1.txt"
+  local kind=$1 oldpid=$2 process=${3:-$PACKAGE} proof="$OUT/instrumentation-detached-$1.txt"
   # API35 has no `activity instrumentation` dump command: its error text is not
   # evidence of detachment. The package-filtered processes dump includes active
   # instrumentation before PID mappings. Its final field is emitted only after
@@ -142,7 +197,7 @@ detached() {
   if ! adb shell dumpsys activity processes "$PACKAGE" > "$proof" 2> "$proof.stderr"; then
     echo 'INSTRUMENTATION_DETACH_UNVERIFIED: process dump command failed'; exit 1
   fi
-  if [[ -s "$proof.stderr" ]] || ! awk -v pid="$oldpid" -v package="$PACKAGE" '
+  if [[ -s "$proof.stderr" ]] || ! awk -v pid="$oldpid" -v package="$process" '
     NR == 1 { header=($0 == "ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)") }
     index($0,"PID #" pid ":") && index($0," " pid ":" package "/") { mapped=1 }
     NF { last=$0 }
@@ -156,11 +211,11 @@ detached() {
   printf 'DETACHED_STATE_PASS %s pid=%s\n' "$kind" "$oldpid"
 }
 activity_state() {
-  local kind=$1 expected=$2 oldpid=$3 proof="$OUT/instrumentation-detached-activity-$1.txt"
+  local kind=$1 expected=$2 oldpid=$3 process=${4:-$PACKAGE} proof="$OUT/instrumentation-detached-activity-$1.txt"
   # On the bounded API35 image, TOP=2 and FOREGROUND_SERVICE=4. Use the
   # actual process record, not instrumentation's OOM importance or old logs.
-  detached "activity-$kind" "$oldpid"
-  if ! awk -v pid="$oldpid" -v package="$PACKAGE" -v expected="$expected" '
+  detached "activity-$kind" "$oldpid" "$process"
+  if ! awk -v pid="$oldpid" -v package="$process" -v expected="$expected" '
     /^  \*APP\* UID / { own=index($0," " pid ":" package "/")>0 }
     own && /^[[:space:]]+curProcState=/ {
       for(i=1;i<=NF;i++) if($i ~ /^curProcState=[0-9]+$/) {
@@ -175,7 +230,8 @@ activity_state() {
 }
 crash_observe() {
   local kind=$1 oldpid=$2 deadline=$((SECONDS+75)) newpid= completed=false
-  detached "$kind" "$oldpid"
+  local process=${TRACK_PROCESS:-$PACKAGE}
+  detached "$kind" "$oldpid" "$process"
   # Only service starts AFTER this phase's detached SIGKILL count. PID creation
   # precedes onStartCommand, so poll for the required service state as well.
   while ((SECONDS<deadline)); do
@@ -184,14 +240,14 @@ crash_observe() {
       seen { print }
       index($0,marker) { seen=1 }
     ' "$OUT/logcat-$kind-restarted.txt" > "$OUT/after-death-$kind.txt"
-    grep -E "Start proc [0-9]+:$PACKAGE/.*for service.*TrackService" "$OUT/after-death-$kind.txt" \
+    grep -E "Start proc [0-9]+:$process/.*for service.*TrackService" "$OUT/after-death-$kind.txt" \
       > "$OUT/service-starts-$kind.txt" || true
-    newpid="$(sed -nE "s/.*Start proc ([0-9]+):$PACKAGE\/.*/\\1/p" "$OUT/service-starts-$kind.txt" | tail -1)"
+    newpid="$(sed -nE "s/.*Start proc ([0-9]+):$process\/.*/\\1/p" "$OUT/service-starts-$kind.txt" | tail -1)"
     adb shell dumpsys activity services "$PACKAGE" > "$OUT/services-$kind-restarted.txt"
     if [[ -n "$newpid" && "$newpid" != "$oldpid" ]]; then
       if [[ "$kind" == valid ]]; then
         if grep -q 'ServiceRecord.*app.passengercount/.TrackService' "$OUT/services-$kind-restarted.txt" \
-          && grep -q "app=ProcessRecord{.* $newpid:$PACKAGE/" "$OUT/services-$kind-restarted.txt" \
+          && grep -q "app=ProcessRecord{.* $newpid:$process/" "$OUT/services-$kind-restarted.txt" \
           && grep -q 'isForeground=true' "$OUT/services-$kind-restarted.txt"; then completed=true; break; fi
       elif ! grep -q 'ServiceRecord.*app.passengercount/.TrackService' "$OUT/services-$kind-restarted.txt"; then
         completed=true; break
@@ -204,6 +260,12 @@ crash_observe() {
 }
 
 phase bootstrap
+if [[ "${PASSENGER_RESTART_RACE_ONLY:-0}" == 1 ]]; then
+  printf 'DIAGNOSTIC ONLY: original lifecycle failure remains binding; this run does not execute or replace its acceptance gates\n' > "$OUT/diagnostic-only.txt"
+  source "$ROOT/scripts/android-restart-race.sh"
+  restart_race
+  exit 0
+fi
 launch_home
 phase basics attached
 phase recover
@@ -214,16 +276,18 @@ launch_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 activity_state before-valid 2 "$oldpid"
 phase prepare-valid attached
+oldpid="$(adb shell pidof "$TRACK_PROCESS" | tr -d '\r')"
 background_home
-activity_state background-valid 4 "$oldpid"
+activity_state background-valid 4 "$oldpid" "$TRACK_PROCESS"
 crash_observe valid "$oldpid"
 phase verify-valid attached
 launch_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 activity_state before-deleted 2 "$oldpid"
 phase prepare-deleted attached
+oldpid="$(adb shell pidof "$TRACK_PROCESS" | tr -d '\r')"
 background_home
-activity_state background-deleted 4 "$oldpid"
+activity_state background-deleted 4 "$oldpid" "$TRACK_PROCESS"
 crash_observe deleted "$oldpid"
 # The tombstoned service must already be gone; this cold invocation checks durable
 # bytes and retries cleanup, not the automatic restart itself.
@@ -234,9 +298,10 @@ launch_home
 oldpid="$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 activity_state before-denied 2 "$oldpid"
 phase prepare-denied attached
+oldpid="$(adb shell pidof "$TRACK_PROCESS" | tr -d '\r')"
 background_home
-activity_state background-denied 4 "$oldpid"
-detached denied "$oldpid"
+activity_state background-denied 4 "$oldpid" "$TRACK_PROCESS"
+detached denied "$oldpid" "$TRACK_PROCESS"
 denial_done=false
 for ((i=0;i<45;i++)); do
   if adb logcat -d -v threadtime > "$OUT/logcat-controlled-denial.txt" 2> "$OUT/logcat-controlled-denial.stderr"; then
@@ -259,10 +324,48 @@ done
 $denial_done || { echo 'Controlled policy denial was not observed'; exit 1; }
 grep -q "DENIAL_AFTER_DETACH pid=$oldpid" "$OUT/logcat-controlled-denial.txt"
 grep -q 'ForegroundServiceStartNotAllowedException' "$OUT/logcat-controlled-denial.txt"
-[[ "$(adb shell pidof "$PACKAGE" | tr -d '\r')" == "$oldpid" ]]
+[[ "$(adb shell pidof "$TRACK_PROCESS" | tr -d '\r')" == "$oldpid" ]]
 phase verify-denied attached
 launch_home
-activity_state recovery-denied 2 "$oldpid"
+activity_state recovery-denied 2 "$(adb shell pidof "$PACKAGE" | tr -d '\r')"
 phase recover-denied attached
+launch_home
+phase ipc-basics attached
+phase prepare-ipc-barrier attached
+phase ipc-drain attached
+phase prepare-ipc-death attached
+phase ipc-death attached
+ui_pid=$IPC_UI_PID
+[[ "$(adb shell pidof "$PACKAGE" | tr -d '\r')" == "$ui_pid" ]]
+# A new, visible Home setup initializes the owner after deliberate provider death.
+# The preceding unknown-acknowledgement assertion has already finished.
+launch_home
+phase prepare-ipc-pipe attached
+phase ipc-prepare-ui-death attached
+ui_pid=$IPC_UI_PID
+background_home
+detached ui-death "$ui_pid"
+ui_gone=false
+for ((i=0;i<25;i++)); do
+  if ui_absent; then ui_gone=true; break; else code=$?; [[ "$code" == 1 ]] || exit 2; fi
+  sleep 1
+done
+$ui_gone || { echo 'UI_PROCESS_DEATH_UNVERIFIED'; exit 1; }
+sleep 6
+adb logcat -d -v threadtime > "$OUT/ui-death-logcat.txt"
+grep -q "UI_SIGKILL_AFTER_DETACH pid=$ui_pid" "$OUT/ui-death-logcat.txt"
+grep -Fq "ActivityManager: Process $PACKAGE (pid $ui_pid) has died:" "$OUT/ui-death-logcat.txt"
+phase verify-ui-death attached
 printf 'PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim\n' | tee "$OUT/result.txt"
 
+
+# Opt-in diagnostic only, after all original controls in their original order.
+# Failure remains aggregate failure; an unhit interleaving is explicitly unverified.
+if [[ "${PASSENGER_RESTART_RACE:-0}" == 1 ]]; then
+  source "$ROOT/scripts/android-restart-race.sh"
+  original_out=$OUT
+  OUT="$original_out/service-only-race"; mkdir -p "$OUT"
+  restart_race split
+  OUT=$original_out
+  restart_race
+fi

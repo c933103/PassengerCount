@@ -144,3 +144,78 @@ test('controlled demotion follows both original sticky restart controls', () => 
   assert.ok(originalDone > 0 && controlledStart > originalDone,
     'new policy-demotion fixture and delay must not precede the original sticky controls');
 });
+
+// Execute the same shell relay completion logic. A successful owner watcher
+// reply alone cannot stand in for execution and detachment in the actual UI.
+const phaseStart=source.indexOf('phase() {'), phaseEnd=source.indexOf('\nlaunch_home() {',phaseStart);
+assert.ok(phaseStart>=0&&phaseEnd>phaseStart);
+const phaseShell=source.slice(phaseStart,phaseEnd).replace(/\bSECONDS\b/g,'fixtureSeconds').replace('fixtureSeconds+65','fixtureSeconds+5');
+const uiEnter='I PassengerJournalTest: IPC_UI_ENTER phase=ipc-basics pid=222';
+const uiPass='I PassengerJournalTest: PHASE_PASS ipc-basics assertions=9 pid=222';
+const uiDetached='I PassengerJournalTest: PHASE_DETACHED ipc-basics pid=222';
+function phaseFixture({name='ipc-basics',ui=[uiEnter,uiPass,uiDetached],delayed=false,commandCode=0,logCode=0,watcherCode=-1,relay=true,mode='attached'}={}) {
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'passenger-ui-relay-'));
+  try {
+    fs.writeFileSync(path.join(dir,'log'),ui.join('\n')+'\n');
+    const script=`set -euo pipefail
+OUT=${JSON.stringify(dir)}; ADB=fake-adb; SERIAL=emulator-5556; RUNNER=owner-runner; UI_RUNNER=ui-runner
+fixtureSeconds=0
+sleep(){ fixtureSeconds=$((fixtureSeconds+1)); }
+timeout(){ printf '%s\\n' "$*" > "$OUT/command"; echo '${name.startsWith('ipc-')?(relay?'PHASE_RELAY':'PHASE_PASS'):'PHASE_PASS'} ${name} ownerPid=111'; echo 'INSTRUMENTATION_CODE: ${watcherCode}'; return ${commandCode}; }
+adb(){ if ${delayed?'((fixtureSeconds<2))':'false'}; then echo '${uiEnter}'; else cat "$OUT/log"; fi; return ${logCode}; }
+${phaseShell}
+phase ${name} ${mode}
+echo "COMPLETE pid=\${IPC_UI_PID:-none}"
+`;
+    const result=spawnSync('bash',['-c',script],{encoding:'utf8',timeout:5000});
+    return {status:result.status,output:result.stdout+result.stderr,command:fs.readFileSync(path.join(dir,'command'),'utf8'),commandExit:Number(fs.readFileSync(path.join(dir,name+'-command-exit-code.txt'),'utf8'))};
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+}
+test('UI relay waits for same-PID UI execution and detachment after owner completion',()=>{
+  const r=phaseFixture({delayed:true});assert.equal(r.status,0,r.output);assert.match(r.output,/COMPLETE pid=222/);assert.match(r.command,/--no-restart -e phase ipc-basics owner-runner/);
+});
+for (const [label,options] of [
+  ['owner watcher success alone',{ui:[]}],
+  ['UI result before entry',{ui:[uiPass,uiEnter,uiDetached]}],
+  ['UI did not detach',{ui:[uiEnter,uiPass]}],
+  ['UI detached before result',{ui:[uiEnter,uiDetached,uiPass]}],
+  ['another UI PID passed',{ui:[uiEnter,uiPass.replace('222','333'),uiDetached]}],
+  ['another UI PID detached',{ui:[uiEnter,uiPass,uiDetached.replace('222','333')]}],
+  ['another phase passed',{ui:[uiEnter,uiPass.replace('ipc-basics','ipc-drain'),uiDetached]}],
+  ['UI explicitly failed',{ui:[uiEnter,uiPass,uiDetached,'I PassengerJournalTest: PHASE_FAIL ipc-basics: failure']}],
+  ['log transport failed',{logCode:1}],
+  ['instrument command failed',{commandCode:1}],
+  ['owner watcher failed',{watcherCode:0}],
+  ['owner did not relay',{relay:false}],
+]) test('UI relay rejects '+label,()=>{const r=phaseFixture(options);assert.notEqual(r.status,0,r.output);assert.doesNotMatch(r.output,/COMPLETE/);});
+test('bootstrap uses cold-target UI runner; owner fixtures select owner runner',()=>{
+  const bootstrap=phaseFixture({name:'bootstrap',mode:'cold'}), owner=phaseFixture({name:'basics'});
+  assert.equal(bootstrap.status,0,bootstrap.output);assert.match(bootstrap.command,/phase bootstrap ui-runner/);assert.doesNotMatch(bootstrap.command,/--no-restart/);
+  assert.equal(owner.status,0,owner.output);assert.match(owner.command,/phase basics owner-runner/);
+});
+
+const absenceStart=source.indexOf('ui_absent() {'), absenceEnd=source.indexOf('\ndetached() {',absenceStart);
+assert.ok(absenceStart>0&&absenceEnd>absenceStart);
+const absenceShell=source.slice(absenceStart,absenceEnd);
+for(const [label,stdout,stderr,code,expected] of [
+  ['no matching process','','',1,0],['UI still alive','222\n','',0,1],
+  ['ADB error','','transport failure\n',1,2],['unexpected error','','',7,2],
+  ['PID despite nonzero status','222\n','',1,2],['empty successful response','','',0,2]
+]) test('UI-only death observation: '+label,()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'passenger-ui-absence-'));
+  try {
+    const r=spawnSync('bash',['-c',`set -euo pipefail
+OUT=${JSON.stringify(dir)}; PACKAGE=app.passengercount
+adb(){ printf '%b' ${JSON.stringify(stdout)}; printf '%b' ${JSON.stringify(stderr)} >&2; return ${code}; }
+${absenceShell}
+ui_absent
+`],{encoding:'utf8',timeout:5000});
+    assert.equal(r.status,expected,r.stdout+r.stderr);
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('instrument command failures retain the real exit status without retrying or passing',()=>{
+  const r=phaseFixture({commandCode:137});assert.equal(r.status,1,r.output);
+  assert.equal(r.commandExit,137);assert.match(r.output,/INSTALLED_PHASE_COMMAND_FAILED: ipc-basics exit=137/);
+  assert.doesNotMatch(r.output,/COMPLETE/);
+});

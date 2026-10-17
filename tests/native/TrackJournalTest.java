@@ -58,6 +58,20 @@ public final class TrackJournalTest {
             append(a, "{\"n\":20003}\n");
             page = TrackJournal.read(a.toFile(), cursor);
             check(page.entries.size() == 1 && page.entries.get(0).json.contains("20003"), "new tail remains reachable");
+            String big = "{\"label\":\"" + new String(new char[60000]).replace('\0', 'x') + "\"}";
+            write(a, big + "\n" + big + "\n" + big + "\n");
+            page = TrackJournal.read(a.toFile(), "");
+            check(page.entries.size() == 2 && page.more, "byte cap splits large records before record-count cap");
+            int bytes = 0;
+            for (TrackJournal.Entry entry : page.entries) bytes += entry.json.getBytes(StandardCharsets.UTF_8).length;
+            check(bytes <= TrackJournal.PAGE_BYTES, "raw page bytes bounded for IPC");
+            TrackJournal.Page tail = TrackJournal.read(a.toFile(), page.cursor);
+            check(tail.entries.size() == 1 && !tail.more, "byte-capped cursor resumes without loss");
+            page = TrackJournal.read(a.toFile(), "", 1);
+            check(page.entries.size() == 1 && page.more, "caller record limit preserves continuation");
+            boolean invalidLimit = false;
+            try { TrackJournal.read(a.toFile(), "", 0); } catch (java.io.IOException expected) { invalidLimit = true; }
+            check(invalidLimit, "invalid page limit fails closed");
             write(a, "");
             check(TrackJournal.read(a.toFile(), cursor).cursor.isEmpty(), "empty truncation clears cursor");
             System.out.println("TrackJournal: " + checks + " assertions passed (12 fixture scenarios)");

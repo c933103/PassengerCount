@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-17",
+  "comparisonBase": "8fe8c6afd75b984a281a08051864d90b3d6215d1",
+  "scope": "One-time source and aapt2-linked binary-manifest inspection; no Android installed claim",
+  "commands": [
+    "aapt2 compile --dir android/res -o resources.zip",
+    "aapt2 link -o before.apk -I android-35/android.jar --manifest base-manifest.xml resources.zip",
+    "aapt2 link -o after.apk -I android-35/android.jar --manifest android/AndroidManifest.xml resources.zip",
+    "aapt2 dump xmltree before.apk --file AndroidManifest.xml",
+    "aapt2 dump xmltree after.apk --file AndroidManifest.xml"
+  ],
+  "before": {
+    "applicationDefault": "app.passengercount",
+    "applicationClass": "android.app.Application",
+    "components": [
+      {
+        "kind": "service",
+        "name": ".TrackService",
+        "process": "app.passengercount:tracking",
+        "exported": "false"
+      },
+      {
+        "kind": "provider",
+        "name": ".TrackProvider",
+        "process": "app.passengercount:tracking",
+        "exported": "false"
+      },
+      {
+        "kind": "activity",
+        "name": ".MainActivity",
+        "process": "app.passengercount",
+        "exported": "true"
+      }
+    ],
+    "permissions": [
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.INTERNET"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.WRITE_EXTERNAL_STORAGE",
+        "{http://schemas.android.com/apk/res/android}maxSdkVersion": "28"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.ACCESS_COARSE_LOCATION"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.ACCESS_FINE_LOCATION"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.FOREGROUND_SERVICE"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.FOREGROUND_SERVICE_LOCATION"
+      }
+    ]
+  },
+  "after": {
+    "applicationDefault": "app.passengercount:tracking",
+    "applicationClass": "android.app.Application",
+    "components": [
+      {
+        "kind": "service",
+        "name": ".TrackService",
+        "process": "app.passengercount:tracking",
+        "exported": "false"
+      },
+      {
+        "kind": "provider",
+        "name": ".TrackProvider",
+        "process": "app.passengercount:tracking",
+        "exported": "false"
+      },
+      {
+        "kind": "activity",
+        "name": ".MainActivity",
+        "process": "app.passengercount",
+        "exported": "true"
+      }
+    ],
+    "permissions": [
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.INTERNET"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.WRITE_EXTERNAL_STORAGE",
+        "{http://schemas.android.com/apk/res/android}maxSdkVersion": "28"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.ACCESS_COARSE_LOCATION"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.ACCESS_FINE_LOCATION"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.FOREGROUND_SERVICE"
+      },
+      {
+        "{http://schemas.android.com/apk/res/android}name": "android.permission.FOREGROUND_SERVICE_LOCATION"
+      }
+    ]
+  },
+  "binaryManifestDiff": "Only application process=:tracking and explicit MainActivity process=app.passengercount attributes added; every component process and permission preserved",
+  "buildInspection": "android/build.sh supplies one production manifest to raw aapt2 link, compiles only android/src/app/passengercount/*.java and has no dependency manifest merge. Linked output contains no receiver, implicit component or library provider/service. Platform WebView sandbox processes are externally supplied isolated processes, not inherited production component declarations.",
+  "initializationInspection": "No custom Application class or manifest android:name; no production Application.getProcessName branching. Tracking provider onCreate has no UI/WebView initialization; UI retains its original process/data directory.",
+  "sha256": {
+    "android/AndroidManifest.xml": "1b8e2f0a705cea6a03e7a1cc6f9afd51a8f5dae00770d8332b5a4f2a641e1450",
+    "android/build.sh": "78f92f3abe3b73d60a61b795784633317b765841b1604660e571f347e951ae12"
+  }
+}
