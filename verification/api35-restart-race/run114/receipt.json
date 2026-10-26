@@ -1,0 +1,198 @@
+{
+  "run": 40265931593,
+  "attempt": 1,
+  "head": "061f9d22036572163fa0c68551cf4953d0d556c1",
+  "testedMerge": "7fda308f3eaafa49469aad6078caf8c5add958a7",
+  "tree": "607269680eb52865d796bbf0f6257b18925a71cc",
+  "conclusion": "failure",
+  "fullGateAccepted": false,
+  "artifacts": [
+    {
+      "role": "diagnostic",
+      "id": 12627090037,
+      "name": "PassengerCount-API35-restart-diagnostic-7fda308f3eaafa49469aad6078caf8c5add958a7",
+      "size_in_bytes": 5891792,
+      "digest": "sha256:4fccd4a4ec5c46bce346bbf25f393113ae03d6cb32e1cced6456f2b0eb8a6d9d",
+      "expires_at": "2027-01-24T03:49:14Z",
+      "zipVerified": true,
+      "exitCode": 1,
+      "source": [
+        "7fda308f3eaafa49469aad6078caf8c5add958a7",
+        "607269680eb52865d796bbf0f6257b18925a71cc"
+      ],
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "3071",
+        "newPid": "4094",
+        "interleaved": true,
+        "cleanupDuringAbsence": true,
+        "triggerBeforeCleanup": true,
+        "foreground": false,
+        "lines": {
+          "marker": 49904,
+          "death": 49936,
+          "scheduled": 49937,
+          "entering": 50006,
+          "promoted": 50008,
+          "reset": 50009,
+          "start": 50331,
+          "denied": 50515
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.iQKRhd/logcat.txt",
+            "bytes": 6997613,
+            "sha256": "20bb7c135de5e089ed40de73aad10823b43267873fe789f56ef6cd3e2d1c7d31"
+          },
+          "services": {
+            "path": "race-observation.iQKRhd/services.txt",
+            "bytes": 2414,
+            "sha256": "4de6b7a32544a8dd6518a052fa050548de6071c28d5e1b7a9a3f6e6a53bf46cb"
+          }
+        }
+      },
+      "capabilityCaptures": [
+        {
+          "stage": "after-tests",
+          "collectorExit": 2,
+          "receiptPath": "platform-capability-after-tests.fX1gEn/platform-preflight-a9avn4gs/receipt.json"
+        },
+        {
+          "stage": "before-tests",
+          "collectorExit": 2,
+          "receiptPath": "platform-capability-before-tests.mmkE5B/platform-preflight-kuwt6btj/receipt.json"
+        }
+      ]
+    },
+    {
+      "role": "original",
+      "id": 12627005327,
+      "name": "PassengerCount-API35-lifecycle-7fda308f3eaafa49469aad6078caf8c5add958a7",
+      "size_in_bytes": 27136029,
+      "digest": "sha256:29e52e2587eaada09c444a927e6671ce100c8954a8ef5ae310ddbfb8f293ab6e",
+      "expires_at": "2027-01-24T03:49:14Z",
+      "zipVerified": true,
+      "exitCode": 1,
+      "source": [
+        "7fda308f3eaafa49469aad6078caf8c5add958a7",
+        "607269680eb52865d796bbf0f6257b18925a71cc"
+      ],
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6742",
+        "newPid": "6996",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": false,
+        "lines": {
+          "marker": 81946,
+          "death": 81958,
+          "scheduled": 81959,
+          "entering": 82004,
+          "promoted": 82006,
+          "reset": -1,
+          "start": 82016,
+          "denied": 82035
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.3HR6Rl/logcat.txt",
+            "bytes": 11756242,
+            "sha256": "1229a43b8e000582c089fce0eef643bc75dc52d62cac8c8c94d3c497fd013cdd"
+          },
+          "services": {
+            "path": "race-observation.3HR6Rl/services.txt",
+            "bytes": 2406,
+            "sha256": "3db0c775624996e993e9096066863e8660245a7b740c3f7762a8e71fb3b586c2"
+          }
+        }
+      },
+      "capabilityCaptures": [
+        {
+          "stage": "after-tests",
+          "collectorExit": 2,
+          "receiptPath": "platform-capability-after-tests.cpDrfq/platform-preflight-drd82qwd/receipt.json"
+        },
+        {
+          "stage": "before-tests",
+          "collectorExit": 2,
+          "receiptPath": "platform-capability-before-tests.X3GJVD/platform-preflight-jltytrwh/receipt.json"
+        }
+      ],
+      "phaseCommandStatuses": {
+        "basics-command-exit-code.txt": "0\n",
+        "bootstrap-command-exit-code.txt": "0\n",
+        "ipc-basics-command-exit-code.txt": "0\n",
+        "ipc-death-command-exit-code.txt": "0\n",
+        "ipc-drain-command-exit-code.txt": "0\n",
+        "ipc-prepare-ui-death-command-exit-code.txt": "0\n",
+        "prepare-deleted-command-exit-code.txt": "0\n",
+        "prepare-denied-command-exit-code.txt": "0\n",
+        "prepare-ipc-barrier-command-exit-code.txt": "0\n",
+        "prepare-ipc-death-command-exit-code.txt": "0\n",
+        "prepare-ipc-pipe-command-exit-code.txt": "0\n",
+        "prepare-race-command-exit-code.txt": "0\n",
+        "prepare-valid-command-exit-code.txt": "0\n",
+        "receipts-final-command-exit-code.txt": "0\n",
+        "receipts-prepare-command-exit-code.txt": "0\n",
+        "receipts-recover-command-exit-code.txt": "0\n",
+        "recover-command-exit-code.txt": "0\n",
+        "recover-denied-command-exit-code.txt": "0\n",
+        "service-only-race/prepare-split-command-exit-code.txt": "0\n",
+        "service-only-race/verify-split-command-exit-code.txt": "0\n",
+        "verify-deleted-command-exit-code.txt": "0\n",
+        "verify-denied-command-exit-code.txt": "0\n",
+        "verify-ui-death-command-exit-code.txt": "0\n",
+        "verify-valid-command-exit-code.txt": "0\n"
+      },
+      "serviceOnlyResult": {
+        "outcome": "foreground-restored",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6206",
+        "newPid": "6742",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": true,
+        "lines": {
+          "marker": 81118,
+          "death": 81120,
+          "scheduled": 81121,
+          "entering": 81152,
+          "promoted": 81154,
+          "reset": -1,
+          "start": 81166,
+          "denied": -1
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.Ri0qiQ/logcat.txt",
+            "bytes": 11617703,
+            "sha256": "d255ebcbbdf0bbc57efdce5619fd81c61c97e6cd179a25d6c455b87072f400ad"
+          },
+          "services": {
+            "path": "race-observation.Ri0qiQ/services.txt",
+            "bytes": 8294,
+            "sha256": "b3f2961751510f2ce7f926a07122485ad3bc5fbb60fee79e140a11d2e886a408"
+          }
+        }
+      }
+    }
+  ],
+  "hosted": {
+    "node": {
+      "passed": 453,
+      "failed": 0
+    },
+    "native": "passed",
+    "browser": "passed",
+    "appBuild": "passed",
+    "testBuild": "passed"
+  },
+  "jobLogSha256": "6dda27013cc260bb35ee5ca0fbfd16486165d29973b4415ac5f24e0af81d7011"
+}
