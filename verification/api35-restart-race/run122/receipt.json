@@ -1,0 +1,176 @@
+{
+  "source": {
+    "head": "c7f31ec1f4482170efd8934e9f83603516d5f9a6",
+    "testedMerge": "b27e8261bfaca9b70fb426657e04986c3798bea4",
+    "tree": "a4a5d4832ed1646279de4572a9483e3b73c950af",
+    "parents": [
+      "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+      "c7f31ec1f4482170efd8934e9f83603516d5f9a6"
+    ],
+    "runId": 40284527890,
+    "attempt": 1
+  },
+  "fullGateAccepted": false,
+  "conclusion": "failure",
+  "artifacts": [
+    {
+      "id": 12634200342,
+      "name": "PassengerCount-API35-lifecycle-b27e8261bfaca9b70fb426657e04986c3798bea4",
+      "size_in_bytes": 89914499,
+      "digest": "sha256:80ae67d45490eff2dbcd58a0edf33e5edf2f15fe8490ac62d8ef4b8c092584f4",
+      "expires_at": "2027-01-24T07:13:59Z",
+      "zipVerified": true
+    },
+    {
+      "id": 12632864745,
+      "name": "PassengerCount-API35-restart-diagnostic-b27e8261bfaca9b70fb426657e04986c3798bea4",
+      "size_in_bytes": 65035569,
+      "digest": "sha256:c9a549e9797d84c909abcedd2e0a6c8f1e65dc70e7a925edecf67dc862cbebeb",
+      "expires_at": "2027-01-24T07:13:59Z",
+      "zipVerified": true
+    }
+  ],
+  "roles": {
+    "original": {
+      "artifactId": 12634200342,
+      "exitCode": 1,
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6663",
+        "newPid": "6901",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": false,
+        "lines": {
+          "marker": 80525,
+          "death": 80531,
+          "scheduled": 80532,
+          "entering": 80569,
+          "promoted": 80571,
+          "reset": -1,
+          "start": 80654,
+          "denied": 80672
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.xGdeSq/logcat.txt",
+            "bytes": 11577975,
+            "sha256": "c983f24efe5db06deae43a980963b5e2cb39939e46efda3cec4c642d2549749a"
+          },
+          "services": {
+            "path": "race-observation.xGdeSq/services.txt",
+            "bytes": 2399,
+            "sha256": "08b74005f984abdf183ce3349684725cf9ed8fe7c3117a0ecd41ba916e731bd9"
+          }
+        }
+      },
+      "phaseCommandStatuses": {
+        "basics-command-exit-code.txt": "0\n",
+        "bootstrap-command-exit-code.txt": "0\n",
+        "ipc-basics-command-exit-code.txt": "0\n",
+        "ipc-death-command-exit-code.txt": "0\n",
+        "ipc-drain-command-exit-code.txt": "0\n",
+        "ipc-prepare-ui-death-command-exit-code.txt": "0\n",
+        "prepare-deleted-command-exit-code.txt": "0\n",
+        "prepare-denied-command-exit-code.txt": "0\n",
+        "prepare-ipc-barrier-command-exit-code.txt": "0\n",
+        "prepare-ipc-death-command-exit-code.txt": "0\n",
+        "prepare-ipc-pipe-command-exit-code.txt": "0\n",
+        "prepare-race-command-exit-code.txt": "0\n",
+        "prepare-valid-command-exit-code.txt": "0\n",
+        "receipts-final-command-exit-code.txt": "0\n",
+        "receipts-prepare-command-exit-code.txt": "0\n",
+        "receipts-recover-command-exit-code.txt": "0\n",
+        "recover-command-exit-code.txt": "0\n",
+        "recover-denied-command-exit-code.txt": "0\n",
+        "service-only-race/prepare-split-command-exit-code.txt": "0\n",
+        "service-only-race/verify-split-command-exit-code.txt": "0\n",
+        "verify-deleted-command-exit-code.txt": "0\n",
+        "verify-denied-command-exit-code.txt": "0\n",
+        "verify-ui-death-command-exit-code.txt": "0\n",
+        "verify-valid-command-exit-code.txt": "0\n"
+      },
+      "serviceOnlyResult": {
+        "outcome": "foreground-restored",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6148",
+        "newPid": "6663",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": true,
+        "lines": {
+          "marker": 79698,
+          "death": 79700,
+          "scheduled": 79701,
+          "entering": 79730,
+          "promoted": 79732,
+          "reset": -1,
+          "start": 79742,
+          "denied": -1
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.SLyvYC/logcat.txt",
+            "bytes": 11430083,
+            "sha256": "6fc0807eca1c7d11e1010211d553cbc6833b302a4a22529f26ae75000cc7ff77"
+          },
+          "services": {
+            "path": "race-observation.SLyvYC/services.txt",
+            "bytes": 8293,
+            "sha256": "34e5ec40f74ce63a8a51f939fd7717653f7e9a1c581e9960e68f201d824492d8"
+          }
+        }
+      },
+      "finalLog": {
+        "archivePath": "logcat-final.txt",
+        "bytes": 11578101,
+        "sha256": "65af74b0fe765ca28156736a1acb9274689de0c39dff19204e80c65129e60240"
+      }
+    },
+    "triggered": {
+      "artifactId": 12632864745,
+      "exitCode": 2,
+      "result": null,
+      "finalLog": {
+        "archivePath": "logcat-final.txt",
+        "bytes": 4391909,
+        "sha256": "f13800258856150a0637ffaa1959d0b7cda77f9c86bf68f99e57754d5b6583a5"
+      }
+    },
+    "control": {
+      "artifactId": 12632864745,
+      "exitCode": 2,
+      "result": null,
+      "triggeredEvidenceGuard": {
+        "rawReceipt": {
+          "archivePath": "no-trigger-control/triggered-input-hashes.txt",
+          "bytes": 38894,
+          "sha256": "a91b05b0dacf361958eae4fe77e906b057a3a129b6ed1ce146dd713eef31f23c"
+        },
+        "filesIndependentlyRehashed": 173,
+        "status": "verified-unchanged"
+      },
+      "executed": false,
+      "status": "not-run-timing-input-unavailable"
+    }
+  },
+  "jobLog": {
+    "bytes": 358401,
+    "sha256": "8e485734cf6ee4005569ccc0d0aa66de7b555f800a52a2e45eae421f127c8018"
+  },
+  "hostedValidation": {
+    "node": {
+      "tests": 649,
+      "passed": 649,
+      "failed": 0,
+      "skipped": 0
+    },
+    "nativeBrowserAndBothApkBuilds": "passed",
+    "originalThirteenLifecyclePhases": "passed",
+    "codex": "clean exact head c7f31ec1f4482170efd8934e9f83603516d5f9a6",
+    "codexUrl": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6410507174"
+  }
+}

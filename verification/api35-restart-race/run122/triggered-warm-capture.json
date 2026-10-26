@@ -1,0 +1,56 @@
+{
+  "stage": "warm-up after bootstrap, before package-process absence or triggered slot",
+  "command": [
+    "adb",
+    "logcat",
+    "-d",
+    "-v",
+    "threadtime"
+  ],
+  "nativeExit": 255,
+  "captureComplete": false,
+  "stdout": {
+    "archivePath": "race-warm-logcat.txt",
+    "bytes": 696320,
+    "sha256": "56ef79f38de50c62dc904bf7945b4e31fba592a8d571f84015a974e0e1daad3b"
+  },
+  "stderr": {
+    "archivePath": "race-warm-logcat.txt.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  "exitSidecar": {
+    "archivePath": "race-warm-logcat.txt.exit-code.txt",
+    "bytes": 4,
+    "sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4",
+    "content": "255\n"
+  },
+  "finalServices": {
+    "archivePath": "services-final.txt",
+    "bytes": 20,
+    "sha256": "a7d0391f2b9ecc7dc302d6ca042251f413b26e1f1ee29d396e7db3df0701640f",
+    "content": "adb: device offline\n"
+  },
+  "finalLog": {
+    "archivePath": "logcat-final.txt",
+    "bytes": 4391909,
+    "sha256": "f13800258856150a0637ffaa1959d0b7cda77f9c86bf68f99e57754d5b6583a5"
+  },
+  "controlStatus": {
+    "archivePath": "no-trigger-control/control-status.txt",
+    "bytes": 33,
+    "sha256": "eca6d21ece2f531458c363ebaa3016be9f5b48033dd7a219728c0c890dc8018a",
+    "content": "not-run-timing-input-unavailable\n"
+  },
+  "triggeredEvidenceStatus": {
+    "archivePath": "no-trigger-control/triggered-evidence-status.txt",
+    "bytes": 19,
+    "sha256": "374ea3581d83bdc9ceb5a8c6ef33d5f0f405fad024bcf7d528daa1019bee42aa",
+    "content": "verified-unchanged\n"
+  },
+  "absenceExecuted": false,
+  "deadlineAlignmentExecuted": false,
+  "controlExecuted": false,
+  "cause": "Not established: partial native255 and later device-offline response; empty capture stderr does not identify disconnection cause."
+}

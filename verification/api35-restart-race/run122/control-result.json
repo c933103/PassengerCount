@@ -1,0 +1,6 @@
+{
+  "status": "not-run-timing-input-unavailable",
+  "acceptance": false,
+  "reason": "Triggered run terminated before producing timing input; wrapper did not execute control runner.",
+  "wrapperControlStatus": 2
+}

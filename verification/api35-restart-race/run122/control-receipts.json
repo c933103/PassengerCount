@@ -1,0 +1,32 @@
+[
+  {
+    "archivePath": "no-trigger-control/paired-wrapper-exit-code.txt",
+    "bytes": 2,
+    "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "content": "2\n"
+  },
+  {
+    "archivePath": "no-trigger-control/control-status.txt",
+    "bytes": 33,
+    "sha256": "eca6d21ece2f531458c363ebaa3016be9f5b48033dd7a219728c0c890dc8018a",
+    "content": "not-run-timing-input-unavailable\n"
+  },
+  {
+    "archivePath": "no-trigger-control/control-exit-code.txt",
+    "bytes": 2,
+    "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "content": "2\n"
+  },
+  {
+    "archivePath": "no-trigger-control/triggered-native-exit-code.txt",
+    "bytes": 2,
+    "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "content": "2\n"
+  },
+  {
+    "archivePath": "no-trigger-control/triggered-evidence-status.txt",
+    "bytes": 19,
+    "sha256": "374ea3581d83bdc9ceb5a8c6ef33d5f0f405fad024bcf7d528daa1019bee42aa",
+    "content": "verified-unchanged\n"
+  }
+]

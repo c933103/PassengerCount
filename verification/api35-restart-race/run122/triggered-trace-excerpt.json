@@ -1,0 +1,21 @@
+{
+  "available": true,
+  "archivePath": "logcat-final.txt",
+  "bytes": 4391909,
+  "sha256": "f13800258856150a0637ffaa1959d0b7cda77f9c86bf68f99e57754d5b6583a5",
+  "indexConvention": "zero-based classifier/raw indices",
+  "lines": [
+    {
+      "index": 22409,
+      "text": "10-26 07:22:06.184   552   585 I ActivityManager: Start proc 2280:app.passengercount/u0a209 for added application app.passengercount"
+    },
+    {
+      "index": 23360,
+      "text": "10-26 07:22:08.252   552   585 I ActivityManager: Start proc 2413:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0ai9000 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 30267,
+      "text": "10-26 07:22:14.389   552  1901 I ActivityManager: Start proc 2726:app.passengercount.tests/u0a210 for service {app.passengercount.tests/app.passengercount.RestartRaceTriggerService}"
+    }
+  ]
+}

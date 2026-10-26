@@ -1,0 +1,49 @@
+[
+  {
+    "archivePath": "exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "source.txt",
+    "bytes": 82,
+    "sha256": "ca78d675659eb99a8c1cf45c828f806c35fc0b6f465902269cd7ebd2ba491c27",
+    "content": "b27e8261bfaca9b70fb426657e04986c3798bea4\na4a5d4832ed1646279de4572a9483e3b73c950af\n"
+  },
+  {
+    "archivePath": "apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "219cb35125765907ee059af3c021aea1bf028d56336a2a8b1b37894e3a4d7bd9",
+    "content": "b5f836ea5a895cb3786caa9a752f86d8f67d65298eef14a6393182d3033fd944  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\n8bf613d3ed4dc67387dcf23d43c0964232af96b06994c31083a1595913b3a19b  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "device-fingerprint.txt",
+    "bytes": 82,
+    "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+    "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+  },
+  {
+    "archivePath": "race-process-scope.txt",
+    "bytes": 48,
+    "sha256": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "content": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n"
+  },
+  {
+    "archivePath": "race-absent-pids.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "race-absent-pids.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "services-final.txt",
+    "bytes": 2413,
+    "sha256": "082a48e1fb7015be991e1bb9947e636aa51dc233e6cbc1ae102a80b6680ae8b6"
+  }
+]
