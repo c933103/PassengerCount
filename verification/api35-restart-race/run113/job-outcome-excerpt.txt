@@ -1,0 +1,8 @@
+2026-10-26T02:56:02.6672744Z # tests 435
+2026-10-26T02:56:02.6673105Z # pass 435
+2026-10-26T02:56:02.6673281Z # fail 0
+2026-10-26T03:01:32.7480754Z PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim
+2026-10-26T03:02:09.9598499Z RACE_AUTOMATIC_RESTART_FAILED: target restart denied; use interleaved flag for trigger attribution
+2026-10-26T03:02:11.4290088Z ##[error]Process completed with exit code 1.
+2026-10-26T03:03:37.8608128Z RACE_AUTOMATIC_RESTART_FAILED: target restart denied; use interleaved flag for trigger attribution
+2026-10-26T03:03:39.8615296Z ##[error]Process completed with exit code 1.

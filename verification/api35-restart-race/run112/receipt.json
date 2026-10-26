@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "scope": "diagnostic evidence only; full all-process-absence acceptance remains required",
+  "artifacts": [
+    {
+      "role": "original",
+      "id": 12624272964,
+      "name": "PassengerCount-API35-lifecycle-65560006436dc228f572708be327d0a335aef465",
+      "bytes": 4333360,
+      "sha256": "991fd0810b2de388e9113ac3484d299623c71a0c989d969dc92481610a3ba93f",
+      "expiresAt": "2027-01-24T02:46:58Z",
+      "bytesVerified": true
+    },
+    {
+      "role": "diagnostic",
+      "id": 12623644016,
+      "name": "PassengerCount-API35-restart-diagnostic-65560006436dc228f572708be327d0a335aef465",
+      "bytes": 6557230,
+      "sha256": "d3a33281037262caa3cf18f8c34aaea2d623d272a0b506b6643fc85cf8067b2d",
+      "expiresAt": "2027-01-24T02:46:58Z",
+      "bytesVerified": true
+    }
+  ],
+  "gateAccepted": false,
+  "runId": 40260793268,
+  "runUrl": "https://github.com/c933103/PassengerCount/actions/runs/40260793268",
+  "head": "4abc74bff3dc5744b747c8ccd93cf14e77c8a57b",
+  "original": {
+    "exitCode": 255,
+    "source": [
+      "65560006436dc228f572708be327d0a335aef465",
+      "e9bd08845e0ec436e49c09734246989be18cd96d"
+    ],
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+    "apkSha256": {
+      "PassengerCount.apk": "3b03a248402a06ecfc88ece20aad5b871a515bead2f4dc76f5f1cf4608924c16",
+      "PassengerCount-lifecycle-tests.apk": "1c231f55b065526d43ab0fd00b05d6dd3af5b55012268a85e810fbc2e5eea52f"
+    },
+    "files": [
+      {
+        "path": "exit-code.txt",
+        "bytes": 4,
+        "sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+      },
+      {
+        "path": "services-final.txt",
+        "bytes": 20,
+        "sha256": "a7d0391f2b9ecc7dc302d6ca042251f413b26e1f1ee29d396e7db3df0701640f"
+      },
+      {
+        "path": "logcat-final.txt",
+        "bytes": 9772047,
+        "sha256": "a0cd67c538b61bb5ad46c8b8eb10edb523765ad020c442d5d9c0f239bc414a1e"
+      },
+      {
+        "path": "services-deleted-restarted.txt",
+        "bytes": 8077,
+        "sha256": "5eb650d799c8d2c577294ab65d0ba5ef5921efebf4bc730a87ebac2bd1d8d478"
+      },
+      {
+        "path": "logcat-deleted-restarted.txt",
+        "bytes": 5300224,
+        "sha256": "9978d0ea058821ee225b101714b5f8e4f147fb1819f412a7b66f34bba5cec5b3"
+      },
+      {
+        "path": "after-death-deleted.txt",
+        "bytes": 2349,
+        "sha256": "6af2c1cc48685f461536bf7a60035d737eaa3fb0953e87fca19e6ed95e1bf6c1"
+      }
+    ],
+    "phaseCommandStatuses": {
+      "basics-command-exit-code.txt": "0",
+      "bootstrap-command-exit-code.txt": "0",
+      "prepare-deleted-command-exit-code.txt": "0",
+      "prepare-valid-command-exit-code.txt": "0",
+      "receipts-final-command-exit-code.txt": "0",
+      "receipts-prepare-command-exit-code.txt": "0",
+      "receipts-recover-command-exit-code.txt": "0",
+      "recover-command-exit-code.txt": "0",
+      "verify-valid-command-exit-code.txt": "0"
+    },
+    "original13LifecyclePhasesPassed": false,
+    "limitation": "Exit 255 after detached deleted-session setup; terminal services capture reports adb: device offline before owned-emulator teardown. Earlier failing command and transport root cause not established; full lifecycle suite did not complete."
+  },
+  "diagnostic": {
+    "exitCode": 1,
+    "source": [
+      "65560006436dc228f572708be327d0a335aef465",
+      "e9bd08845e0ec436e49c09734246989be18cd96d"
+    ],
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+    "apkSha256": {
+      "PassengerCount.apk": "3b03a248402a06ecfc88ece20aad5b871a515bead2f4dc76f5f1cf4608924c16",
+      "PassengerCount-lifecycle-tests.apk": "1c231f55b065526d43ab0fd00b05d6dd3af5b55012268a85e810fbc2e5eea52f"
+    },
+    "outcome": "automatic-restart-denied",
+    "processScope": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true",
+    "rootResultSha256": "a5aa62ed321606354585f64d7d606bb79fe60051925b64afe8acc6056327adb7",
+    "rootEqualsAttemptResult": true,
+    "attemptCount": 4,
+    "originalExitCodeRecorded": 255
+  },
+  "workflowConclusion": "failure",
+  "workflowAttempt": 1,
+  "hostedChecks": {
+    "nodeTests": 433,
+    "nodeFailures": 0,
+    "native": "success",
+    "browser": "success",
+    "applicationApkBuild": "success",
+    "instrumentationApkBuild": "success"
+  },
+  "review": {
+    "url": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6407121597",
+    "result": "no major issues",
+    "head": "4abc74bff3dc5744b747c8ccd93cf14e77c8a57b"
+  }
+}

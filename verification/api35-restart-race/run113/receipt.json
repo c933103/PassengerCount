@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "scope": "diagnostic evidence only; full all-process-absence acceptance remains required",
+  "artifacts": [
+    {
+      "role": "original",
+      "id": 12624841544,
+      "name": "PassengerCount-API35-lifecycle-db7eb5561462b4d840f3657b8da20900400e2ed3",
+      "bytes": 24978211,
+      "sha256": "29c4e4d5d263d5da57982b986625762421e187d4314e83135e946cce29de6f1c",
+      "expiresAt": "2027-01-24T02:55:17Z",
+      "bytesVerified": true
+    },
+    {
+      "role": "diagnostic",
+      "id": 12623729936,
+      "name": "PassengerCount-API35-restart-diagnostic-db7eb5561462b4d840f3657b8da20900400e2ed3",
+      "bytes": 4716073,
+      "sha256": "6b220ba14bb4e2224cda27a87e7841ce2dc12bfaa880640073d0a413dcc6d8b0",
+      "expiresAt": "2027-01-24T02:55:17Z",
+      "bytesVerified": true
+    }
+  ],
+  "gateAccepted": false,
+  "runId": 40261475995,
+  "runUrl": "https://github.com/c933103/PassengerCount/actions/runs/40261475995",
+  "head": "328d87d3c6bae32ba081aef6c1890e45e59bb9bd",
+  "original": {
+    "exitCode": 1,
+    "source": [
+      "db7eb5561462b4d840f3657b8da20900400e2ed3",
+      "6a939342a8bfab3098223144950ec138c330bcca"
+    ],
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+    "apkSha256": {
+      "PassengerCount.apk": "b653e09ce58c174f175e2a0533135bdaf4dfaa1ff8eca7dc4e3e443418f738db",
+      "PassengerCount-lifecycle-tests.apk": "20c22d9ae6cc508e3f5877910012cf9f97ef583685baf48f21e3016799c3fa47"
+    },
+    "outcome": "automatic-restart-denied",
+    "processScope": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true",
+    "rootResultSha256": "9b0047174370f31145aaf32ada0b6d4ad9872b0e2352d7b074232fb3fa139280",
+    "rootEqualsAttemptResult": true,
+    "attemptCount": 4,
+    "files": [
+      {
+        "path": "exit-code.txt",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "services-final.txt",
+        "bytes": 2403,
+        "sha256": "2233025bda49eca296484b454aebf5a59576c3e749d74f82f7a6d3820d85d458"
+      },
+      {
+        "path": "logcat-final.txt",
+        "bytes": 10796030,
+        "sha256": "6fb136c8ce303526719266bde24f4e484d16688f53bb04511d1ea89d97bbe1a7"
+      },
+      {
+        "path": "services-deleted-restarted.txt",
+        "bytes": 3778,
+        "sha256": "bb1fa18d2b3ec332a914a51614a51a2b7ed5f2347eb719bb24346e933e753a6f"
+      },
+      {
+        "path": "logcat-deleted-restarted.txt",
+        "bytes": 9258796,
+        "sha256": "28288885fd1f4452995eb3563f1b355e398f3ecbf7b7e0b34cc6a128c215e2b5"
+      },
+      {
+        "path": "after-death-deleted.txt",
+        "bytes": 97914,
+        "sha256": "a3ea070ea0cef1958154060dcaa4c13af75b3f684970da8c4f0df0268bef888c"
+      }
+    ],
+    "phaseCommandStatuses": {
+      "basics-command-exit-code.txt": "0",
+      "bootstrap-command-exit-code.txt": "0",
+      "ipc-basics-command-exit-code.txt": "0",
+      "ipc-death-command-exit-code.txt": "0",
+      "ipc-drain-command-exit-code.txt": "0",
+      "ipc-prepare-ui-death-command-exit-code.txt": "0",
+      "prepare-deleted-command-exit-code.txt": "0",
+      "prepare-denied-command-exit-code.txt": "0",
+      "prepare-ipc-barrier-command-exit-code.txt": "0",
+      "prepare-ipc-death-command-exit-code.txt": "0",
+      "prepare-ipc-pipe-command-exit-code.txt": "0",
+      "prepare-race-command-exit-code.txt": "0",
+      "prepare-valid-command-exit-code.txt": "0",
+      "receipts-final-command-exit-code.txt": "0",
+      "receipts-prepare-command-exit-code.txt": "0",
+      "receipts-recover-command-exit-code.txt": "0",
+      "recover-command-exit-code.txt": "0",
+      "recover-denied-command-exit-code.txt": "0",
+      "service-only-race/prepare-split-command-exit-code.txt": "0",
+      "service-only-race/verify-split-command-exit-code.txt": "0",
+      "verify-deleted-command-exit-code.txt": "0",
+      "verify-denied-command-exit-code.txt": "0",
+      "verify-ui-death-command-exit-code.txt": "0",
+      "verify-valid-command-exit-code.txt": "0"
+    },
+    "original13LifecyclePhasesPassed": true,
+    "phaseOnlyPassText": "PASS: API35 installed journal/coordinator/service scenarios; no power-loss, physical-device or API26 claim",
+    "serviceOnly": {
+      "outcome": "foreground-restored",
+      "oldPid": "6133",
+      "newPid": "6639",
+      "processScope": "UI_SURVIVED_SERVICE_DEATH pid=6434",
+      "rootEqualsAttemptResult": true,
+      "resultSha256": "c9d0b20a9c0d54e9be2ab5c26ba20735772fcacb547953b662e3c95bd67b8804"
+    }
+  },
+  "diagnostic": {
+    "exitCode": 1,
+    "source": [
+      "db7eb5561462b4d840f3657b8da20900400e2ed3",
+      "6a939342a8bfab3098223144950ec138c330bcca"
+    ],
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+    "apkSha256": {
+      "PassengerCount.apk": "b653e09ce58c174f175e2a0533135bdaf4dfaa1ff8eca7dc4e3e443418f738db",
+      "PassengerCount-lifecycle-tests.apk": "20c22d9ae6cc508e3f5877910012cf9f97ef583685baf48f21e3016799c3fa47"
+    },
+    "outcome": "automatic-restart-denied",
+    "processScope": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true",
+    "rootResultSha256": "09509940bb2e5141f3b3044a220bf3003b854e5c425cf9cf5db4911676fc4cb3",
+    "rootEqualsAttemptResult": true,
+    "attemptCount": 2,
+    "originalExitCodeRecorded": 1
+  },
+  "workflowConclusion": "failure",
+  "workflowAttempt": 1,
+  "hostedChecks": {
+    "nodeTests": 435,
+    "nodeFailures": 0,
+    "native": "success",
+    "browser": "success",
+    "applicationApkBuild": "success",
+    "instrumentationApkBuild": "success"
+  },
+  "review": {
+    "url": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6407199890",
+    "result": "no major issues",
+    "head": "328d87d3c6bae32ba081aef6c1890e45e59bb9bd"
+  }
+}

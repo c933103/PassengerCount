@@ -1,0 +1,58 @@
+[
+  {
+    "resultPath": "race-observation.BA7IUi/result.json",
+    "resultSha256": "09509940bb2e5141f3b3044a220bf3003b854e5c425cf9cf5db4911676fc4cb3",
+    "outcome": "automatic-restart-denied",
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "race-observation.BA7IUi/logcat.txt",
+        "path": "race-observation.BA7IUi/logcat.txt",
+        "bytes": 6526586,
+        "sha256": "88e59fe331798e522c6a7103ccb96baac80d79edb176884ae9033b946b5ba7c0",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      },
+      {
+        "kind": "services",
+        "archivePath": "race-observation.BA7IUi/services.txt",
+        "path": "race-observation.BA7IUi/services.txt",
+        "bytes": 2414,
+        "sha256": "e0398fa6d915c13e31bd43db52300d2cdce196937053ced0ee4fa0110113820e",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      }
+    ],
+    "classifierExitCode": 10
+  },
+  {
+    "resultPath": "race-observation.n6urtq/result.json",
+    "resultSha256": "f28615ed9a45db0aa707c1783ad81ff266fac91e00a366f2d39b64d5b10ef1e1",
+    "outcome": "interleaving-unverified",
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "race-observation.n6urtq/logcat.txt",
+        "path": "race-observation.n6urtq/logcat.txt",
+        "bytes": 6073209,
+        "sha256": "072e262c2e6f21ce9889809f35392216699f48d7b3e8836ede845dd8714ae4e8",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      },
+      {
+        "kind": "services",
+        "archivePath": "race-observation.n6urtq/services.txt",
+        "path": "race-observation.n6urtq/services.txt",
+        "bytes": 5858,
+        "sha256": "b28d13f49111707554b52d624bfb33f9c4533868daff42aa7c56327ad1961068",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      }
+    ],
+    "classifierExitCode": 2
+  }
+]

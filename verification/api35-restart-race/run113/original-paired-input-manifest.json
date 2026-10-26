@@ -1,0 +1,114 @@
+[
+  {
+    "resultPath": "race-observation.6YE2cp/result.json",
+    "resultSha256": "9b0047174370f31145aaf32ada0b6d4ad9872b0e2352d7b074232fb3fa139280",
+    "outcome": "automatic-restart-denied",
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "race-observation.6YE2cp/logcat.txt",
+        "path": "race-observation.6YE2cp/logcat.txt",
+        "bytes": 10795904,
+        "sha256": "309a6abe8a89d538d93b9e051d2e2af99ceb464cdce31eb8e377e060b455dd3b",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      },
+      {
+        "kind": "services",
+        "archivePath": "race-observation.6YE2cp/services.txt",
+        "path": "race-observation.6YE2cp/services.txt",
+        "bytes": 2406,
+        "sha256": "4bb9030952fe2ce9e428f74847d2d948de55baaa984301c96545a415f60485ab",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      }
+    ],
+    "classifierExitCode": 10
+  },
+  {
+    "resultPath": "race-observation.cGftpQ/result.json",
+    "resultSha256": "93548a3608eb1a5f71109ac92856a255b8840cf521f91b18c2ae33a102d3384f",
+    "outcome": "interleaving-unverified",
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "race-observation.cGftpQ/logcat.txt",
+        "path": "race-observation.cGftpQ/logcat.txt",
+        "bytes": 10789537,
+        "sha256": "d804d27a108946fde22c77b5e9384550930b239d484d1b93d0245de319253f56",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      },
+      {
+        "kind": "services",
+        "archivePath": "race-observation.cGftpQ/services.txt",
+        "path": "race-observation.cGftpQ/services.txt",
+        "bytes": 5854,
+        "sha256": "7ffe0d3322ac0e6ba3791745db633e01de08c0519d1c7c3ce81b244ae5e5ace4",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      }
+    ],
+    "classifierExitCode": 2
+  },
+  {
+    "resultPath": "service-only-race/race-observation.T9ar7i/result.json",
+    "resultSha256": "57120d34f09eefb81020e2b93c200d33a2f35d8b2a39d7dd36498f4a59a0c1bd",
+    "outcome": "interleaving-unverified",
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "service-only-race/race-observation.T9ar7i/logcat.txt",
+        "path": "race-observation.T9ar7i/logcat.txt",
+        "bytes": 10647247,
+        "sha256": "6b249d729d221bf09c044a195bda8e284e10b222ebf548a64d63a8f445833e8e",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      },
+      {
+        "kind": "services",
+        "archivePath": "service-only-race/race-observation.T9ar7i/services.txt",
+        "path": "race-observation.T9ar7i/services.txt",
+        "bytes": 10402,
+        "sha256": "418456bc55bbe1d1e9fd85c5840617ab585eb5e1cf1b95e748ffaaa2161322c8",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      }
+    ],
+    "classifierExitCode": 2
+  },
+  {
+    "resultPath": "service-only-race/race-observation.WPAjr8/result.json",
+    "resultSha256": "c9d0b20a9c0d54e9be2ab5c26ba20735772fcacb547953b662e3c95bd67b8804",
+    "outcome": "foreground-restored",
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "service-only-race/race-observation.WPAjr8/logcat.txt",
+        "path": "race-observation.WPAjr8/logcat.txt",
+        "bytes": 10653382,
+        "sha256": "4168c4ddca91fb5257cfb0cb98cf0f9bc5ad93f940c608345fdd8014217657c2",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      },
+      {
+        "kind": "services",
+        "archivePath": "service-only-race/race-observation.WPAjr8/services.txt",
+        "path": "race-observation.WPAjr8/services.txt",
+        "bytes": 8286,
+        "sha256": "17c9b5d4743dd9f71526124f0eebc524128f8143f7c05b8996c0d4756e1a46c1",
+        "captureExitCode": 0,
+        "stderrBytes": 0,
+        "bytesVerified": true
+      }
+    ],
+    "classifierExitCode": 0
+  }
+]

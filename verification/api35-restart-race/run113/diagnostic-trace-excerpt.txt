@@ -1,0 +1,13 @@
+Source: race-observation.BA7IUi/logcat.txt
+SHA-256: 88e59fe331798e522c6a7103ccb96baac80d79edb176884ae9033b946b5ba7c0
+Indices below are zero-based classifier line indices.
+[42625] 10-26 03:03:34.660  2970  2970 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=2970
+[42708] 10-26 03:03:34.764   562  1791 I ActivityManager: Process app.passengercount:tracking (pid 2970) has died: prcp FGS 
+[42709] 10-26 03:03:34.764   562  1791 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+[42710] 10-26 03:03:34.764   562  1793 I ActivityManager: Process app.passengercount (pid 2773) has died: prev LAST
+[42921] 10-26 03:03:35.407  2641  2641 I PassengerRaceTrigger: RACE_TRIGGER_ENTER pid=2641 uid=10210
+[42932] 10-26 03:03:35.439  2641  2641 I PassengerRaceTrigger: RACE_TRIGGER_FOREGROUND pid=2641 uid=10210
+[42935] 10-26 03:03:35.443   562   596 E AppOps  : Operation not started: uid=10209 pkg=app.passengercount(null) op=START_FOREGROUND
+[44885] 10-26 03:03:36.262   562   597 I ActivityManager: Start proc 3843:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}
+[46437] 10-26 03:03:36.596   562   843 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]
+[46438] 10-26 03:03:36.596   562   843 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService

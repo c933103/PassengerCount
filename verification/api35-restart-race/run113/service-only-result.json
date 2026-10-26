@@ -1,0 +1,32 @@
+{
+  "outcome": "foreground-restored",
+  "process": "app.passengercount:tracking",
+  "oldPid": "6133",
+  "newPid": "6639",
+  "interleaved": true,
+  "cleanupDuringAbsence": false,
+  "triggerBeforeCleanup": false,
+  "foreground": true,
+  "lines": {
+    "marker": 74859,
+    "death": 74861,
+    "scheduled": 74862,
+    "entering": 74893,
+    "promoted": 74895,
+    "reset": -1,
+    "start": 74904,
+    "denied": -1
+  },
+  "evidence": {
+    "log": {
+      "path": "race-observation.WPAjr8/logcat.txt",
+      "bytes": 10653382,
+      "sha256": "4168c4ddca91fb5257cfb0cb98cf0f9bc5ad93f940c608345fdd8014217657c2"
+    },
+    "services": {
+      "path": "race-observation.WPAjr8/services.txt",
+      "bytes": 8286,
+      "sha256": "17c9b5d4743dd9f71526124f0eebc524128f8143f7c05b8996c0d4756e1a46c1"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+Original exit code: 255
+Phase command status files (a subset is not full lifecycle acceptance):
+basics-command-exit-code.txt: 0
+bootstrap-command-exit-code.txt: 0
+prepare-deleted-command-exit-code.txt: 0
+prepare-valid-command-exit-code.txt: 0
+receipts-final-command-exit-code.txt: 0
+receipts-prepare-command-exit-code.txt: 0
+receipts-recover-command-exit-code.txt: 0
+recover-command-exit-code.txt: 0
+verify-valid-command-exit-code.txt: 0
+Terminal services-final.txt: adb: device offline
+This capture runs before the runner-owned emulator teardown. It does not identify the failing earlier command or establish why transport went offline.
+Exact selected lines from after-death-deleted.txt:
+10-26 02:52:07.069   568   847 I ActivityManager: Process app.passengercount:tracking (pid 4676) has died: prcp FGS 
+10-26 02:52:07.070   568   847 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+Exact selected lines from logcat-final.txt:
+10-26 02:51:44.621   568   605 I ActivityManager: Start proc 4676:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}
+10-26 02:51:45.911  4676  4709 I PassengerJournalTest: PASS exact target package
+10-26 02:51:45.911  4676  4709 I PassengerJournalTest: PASS bounded API35 runtime
+10-26 02:51:45.911  4676  4709 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+10-26 02:51:46.700   568  1189 I ActivityManager: Start proc 4739:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:1/u0i10 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:1}
+10-26 02:51:47.994  4676  4709 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+10-26 02:51:48.180  4676  4709 I PassengerJournalTest: PASS system restarted a different process
+10-26 02:51:48.181  4676  4709 I PassengerJournalTest: PASS durable valid session/token survives actual death
+10-26 02:51:48.186  4676  4709 I PassengerJournalTest: PASS positive control resumes real foreground service
+10-26 02:51:48.193  4676  4709 I PassengerJournalTest: PASS stale-A fixture marker
+10-26 02:51:48.636  4676  4709 I PassengerJournalTest: PASS stale tombstoned A start preserves accepted B
+10-26 02:51:51.981  4676  4709 I PassengerJournalTest: PASS restarted B receives GPS
+10-26 02:51:51.990  4676  4709 I PassengerJournalTest: PASS stop positive control
+10-26 02:51:52.095  4676  4709 I PassengerJournalTest: PASS positive control stops
+10-26 02:51:52.096  4676  4709 I PassengerJournalTest: PASS actual workspace commit
+10-26 02:51:52.099  4676  4709 I PassengerJournalTest: PASS test document made no network request
+10-26 02:51:54.916  4676  4829 I PassengerJournalTest: PASS exact target package
+10-26 02:51:54.916  4676  4829 I PassengerJournalTest: PASS bounded API35 runtime
+10-26 02:51:54.916  4676  4829 I PassengerJournalTest: PASS owner fixtures run in actual tracking process
+10-26 02:51:55.003   568  1460 I ActivityManager: Start proc 4831:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:2/u0i11 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:2}
+10-26 02:51:55.313  4676  4829 I PassengerJournalTest: PASS exact packaged modules and fresh local catalogue loaded
+10-26 02:51:55.347  4676  4829 I PassengerJournalTest: PASS owner IPC start acknowledged
+10-26 02:51:55.434  4676  4829 I PassengerJournalTest: PASS real foreground service starts pcit-crash-deleted-A
+10-26 02:51:55.434  4676  4829 I PassengerJournalTest: PASS requested ID owns native session
+10-26 02:51:58.970  4676  4829 I PassengerJournalTest: PASS crash control receives real GPS
+10-26 02:51:58.972  4676  4829 I PassengerJournalTest: PASS actual workspace commit
+10-26 02:51:58.973  4676  4829 I PassengerJournalTest: PASS construct durable tombstone-before-stop state
+10-26 02:51:58.973  4676  4829 I PassengerJournalTest: PASS tombstone rejects live generation before process death
+10-26 02:51:58.975  4676  4829 I PassengerJournalTest: PASS durable crash evidence
+10-26 02:51:58.975  4676  4829 I PassengerJournalTest: PASS real service remains foreground before instrumentation detaches
+10-26 02:51:58.976  4676  4829 I PassengerJournalTest: PASS test document made no network request
+10-26 02:52:06.978  4676  4676 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-deleted pid=4676
+10-26 02:52:07.069   568   847 I ActivityManager: Process app.passengercount:tracking (pid 4676) has died: prcp FGS 
+10-26 02:52:07.070   568   847 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested
+10-26 02:52:08.077   568   605 I ActivityManager: Start proc 5003:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}
