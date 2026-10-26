@@ -1,0 +1,9 @@
+test_jdwp_timeout_preserves_partial_bytes_but_is_incomplete (test_read_only_preflight.CollectorTests.test_jdwp_timeout_preserves_partial_bytes_but_is_incomplete) ... ok
+test_read_only_commands_and_finite_jdwp_snapshot_are_recorded (test_read_only_preflight.CollectorTests.test_read_only_commands_and_finite_jdwp_snapshot_are_recorded) ... ok
+test_success_then_partial_failure_preserves_previous_attempt (test_read_only_preflight.CollectorTests.test_success_then_partial_failure_preserves_previous_attempt) ... ok
+test_unavailable_transport_stops_before_device_queries (test_read_only_preflight.CollectorTests.test_unavailable_transport_stops_before_device_queries) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.007s
+
+OK

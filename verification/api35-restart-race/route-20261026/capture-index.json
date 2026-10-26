@@ -1,0 +1,267 @@
+{
+  "sourceHead": "328d87d3c6bae32ba081aef6c1890e45e59bb9bd",
+  "run": 40261475995,
+  "lineIndexConvention": "one-based, raw source lines",
+  "captures": [
+    {
+      "role": "original",
+      "artifactId": "12624841544",
+      "zipBytes": 24978211,
+      "zipSha256": "29c4e4d5d263d5da57982b986625762421e187d4314e83135e946cce29de6f1c",
+      "recordToken": "30844ba",
+      "inputs": [
+        {
+          "archivePath": "package.txt",
+          "copy": "original/package.txt",
+          "bytes": 4464,
+          "sha256": "127ac3427eb1271ca3074aee9b118652bf80f1f249164717a5dddaca25874615"
+        },
+        {
+          "archivePath": "race-before-services.txt",
+          "copy": "original/before.txt",
+          "bytes": 5883,
+          "sha256": "8379aba5566898cc921a54e143c870e54d6b7534c94b51213db8a09e08d8834d",
+          "commandExitCode": "0",
+          "stderrBytes": 0
+        },
+        {
+          "archivePath": "race-observation.cGftpQ/services.txt",
+          "copy": "original/pending-restart.txt",
+          "bytes": 5854,
+          "sha256": "7ffe0d3322ac0e6ba3791745db633e01de08c0519d1c7c3ce81b244ae5e5ace4",
+          "commandExitCode": "0",
+          "stderrBytes": 0
+        },
+        {
+          "archivePath": "race-observation.6YE2cp/services.txt",
+          "copy": "original/terminal.txt",
+          "bytes": 2406,
+          "sha256": "4bb9030952fe2ce9e428f74847d2d948de55baaa984301c96545a415f60485ab",
+          "commandExitCode": "0",
+          "stderrBytes": 0
+        },
+        {
+          "archivePath": "race-observation.cGftpQ/result.json",
+          "copy": "original/pending-result.json",
+          "bytes": 801,
+          "sha256": "93548a3608eb1a5f71109ac92856a255b8840cf521f91b18c2ae33a102d3384f"
+        },
+        {
+          "archivePath": "race-result.json",
+          "copy": "original/terminal-result.json",
+          "bytes": 809,
+          "sha256": "9b0047174370f31145aaf32ada0b6d4ad9872b0e2352d7b074232fb3fa139280"
+        },
+        {
+          "archivePath": "race-absent-pids.txt",
+          "copy": "original/absence.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "archivePath": "race-process-scope.txt",
+          "copy": "original/scope.txt",
+          "bytes": 48,
+          "sha256": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa"
+        },
+        {
+          "archivePath": "device-fingerprint.txt",
+          "copy": "original/fingerprint.txt",
+          "bytes": 82,
+          "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+        }
+      ],
+      "selectedLogLines": [
+        {
+          "line": 58033,
+          "text": "10-26 02:59:38.039   561   579 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+        },
+        {
+          "line": 65325,
+          "text": "10-26 03:00:01.450   561  1011 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+        },
+        {
+          "line": 69844,
+          "text": "10-26 03:00:29.575   561   578 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 69845,
+          "text": "10-26 03:00:29.576   561   578 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]"
+        },
+        {
+          "line": 69846,
+          "text": "10-26 03:00:29.576   561   578 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 69851,
+          "text": "10-26 03:00:29.581  5302  5302 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 69852,
+          "text": "10-26 03:00:29.581  5302  5302 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:54)"
+        },
+        {
+          "line": 69853,
+          "text": "10-26 03:00:29.581  5302  5302 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:50)"
+        },
+        {
+          "line": 69862,
+          "text": "10-26 03:00:29.581  5302  5302 E PassengerTrack: \tat app.passengercount.TrackService.onStartCommand(TrackService.java:147)"
+        },
+        {
+          "line": 73036,
+          "text": "10-26 03:01:08.036   561   579 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+        },
+        {
+          "line": 74863,
+          "text": "10-26 03:01:47.236   561  2613 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+        },
+        {
+          "line": 75678,
+          "text": "10-26 03:02:07.983   561  1875 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+        },
+        {
+          "line": 75812,
+          "text": "10-26 03:02:09.032   561  1011 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 75813,
+          "text": "10-26 03:02:09.033   561  1011 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]"
+        },
+        {
+          "line": 75814,
+          "text": "10-26 03:02:09.033   561  1011 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 75816,
+          "text": "10-26 03:02:09.036  6874  6874 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 75817,
+          "text": "10-26 03:02:09.036  6874  6874 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:54)"
+        },
+        {
+          "line": 75818,
+          "text": "10-26 03:02:09.036  6874  6874 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:50)"
+        },
+        {
+          "line": 75827,
+          "text": "10-26 03:02:09.036  6874  6874 E PassengerTrack: \tat app.passengercount.TrackService.onStartCommand(TrackService.java:147)"
+        }
+      ],
+      "log": {
+        "archivePath": "race-observation.6YE2cp/logcat.txt",
+        "bytes": 10795904,
+        "sha256": "309a6abe8a89d538d93b9e051d2e2af99ceb464cdce31eb8e377e060b455dd3b"
+      }
+    },
+    {
+      "role": "diagnostic",
+      "artifactId": "12623729936",
+      "zipBytes": 4716073,
+      "zipSha256": "6b220ba14bb4e2224cda27a87e7841ce2dc12bfaa880640073d0a413dcc6d8b0",
+      "recordToken": "bae2c2e",
+      "inputs": [
+        {
+          "archivePath": "package.txt",
+          "copy": "diagnostic/package.txt",
+          "bytes": 4592,
+          "sha256": "db47b8475143738042c1f7bb5451cf852fd6256f3dfa8d1cbd01d2f7c264b921"
+        },
+        {
+          "archivePath": "race-before-services.txt",
+          "copy": "diagnostic/before.txt",
+          "bytes": 5881,
+          "sha256": "810968d417662d1639f981378fe6aadfe6ace987d8fc8132a0635b06647f9bae",
+          "commandExitCode": "0",
+          "stderrBytes": 0
+        },
+        {
+          "archivePath": "race-observation.n6urtq/services.txt",
+          "copy": "diagnostic/pending-restart.txt",
+          "bytes": 5858,
+          "sha256": "b28d13f49111707554b52d624bfb33f9c4533868daff42aa7c56327ad1961068",
+          "commandExitCode": "0",
+          "stderrBytes": 0
+        },
+        {
+          "archivePath": "race-observation.BA7IUi/services.txt",
+          "copy": "diagnostic/terminal.txt",
+          "bytes": 2414,
+          "sha256": "e0398fa6d915c13e31bd43db52300d2cdce196937053ced0ee4fa0110113820e",
+          "commandExitCode": "0",
+          "stderrBytes": 0
+        },
+        {
+          "archivePath": "race-observation.n6urtq/result.json",
+          "copy": "diagnostic/pending-result.json",
+          "bytes": 803,
+          "sha256": "f28615ed9a45db0aa707c1783ad81ff266fac91e00a366f2d39b64d5b10ef1e1"
+        },
+        {
+          "archivePath": "race-result.json",
+          "copy": "diagnostic/terminal-result.json",
+          "bytes": 809,
+          "sha256": "09509940bb2e5141f3b3044a220bf3003b854e5c425cf9cf5db4911676fc4cb3"
+        },
+        {
+          "archivePath": "race-absent-pids.txt",
+          "copy": "diagnostic/absence.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "archivePath": "race-process-scope.txt",
+          "copy": "diagnostic/scope.txt",
+          "bytes": 48,
+          "sha256": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa"
+        },
+        {
+          "archivePath": "device-fingerprint.txt",
+          "copy": "diagnostic/fingerprint.txt",
+          "bytes": 82,
+          "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+        }
+      ],
+      "selectedLogLines": [
+        {
+          "line": 42710,
+          "text": "10-26 03:03:34.764   562  1791 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+        },
+        {
+          "line": 46437,
+          "text": "10-26 03:03:36.596   562   843 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 46438,
+          "text": "10-26 03:03:36.596   562   843 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]"
+        },
+        {
+          "line": 46439,
+          "text": "10-26 03:03:36.596   562   843 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 46563,
+          "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+        },
+        {
+          "line": 46564,
+          "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:54)"
+        },
+        {
+          "line": 46565,
+          "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:50)"
+        },
+        {
+          "line": 46574,
+          "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: \tat app.passengercount.TrackService.onStartCommand(TrackService.java:147)"
+        }
+      ],
+      "log": {
+        "archivePath": "race-observation.BA7IUi/logcat.txt",
+        "bytes": 6526586,
+        "sha256": "88e59fe331798e522c6a7103ccb96baac80d79edb176884ae9033b946b5ba7c0"
+      }
+    }
+  ]
+}

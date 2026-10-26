@@ -1,0 +1,34 @@
+[
+  {
+    "line": 42710,
+    "text": "10-26 03:03:34.764   562  1791 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+  },
+  {
+    "line": 46437,
+    "text": "10-26 03:03:36.596   562   843 W ActivityManager: Foreground service started from background can not have location/camera/microphone access: service app.passengercount/.TrackService"
+  },
+  {
+    "line": 46438,
+    "text": "10-26 03:03:36.596   562   843 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]"
+  },
+  {
+    "line": 46439,
+    "text": "10-26 03:03:36.596   562   843 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+  },
+  {
+    "line": 46563,
+    "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: android.app.ForegroundServiceStartNotAllowedException: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+  },
+  {
+    "line": 46564,
+    "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:54)"
+  },
+  {
+    "line": 46565,
+    "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: \tat android.app.ForegroundServiceStartNotAllowedException$1.createFromParcel(ForegroundServiceStartNotAllowedException.java:50)"
+  },
+  {
+    "line": 46574,
+    "text": "10-26 03:03:36.625  3843  3843 E PassengerTrack: \tat app.passengercount.TrackService.onStartCommand(TrackService.java:147)"
+  }
+]

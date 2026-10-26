@@ -1,0 +1,112 @@
+Activity Resolver Table:
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        69f976c app.passengercount/.MainActivity filter b9e9135
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Domain verification status:
+
+Registered ContentProviders:
+  app.passengercount/.TrackProvider:
+    Provider{795083e app.passengercount/.TrackProvider}
+
+ContentProvider Authorities:
+  [app.passengercount.tracking]:
+    Provider{795083e app.passengercount/.TrackProvider}
+      applicationInfo=ApplicationInfo{eb969f app.passengercount}
+
+Key Set Manager:
+  [app.passengercount]
+      Signing KeySets: 59
+
+Packages:
+  Package [app.passengercount] (838d07f):
+    appId=10209
+    pkg=Package{f1a84c app.passengercount}
+    codePath=/data/app/~~rC5SQ8sf31RHDzntnk5ZeQ==/app.passengercount-DnUBfMg2AXXYiMDH5Covug==
+    resourcePath=/data/app/~~rC5SQ8sf31RHDzntnk5ZeQ==/app.passengercount-DnUBfMg2AXXYiMDH5Covug==
+    legacyNativeLibraryDir=/data/app/~~rC5SQ8sf31RHDzntnk5ZeQ==/app.passengercount-DnUBfMg2AXXYiMDH5Covug==/lib
+    extractNativeLibs=true
+    primaryCpuAbi=null
+    secondaryCpuAbi=null
+    cpuAbiOverride=null
+    versionCode=12 minSdk=26 targetSdk=35
+    minExtensionVersions=[]
+    versionName=1.11
+    hiddenApiEnforcementPolicy=2
+    usesNonSdkApi=false
+    splits=[base]
+    apkSigningVersion=4
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    scannedAsStoppedSystemApp=false
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2026-10-26 03:02:53
+    lastUpdateTime=2026-10-26 03:02:55
+    installerPackageName=null
+    installerPackageUid=-1
+    initiatingPackageName=com.android.shell
+    originatingPackageName=null
+    packageSource=1
+    loadingProgress=100%
+    loadingCompletedTime=2026-10-26 03:02:55
+    appMetadataFilePath=null
+    appMetadataSource=0
+    signatures=PackageSignatures{ef40095 version:4, signatures:[818ec44b], past signatures:[]}
+    installPermissionsFixed=false
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privatePkgFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    apexModuleName=null
+    requested permissions:
+      android.permission.ACCESS_FINE_LOCATION
+      android.permission.FOREGROUND_SERVICE
+      android.permission.FOREGROUND_SERVICE_LOCATION
+      android.permission.INTERNET
+      android.permission.ACCESS_COARSE_LOCATION
+    install permissions:
+      android.permission.FOREGROUND_SERVICE: granted=true
+      android.permission.FOREGROUND_SERVICE_LOCATION: granted=true
+      android.permission.INTERNET: granted=true
+    User 0: ceDataInode=352499 deDataInode=57722 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false quarantined=false
+      installReason=0
+      dataDir=/data/user/0/app.passengercount
+      firstInstallTime=2026-10-26 03:02:55
+      uninstallReason=0
+      overlay paths:
+        /product/overlay/NavigationBarModeGestural/NavigationBarModeGesturalOverlay.apk
+        /data/resource-cache/com.android.systemui-neutral-ly5b.frro
+        /data/resource-cache/com.android.systemui-accent-NpOZ.frro
+        /data/resource-cache/com.android.systemui-dynamic-NHSY.frro
+      legacy overlay paths:
+        /product/overlay/NavigationBarModeGestural/NavigationBarModeGesturalOverlay.apk
+      gids=[3003]
+      runtime permissions:
+        android.permission.ACCESS_FINE_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_COARSE_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+
+Queries:
+  system apps queryable: false
+  queries via forceQueryable:
+  queries via package name:
+    app.passengercount:
+      app.passengercount.tests
+    app.passengercount.tests:
+      app.passengercount
+  queries via component:
+    com.google.android.settings.intelligence:
+      app.passengercount
+  queryable via interaction:
+    User 0:
+  queryable via uses-library:
+
+Dexopt state:
+  [app.passengercount]
+    path: /data/app/~~rC5SQ8sf31RHDzntnk5ZeQ==/app.passengercount-DnUBfMg2AXXYiMDH5Covug==/base.apk
+      x86_64: [status=run-from-apk] [reason=unknown] [primary-abi]
+        [location is error]
+
+Compiler stats:
+  [app.passengercount]
+    (No recorded stats)

@@ -1,0 +1,89 @@
+ACTIVITY MANAGER SERVICES (dumpsys activity services)
+  User 0 active services:
+  * ServiceRecord{bae2c2e u0 app.passengercount/.TrackService c:app.passengercount}
+    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}
+    packageName=app.passengercount
+    processName=app.passengercount:tracking
+    targetSdkVersion=35
+    baseDir=/data/app/~~rC5SQ8sf31RHDzntnk5ZeQ==/app.passengercount-DnUBfMg2AXXYiMDH5Covug==/base.apk
+    dataDir=/data/user/0/app.passengercount
+    app=ProcessRecord{cefeccd 2970:app.passengercount:tracking/u0a209}
+    useNewWiuLogic_forCapabilities()=true
+    useNewWiuLogic_forStart()=true
+    useNewBfslLogic()=true
+    mAllowWiu_noBinding=PROC_STATE_TOP
+    mAllowWiu_inBindService=DENIED
+    mAllowWiu_byBindings=DENIED
+    getFgsAllowWiu_legacy=PROC_STATE_TOP
+    getFgsAllowWiu_new=PROC_STATE_TOP
+    getFgsAllowWiu_forStart=PROC_STATE_TOP
+    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP
+    allowUiJobScheduling=true
+    recentCallingPackage=app.passengercount
+    recentCallingUid=10209
+    mAllowStart_noBinding=PROC_STATE_TOP
+    mAllowStart_inBindService=DENIED
+    mAllowStart_byBindings=DENIED
+    getFgsAllowStart_legacy=PROC_STATE_TOP
+    getFgsAllowStart_new=PROC_STATE_TOP
+    getFgsAllowStart=PROC_STATE_TOP
+    startForegroundCount=1
+    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]
+    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)
+    createTime=-5s601ms startingBgTimeout=--
+    lastActivity=-5s598ms restartTime=-5s598ms createdFromFg=true
+    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1
+ startCommandResult=1
+
+  * ServiceRecord{cbcdea0 u0 app.passengercount/org.chromium.content.app.SandboxedProcessService0:0 c:app.passengercount}
+    intent={cmp=app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}
+    packageName=app.passengercount
+    processName=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0
+    targetSdkVersion=34
+    baseDir=/data/app/~~bhQg5uv8olXrqJPZHls0bQ==/com.google.android.webview-Y8-qY3bFywaIEIrjlyAT1w==/WebViewGoogle.apk
+    dataDir=/data/user/0/com.google.android.webview
+    app=ProcessRecord{9877393 2820:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a209i1}
+    isolationHostProc=ProcessRecord{9877393 2820:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a209i1}
+    useNewWiuLogic_forCapabilities()=true
+    useNewWiuLogic_forStart()=true
+    useNewBfslLogic()=true
+    mAllowWiu_noBinding=DENIED
+    mAllowWiu_inBindService=PROC_STATE_TOP
+    mAllowWiu_byBindings=DENIED
+    getFgsAllowWiu_legacy=PROC_STATE_TOP
+    getFgsAllowWiu_new=DENIED
+    getFgsAllowWiu_forStart=DENIED
+    getFgsAllowWiu_forCapabilities=DENIED
+    allowUiJobScheduling=false
+    recentCallingPackage=app.passengercount
+    recentCallingUid=10209
+    mAllowStart_noBinding=DENIED
+    mAllowStart_inBindService=PROC_STATE_TOP
+    mAllowStart_byBindings=DENIED
+    getFgsAllowStart_legacy=PROC_STATE_TOP
+    getFgsAllowStart_new=DENIED
+    getFgsAllowStart=DENIED
+    startForegroundCount=0
+    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { cmp=app.passengercount/org.chromium.content.app.SandboxedProcessService0:0 (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:34; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:true]
+    createTime=-16s81ms startingBgTimeout=--
+    lastActivity=-7s868ms restartTime=-15s172ms createdFromFg=true
+    Bindings:
+    * IntentBindRecord{97e6d40 CREATE}:
+      intent={cmp=app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}
+      binder=android.os.BinderProxy@f9e3479
+      requested=true received=true hasBound=true doRebind=false
+      * Client AppBindRecord{8ef65be ProcessRecord{500fc15 2773:app.passengercount/u0a209}}
+        Per-process Connections:
+          ConnectionRecord{be578fc u0 CR WPRI app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:@a2bb5ef flags=0x80000021}
+          ConnectionRecord{dba52df u0 CR IMP app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:@b71a339 flags=0x80000041}
+    All Connections:
+      ConnectionRecord{be578fc u0 CR WPRI app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:@a2bb5ef flags=0x80000021}
+      ConnectionRecord{dba52df u0 CR IMP app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:@b71a339 flags=0x80000041}
+
+  Connection bindings to services:
+  * ConnectionRecord{be578fc u0 CR WPRI app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:@a2bb5ef flags=0x80000021}
+    binding=AppBindRecord{8ef65be app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:app.passengercount}
+    conn=android.os.BinderProxy@a2bb5ef flags=0x80000021
+  * ConnectionRecord{dba52df u0 CR IMP app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:@b71a339 flags=0x80000041}
+    binding=AppBindRecord{8ef65be app.passengercount/org.chromium.content.app.SandboxedProcessService0:0:app.passengercount}
+    conn=android.os.BinderProxy@b71a339 flags=0x80000041

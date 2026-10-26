@@ -1,0 +1,32 @@
+{
+  "outcome": "interleaving-unverified",
+  "process": "app.passengercount:tracking",
+  "oldPid": "2970",
+  "newPid": null,
+  "interleaved": false,
+  "cleanupDuringAbsence": false,
+  "triggerBeforeCleanup": false,
+  "foreground": false,
+  "lines": {
+    "marker": 42625,
+    "death": 42708,
+    "scheduled": 42709,
+    "entering": 42921,
+    "promoted": 42932,
+    "reset": 42935,
+    "start": -1,
+    "denied": -1
+  },
+  "evidence": {
+    "log": {
+      "path": "race-observation.n6urtq/logcat.txt",
+      "bytes": 6073209,
+      "sha256": "072e262c2e6f21ce9889809f35392216699f48d7b3e8836ede845dd8714ae4e8"
+    },
+    "services": {
+      "path": "race-observation.n6urtq/services.txt",
+      "bytes": 5858,
+      "sha256": "b28d13f49111707554b52d624bfb33f9c4533868daff42aa7c56327ad1961068"
+    }
+  }
+}

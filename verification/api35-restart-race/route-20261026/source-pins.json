@@ -1,0 +1,137 @@
+{
+  "checkedAt": "2026-10-26T03:28:56Z",
+  "manifests": [
+    {
+      "ref": "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+      "path": "android/AndroidManifest.xml",
+      "sha": "71e664ff73f0ab8e1c666aae4325fab9e24f6d4a",
+      "content": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"app.passengercount\" android:versionCode=\"12\" android:versionName=\"1.11\">\n    <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"35\" />\n    <uses-permission android:name=\"android.permission.INTERNET\" />\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" android:maxSdkVersion=\"28\" />\n    <uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_LOCATION\" />\n    <uses-feature android:name=\"android.hardware.location\" android:required=\"false\" />\n    <application android:label=\"PassengerCount\" android:icon=\"@drawable/ic_launcher\" android:theme=\"@style/AppTheme\" android:allowBackup=\"false\" android:usesCleartextTraffic=\"false\" android:supportsRtl=\"true\">\n        <service android:name=\".TrackService\" android:exported=\"false\" android:foregroundServiceType=\"location\" />\n        <activity android:name=\".MainActivity\" android:exported=\"true\" android:windowSoftInputMode=\"adjustResize\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n    </application>\n</manifest>\n\n"
+    },
+    {
+      "ref": "052fbb20ed7edd6f849681bf60e2862176b40aaf",
+      "path": "android/AndroidManifest.xml",
+      "sha": "e662df9107df615588e83505013f4ca08188ec7a",
+      "content": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"app.passengercount\" android:versionCode=\"12\" android:versionName=\"1.11\">\n    <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"35\" />\n    <uses-permission android:name=\"android.permission.INTERNET\" />\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" android:maxSdkVersion=\"28\" />\n    <uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_LOCATION\" />\n    <uses-feature android:name=\"android.hardware.location\" android:required=\"false\" />\n    <application android:process=\":tracking\" android:label=\"PassengerCount\" android:icon=\"@drawable/ic_launcher\" android:theme=\"@style/AppTheme\" android:allowBackup=\"false\" android:usesCleartextTraffic=\"false\" android:supportsRtl=\"true\">\n        <service android:name=\".TrackService\" android:process=\":tracking\" android:exported=\"false\" android:foregroundServiceType=\"location\" />\n        <provider android:name=\".TrackProvider\" android:authorities=\"app.passengercount.tracking\"\n            android:process=\":tracking\" android:exported=\"false\" android:grantUriPermissions=\"false\" />\n        <activity android:name=\".MainActivity\" android:process=\"app.passengercount\" android:exported=\"true\" android:windowSoftInputMode=\"adjustResize\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n    </application>\n</manifest>\n\n"
+    },
+    {
+      "ref": "328d87d3c6bae32ba081aef6c1890e45e59bb9bd",
+      "path": "android/AndroidManifest.xml",
+      "sha": "e662df9107df615588e83505013f4ca08188ec7a",
+      "content": "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"app.passengercount\" android:versionCode=\"12\" android:versionName=\"1.11\">\n    <uses-sdk android:minSdkVersion=\"26\" android:targetSdkVersion=\"35\" />\n    <uses-permission android:name=\"android.permission.INTERNET\" />\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" android:maxSdkVersion=\"28\" />\n    <uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE_LOCATION\" />\n    <uses-feature android:name=\"android.hardware.location\" android:required=\"false\" />\n    <application android:process=\":tracking\" android:label=\"PassengerCount\" android:icon=\"@drawable/ic_launcher\" android:theme=\"@style/AppTheme\" android:allowBackup=\"false\" android:usesCleartextTraffic=\"false\" android:supportsRtl=\"true\">\n        <service android:name=\".TrackService\" android:process=\":tracking\" android:exported=\"false\" android:foregroundServiceType=\"location\" />\n        <provider android:name=\".TrackProvider\" android:authorities=\"app.passengercount.tracking\"\n            android:process=\":tracking\" android:exported=\"false\" android:grantUriPermissions=\"false\" />\n        <activity android:name=\".MainActivity\" android:process=\"app.passengercount\" android:exported=\"true\" android:windowSoftInputMode=\"adjustResize\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n    </application>\n</manifest>\n\n"
+    }
+  ],
+  "platformSources": [
+    {
+      "key": "source:Zygote",
+      "ref": "4e43ad12e1b211f15152e9c5b16b0fe88e6b93f3",
+      "sha": "cab84bb01f70733a28bc35c820acfea04201c3aa",
+      "selectedLines": [
+        {
+          "line": 67,
+          "text": "    public static final int DEBUG_ENABLE_JDWP   = 1;"
+        },
+        {
+          "line": 813,
+          "text": "            applyDebuggerSystemProperty(args);"
+        },
+        {
+          "line": 1036,
+          "text": "    private static final boolean ENABLE_JDWP = SystemProperties.get("
+        },
+        {
+          "line": 1037,
+          "text": "                          \"persist.debug.dalvik.vm.jdwp.enabled\").equals(\"1\");"
+        },
+        {
+          "line": 1051,
+          "text": "     * On userdebug builds if persist.debug.dalvik.vm.jdwp.enabled"
+        },
+        {
+          "line": 1061,
+          "text": "    static void applyDebuggerSystemProperty(ZygoteArguments args) {"
+        },
+        {
+          "line": 1062,
+          "text": "        if (Build.IS_ENG || (Build.IS_USERDEBUG && ENABLE_JDWP)) {"
+        },
+        {
+          "line": 1063,
+          "text": "            args.mRuntimeFlags |= Zygote.DEBUG_ENABLE_JDWP;"
+        },
+        {
+          "line": 1068,
+          "text": "        if (Build.IS_ENG || (Build.IS_USERDEBUG && ENABLE_PTRACE)) {"
+        },
+        {
+          "line": 1093,
+          "text": "                    & (Zygote.DEBUG_ENABLE_JDWP | Zygote.DEBUG_ENABLE_PTRACE)) == 0) {"
+        },
+        {
+          "line": 1392,
+          "text": "                && (Build.IS_USERDEBUG || Build.IS_ENG)"
+        }
+      ]
+    },
+    {
+      "key": "source:ZygoteInit",
+      "ref": "4e43ad12e1b211f15152e9c5b16b0fe88e6b93f3",
+      "sha": "b9cc457fecc92de8cdd8127f8c7ae060d79908b2",
+      "selectedLines": [
+        {
+          "line": 454,
+          "text": "            if (shouldProfileSystemServer() && (Build.IS_USERDEBUG || Build.IS_ENG)) {"
+        },
+        {
+          "line": 685,
+          "text": "            Zygote.applyDebuggerSystemProperty(parsedArgs);"
+        }
+      ]
+    },
+    {
+      "key": "aosp:services/tests/mockingservicestests/Android.bp",
+      "ref": "4e43ad12e1b211f15152e9c5b16b0fe88e6b93f3",
+      "sha": "4149e44a2ee908d609a01989ad6324ccd0d84a76",
+      "selectedLines": [
+        {
+          "line": 64,
+          "text": "        \"services.core\","
+        },
+        {
+          "line": 98,
+          "text": "    certificate: \"platform\","
+        },
+        {
+          "line": 99,
+          "text": "    platform_apis: true,"
+        },
+        {
+          "line": 124,
+          "text": "android_ravenwood_test {"
+        },
+        {
+          "line": 132,
+          "text": "        \"services.core\","
+        },
+        {
+          "line": 135,
+          "text": "        \"src/com/android/server/am/BroadcastRecordTest.java\","
+        }
+      ]
+    },
+    {
+      "key": "aosp:services/tests/mockingservicestests/src/com/android/server/am/ActiveServicesTest.java",
+      "ref": "4e43ad12e1b211f15152e9c5b16b0fe88e6b93f3",
+      "sha": "7e1dc08f301e9d5caa2fea9ee88e30e6ed12e811",
+      "selectedLines": [
+        {
+          "line": 312,
+          "text": "        mActiveServices = mock(ActiveServices.class);"
+        },
+        {
+          "line": 366,
+          "text": "        final ServiceRecord r = mock(ServiceRecord.class);"
+        }
+      ]
+    }
+  ]
+}

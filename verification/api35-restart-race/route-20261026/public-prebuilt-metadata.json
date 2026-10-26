@@ -1,0 +1,20 @@
+{
+  "observedUtc": "2026-10-26T03:26:55Z",
+  "purpose": "Public metadata only; no download, login, license acceptance, provisioning, or host setup",
+  "page": "https://ci.android.com/builds/submitted/16644040/aosp_cf_x86_64_only_phone-userdebug/latest",
+  "build": 16644040,
+  "target": "aosp_cf_x86_64_only_phone-userdebug",
+  "branch": "aosp-android-latest-release",
+  "notVerifiedAsApi35OrFailureImage": true,
+  "visibleArtifactSizes": {
+    "aosp_cf_x86_64_only_phone-img-16644040.zip": "1.1 GiB",
+    "cvd-host_package.tar.gz": "857.2 MiB",
+    "manifest_16644040.xml": "165.2 KiB",
+    "repo.prop": "77.3 KiB"
+  },
+  "limitations": [
+    "Sizes are rendered compressed artifact sizes, not unpacked or runtime requirements.",
+    "FrameworksMockingServicesTests was not found in the inspected artifact listing.",
+    "aosp-android15-gsi and aosp-android15-release lookups returned ambiguous not-found/credential text; no login attempted and no global unavailability inferred."
+  ]
+}
