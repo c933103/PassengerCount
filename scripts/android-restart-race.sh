@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Sourced only by the owned, disposable-emulator runner, after its original gates.
 race_capture() {
-  local output=$1; shift
+  local output=$1 capture_code; shift
   if adb "$@" > "$output" 2> "$output.stderr"; then
-    if [[ ! -s "$output.stderr" ]]; then return 0; fi
-  fi
+    capture_code=0
+  else capture_code=$?; fi
+  printf '%s\n' "$capture_code" > "$output.exit-code.txt" || return 2
+  if [[ "$capture_code" == 0 && ! -s "$output.stderr" ]]; then return 0; fi
   echo "RACE_OBSERVATION_UNVERIFIED: $*" >&2
   cat "$output.stderr" >&2
   return 2
@@ -45,13 +47,13 @@ restart_race() {
   # Trigger on actual restart scheduling after this death, not a timer guessed
   # from instrumentation duration. No stopForeground/policy toggle on the target.
   while ((SECONDS<deadline)); do
-    race_capture "$OUT/race-logcat.txt" logcat -d -v threadtime
+    race_capture "$OUT/race-scheduling-logcat.txt" logcat -d -v threadtime
     if awk -v pid="$oldpid" -v process="$process" -v kind="$kind" '
       index($0,"PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-" kind " pid=" pid) { marker=1 }
       marker && index($0,"ActivityManager: Process " process " (pid " pid ") has died:") { death=1 }
       death && /ActivityManager: Scheduling restart of crashed service app.passengercount\/\.TrackService / { found=1 }
       END { exit !found }
-    ' "$OUT/race-logcat.txt"; then scheduled=true; break; fi
+    ' "$OUT/race-scheduling-logcat.txt"; then scheduled=true; break; fi
     sleep 0.05
   done
   $scheduled || { echo 'RACE_RESTART_SCHEDULING_UNVERIFIED'; return 2; }
@@ -68,7 +70,7 @@ restart_race() {
         absence_code=0
       else absence_code=$?; fi
       if [[ "$absence_code" != 1 || -s "$OUT/race-absent-pids.txt" || -s "$OUT/race-absent-pids.stderr" ]] \
-        || ! grep -Fq "ActivityManager: Process $PACKAGE (pid $ui_pid) has died:" "$OUT/race-logcat.txt"; then
+        || ! grep -Fq "ActivityManager: Process $PACKAGE (pid $ui_pid) has died:" "$OUT/race-scheduling-logcat.txt"; then
         echo 'RACE_ALL_PROCESS_ABSENCE_UNVERIFIED'; return 2;
       fi
       printf 'ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n' > "$OUT/race-process-scope.txt"
@@ -79,19 +81,34 @@ restart_race() {
   race_capture "$OUT/race-trigger.txt" shell am start-foreground-service -n "$component" -a app.passengercount.tests.TRIGGER
   if grep -Eq 'Error|Exception|Permission Denial' "$OUT/race-trigger.txt"; then return 2; fi
   deadline=$((SECONDS+75))
-  local code=2
+  local code=2 observation
   while ((SECONDS<deadline)); do
-    race_capture "$OUT/race-logcat.txt" logcat -d -v threadtime
-    race_capture "$OUT/race-services.txt" shell dumpsys activity services "$PACKAGE"
+    # A later partial capture must never overwrite the inputs of the last
+    # complete classification. Keep every attempt, including failed raw output.
+    observation="$(mktemp -d "$OUT/race-observation.XXXXXX")" || return 2
+    race_capture "$observation/logcat.txt" logcat -d -v threadtime || return 2
+    race_capture "$observation/services.txt" shell dumpsys activity services "$PACKAGE" || return 2
     if node "$ROOT/scripts/analyze-android-restart-race.mjs" \
-      "$OUT/race-logcat.txt" "$OUT/race-services.txt" "$oldpid" "$kind" "$process" > "$OUT/race-result.json"; then
+      "$observation/logcat.txt" "$observation/services.txt" "$oldpid" "$kind" "$process" \
+      --publish "$OUT/race-result.json" > "$observation/classifier.stdout" 2> "$observation/classifier.stderr"; then
       code=0
-      break
     else code=$?; fi
+    if ! printf '%s\n' "$code" > "$observation/classifier-exit-code.txt"; then
+      [[ "$code" != 1 ]] || return 1
+      return 2
+    fi
+    if [[ "$code" != 0 && "$code" != 1 && "$code" != 2 ]]; then
+      cat "$observation/classifier.stderr" >&2
+      return 2
+    fi
+    [[ "$code" != 0 ]] || break
     # A measured automatic-restart policy denial is a failure, never a pass.
     if [[ "$code" == 1 ]]; then
       echo 'RACE_AUTOMATIC_RESTART_FAILED: target restart denied; use interleaved flag for trigger attribution'
-      cat "$OUT/race-result.json"
+      # A publication error may leave the root pointer on a prior observation.
+      # Report only this attempt, never quote that older result as this denial.
+      [[ ! -f "$observation/result.json" ]] || cat "$observation/result.json"
+      cat "$observation/classifier.stderr" >&2
       return 1
     fi
     sleep 0.2

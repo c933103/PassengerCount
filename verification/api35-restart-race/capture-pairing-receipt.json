@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-26",
+  "scope": "Transactional diagnostic capture/result pairing only; full automatic-restart requirement remains open.",
+  "baseHead": "052fbb20ed7edd6f849681bf60e2862176b40aaf",
+  "sourceBlobs": {
+    "scripts/analyze-android-restart-race.mjs": "baee0e5930da8e80a7b2ce896392fdacdee422ed",
+    "scripts/android-restart-race.sh": "d47e6b106c975badbfdff58b472536ad312a4243",
+    "tests/android-restart-race.test.js": "2d20a2bbf8fa1ea20221f5e328c1438b494ce6c6",
+    "tests/android/README.md": "c3e48cdf4890e6b1dc44bf091ddfc84a958d844f"
+  },
+  "reproducedEvidence": {
+    "originalRun": "https://github.com/c933103/PassengerCount/actions/runs/39013057272",
+    "immutableReceipt": "https://github.com/c933103/PassengerCount/blob/69cd32be3d37392f4e1a69fcee7f0aad7af630dd/verification/api35-restart-race/run111/receipt.json",
+    "diagnosticArtifact": 12093389294,
+    "diagnosticZipSha256": "ca62ec0dc4d54a11ae8bb419477aaa210195b85b3c733559554826d307dff7f6",
+    "retainedPartialLogSha256": "9d215f0a62378446ea140dfe3dca2e392b89e1582e3766d1f6b59e1c3b3c5efb",
+    "retainedPartialLogLines": 20529,
+    "priorClassifierMarkerLine": 42508,
+    "priorClassifierHelperPromotionLine": 43827,
+    "finding": "A later failed logcat dump replaced the prior classifier's raw input. Empty stderr does not identify the cause of capture failure.",
+    "originalInstalledExit": 1,
+    "independentDiagnosticExit": 2,
+    "originalArtifactsUnchanged": true
+  },
+  "localValidation": {
+    "environment": "Temporary source-bound text snapshot; Node v24.22.1, OpenJDK 21.0.12.1",
+    "focused": {
+      "command": "node --test tests/android-restart-race.test.js tests/android-restart-after-failure.test.js",
+      "passed": 71,
+      "failed": 0,
+      "logSha256": "c1be5183f5921b634f7c0e7ff10790250c9f56c4031292d71d1d20e12627d769"
+    },
+    "nodeAggregate": {
+      "command": "npm test",
+      "passed": 432,
+      "failed": 1,
+      "total": 433,
+      "outcome": "not a full pass",
+      "failure": "Existing bundled N8 test cannot read data/government-routes.json.gz, absent from the temporary partial materialization. No assertion or source fixture was skipped/changed; complete hosted checkout remains required.",
+      "logSha256": "1fda4d8b5b7c8480f6672358a8f020cf293c03071f7a954261eb02451293c408"
+    },
+    "native": {
+      "command": "npm run test:native",
+      "outcome": "passed",
+      "logSha256": "94c8a3e7d51058a32d10b3fb212813a35bbabfc26c48c0136e1521f472883c45"
+    },
+    "browser": {
+      "command": "npm run test:browser",
+      "outcome": "blocked before launch",
+      "reason": "Playwright Chromium headless executable is absent in this temporary environment; no local browser acceptance."
+    },
+    "shellSyntax": "passed",
+    "diffCheck": "passed",
+    "hosted": "pending exact-successor-head natural PR validation and Codex review"
+  },
+  "unchanged": [
+    "Production source and permissions",
+    "All-process-absence requirement and process proof",
+    "Original 13 lifecycle phases and original failure binding",
+    "Denial remains exit 1, including observed denial followed by publication error",
+    "No workflow changes, manual rerun, merge or release"
+  ],
+  "nextTechnicalEvidence": "Use a source/build/flag-pinned instrumentable framework target to correlate ServiceRecord identity, pending restart, caller stacks and eligibility-field changes through all-process absence; then add actual framework lifecycle regressions and matched installed comparison. Current application-only hosted workflow does not build that framework. This harness repair is not a full restart fix."
+}

@@ -86,11 +86,28 @@ null-intent callback, or instrumentation is involved in that restart window.
   the window and no retry hides a failed sample.
 
 `race-result.json` records line indices, old/new PID, measured interleaving and
-any START_FOREGROUND cleanup during process absence. That app-op signature is
-supporting evidence, not a captured internal framework stack. Original phase
-results stay separate from the diagnostic. Node regressions execute the actual
-shell and classifier with success, denial, transport failure, stale-state and
-missed-window controls.
+any START_FOREGROUND cleanup during process absence. Its `evidence` object names
+the exact log and service dump, their byte lengths and SHA-256 hashes. Each
+`race-observation.*` directory retains that attempt's raw captures, stderr and
+command exit codes. A completed classification is also retained there as
+`result.json`; only then is the root `race-result.json` atomically replaced.
+A later partial capture or failed publication cannot overwrite the preceding
+complete pair. Failed attempts remain separate and the overall run is still
+inconclusive (exit 2), not the old result's success. A denial already observed
+in complete inputs remains failure (exit 1), including a later publication
+error. Internal classifier errors use 3 and are mapped to inconclusive 2 by
+the owned runner; they cannot be mistaken for product denial.
+
+Follow the `evidence` paths when reading a classifier, not the preparatory
+`race-scheduling-logcat.txt`. That earlier capture proves restart scheduling and
+process absence before the helper, not the subsequent result. No old archive
+is rewritten or reclassified by this storage-layout repair.
+
+The app-op signature is supporting evidence, not a captured internal framework
+stack. Original phase results stay separate from the diagnostic. Node regressions
+execute the actual shell and classifier with success, denial, transport failure,
+stale-state and missed-window controls, including complete capture followed by
+partial failure, interrupted publication, exact input pairing and retained denial.
 
 
 ## Process-split candidate coverage

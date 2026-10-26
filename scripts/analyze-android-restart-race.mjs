@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 
 // A trace classifier, not a proof of the internal system_server call stack.
@@ -39,9 +41,60 @@ export function analyzeRestartRace(log, services, oldPid, kind = 'race', process
     foreground, lines: {marker, death, scheduled, entering, promoted, reset, start, denied}};
 }
 
+// Each observation has unique inputs. Publish only one complete, hash-bound
+// result, never independently replace its log and service snapshot. Earlier
+// observations (including failed captures) remain available in the artifact.
+export function publishRestartRace(logPath, servicesPath, oldPid, kind, targetProcess, outputPath) {
+  const inputs = {};
+  const evidence = {};
+  const outputDirectory = path.dirname(outputPath);
+  if (path.dirname(logPath) !== path.dirname(servicesPath))
+    throw new Error('Observation inputs must share one attempt directory');
+  for (const [name, filename] of Object.entries({log: logPath, services: servicesPath})) {
+    if (fs.readFileSync(filename + '.exit-code.txt', 'utf8').trim() !== '0'
+        || fs.statSync(filename + '.stderr').size !== 0)
+      throw new Error('Incomplete ' + name + ' capture');
+    const bytes = fs.readFileSync(filename);
+    inputs[name] = bytes.toString('utf8');
+    evidence[name] = {path: path.relative(outputDirectory, filename), bytes: bytes.length,
+      sha256: createHash('sha256').update(bytes).digest('hex')};
+  }
+  const result = {...analyzeRestartRace(inputs.log, inputs.services, oldPid, kind, targetProcess), evidence};
+  const serialized = JSON.stringify(result, null, 2) + '\n';
+  try {
+    // Exclusive creation also prevents accidentally reusing an old attempt.
+    fs.writeFileSync(path.join(path.dirname(logPath), 'result.json'), serialized, {flag: 'wx'});
+    const pending = fs.mkdtempSync(path.join(outputDirectory, '.race-result-'));
+    try {
+      const filename = path.join(pending, 'result.json');
+      fs.writeFileSync(filename, serialized, {flag: 'wx'});
+      fs.renameSync(filename, outputPath);
+    } finally {
+      fs.rmSync(pending, {recursive: true, force: true});
+    }
+  } catch (error) {
+    // A storage failure cannot demote a denial already observed in complete
+    // inputs. Do not manufacture this flag for missing/unverified captures.
+    error.automaticRestartDenied = result.outcome === 'automatic-restart-denied';
+    throw error;
+  }
+  return result;
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const [, , logPath, servicesPath, oldPid, kind = 'race', targetProcess = 'app.passengercount'] = process.argv;
-  const result = analyzeRestartRace(fs.readFileSync(logPath, 'utf8'), fs.readFileSync(servicesPath, 'utf8'), oldPid, kind, targetProcess);
-  console.log(JSON.stringify(result, null, 2));
-  process.exitCode = result.outcome === 'foreground-restored' ? 0 : result.outcome === 'automatic-restart-denied' ? 1 : 2;
+  const [, , logPath, servicesPath, oldPid, kind = 'race', targetProcess = 'app.passengercount', mode, outputPath] = process.argv;
+  try {
+    if (mode !== undefined && (mode !== '--publish' || !outputPath)) throw new Error('Expected --publish outputPath');
+    const result = mode === '--publish'
+      ? publishRestartRace(logPath, servicesPath, oldPid, kind, targetProcess, outputPath)
+      : analyzeRestartRace(fs.readFileSync(logPath, 'utf8'), fs.readFileSync(servicesPath, 'utf8'), oldPid, kind, targetProcess);
+    if (mode !== '--publish') console.log(JSON.stringify(result, null, 2));
+    process.exitCode = result.outcome === 'foreground-restored' ? 0 : result.outcome === 'automatic-restart-denied' ? 1 : 2;
+  } catch (error) {
+    console.error('RACE_CLASSIFICATION_UNVERIFIED: ' + error.message);
+    // Internal observation/publication errors are distinct from product denial.
+    // The owned shell maps this internal code to its existing inconclusive 2.
+    if (error.automaticRestartDenied) console.error('RACE_AUTOMATIC_RESTART_DENIED: complete inputs record denial; result publication failed');
+    process.exitCode = error.automaticRestartDenied ? 1 : 3;
+  }
 }

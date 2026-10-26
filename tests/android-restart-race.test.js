@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {analyzeRestartRace} from '../scripts/analyze-android-restart-race.mjs';
+import {analyzeRestartRace, publishRestartRace} from '../scripts/analyze-android-restart-race.mjs';
 
 const death = '10-15 09:09:41.843 111 111 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=111';
 const died = '10-15 09:09:41.954 564 1725 I ActivityManager: Process app.passengercount (pid 111) has died: fg +50 FGS';
@@ -68,7 +69,7 @@ test('no helper requirement for historical natural control; no app-op cleanup al
 const root=fileURLToPath(new URL('../',import.meta.url));
 const shell=fs.readFileSync(new URL('../scripts/android-restart-race.sh',import.meta.url),'utf8')
   .replace(/\bSECONDS\b/g,'fixtureClock').replace('fixtureClock+75','fixtureClock+5');
-function runShell(events,dump=service,transportError=false,warmReady=true,scope=null) {
+function runShell(events,dump=service,transportError=false,warmReady=true,scope=null,fault=null) {
   const out=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-'));
   try {
     fs.writeFileSync(path.join(out,'input.log'),(warmReady?['10-15 09:09:30.000 333 333 I PassengerRaceTrigger: RACE_WARM_READY pid=333 uid=10210',...events]:events).join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
@@ -76,7 +77,13 @@ function runShell(events,dump=service,transportError=false,warmReady=true,scope=
 ROOT=${JSON.stringify(root)}; OUT=${JSON.stringify(out)}; CI=true; EMU_PID=99; SERIAL=emulator-5556; PACKAGE=app.passengercount
 ${scope ? "TRACK_PROCESS=app.passengercount:tracking" : ""}
 fixtureClock=0
+observation_logs=0; observation_services=0; classifier_calls=0
 sleep(){ fixtureClock=$((fixtureClock+1)); }
+node(){
+ classifier_calls=$((classifier_calls+1))
+ ${fault?.stage === 'classifier' ? `if [[ "$classifier_calls" == ${fault.at ?? 2} ]]; then echo 'injected classifier failure' >&2; return 3; fi` : ''}
+ command node "$@"
+}
 launch_home(){ echo launch_home >> "$OUT/calls"; }
 activity_state(){ echo "activity_state $*" >> "$OUT/calls"; }
 detached(){ echo "detached $*" >> "$OUT/calls"; }
@@ -89,15 +96,28 @@ adb(){
   'shell pidof app.passengercount') ${scope ? `if [[ ! -f "$OUT/prepared" ]] || [[ "${scope.uiAlive !== false}" == true ]]; then echo 444; else return 1; fi` : 'echo 111'};;
   'shell pidof app.passengercount:tracking') echo 111;;
   'shell pidof app.passengercount app.passengercount:tracking') ${scope?.absenceOutput ? `echo ${JSON.stringify(scope.absenceOutput)};` : ''} ${scope?.absenceStderr ? `echo ${JSON.stringify(scope.absenceStderr)} >&2;` : ''} return ${scope?.absenceExit ?? 1};;
-  'logcat -d -v threadtime') cat "$OUT/input.log";;
-  'shell dumpsys activity services app.passengercount') cat "$OUT/input.services";;
+  'logcat -d -v threadtime')
+   if [[ -f "$OUT/triggered" ]]; then
+    observation_logs=$((observation_logs+1))
+    ${fault?.stage === 'log' ? `if [[ "$observation_logs" == ${fault.at ?? 2} ]]; then printf 'partial log'; ${fault.stderr ? `echo ${JSON.stringify(fault.stderr)} >&2;` : ''} return ${fault.exit ?? 1}; fi` : ''}
+   fi
+   cat "$OUT/input.log";;
+  'shell dumpsys activity services app.passengercount')
+   if [[ -f "$OUT/triggered" ]]; then
+    observation_services=$((observation_services+1))
+    ${fault?.stage === 'services' ? `if [[ "$observation_services" == ${fault.at ?? 2} ]]; then printf 'partial services'; ${fault.stderr ? `echo ${JSON.stringify(fault.stderr)} >&2;` : ''} return ${fault.exit ?? 1}; fi` : ''}
+   fi
+   cat "$OUT/input.services";;
+  'shell am start-foreground-service -n app.passengercount.tests/app.passengercount.RestartRaceTriggerService -a app.passengercount.tests.TRIGGER') touch "$OUT/triggered";;
   *) echo 'Starting service: Intent { test fixture }';;
  esac
 }
 ${shell}
 restart_race ${scope?.kind || ""}
 `],{encoding:'utf8',timeout:10000});
-    return {...r,calls:fs.readFileSync(path.join(out,'calls'),'utf8'),result:fs.existsSync(path.join(out,'race-result.json'))?JSON.parse(fs.readFileSync(path.join(out,'race-result.json'),'utf8')):null};
+    const files=Object.fromEntries(fs.readdirSync(out,{recursive:true})
+      .filter(p=>fs.statSync(path.join(out,p)).isFile()).map(p=>[p,fs.readFileSync(path.join(out,p),'utf8')]));
+    return {...r,files,calls:files.calls,result:files['race-result.json']?JSON.parse(files['race-result.json']):null};
   } finally {fs.rmSync(out,{recursive:true,force:true});}
 }
 test('actual shell requires foreground proof before GPS verification reattaches',()=>{
@@ -197,3 +217,130 @@ for(const [label,options,deathObserved] of [
   assert.equal(r.status,2,r.stdout+r.stderr);
   assert.doesNotMatch(r.calls,/app.passengercount.tests.TRIGGER/);
 });
+
+const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+function assertPaired(r) {
+  assert.ok(r.result?.evidence, 'a completed observation identifies its exact inputs');
+  const {evidence,...classification}=r.result;
+  for(const item of Object.values(evidence)) {
+    assert.equal(digest(r.files[item.path]),item.sha256);
+    assert.equal(Buffer.byteLength(r.files[item.path]),item.bytes);
+    assert.equal(r.files[item.path+'.exit-code.txt'],'0\n');
+    assert.equal(r.files[item.path+'.stderr'],'');
+  }
+  assert.equal(path.dirname(evidence.log.path),path.dirname(evidence.services.path));
+  assert.equal(r.files[path.join(path.dirname(evidence.log.path),'result.json')],r.files['race-result.json']);
+  assert.deepEqual(analyzeRestartRace(r.files[evidence.log.path],r.files[evidence.services.path],
+    classification.oldPid,'race',classification.process),classification);
+}
+
+for(const [label,fault] of [
+  ['partial logcat/nonzero with empty stderr',{stage:'log',exit:1}],
+  ['partial logcat/zero exit with stderr',{stage:'log',exit:0,stderr:'transport warning'}],
+  ['partial service dump after new complete log',{stage:'services',exit:1}],
+  ['service dump/zero exit with stderr',{stage:'services',exit:0,stderr:'transport warning'}],
+  ['classifier failure after both captures',{stage:'classifier'}],
+]) test('last complete evidence survives later '+label,()=>{
+  // Complete observation, but missed timing: continue polling without calling
+  // this a product success, then reproduce run111's later partial capture.
+  const r=runShell([death,died,scheduled,start,entering,promoted],service,false,true,null,fault);
+  assert.equal(r.status,2,r.stdout+r.stderr);
+  assert.equal(r.result.outcome,'interleaving-unverified');
+  assertPaired(r);
+  assert.doesNotMatch(r.calls,/phase verify-race/);
+  assert.doesNotMatch(r.stdout,/PASS: one measured/);
+  const attempts=[...new Set(Object.keys(r.files).filter(p=>p.startsWith('race-observation.')).map(p=>p.split('/')[0]))];
+  assert.equal(attempts.length,2);
+  const failed=attempts.find(p=>p!==path.dirname(r.result.evidence.log.path));
+  assert.equal(r.files[failed+'/result.json'],undefined);
+  if(fault.stage==='classifier') assert.equal(r.files[failed+'/classifier-exit-code.txt'],'3\n');
+  else {
+    const file=failed+(fault.stage==='log'?'/logcat.txt':'/services.txt');
+    assert.match(r.files[file],/^partial /);
+    assert.equal(r.files[file+'.exit-code.txt'],`${fault.exit}\n`);
+    assert.equal(r.files[file+'.stderr'],fault.stderr?fault.stderr+'\n':'');
+  }
+});
+for(const stage of ['log','services','classifier']) test('first '+stage+' failure publishes no stale success',()=>{
+  const r=runShell([death,died,scheduled,entering,promoted,start],service,false,true,null,{stage,at:1});
+  assert.equal(r.status,2,r.stdout+r.stderr);
+  assert.equal(r.result,null);
+  assert.doesNotMatch(r.calls,/phase verify-race/);
+});
+test('success and denial each publish complete pairs with unchanged outcome codes',()=>{
+  for(const [events,dump,code] of [[log.split('\n'),service,0],[[death,died,scheduled,entering,promoted,start,denied],'',1]]) {
+    const r=runShell(events,dump,false,true,null,{stage:'log',at:2});
+    assert.equal(r.status,code,r.stdout+r.stderr);
+    assertPaired(r);
+    assert.equal(Object.keys(r.files).filter(p=>/race-observation\.[^/]+\/result.json$/.test(p)).length,1);
+    if(code===1) assert.doesNotMatch(r.calls,/phase verify-race/);
+  }
+});
+
+function publicationFixture(fn) {
+  const out=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-publish-'));
+  function attempt(name,events=log) {
+    const dir=path.join(out,name);fs.mkdirSync(dir);
+    for(const [file,content] of [['logcat.txt',events],['services.txt',service]]) {
+      fs.writeFileSync(path.join(dir,file),content);
+      fs.writeFileSync(path.join(dir,file+'.stderr'),'');
+      fs.writeFileSync(path.join(dir,file+'.exit-code.txt'),'0\n');
+    }
+    return [path.join(dir,'logcat.txt'),path.join(dir,'services.txt'),'111','race','app.passengercount',path.join(out,'race-result.json')];
+  }
+  try {
+    const first=attempt('first',[death,died,scheduled,start,entering,promoted].join('\n'));
+    publishRestartRace(...first);
+    const previous=fs.readFileSync(first[5]);
+    fn({out,first,previous,attempt});
+  } finally {fs.rmSync(out,{recursive:true,force:true});}
+}
+for(const failure of ['missing-log','missing-services','missing-status','nonzero-status','stderr','mixed-attempts','reused-attempt'])
+  test('publisher refuses '+failure+' without disturbing prior pair',()=>publicationFixture(({first,previous,attempt})=>{
+    const next=attempt('next');
+    if(failure==='missing-log') fs.unlinkSync(next[0]);
+    if(failure==='missing-services') fs.unlinkSync(next[1]);
+    if(failure==='missing-status') fs.unlinkSync(next[0]+'.exit-code.txt');
+    if(failure==='nonzero-status') fs.writeFileSync(next[1]+'.exit-code.txt','1\n');
+    if(failure==='stderr') fs.writeFileSync(next[0]+'.stderr','unverified');
+    if(failure==='mixed-attempts') next[1]=first[1];
+    if(failure==='reused-attempt') fs.writeFileSync(path.join(path.dirname(next[0]),'result.json'),'existing');
+    assert.throws(()=>publishRestartRace(...next));
+    assert.deepEqual(fs.readFileSync(first[5]),previous);
+    assert.deepEqual(fs.readFileSync(path.join(path.dirname(first[0]),'result.json')),previous);
+  }));
+for(const failure of ['snapshot-write','staging-directory','staging-write','atomic-rename'])
+  test('publication '+failure+' failure retains the last complete result',()=>publicationFixture(({first,previous,attempt})=>{
+    const next=attempt('next');
+    const method=failure==='staging-directory'?'mkdtempSync':failure==='atomic-rename'?'renameSync':'writeFileSync';
+    const original=fs[method];
+    fs[method]=function(filename,...args) {
+      if(failure==='staging-directory'||failure==='atomic-rename'
+          || (failure==='snapshot-write'&&filename===path.join(path.dirname(next[0]),'result.json'))
+          || (failure==='staging-write'&&filename.includes('.race-result-')))
+        throw new Error('injected '+failure);
+      return original.call(this,filename,...args);
+    };
+    try {assert.throws(()=>publishRestartRace(...next),/injected/);}
+    finally {fs[method]=original;}
+    assert.deepEqual(fs.readFileSync(first[5]),previous);
+    assert.deepEqual(fs.readFileSync(path.join(path.dirname(first[0]),'result.json')),previous);
+  }));
+test('actual classifier CLI distinguishes publication/input errors from a product denial',()=>publicationFixture(({first,previous,attempt})=>{
+  const next=attempt('next');fs.writeFileSync(next[0]+'.exit-code.txt','1\n');
+  const r=spawnSync(process.execPath,[path.join(root,'scripts/analyze-android-restart-race.mjs'),...next.slice(0,5),'--publish',next[5]],{encoding:'utf8'});
+  assert.equal(r.status,3,r.stdout+r.stderr);
+  assert.match(r.stderr,/RACE_CLASSIFICATION_UNVERIFIED/);
+  assert.deepEqual(fs.readFileSync(first[5]),previous);
+}));
+test('a publication failure cannot downgrade an observed denial to inconclusive',()=>publicationFixture(({first,previous,attempt})=>{
+  const next=attempt('denied',[death,died,scheduled,entering,promoted,start,denied].join('\n'));
+  // Refuse reuse before any root publication, while retaining the denial
+  // established from complete inputs and the previously published pair.
+  fs.writeFileSync(path.join(path.dirname(next[0]),'result.json'),'existing');
+  const r=spawnSync(process.execPath,[path.join(root,'scripts/analyze-android-restart-race.mjs'),...next.slice(0,5),'--publish',next[5]],{encoding:'utf8'});
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.match(r.stderr,/RACE_AUTOMATIC_RESTART_DENIED/);
+  assert.match(r.stderr,/result publication failed/);
+  assert.deepEqual(fs.readFileSync(first[5]),previous);
+}));
