@@ -1,0 +1,6 @@
+{
+  "status": "not-produced",
+  "acceptance": false,
+  "reason": "Native runner terminated before classifier; no outcome inferred",
+  "nativeExit": 2
+}

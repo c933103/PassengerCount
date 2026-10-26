@@ -1,0 +1,32 @@
+[
+  {
+    "archivePath": "exit-code.txt",
+    "bytes": 4,
+    "sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4",
+    "content": "255\n"
+  },
+  {
+    "archivePath": "source.txt",
+    "bytes": 82,
+    "sha256": "51bfafea30a68827b5f5d44f1bef7660808b268a82f2e2f8f4a6ab04bfdd3be6",
+    "content": "e54e0a5a781606b05b6e35b4c439575acc605161\nda0dda15e0492b36f18a2c1e0cce22c2a97617f6\n"
+  },
+  {
+    "archivePath": "apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "1d6dfcbcb978dceab330e774a51b4e0d8ad0700463fe37a9245b2f52cce32ecb",
+    "content": "1278ce39c0ca3a6322d031eeb628198c877ddb80aed4dec7c691ecc3258dd65c  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\n87afc53190cbe0382df9a436a037433ae06c6284d51467e3e92a8bb62f6dd43f  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "device-fingerprint.txt",
+    "bytes": 82,
+    "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+    "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+  },
+  {
+    "archivePath": "services-final.txt",
+    "bytes": 20,
+    "sha256": "a7d0391f2b9ecc7dc302d6ca042251f413b26e1f1ee29d396e7db3df0701640f",
+    "content": "adb: device offline\n"
+  }
+]

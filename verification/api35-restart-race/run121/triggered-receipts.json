@@ -1,0 +1,80 @@
+[
+  {
+    "archivePath": "exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "source.txt",
+    "bytes": 82,
+    "sha256": "51bfafea30a68827b5f5d44f1bef7660808b268a82f2e2f8f4a6ab04bfdd3be6",
+    "content": "e54e0a5a781606b05b6e35b4c439575acc605161\nda0dda15e0492b36f18a2c1e0cce22c2a97617f6\n"
+  },
+  {
+    "archivePath": "apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "1d6dfcbcb978dceab330e774a51b4e0d8ad0700463fe37a9245b2f52cce32ecb",
+    "content": "1278ce39c0ca3a6322d031eeb628198c877ddb80aed4dec7c691ecc3258dd65c  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\n87afc53190cbe0382df9a436a037433ae06c6284d51467e3e92a8bb62f6dd43f  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "device-fingerprint.txt",
+    "bytes": 82,
+    "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+    "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+  },
+  {
+    "archivePath": "race-process-scope.txt",
+    "bytes": 48,
+    "sha256": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "content": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n"
+  },
+  {
+    "archivePath": "race-absent-pids.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "race-absent-pids.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "race-absent-pids.exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "race-trigger-slot.json",
+    "bytes": 633,
+    "sha256": "440f4d2dfadf878691dcfe8633f590e17633fe88958feff9471927ce34722f98",
+    "content": "{\n  \"kind\": \"host-timing-observation-not-acceptance\",\n  \"clock\": \"time.monotonic_ns\",\n  \"clockImplementation\": \"clock_gettime(CLOCK_MONOTONIC)\",\n  \"clockResolutionSeconds\": 1e-09,\n  \"limitations\": [\n    \"Host timestamps bracket command slots, not device events.\",\n    \"Separate emulator boot/warmup, scheduling and memory pressure are uncontrolled confounds.\",\n    \"Idle replay is not timing equality or a causal/acceptance result.\"\n  ],\n  \"mode\": \"triggered\",\n  \"status\": \"measured\",\n  \"verifiedAbsenceNs\": 425885578629,\n  \"slotStartNs\": 425927702088,\n  \"slotEndNs\": 426047798415,\n  \"elapsedNs\": 120096327,\n  \"captureExitCode\": 0\n}\n"
+  },
+  {
+    "archivePath": "race-first-services-timing.json",
+    "bytes": 949,
+    "sha256": "8f2d5eb3108df926eea03704a443f62b5dcd840690d77cfbcc824163690991a5",
+    "content": "{\n  \"kind\": \"host-timing-observation-not-acceptance\",\n  \"clock\": \"time.monotonic_ns\",\n  \"clockImplementation\": \"clock_gettime(CLOCK_MONOTONIC)\",\n  \"clockResolutionSeconds\": 1e-09,\n  \"limitations\": [\n    \"Host timestamps bracket command slots, not device events.\",\n    \"Separate emulator boot/warmup, scheduling and memory pressure are uncontrolled confounds.\",\n    \"Idle replay is not timing equality or a causal/acceptance result.\"\n  ],\n  \"mode\": \"triggered\",\n  \"status\": \"measured\",\n  \"verifiedAbsenceNs\": 425885578629,\n  \"firstServicesStartNs\": 426875724830,\n  \"firstServicesEndNs\": 426989291988,\n  \"servicesElapsedNs\": 113567158,\n  \"gapAfterSlotNs\": 827926415,\n  \"elapsedFromAbsenceNs\": 990146201,\n  \"slotEvidence\": {\n    \"path\": \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/race-trigger-slot.json\",\n    \"bytes\": 633,\n    \"sha256\": \"440f4d2dfadf878691dcfe8633f590e17633fe88958feff9471927ce34722f98\"\n  }\n}\n"
+  },
+  {
+    "archivePath": "original-validation-exit-code.txt",
+    "bytes": 4,
+    "sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4",
+    "content": "255\n"
+  },
+  {
+    "archivePath": "diagnostic-step-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "services-final.txt",
+    "bytes": 2414,
+    "sha256": "7baccd502f6baed483c8f3dfd713be456979aab4449cbe392d1e2dbe3bcc2093",
+    "content": "ACTIVITY MANAGER SERVICES (dumpsys activity services)\n  User 0 active services:\n  * ServiceRecord{7df0095 u0 app.passengercount.tests/app.passengercount.RestartRaceTriggerService c:com.android.shell}\n    intent={act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService}\n    packageName=app.passengercount.tests\n    processName=app.passengercount.tests\n    targetSdkVersion=35\n    baseDir=/data/app/~~33pVJehXt0R0QurEGIiP5A==/app.passengercount.tests-MNPbLtP_epkA3r2DNUyJLQ==/base.apk\n    dataDir=/data/user/0/app.passengercount.tests\n    app=ProcessRecord{8151dbc 2765:app.passengercount.tests/u0a210}\n    useNewWiuLogic_forCapabilities()=true\n    useNewWiuLogic_forStart()=true\n    useNewBfslLogic()=true\n    mAllowWiu_noBinding=SYSTEM_UID\n    mAllowWiu_inBindService=DENIED\n    mAllowWiu_byBindings=DENIED\n    getFgsAllowWiu_legacy=SYSTEM_UID\n    getFgsAllowWiu_new=SYSTEM_UID\n    getFgsAllowWiu_forStart=SYSTEM_UID\n    getFgsAllowWiu_forCapabilities=SYSTEM_UID\n    allowUiJobScheduling=true\n    recentCallingPackage=com.android.shell\n    recentCallingUid=2000\n    mAllowStart_noBinding=SYSTEM_UID\n    mAllowStart_inBindService=DENIED\n    mAllowStart_byBindings=DENIED\n    getFgsAllowStart_legacy=SYSTEM_UID\n    getFgsAllowStart_new=SYSTEM_UID\n    getFgsAllowStart=SYSTEM_UID\n    startForegroundCount=1\n    infoAllowStartForeground=[callingPackage: com.android.shell; callingUid: 2000; uidState: CEM ; uidBFSL: n/a; intent: Intent { act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService }; code:SYSTEM_UID; tempAllowListReason:<,reasonCode:SYSTEM_ALLOW_LISTED,duration:9223372036854775807,callingUid:-1>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]\n    isForeground=true foregroundId=701 types=0x00000800 foregroundNoti=Notification(channel=restart-race shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=FOREGROUND_SERVICE color=0x00000000 vis=PRIVATE)\n    isShortFgs=true startId=1 startForegroundCount=1 startTime=-1s108ms timeout=+2m58s892ms demoteTime=+3m3s892ms anrTime=+3m8s892ms\n    createTime=-1s178ms startingBgTimeout=--\n    lastActivity=-1s173ms restartTime=-1s173ms createdFromFg=true\n    startRequested=true delayedStop=false stopIfKilled=true callStart=true lastStartId=1\n startCommandResult=2\n"
+  }
+]

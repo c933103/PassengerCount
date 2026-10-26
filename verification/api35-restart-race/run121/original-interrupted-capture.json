@@ -1,0 +1,54 @@
+{
+  "evidence": [
+    {
+      "archivePath": "logcat-deleted-restarted.txt",
+      "bytes": 126976,
+      "sha256": "f228798bebe3049069aac3bfd22b19b7db719d3e058a99898a25ff0e24686e29",
+      "firstLines": [
+        "--------- beginning of main",
+        "10-26 07:00:18.196   147   147 W linker  : Warning: failed to find generated linker configuration from \"/linkerconfig/ld.config.txt\"",
+        "10-26 07:00:18.203   148   148 W linker  : Warning: failed to find generated linker configuration from \"/linkerconfig/ld.config.txt\""
+      ],
+      "lastLines": [
+        "10-26 07:00:19.298     0     0 I init    : ... started service 'tombstoned' has pid 212",
+        "10-26 07:00:19.299     0     0 I init    : Switched to default mount namespace",
+        "10-26 07:00:19.300     0     0 I init    : Encryption policy of /data/misc set to a90afd8de97881203b71be6c35c328b2 v2 modes 1/4 flags"
+      ]
+    },
+    {
+      "archivePath": "services-final.txt",
+      "bytes": 20,
+      "sha256": "a7d0391f2b9ecc7dc302d6ca042251f413b26e1f1ee29d396e7db3df0701640f",
+      "content": "adb: device offline\n"
+    },
+    {
+      "archivePath": "instrumentation-detached-deleted.txt",
+      "bytes": 15652,
+      "sha256": "592f36d1675ecad783c8453fd0d0035c1f8352fc71a68dcd36adb8d4e121d5bc"
+    },
+    {
+      "archivePath": "instrumentation-detached-deleted.txt.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "archivePath": "emulator.txt",
+      "bytes": 9848,
+      "sha256": "103def16c35cac2bbe6adc8ad649be356d44b021a4470820725a2d7d0d49ca45"
+    },
+    {
+      "archivePath": "exit-code.txt",
+      "bytes": 4,
+      "sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4",
+      "content": "255\n"
+    }
+  ],
+  "absentPaths": [
+    "after-death-deleted.txt",
+    "service-starts-deleted.txt",
+    "services-deleted-restarted.txt",
+    "race-result.json"
+  ],
+  "source": "https://github.com/c933103/PassengerCount/blob/8b985de9fb048dde130bd1aed476ea892f83848d/scripts/test-android-installed.sh#L298-L302",
+  "inference": "Partial logcat destination exists but subsequent awk destination absent; source ordering points to interrupted adb logcat command. No per-command native receipt exists; precise transport/root cause unproved. Later metadata/static captures recovered."
+}

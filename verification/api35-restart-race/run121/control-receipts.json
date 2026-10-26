@@ -1,0 +1,120 @@
+[
+  {
+    "archivePath": "no-trigger-control/exit-code.txt",
+    "bytes": 2,
+    "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "content": "2\n"
+  },
+  {
+    "archivePath": "no-trigger-control/source.txt",
+    "bytes": 82,
+    "sha256": "51bfafea30a68827b5f5d44f1bef7660808b268a82f2e2f8f4a6ab04bfdd3be6",
+    "content": "e54e0a5a781606b05b6e35b4c439575acc605161\nda0dda15e0492b36f18a2c1e0cce22c2a97617f6\n"
+  },
+  {
+    "archivePath": "no-trigger-control/apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "1d6dfcbcb978dceab330e774a51b4e0d8ad0700463fe37a9245b2f52cce32ecb",
+    "content": "1278ce39c0ca3a6322d031eeb628198c877ddb80aed4dec7c691ecc3258dd65c  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\n87afc53190cbe0382df9a436a037433ae06c6284d51467e3e92a8bb62f6dd43f  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "no-trigger-control/device-fingerprint.txt",
+    "bytes": 82,
+    "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+    "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+  },
+  {
+    "archivePath": "no-trigger-control/race-absent-pids.txt",
+    "bytes": 5,
+    "sha256": "2d99ff9c8b6f090be51092b0a1ea76c1870ef8cdd36589511d84afd08a521eff",
+    "content": "3874\n"
+  },
+  {
+    "archivePath": "no-trigger-control/race-absent-pids.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "no-trigger-control/paired-wrapper-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "no-trigger-control/control-status.txt",
+    "bytes": 30,
+    "sha256": "7552fc094f63ffa2ee70f35f3636b7f59eabca82962558ab35867093f07c0d19",
+    "content": "process-exited-not-acceptance\n"
+  },
+  {
+    "archivePath": "no-trigger-control/control-exit-code.txt",
+    "bytes": 2,
+    "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "content": "2\n"
+  },
+  {
+    "archivePath": "no-trigger-control/triggered-native-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "no-trigger-control/triggered-evidence-status.txt",
+    "bytes": 19,
+    "sha256": "374ea3581d83bdc9ceb5a8c6ef33d5f0f405fad024bcf7d528daa1019bee42aa",
+    "content": "verified-unchanged\n"
+  },
+  {
+    "archivePath": "no-trigger-control/runner.stdout",
+    "bytes": 2434,
+    "sha256": "7b255fa105e76baba5b6ede491155f8d71d2b6b26ad979ccd22d0f8a1d095bfa",
+    "selection": "Only phase/detachment/result status lines; all runtime/evidence JSON and session material omitted",
+    "selectedStatusLines": [
+      {
+        "index": 16,
+        "text": "INSTRUMENTATION_RESULT: stream=PHASE_PASS bootstrap assertions=7 pid=2318"
+      },
+      {
+        "index": 19,
+        "text": "DETACHED_STATE_PASS activity-before-race pid=2799"
+      },
+      {
+        "index": 20,
+        "text": "ACTIVITY_STATE_PASS before-race state=2 pid=2799"
+      },
+      {
+        "index": 28,
+        "text": "INSTRUMENTATION_RESULT: stream=PHASE_PASS prepare-race assertions=12 pid=3005"
+      },
+      {
+        "index": 31,
+        "text": "DETACHED_STATE_PASS activity-background-race pid=3005"
+      },
+      {
+        "index": 32,
+        "text": "ACTIVITY_STATE_PASS background-race state=4 pid=3005"
+      },
+      {
+        "index": 33,
+        "text": "DETACHED_STATE_PASS race pid=3005"
+      },
+      {
+        "index": 34,
+        "text": "RACE_ALL_PROCESS_ABSENCE_UNVERIFIED"
+      }
+    ]
+  },
+  {
+    "archivePath": "no-trigger-control/runner.stderr",
+    "bytes": 100,
+    "sha256": "a13bb631a20d412241dcd846f60845164b44758d6bd971c6c348c17255e37173",
+    "content": "All files should be loaded. Notifying the device.\nAll files should be loaded. Notifying the device.\n"
+  },
+  {
+    "archivePath": "no-trigger-control/services-final.txt",
+    "bytes": 2262,
+    "sha256": "622f96fc26a8dd64238115abe3acf46f931c67849a8d8e1fcefdbdb4a118a273",
+    "content": "ACTIVITY MANAGER SERVICES (dumpsys activity services)\n  User 0 active services:\n  * ServiceRecord{140cec5 u0 app.passengercount/.TrackService c:app.passengercount}\n    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}\n    packageName=app.passengercount\n    processName=app.passengercount:tracking\n    targetSdkVersion=35\n    baseDir=/data/app/~~ihoxFSvQM6CEXpOK_O2b0A==/app.passengercount-bYeF41f4dhqyX-xyxlVoPA==/base.apk\n    dataDir=/data/user/0/app.passengercount\n    app=ProcessRecord{1a9eb97 3874:app.passengercount:tracking/u0a209}\n    useNewWiuLogic_forCapabilities()=true\n    useNewWiuLogic_forStart()=true\n    useNewBfslLogic()=true\n    mAllowWiu_noBinding=PROC_STATE_TOP\n    mAllowWiu_inBindService=DENIED\n    mAllowWiu_byBindings=DENIED\n    getFgsAllowWiu_legacy=PROC_STATE_TOP\n    getFgsAllowWiu_new=PROC_STATE_TOP\n    getFgsAllowWiu_forStart=PROC_STATE_TOP\n    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP\n    allowUiJobScheduling=true\n    recentCallingPackage=app.passengercount\n    recentCallingUid=10209\n    mAllowStart_noBinding=PROC_STATE_TOP\n    mAllowStart_inBindService=DENIED\n    mAllowStart_byBindings=DENIED\n    getFgsAllowStart_legacy=PROC_STATE_TOP\n    getFgsAllowStart_new=PROC_STATE_TOP\n    getFgsAllowStart=PROC_STATE_TOP\n    startForegroundCount=1\n    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]\n    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)\n    createTime=-13s553ms startingBgTimeout=--\n    lastActivity=-116ms restartTime=-116ms createdFromFg=false\n    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=2\n startCommandResult=1\n    restartCount=1 restartDelay=-1m10s129ms nextRestartTime=-356ms crashCount=0\n"
+  }
+]

@@ -1,0 +1,112 @@
+{
+  "archivePath": "logcat-final.txt",
+  "bytes": 9877483,
+  "sha256": "0391549b0e281e06b940c7a0d7c51bd6b2db9adb06bf1650c418597ad25caf53",
+  "indexConvention": "zero-based classifier/raw indices",
+  "lines": [
+    {
+      "index": 29161,
+      "text": "10-26 07:00:55.382   560   593 I ActivityManager: Start proc 2393:app.passengercount/u0a209 for added application app.passengercount"
+    },
+    {
+      "index": 31320,
+      "text": "10-26 07:00:58.013   560  1898 I ActivityManager: Start proc 2540:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0ai9000 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 32783,
+      "text": "10-26 07:01:00.792   560   593 I ActivityManager: Start proc 2704:app.passengercount/u0a209 for next-top-activity {app.passengercount/app.passengercount.MainActivity}"
+    },
+    {
+      "index": 33130,
+      "text": "10-26 07:01:01.695   560   593 I ActivityManager: Start proc 2752:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i1 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 33755,
+      "text": "10-26 07:01:03.462   560   593 I ActivityManager: Start proc 2838:app.passengercount:tracking/u0a209 for content provider {app.passengercount/app.passengercount.TrackProvider}"
+    },
+    {
+      "index": 35267,
+      "text": "10-26 07:01:06.492   560   593 I ActivityManager: Start proc 2991:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:1/u0i2 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:1}"
+    },
+    {
+      "index": 49862,
+      "text": "10-26 07:01:22.480   560   593 I ActivityManager: Start proc 3811:app.passengercount:tracking/u0a209 for added application app.passengercount:tracking"
+    },
+    {
+      "index": 51114,
+      "text": "10-26 07:01:24.306   560  1542 I ActivityManager: Start proc 3906:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i4 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 51436,
+      "text": "10-26 07:01:25.621   560   593 I ActivityManager: Start proc 3964:app.passengercount:tracking/u0a209 for added application app.passengercount:tracking"
+    },
+    {
+      "index": 51827,
+      "text": "10-26 07:01:26.258   560   593 I ActivityManager: Start proc 3989:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i5 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 53157,
+      "text": "10-26 07:01:28.645   560   593 I ActivityManager: Start proc 4080:app.passengercount:tracking/u0a209 for added application app.passengercount:tracking"
+    },
+    {
+      "index": 53370,
+      "text": "10-26 07:01:29.210   560  1292 I ActivityManager: Start proc 4116:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i6 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 53936,
+      "text": "10-26 07:01:30.171   560   593 I ActivityManager: Start proc 4182:app.passengercount:tracking/u0a209 for added application app.passengercount:tracking"
+    },
+    {
+      "index": 54370,
+      "text": "10-26 07:01:31.156   560   593 I ActivityManager: Start proc 4221:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i7 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 54506,
+      "text": "10-26 07:01:31.770   560   593 I ActivityManager: Start proc 4268:app.passengercount/u0a209 for next-top-activity {app.passengercount/app.passengercount.MainActivity}"
+    },
+    {
+      "index": 54644,
+      "text": "10-26 07:01:32.201   560  2284 I ActivityManager: Start proc 4305:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i8 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:0}"
+    },
+    {
+      "index": 54975,
+      "text": "10-26 07:01:33.393   560   593 I ActivityManager: Start proc 4354:app.passengercount:tracking/u0a209 for content provider {app.passengercount/app.passengercount.TrackProvider}"
+    },
+    {
+      "index": 56101,
+      "text": "10-26 07:01:35.592   560   593 I ActivityManager: Start proc 4454:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:1/u0i9 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:1}"
+    },
+    {
+      "index": 61739,
+      "text": "10-26 07:01:47.751  4354  4354 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-valid pid=4354"
+    },
+    {
+      "index": 61748,
+      "text": "10-26 07:01:47.937   560  1557 I ActivityManager: Process app.passengercount:tracking (pid 4354) has died: prcp FGS "
+    },
+    {
+      "index": 61749,
+      "text": "10-26 07:01:47.946   560  1557 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+    },
+    {
+      "index": 61776,
+      "text": "10-26 07:01:48.052   560   591 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 9893ms for mem-pressure-event"
+    },
+    {
+      "index": 61839,
+      "text": "10-26 07:01:48.512   560   591 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 433ms for mem-pressure-event"
+    },
+    {
+      "index": 62005,
+      "text": "10-26 07:01:48.958   560   593 I ActivityManager: Start proc 4715:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}"
+    },
+    {
+      "index": 63250,
+      "text": "10-26 07:01:51.483   560   593 I ActivityManager: Start proc 4801:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:1/u0i10 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:1}"
+    },
+    {
+      "index": 66232,
+      "text": "10-26 07:01:58.596   560  1897 I ActivityManager: Start proc 4943:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:2/u0i11 for  {app.passengercount/org.chromium.content.app.SandboxedProcessService0:2}"
+    }
+  ]
+}

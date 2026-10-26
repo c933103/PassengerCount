@@ -1,0 +1,122 @@
+{
+  "source": {
+    "head": "8b985de9fb048dde130bd1aed476ea892f83848d",
+    "testedMerge": "e54e0a5a781606b05b6e35b4c439575acc605161",
+    "tree": "da0dda15e0492b36f18a2c1e0cce22c2a97617f6",
+    "parents": [
+      "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+      "8b985de9fb048dde130bd1aed476ea892f83848d"
+    ],
+    "runId": 40282796603,
+    "attempt": 1
+  },
+  "fullGateAccepted": false,
+  "conclusion": "failure",
+  "artifacts": [
+    {
+      "id": 12633331583,
+      "name": "PassengerCount-API35-restart-diagnostic-e54e0a5a781606b05b6e35b4c439575acc605161",
+      "size_in_bytes": 135066099,
+      "digest": "sha256:29ff3d0c0342e442271c6efc3211a6976a0d9f23cd9128cfc301760dfb26d2d7",
+      "expires_at": "2027-01-24T06:56:46Z",
+      "zipVerified": true
+    },
+    {
+      "id": 12633132148,
+      "name": "PassengerCount-API35-lifecycle-e54e0a5a781606b05b6e35b4c439575acc605161",
+      "size_in_bytes": 67563451,
+      "digest": "sha256:efdd93b439ba0164f1695667f519f41ef239a0aa5ec2ae442d0c94fc1b361cdf",
+      "expires_at": "2027-01-24T06:56:46Z",
+      "zipVerified": true
+    }
+  ],
+  "roles": {
+    "triggered": {
+      "artifactId": 12633331583,
+      "exitCode": 1,
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "3032",
+        "newPid": "3919",
+        "interleaved": true,
+        "cleanupDuringAbsence": true,
+        "triggerBeforeCleanup": true,
+        "foreground": false,
+        "lines": {
+          "marker": 47969,
+          "death": 48145,
+          "scheduled": 48146,
+          "entering": 48530,
+          "promoted": 48674,
+          "reset": 48676,
+          "start": 48711,
+          "denied": 48961
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.SVaFc6/logcat.txt",
+            "bytes": 6794703,
+            "sha256": "3161dad5edf8b68acdedbd34e6d373640ba509f098d9fc419479971979b538b6"
+          },
+          "services": {
+            "path": "race-observation.SVaFc6/services.txt",
+            "bytes": 338615,
+            "sha256": "54e2b4191f3e9ae08b89c9b5b1f71077b7f965330506d5c0e55241149564815c"
+          }
+        }
+      }
+    },
+    "control": {
+      "artifactId": 12633331583,
+      "exitCode": 2,
+      "result": null,
+      "triggeredEvidenceGuard": {
+        "rawReceipt": {
+          "archivePath": "no-trigger-control/triggered-input-hashes.txt",
+          "bytes": 47181,
+          "sha256": "0c6121029804142bee75eae11413ad4002e59e265bbfd73091f49c8c8dbe4fed"
+        },
+        "filesIndependentlyRehashed": 218,
+        "status": "verified-unchanged"
+      }
+    },
+    "original": {
+      "artifactId": 12633132148,
+      "exitCode": 255,
+      "result": null,
+      "phaseCommandStatuses": {
+        "basics-command-exit-code.txt": "0\n",
+        "bootstrap-command-exit-code.txt": "0\n",
+        "prepare-deleted-command-exit-code.txt": "0\n",
+        "prepare-valid-command-exit-code.txt": "0\n",
+        "receipts-final-command-exit-code.txt": "0\n",
+        "receipts-prepare-command-exit-code.txt": "0\n",
+        "receipts-recover-command-exit-code.txt": "0\n",
+        "recover-command-exit-code.txt": "0\n",
+        "verify-valid-command-exit-code.txt": "0\n"
+      },
+      "serviceOnlyResult": null
+    }
+  },
+  "jobLog": {
+    "bytes": 343036,
+    "sha256": "04a00ff705641123e0671b6b3958a3155d54a676e9f3c29c3095bca573816d7c"
+  },
+  "hosted": {
+    "node": {
+      "passed": 644,
+      "failed": 0
+    },
+    "native": "passed",
+    "browser": "passed",
+    "appBuild": "passed",
+    "testBuild": "passed",
+    "originalLifecyclePhases": "incomplete: stopped after deleted detachment; original full race not reached"
+  },
+  "codex": {
+    "head": "8b985de9fb048dde130bd1aed476ea892f83848d",
+    "noFindings": true,
+    "url": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6410241990"
+  }
+}

@@ -1,0 +1,224 @@
+[
+  {
+    "archivePath": "race-before-services.txt",
+    "bytes": 310274,
+    "sha256": "6f257dc71485ad2e7f0cafc676ec93f5ce504d358759a87185fea1dcb44d70a9",
+    "lines": [
+      {
+        "index": 289,
+        "text": ""
+      },
+      {
+        "index": 290,
+        "text": "  * ServiceRecord{db15d61 u0 app.passengercount/.TrackService c:app.passengercount}"
+      },
+      {
+        "index": 291,
+        "text": "    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}"
+      },
+      {
+        "index": 292,
+        "text": "    packageName=app.passengercount"
+      },
+      {
+        "index": 293,
+        "text": "    processName=app.passengercount:tracking"
+      },
+      {
+        "index": 294,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 295,
+        "text": "    baseDir=/data/app/~~0UOX4l4MqCONXohuakdAsg==/app.passengercount-HOY8x3AEHcs3oQKHU_zI_w==/base.apk"
+      },
+      {
+        "index": 296,
+        "text": "    dataDir=/data/user/0/app.passengercount"
+      },
+      {
+        "index": 297,
+        "text": "    app=ProcessRecord{d874acc 3032:app.passengercount:tracking/u0a209}"
+      },
+      {
+        "index": 298,
+        "text": "    useNewWiuLogic_forCapabilities()=true"
+      },
+      {
+        "index": 299,
+        "text": "    useNewWiuLogic_forStart()=true"
+      },
+      {
+        "index": 300,
+        "text": "    useNewBfslLogic()=true"
+      },
+      {
+        "index": 301,
+        "text": "    mAllowWiu_noBinding=PROC_STATE_TOP"
+      },
+      {
+        "index": 302,
+        "text": "    mAllowWiu_inBindService=DENIED"
+      },
+      {
+        "index": 303,
+        "text": "    mAllowWiu_byBindings=DENIED"
+      },
+      {
+        "index": 304,
+        "text": "    getFgsAllowWiu_legacy=PROC_STATE_TOP"
+      },
+      {
+        "index": 305,
+        "text": "    getFgsAllowWiu_new=PROC_STATE_TOP"
+      },
+      {
+        "index": 306,
+        "text": "    getFgsAllowWiu_forStart=PROC_STATE_TOP"
+      },
+      {
+        "index": 307,
+        "text": "    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP"
+      },
+      {
+        "index": 308,
+        "text": "    allowUiJobScheduling=true"
+      },
+      {
+        "index": 309,
+        "text": "    recentCallingPackage=app.passengercount"
+      },
+      {
+        "index": 310,
+        "text": "    recentCallingUid=10209"
+      },
+      {
+        "index": 311,
+        "text": "    mAllowStart_noBinding=PROC_STATE_TOP"
+      },
+      {
+        "index": 312,
+        "text": "    mAllowStart_inBindService=DENIED"
+      },
+      {
+        "index": 313,
+        "text": "    mAllowStart_byBindings=DENIED"
+      },
+      {
+        "index": 314,
+        "text": "    getFgsAllowStart_legacy=PROC_STATE_TOP"
+      },
+      {
+        "index": 315,
+        "text": "    getFgsAllowStart_new=PROC_STATE_TOP"
+      },
+      {
+        "index": 316,
+        "text": "    getFgsAllowStart=PROC_STATE_TOP"
+      },
+      {
+        "index": 317,
+        "text": "    startForegroundCount=1"
+      },
+      {
+        "index": 318,
+        "text": "    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]"
+      },
+      {
+        "index": 319,
+        "text": "    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)"
+      },
+      {
+        "index": 320,
+        "text": "    createTime=-5s988ms startingBgTimeout=--"
+      },
+      {
+        "index": 321,
+        "text": "    lastActivity=-5s986ms restartTime=-5s986ms createdFromFg=true"
+      },
+      {
+        "index": 322,
+        "text": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1"
+      },
+      {
+        "index": 323,
+        "text": " startCommandResult=1"
+      },
+      {
+        "index": 324,
+        "text": ""
+      },
+      {
+        "index": 325,
+        "text": "  * ServiceRecord{935ca33 u0 com.google.android.gms/.icing.service.AppIndexingService c:com.google.android.gms}"
+      },
+      {
+        "index": 326,
+        "text": "    intent={act=com.google.android.gms.icing.APP_INDEXING_SERVICE pkg=com.google.android.gms}"
+      },
+      {
+        "index": 4396,
+        "text": "Active foreground apps - user 0:"
+      },
+      {
+        "index": 4397,
+        "text": "  #0: app.passengercount"
+      },
+      {
+        "index": 4398,
+        "text": "    mNumActive=1 mAppOnTop=false mShownWhileTop=true mShownWhileScreenOn=true"
+      },
+      {
+        "index": 4399,
+        "text": "    mStartTime=-6s106ms mStartVisibleTime=-6s106ms"
+      }
+    ]
+  },
+  {
+    "archivePath": "race-observation.SVaFc6/services.txt",
+    "bytes": 338615,
+    "sha256": "54e2b4191f3e9ae08b89c9b5b1f71077b7f965330506d5c0e55241149564815c",
+    "lines": [
+      {
+        "index": 3268,
+        "text": "    intent={act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService}"
+      },
+      {
+        "index": 3269,
+        "text": "    packageName=app.passengercount.tests"
+      },
+      {
+        "index": 3270,
+        "text": "    processName=app.passengercount.tests"
+      },
+      {
+        "index": 3271,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 3272,
+        "text": "    baseDir=/data/app/~~33pVJehXt0R0QurEGIiP5A==/app.passengercount.tests-MNPbLtP_epkA3r2DNUyJLQ==/base.apk"
+      },
+      {
+        "index": 4840,
+        "text": "  Handler - user 0:"
+      },
+      {
+        "index": 4841,
+        "text": "    Handler (com.android.server.am.ActiveServices$ServiceMap) {8b8f0a6} @ 72142"
+      },
+      {
+        "index": 4842,
+        "text": "      Looper (ActivityManager, tid 30) {74f6573}"
+      },
+      {
+        "index": 4843,
+        "text": "        Message 4: { when=+8s154ms what=1 target=com.android.server.am.ActiveServices$ServiceMap }"
+      },
+      {
+        "index": 4844,
+        "text": "        (Total messages: 22, polling=true, quitting=false)"
+      }
+    ]
+  }
+]
