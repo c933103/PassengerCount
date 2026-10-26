@@ -6,7 +6,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {analyzeRestartRace, publishRestartRace} from '../scripts/analyze-android-restart-race.mjs';
+import {analyzeRestartRace, analyzeNoTriggerControl, publishRestartRace} from '../scripts/analyze-android-restart-race.mjs';
 
 const death = '10-15 09:09:41.843 111 111 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=111';
 const died = '10-15 09:09:41.954 564 1725 I ActivityManager: Process app.passengercount (pid 111) has died: fg +50 FGS';
@@ -69,13 +69,19 @@ test('no helper requirement for historical natural control; no app-op cleanup al
 const root=fileURLToPath(new URL('../',import.meta.url));
 const shell=fs.readFileSync(new URL('../scripts/android-restart-race.sh',import.meta.url),'utf8')
   .replace(/\bSECONDS\b/g,'fixtureClock').replace('fixtureClock+75','fixtureClock+5');
-function runShell(events,dump=service,transportError=false,warmReady=true,scope=null,fault=null,diagnostic=false) {
-  const out=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-'));
+function runShell(events,dump=service,transportError=false,warmReady=true,scope=null,fault=null,diagnostic=false,control=false) {
+  const base=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-'));
+  const out=control?path.join(base,'no-trigger-control'):base;
+  if(control) { fs.mkdirSync(out); timingFixture(base); provenanceFixture(base,out);
+    if(fault?.stage==='timing') fs.writeFileSync(path.join(base,'race-trigger-slot.json'),'{"status":"measured"}');
+    if(fault?.stage==='control-receipt') fs.mkdirSync(path.join(out,fault.name));
+  }
   try {
     fs.writeFileSync(path.join(out,'input.log'),(warmReady?['10-15 09:09:30.000 333 333 I PassengerRaceTrigger: RACE_WARM_READY pid=333 uid=10210',...events]:events).join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
     const r=spawnSync('bash',['-c',`set -euo pipefail
 ROOT=${JSON.stringify(root)}; OUT=${JSON.stringify(out)}; CI=true; EMU_PID=99; SERIAL=emulator-5556; PACKAGE=app.passengercount
 PASSENGER_RESTART_RACE_ONLY=${diagnostic?'1':'0'}
+PASSENGER_RESTART_NO_TRIGGER=${control?'1':'0'}
 ${scope ? "TRACK_PROCESS=app.passengercount:tracking" : ""}
 fixtureClock=0
 observation_logs=0; observation_services=0; classifier_calls=0
@@ -96,7 +102,7 @@ adb(){
  case "$*" in
   'shell pidof app.passengercount') ${scope ? `if [[ ! -f "$OUT/prepared" ]] || [[ "${scope.uiAlive !== false}" == true ]]; then echo 444; else return 1; fi` : 'echo 111'};;
   'shell pidof app.passengercount:tracking') echo 111;;
-  'shell pidof app.passengercount app.passengercount:tracking') ${scope?.absenceOutput ? `echo ${JSON.stringify(scope.absenceOutput)};` : ''} ${scope?.absenceStderr ? `echo ${JSON.stringify(scope.absenceStderr)} >&2;` : ''} return ${scope?.absenceExit ?? 1};;
+  'shell pidof app.passengercount app.passengercount:tracking') ${control?'touch "$OUT/triggered";':''} ${scope?.absenceOutput ? `echo ${JSON.stringify(scope.absenceOutput)};` : ''} ${scope?.absenceStderr ? `echo ${JSON.stringify(scope.absenceStderr)} >&2;` : ''} return ${scope?.absenceExit ?? 1};;
   'logcat -d -v threadtime')
    if [[ -f "$OUT/triggered" ]]; then
     observation_logs=$((observation_logs+1))
@@ -119,7 +125,7 @@ restart_race ${scope?.kind || ""}
     const files=Object.fromEntries(fs.readdirSync(out,{recursive:true})
       .filter(p=>fs.statSync(path.join(out,p)).isFile()).map(p=>[p,fs.readFileSync(path.join(out,p),'utf8')]));
     return {...r,files,calls:files.calls,result:files['race-result.json']?JSON.parse(files['race-result.json']):null};
-  } finally {fs.rmSync(out,{recursive:true,force:true});}
+  } finally {fs.rmSync(base,{recursive:true,force:true});}
 }
 test('actual shell requires foreground proof before GPS verification reattaches',()=>{
   const r=runShell([death,died,scheduled,entering,promoted,start]);
@@ -408,3 +414,285 @@ test('standalone classifier retains its established success/denial/inconclusive 
     assert.equal(JSON.parse(r.stdout).evidence,undefined);
   }
 }));
+
+// Transport-only fixtures exercise host timing and the separate control. They
+// do not simulate Android foreground-service policy or claim runtime causality.
+function timingFixture(parent) {
+  const slot={kind:'host-timing-observation-not-acceptance',mode:'triggered',status:'measured',
+    clock:'time.monotonic_ns',verifiedAbsenceNs:1000,slotStartNs:2000,slotEndNs:2002000,
+    elapsedNs:2000000,captureExitCode:0};
+  const bytes=JSON.stringify(slot)+'\n';
+  fs.writeFileSync(path.join(parent,'race-trigger-slot.json'),bytes);
+  const first={kind:slot.kind,mode:'triggered',status:'measured',clock:slot.clock,
+    verifiedAbsenceNs:1000,firstServicesStartNs:3002000,firstServicesEndNs:4002000,
+    servicesElapsedNs:1000000,gapAfterSlotNs:1000000,elapsedFromAbsenceNs:3001000,
+    slotEvidence:{bytes:Buffer.byteLength(bytes),sha256:digest(bytes)}};
+  fs.writeFileSync(path.join(parent,'race-first-services-timing.json'),JSON.stringify(first)+'\n');
+  return {slot,first};
+}
+const controlEvents=(denial=false)=>splitEvents('race',denial).filter(line=>!line.includes('RACE_TRIGGER_'));
+test('strict original classifier still refuses an untriggered foreground observation',()=>{
+  assert.equal(analyzeRestartRace(controlEvents().join('\n'),trackerService,111,'race','app.passengercount:tracking').outcome,'interleaving-unverified');
+  const result=analyzeNoTriggerControl(controlEvents().join('\n'),trackerService,111);
+  assert.equal(result.outcome,'foreground-observed-no-trigger');
+  assert.equal(result.kind,'independent-no-trigger-observation-not-acceptance');
+  assert.equal(result.interleaved,false);
+});
+for(const missing of ['SIGKILL_AFTER_DETACH','has died: fg','Scheduling restart','Start proc'])
+test('no-trigger control cannot replace missing '+missing,()=>{
+  const result=analyzeNoTriggerControl(controlEvents().filter(line=>!line.includes(missing)).join('\n'),trackerService,111);
+  assert.equal(result.outcome,'control-comparison-unverified'); assert.equal(result.comparisonEligible,false);
+});
+for(const contamination of [entering,promoted]) test('unexpected control trigger invalidates comparison without hiding denial: '+contamination,()=>{
+  for(const denial of [false,true]) {
+    const result=analyzeNoTriggerControl([...controlEvents(denial),contamination].join('\n'),trackerService,111);
+    assert.equal(result.outcome,denial?'automatic-restart-denied':'control-comparison-unverified');
+    assert.equal(result.comparisonEligible,false);assert.equal(result.comparisonStatus,'unexpected-trigger');
+  }
+});
+test('a pre-kill trigger also contaminates a fresh-emulator control, while denial remains failure',()=>{
+  for(const denial of [false,true]) {
+    const result=analyzeNoTriggerControl([entering,promoted,...controlEvents(denial)].join('\n'),trackerService,111);
+    assert.equal(result.comparisonEligible,false);assert.equal(result.comparisonStatus,'unexpected-trigger');
+    assert.equal(result.outcome,denial?'automatic-restart-denied':'control-comparison-unverified');
+  }
+});
+for(const [label,events,dump] of [
+  ['same PID',controlEvents().map(line=>line.replace('222:','111:')),trackerService],
+  ['surviving UI process',controlEvents(),service],
+  ['not foreground',controlEvents(),trackerService.replace('isForeground=true','isForeground=false')],
+  ['unrelated foreground',controlEvents(),service.replaceAll('app.passengercount','app.other')],
+]) test('control rejects '+label,()=>assert.equal(analyzeNoTriggerControl(events.join('\n'),dump,111).outcome,'control-comparison-unverified'));
+
+test('actual control shell omits only trigger slot, keeps full absence/snapshot cadence, and never reattaches',()=>{
+  const triggered=runShell(splitEvents('race'),trackerService,false,true,{kind:'race',uiAlive:false},null,true);
+  const control=runShell(controlEvents(),trackerService,false,true,{kind:'race',uiAlive:false},null,true,true);
+  assert.equal(control.status,0,control.stdout+control.stderr);
+  assert.equal(control.result.outcome,'foreground-observed-no-trigger');
+  assert.equal(control.result.fullAbsenceReceiptVerified,true);assert.equal(control.result.comparisonEligible,true);
+  assert.equal(control.result.comparisonTiming.timingEqualityEstablished,false);
+  assert.equal(control.result.comparisonTiming.status,'measured-differences-not-matched');
+  assert.doesNotMatch(control.calls,/app.passengercount.tests.TRIGGER|phase verify-/);
+  assert.doesNotMatch(control.stdout,/PASS:/); assert.match(control.files['race-result.txt'],/OBSERVATION ONLY/);
+  const commands=r=>r.calls.split('\n').filter(line=>line.startsWith('adb ')&&!line.includes('.TRIGGER'));
+  assert.deepEqual(commands(control),commands(triggered));
+  assert.equal(control.files['race-process-scope.txt'],'ALL_PACKAGE_PROCESSES_ABSENT before_control_idle=true\n');
+  assert.equal(control.files['race-absent-pids.exit-code.txt'],'1\n');
+  const slot=JSON.parse(control.files['race-trigger-slot.json']);
+  const first=JSON.parse(control.files['race-first-services-timing.json']);
+  assert.ok(slot.replayDifferenceNs>=0);
+  assert.equal(slot.requestedReplayNs,2000000);
+  assert.equal(first.slotEvidence.sha256,digest(control.files['race-trigger-slot.json']));
+  assert.equal(first.elapsedFromAbsenceNs,first.firstServicesStartNs-slot.verifiedAbsenceNs);
+  assert.ok(first.firstServicesStartNs>=slot.slotEndNs);
+});
+test('actual control denial remains1; unexpected trigger affects only comparison eligibility',()=>{
+  for(const contaminate of [false,true]) {
+    const events=[...controlEvents(true),...(contaminate?[entering]:[])];
+    const r=runShell(events,'',false,true,{kind:'race',uiAlive:false},null,true,true);
+    assert.equal(r.status,1,r.stdout+r.stderr); assert.equal(r.result.outcome,'automatic-restart-denied');
+    assert.equal(r.result.comparisonEligible,!contaminate);assert.doesNotMatch(r.calls,/phase verify-/);
+  }
+});
+test('original race mode rejects a leaked control flag before any device command',()=>{
+  const r=runShell(controlEvents(),trackerService,false,true,{kind:'race',uiAlive:false},null,false,true);
+  assert.equal(r.status,2,r.stdout+r.stderr);assert.equal(r.calls,undefined);
+  assert.match(r.stdout,/NO_TRIGGER_CONTROL_REQUIRES_INDEPENDENT/);
+});
+for(const options of [{absenceExit:0,absenceOutput:'444'},{absenceExit:255,absenceStderr:'offline'}])
+test('control cannot weaken all-process absence: '+JSON.stringify(options),()=>{
+  const r=runShell(controlEvents(true),'',false,true,{kind:'race',uiAlive:false,...options},null,true,true);
+  assert.equal(r.status,2,r.stdout+r.stderr); assert.equal(r.result,null);
+  assert.equal(r.files['race-trigger-slot.json'],undefined);
+});
+
+function controlPublicationFixture(fn) {
+  const parent=fs.mkdtempSync(path.join(os.tmpdir(),'pc-control-publish-'));
+  const out=path.join(parent,'no-trigger-control');fs.mkdirSync(out);
+  timingFixture(parent); provenanceFixture(parent,out);
+  const triggeredBytes=fs.readFileSync(path.join(parent,'race-trigger-slot.json'));
+  const slot={kind:'host-timing-observation-not-acceptance',mode:'no-trigger-control',status:'measured',
+    clock:'time.monotonic_ns',verifiedAbsenceNs:5000000,slotStartNs:5100000,slotEndNs:7200000,
+    elapsedNs:2100000,requestedReplayNs:2000000,replayDifferenceNs:100000,
+    reference:{bytes:triggeredBytes.length,sha256:digest(triggeredBytes)}};
+  const slotBytes=JSON.stringify(slot)+'\n';
+  const first={kind:slot.kind,mode:slot.mode,status:'measured',clock:slot.clock,
+    verifiedAbsenceNs:slot.verifiedAbsenceNs,firstServicesStartNs:8500000,firstServicesEndNs:9500000,
+    servicesElapsedNs:1000000,gapAfterSlotNs:1300000,elapsedFromAbsenceNs:3500000,
+    slotEvidence:{bytes:Buffer.byteLength(slotBytes),sha256:digest(slotBytes)}};
+  for(const [name,value] of Object.entries({'race-process-scope.txt':'ALL_PACKAGE_PROCESSES_ABSENT before_control_idle=true\n',
+    'race-absent-pids.exit-code.txt':'1\n','race-absent-pids.txt':'','race-absent-pids.stderr':'',
+    'race-trigger-slot.json':slotBytes,'race-first-services-timing.json':JSON.stringify(first)+'\n'})) fs.writeFileSync(path.join(out,name),value);
+  const attempt=(name,denial=false)=>{
+    const directory=path.join(out,name);fs.mkdirSync(directory);
+    for(const [file,content] of [['logcat.txt',controlEvents(denial).join('\n')],['services.txt',trackerService]]) {
+      fs.writeFileSync(path.join(directory,file),content);
+      fs.writeFileSync(path.join(directory,file+'.stderr'),'');fs.writeFileSync(path.join(directory,file+'.exit-code.txt'),'0\n');
+    }
+    return [path.join(directory,'logcat.txt'),path.join(directory,'services.txt'),'111','race','app.passengercount:tracking',path.join(out,'race-result.json'),true];
+  };
+  try {fn({out,parent,slot,first,attempt});} finally {fs.rmSync(parent,{recursive:true,force:true});}
+}
+test('control publication binds exact timing receipts and reports differences instead of equality',()=>controlPublicationFixture(({attempt})=>{
+  const result=publishRestartRace(...attempt('first'));
+  assert.equal(result.outcome,'foreground-observed-no-trigger');assert.equal(result.comparisonEligible,true);
+  assert.deepEqual(result.comparisonTiming.controlMinusTriggered,{slotElapsedNs:100000,firstServicesFromAbsenceNs:499000,firstServicesAfterSlotNs:300000,servicesElapsedNs:0});
+  assert.equal(result.comparisonTiming.timingEqualityEstablished,false);
+}));
+for(const fault of ['missing-absence','wrong-absence','absence-stderr','missing-slot','oversized-slot','slot-reference','slot-elapsed','slot-replay','negative-number','unsafe-number','first-reference','first-order','first-gap','first-absence','triggered-reference','triggered-source'])
+test('control metadata '+fault+' is uncertainty without erasing complete denial',()=>{
+  for(const denial of [false,true]) controlPublicationFixture(({out,parent,slot,first,attempt})=>{
+    const save=(name,value)=>fs.writeFileSync(path.join(out,name),JSON.stringify(value)+'\n');
+    if(fault==='missing-absence') fs.unlinkSync(path.join(out,'race-absent-pids.exit-code.txt'));
+    if(fault==='wrong-absence') fs.writeFileSync(path.join(out,'race-absent-pids.exit-code.txt'),'0\n');
+    if(fault==='absence-stderr') fs.writeFileSync(path.join(out,'race-absent-pids.stderr'),'transport warning');
+    if(fault==='missing-slot') fs.unlinkSync(path.join(out,'race-trigger-slot.json'));
+    if(fault==='oversized-slot') fs.writeFileSync(path.join(out,'race-trigger-slot.json'),' '.repeat(65537));
+    if(fault==='slot-reference') {slot.reference.sha256='bad';save('race-trigger-slot.json',slot);}
+    if(fault==='slot-elapsed') {slot.elapsedNs++;save('race-trigger-slot.json',slot);}
+    if(fault==='slot-replay') {slot.requestedReplayNs++;save('race-trigger-slot.json',slot);}
+    if(fault==='negative-number') {slot.slotStartNs=-1;save('race-trigger-slot.json',slot);}
+    if(fault==='unsafe-number') {slot.slotEndNs=Number.MAX_SAFE_INTEGER+1;save('race-trigger-slot.json',slot);}
+    if(fault==='first-reference') {first.slotEvidence.sha256='bad';save('race-first-services-timing.json',first);}
+    if(fault==='first-order') {first.firstServicesStartNs=1;save('race-first-services-timing.json',first);}
+    if(fault==='first-gap') {first.gapAfterSlotNs++;save('race-first-services-timing.json',first);}
+    if(fault==='first-absence') {first.verifiedAbsenceNs++;save('race-first-services-timing.json',first);}
+    if(fault==='triggered-reference') {
+      const file=path.join(parent,'race-first-services-timing.json'),data=JSON.parse(fs.readFileSync(file));data.slotEvidence.sha256='bad';fs.writeFileSync(file,JSON.stringify(data));
+    }
+    if(fault==='triggered-source') fs.appendFileSync(path.join(parent,'race-trigger-slot.json'),' ');
+    const result=publishRestartRace(...attempt('attempt',denial));
+    assert.equal(result.comparisonEligible,false);assert.equal(result.comparisonTiming.status,'unverified');
+    assert.equal(result.outcome,denial?'automatic-restart-denied':'control-comparison-unverified');
+    assert.ok(result.controlEvidenceErrors.length);
+  });
+});
+test('later control partial input cannot overwrite a prior exact paired observation',()=>controlPublicationFixture(({out,attempt})=>{
+  const first=attempt('first');publishRestartRace(...first);const previous=fs.readFileSync(path.join(out,'race-result.json'));
+  const later=attempt('later',true);fs.writeFileSync(later[0]+'.stderr','partial capture');
+  assert.throws(()=>publishRestartRace(...later),/Incomplete log/);
+  assert.deepEqual(fs.readFileSync(path.join(out,'race-result.json')),previous);
+}));
+
+test('missing replay timing cannot hide a control denial or make foreground an accepted contrast',()=>{
+  for(const denial of [false,true]) {
+    const r=runShell(controlEvents(denial),trackerService,false,true,{kind:'race',uiAlive:false},{stage:'timing'},true,true);
+    assert.equal(r.status,denial?1:2,r.stdout+r.stderr);
+    assert.equal(r.result.outcome,denial?'automatic-restart-denied':'control-comparison-unverified');
+    assert.equal(r.result.comparisonEligible,false);
+    assert.match(r.files['host-idle.stderr'],/RACE_HOST_TIMING_UNVERIFIED/);
+    assert.doesNotMatch(r.calls,/app.passengercount.tests.TRIGGER|phase verify-/);
+  }
+});
+test('raw memory-pressure restart rescheduling remains in the bound control evidence',()=>{
+  const events=controlEvents(true);
+  events.splice(4,0,'ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 8975ms for mem-pressure-event',
+    'ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 0ms for mem-pressure-event');
+  const r=runShell(events,'',false,true,{kind:'race',uiAlive:false},null,true,true);
+  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.match(r.files[r.result.evidence.log.path],/in 8975ms for mem-pressure-event\nActivityManager: Rescheduling.*in 0ms for mem-pressure-event/);
+  assert.equal(digest(r.files[r.result.evidence.log.path]),r.result.evidence.log.sha256);
+});
+
+const hostTiming=shell.slice(shell.indexOf('race_host_timing() {'),shell.indexOf('\nrestart_race() {'));
+function timingCall(args) {
+  return spawnSync('bash',['-c',`${hostTiming}\nrace_host_timing "$@"`,'_',...args.map(String)],{encoding:'utf8',timeout:3000});
+}
+test('real host helper records absence, bounded idle, actual overshoot and first-services gap',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pc-host-clock-'));
+  try {
+    const first=path.join(dir,'trigger.json'),control=path.join(dir,'control.json'),services=path.join(dir,'services.json');
+    let r=timingCall(['record',first,100,200,20200,0]);assert.equal(r.status,0,r.stderr);
+    const before=Number(timingCall(['now']).stdout.trim());
+    r=timingCall(['idle',first,control,before]);assert.equal(r.status,0,r.stderr);
+    const slot=JSON.parse(fs.readFileSync(control));
+    assert.equal(slot.reference.sha256,digest(fs.readFileSync(first)));
+    assert.equal(slot.requestedReplayNs,20000);assert.ok(slot.elapsedNs>=20000);
+    assert.equal(slot.replayDifferenceNs,slot.elapsedNs-20000);
+    const start=Number(timingCall(['now']).stdout.trim()),end=Number(timingCall(['now']).stdout.trim());
+    r=timingCall(['first-services',control,services,start,end]);assert.equal(r.status,0,r.stderr);
+    const result=JSON.parse(fs.readFileSync(services));
+    assert.equal(result.elapsedFromAbsenceNs,start-before);assert.equal(result.gapAfterSlotNs,start-slot.slotEndNs);
+    assert.equal(result.slotEvidence.sha256,digest(fs.readFileSync(control)));
+    assert.equal(timingCall(['record',first,100,200,300,0]).status,2,'never overwrite a previous timing receipt');
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+for(const fault of ['over-limit','negative','elapsed-mismatch','nonzero-capture','missing-clock','oversized','absent'])
+test('host idle refuses unverified input '+fault+' without waiting or publishing',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pc-host-clock-invalid-'));
+  try {
+    const {slot}=timingFixture(dir),file=path.join(dir,'race-trigger-slot.json'),out=path.join(dir,'control.json');
+    if(fault==='over-limit') {slot.elapsedNs=10000000001;slot.slotEndNs=slot.slotStartNs+slot.elapsedNs;}
+    if(fault==='negative') slot.elapsedNs=-1;
+    if(fault==='elapsed-mismatch') slot.elapsedNs++;
+    if(fault==='nonzero-capture') slot.captureExitCode=2;
+    if(fault==='missing-clock') delete slot.clock;
+    fs.writeFileSync(file,fault==='oversized'?' '.repeat(65537):JSON.stringify(slot));
+    if(fault==='absent') fs.unlinkSync(file);
+    const r=timingCall(['idle',file,out,100]);
+    assert.equal(r.status,2,r.stdout+r.stderr);assert.match(r.stderr,/RACE_HOST_TIMING_UNVERIFIED/);assert.equal(fs.existsSync(out),false);
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+test('control TERM preserves124 and partials while skipping new collectors and retaining owned teardown',()=>{
+  const installed=fs.readFileSync(path.join(root,'scripts/test-android-installed.sh'),'utf8');
+  const cleanup=installed.slice(installed.indexOf('\ncleanup() {'),installed.indexOf('\ngit -C "$ROOT" rev-parse'));
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pc-control-term-'));
+  try {
+    fs.writeFileSync(path.join(dir,'partial.txt'),'partial bytes');
+    const r=spawnSync('bash',['-c',`set -euo pipefail
+OUT=${JSON.stringify(dir)}; EMU_PID=999999; GPS_PID=; LOG_PID=; PLATFORM_PREFLIGHT_READY=1; PACKAGE=app.passengercount
+PASSENGER_RESTART_NO_TRIGGER=1
+adb(){ echo "adb $*" >> "$OUT/calls"; }
+wait(){ echo wait >> "$OUT/calls"; }
+platform_preflight(){ echo UNEXPECTED_PREFLIGHT >> "$OUT/calls"; }
+framework_binary_capture(){ echo UNEXPECTED_FRAMEWORK >> "$OUT/calls"; }
+${cleanup}
+kill -TERM $$
+echo unexpected-return
+`],{encoding:'utf8',timeout:3000});
+    assert.equal(r.status,124,r.stdout+r.stderr);
+    assert.equal(fs.readFileSync(path.join(dir,'exit-code.txt'),'utf8'),'124\n');
+    assert.equal(fs.readFileSync(path.join(dir,'partial.txt'),'utf8'),'partial bytes');
+    assert.equal(fs.readFileSync(path.join(dir,'calls'),'utf8'),'adb emu kill\nwait\n');
+    assert.equal(r.stdout,'');
+  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+function provenanceFixture(parent,out) {
+  for(const [name,value] of Object.entries({
+    'apk-sha256.txt':`${'a'.repeat(64)}  /source/android/build/PassengerCount.apk\n${'b'.repeat(64)}  /source/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n`,
+    'device-fingerprint.txt':'google/sdk_gphone64_x86_64/emu64xa:15/AP3A/123:userdebug/dev-keys\n',
+    'source.txt':`${'c'.repeat(40)}\n${'d'.repeat(40)}\n`,
+  })) for(const directory of [parent,out]) fs.writeFileSync(path.join(directory,name),value);
+}
+for(const filename of ['apk-sha256.txt','device-fingerprint.txt','source.txt'])
+for(const fault of ['missing','different','both-malformed'])
+test(`paired ${filename} ${fault} invalidates comparison, not observed denial`,()=>{
+  for(const denial of [false,true]) controlPublicationFixture(({out,parent,attempt})=>{
+    if(fault==='missing') fs.unlinkSync(path.join(out,filename));
+    if(fault==='different') fs.appendFileSync(path.join(out,filename),'different');
+    if(fault==='both-malformed') for(const directory of [parent,out]) fs.writeFileSync(path.join(directory,filename),'invalid');
+    const result=publishRestartRace(...attempt('attempt',denial));
+    assert.equal(result.outcome,denial?'automatic-restart-denied':'control-comparison-unverified');
+    assert.equal(result.comparisonEligible,false);assert.equal(result.pairProvenance.status,'unverified');
+    assert.equal(result.pairProvenance.wholeImageOrRuntimeEquivalenceEstablished,false);
+    if(fault==='different') {
+      const key={'apk-sha256.txt':'apkHashes','device-fingerprint.txt':'fingerprint','source.txt':'source'}[filename];
+      assert.notEqual(result.evidence['control'+key].sha256,result.evidence['triggered'+key].sha256);
+    }
+  });
+});
+test('paired provenance identifies exact APKs/head/tree/fingerprint, not runtime equivalence',()=>controlPublicationFixture(({attempt})=>{
+  const result=publishRestartRace(...attempt('first'));
+  assert.equal(result.comparisonEligible,true);assert.equal(result.pairProvenance.status,'matching-exact-receipts');
+  assert.equal(result.pairProvenance.apkSha256.target,'a'.repeat(64));
+  assert.equal(result.pairProvenance.source.tree,'d'.repeat(40));
+  assert.equal(result.pairProvenance.wholeImageOrRuntimeEquivalenceEstablished,false);
+}));
+
+for(const name of ['race-process-scope.txt','no-trigger-control.txt','race-result.txt'])
+test('control-only receipt write failure is uncertainty2: '+name,()=>{
+  const r=runShell(controlEvents(),trackerService,false,true,{kind:'race',uiAlive:false},{stage:'control-receipt',name},true,true);
+  assert.equal(r.status,2,r.stdout+r.stderr);assert.doesNotMatch(r.calls,/phase verify-/);
+  if(name==='race-result.txt') assert.equal(r.result.outcome,'foreground-observed-no-trigger');
+});

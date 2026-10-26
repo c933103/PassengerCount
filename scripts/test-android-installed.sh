@@ -14,10 +14,17 @@ IMAGE='system-images;android-35;google_apis;x86_64'
 # original job step. It has a separate evidence destination and cannot replace
 # the original gate's exit code or artifacts.
 case "${PASSENGER_RESTART_RACE_ONLY:-0}" in
-  0) OUT="$ROOT/android/build/lifecycle-evidence" ;;
+  0)
+    [[ "${PASSENGER_RESTART_NO_TRIGGER:-0}" == 0 ]] || { echo 'No-trigger mode cannot run in the original acceptance path'; exit 2; }
+    OUT="$ROOT/android/build/lifecycle-evidence" ;;
   1)
     [[ "${PASSENGER_RESTART_RACE:-0}" == 1 ]] || { echo 'Diagnostic-only mode requires explicit race opt-in'; exit 2; }
     OUT="$ROOT/android/build/restart-race-evidence"
+    case "${PASSENGER_RESTART_NO_TRIGGER:-0}" in
+      0) ;;
+      1) OUT="$OUT/no-trigger-control" ;;
+      *) echo 'Unknown no-trigger control mode'; exit 2 ;;
+    esac
     ;;
   *) echo 'Unknown diagnostic mode'; exit 2 ;;
 esac
@@ -26,6 +33,7 @@ TEMP="$(mktemp -d "$RUNNER_TEMP/passenger-api35.XXXXXX")"
 export ANDROID_AVD_HOME="$TEMP/avds"
 mkdir -p "$ANDROID_AVD_HOME"
 NAME="passenger_lifecycle_${GITHUB_RUN_ID:-ci}_${GITHUB_RUN_ATTEMPT:-1}_${PASSENGER_RESTART_RACE_ONLY:-0}"
+[[ "${PASSENGER_RESTART_NO_TRIGGER:-0}" != 1 ]] || NAME="${NAME}_no_trigger"
 SERIAL=emulator-5556
 PACKAGE=app.passengercount
 TRACK_PROCESS=app.passengercount:tracking
@@ -75,7 +83,9 @@ cleanup() {
   if ! printf '%s\n' "$code" > "$OUT/exit-code.txt"; then
     echo "ORIGINAL_EXIT_RECEIPT_UNAVAILABLE: exit=$code; retaining process exit and attempting owned-emulator teardown" >&2
   fi
-  if [[ -n "$EMU_PID" ]]; then
+  # On a bounded control timeout keep partials and go straight to owned-process
+  # teardown; do not spend the kill grace starting new diagnostic collectors.
+  if [[ -n "$EMU_PID" && !( "${PASSENGER_RESTART_NO_TRIGGER:-0}" == 1 && "$code" == 124 ) ]]; then
     adb shell dumpsys activity services "$PACKAGE" > "$OUT/services-final.txt" 2>&1 || true
     adb logcat -d -v threadtime > "$OUT/logcat-final.txt" 2>&1 || true
     if [[ "$PLATFORM_PREFLIGHT_READY" == 1 ]]; then
@@ -89,6 +99,9 @@ cleanup() {
   [[ -z "$EMU_PID" ]] || { adb emu kill >/dev/null 2>&1 || true; wait "$EMU_PID" 2>/dev/null || true; }
 }
 trap cleanup EXIT
+if [[ "${PASSENGER_RESTART_NO_TRIGGER:-0}" == 1 ]]; then
+  trap 'exit 124' TERM
+fi
 git -C "$ROOT" rev-parse HEAD HEAD^{tree} > "$OUT/source.txt"
 git -C "$ROOT" ls-tree -r HEAD -- android/src android/AndroidManifest.xml app.js record-deletion.js storage.js > "$OUT/production-paths.txt"
 sha256sum "$ROOT/android/build/PassengerCount.apk" \

@@ -15,7 +15,10 @@ test('host observation happens after independent execution and cannot select a d
   const wrapper=fs.readFileSync(new URL('../scripts/test-android-restart-after-failure.sh',import.meta.url),'utf8');
   const observer=wrapper.indexOf('python3 "$ROOT/scripts/analyze-android-foreground-observation.py"');
   assert.ok(observer>wrapper.indexOf('diagnostic_code=$?'));
-  assert.ok(observer<wrapper.lastIndexOf('exit "$diagnostic_code"'));
+  assert.ok(observer<wrapper.lastIndexOf('exit "$paired_code"'));
+  assert.ok(wrapper.indexOf('observe_bookkeeping "$OUT"')>wrapper.indexOf('diagnostic_code=$?'));
+  assert.match(wrapper,/paired_code=\$diagnostic_code/);
+  assert.match(wrapper,/\[\[ "\$paired_code" != 0 \]\] \|\| paired_code=\$control_code/);
   assert.match(wrapper,/timeout --kill-after=2s 15s python3/);
   const parser=fs.readFileSync(new URL('../scripts/analyze-android-foreground-observation.py',import.meta.url),'utf8');
   assert.doesNotMatch(parser,/import subprocess|from subprocess|os\.system\(|os\.popen\(/);

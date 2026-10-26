@@ -16,6 +16,44 @@ import time
 from android_jdwp_snapshot import capture_initial_frame
 
 
+def profiler_state(stdout, status, stderr_bytes):
+    """Printed AMS bookkeeping only; never permission to start/replace a profiler."""
+    result = {"status": "inconclusive", "scope": "AMS-recorded profiler state only",
+              "profilerActionPerformed": False, "directArtProfilerExcluded": False,
+              "existingProfilerMustBePreserved": True, "fields": [],
+              "evidenceCommand": "profiling-processes", "nativeReturnCode": status,
+              "stdoutBytes": len(stdout), "stdoutSha256": hashlib.sha256(stdout).hexdigest(),
+              "stderrBytes": stderr_bytes}
+    if status != 0 or stderr_bytes or len(stdout) > 2 * 1024 * 1024:
+        return result
+    try:
+        text = stdout.decode("utf-8")
+    except UnicodeDecodeError:
+        return result
+    header = "ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)"
+    lines = text.splitlines()
+    if (not lines or lines[0] != header or lines.count(header) != 1
+            or not stdout.endswith(b"\n")
+            or re.search(r"(?im)^\s*(?:Error|Exception|Permission Denial|DUMP TIMEOUT|Failure dumping)", text)):
+        return result
+    result["fields"] = [{"line": index, "text": line} for index, line in enumerate(lines, 1)
+                        if re.search(r"\bm(?:ProfileApp|ProfileProc|ProfilerInfo|ProfileType|ProfileFile|SamplingInterval)\b", line)]
+    # Exact installed AMS.dumpProcessesLocked invokes dumpProfileDataLocked at
+    # +03d4, then unconditionally prints this terminal field at +04ee..04fc.
+    # Native0 + a header/newline alone could still be a newline-truncated dump.
+    terminal = [index for index, line in enumerate(lines, 1)
+                if re.fullmatch(r"  mForceBackgroundCheck=(?:true|false)", line)]
+    nonempty = [(index, line) for index, line in enumerate(lines, 1) if line]
+    result["terminalFieldObserved"] = len(terminal) == 1 and terminal[0] == nonempty[-1][0]
+    if not result["terminalFieldObserved"]:
+        return result
+    result["status"] = "ams-profiler-fields-observed" if result["fields"] else "ams-profiler-fields-not-listed"
+    result["interpretation"] = ("Do not start or replace a profiler when existing AMS fields are observed. "
+                                "No printed fields in a complete dump does not exclude direct ART profiling, "
+                                "prove permission/ART support, or authorize a stateful profiling experiment.")
+    return result
+
+
 def collect(serial, output_root, adb="adb", sdk_image_dir=None):
     if not serial or not serial.strip():
         raise ValueError("An explicit non-empty owned target serial is required")
@@ -24,6 +62,7 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
     dest = pathlib.Path(tempfile.mkdtemp(prefix="platform-preflight-", dir=root))
     entries = []
     jdwp_observation = {"status": "inconclusive", "reason": "transport unavailable"}
+    profile_observation = profiler_state(b"", "not-run", 0)
 
     def query(name, args, timeout=8):
         command = [adb, "-s", serial, *args]
@@ -88,6 +127,17 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
         for name in ("services.jar", "framework.jar"):
             query(name + "-sha256", ["shell", "sha256sum", "/system/framework/" + name])
         query("framework-test-packages", ["shell", "pm", "list", "packages", "com.android.frameworks.mockingservicestests"])
+        # Capability/source identity only, outside the runner's absence interval.
+        # Starting/stopping a profile would mutate transient global profiler state
+        # and can replace an existing profiler; never use it as an availability test.
+        profile_status, profile_dump = query("profiling-processes", ["shell", "dumpsys", "activity", "processes"])
+        profile_observation = profiler_state(profile_dump, profile_status, entries[-1]["stderrBytes"])
+        query("profiling-shell-package", ["shell", "dumpsys", "package", "com.android.shell"])
+        query("profiling-output-directory", ["shell", "ls", "-ld", "/data/local/tmp"])
+        query("art-apex-identity", ["shell", "cat", "/apex/apex-info-list.xml"])
+        query("art-candidate-library-sha256", ["shell", "sha256sum", "/apex/com.android.art/lib64/libart.so"])
+        query("art-library-property", ["shell", "getprop", "persist.sys.dalvik.vm.lib.2"])
+        query("traceview-buffer-property", ["shell", "getprop", "debug.traceview-buffer-size-mb"])
     sdk_files = []
     if sdk_image_dir is not None:
         for name in ("source.properties", "package.xml"):
@@ -101,10 +151,14 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
                 sdk_files.append({"name": name, "error": str(error)})
     receipt = {"kind": "capability-observation-not-acceptance", "serial": serial,
                "commands": entries, "sdkFiles": sdk_files, "jdwpObservation": jdwp_observation,
+               "profilingObservation": profile_observation,
                "deviceStateChangedByCollector": False,
                "limitations": ["Sequential observations, not an atomic snapshot.",
                                "A listed JDWP PID does not by itself prove attach permissions or field-event support.",
                                "A missing PID in a nonempty frame is not global absence proof; daemon lists may be truncated.",
+                               "Profiler dumps describe AMS bookkeeping, not all direct ART profiler state or permission to replace it.",
+                               "ART APEX/candidate-library identity is not a verified loaded-library/native execution match.",
+                               "No profiler start/stop, trace-tag activation, settings write or output-file creation is performed.",
                                "No full-restart test or debugger attachment performed."]}
     (dest / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
     # No unavailable/failed query becomes a pass. This status is NOT the original gate's status.
@@ -113,6 +167,7 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
                            (e["name"] == "jdwp-initial-frame" and e["status"] == "complete-frame"))
                           and e["stderrBytes"] == 0 for e in entries)
     valid = valid and jdwp_observation["status"] != "inconclusive"
+    valid = valid and profile_observation["status"] != "inconclusive"
     valid = valid and all("error" not in f for f in sdk_files)
     return dest, 0 if valid else 2
 

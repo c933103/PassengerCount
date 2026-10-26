@@ -1,0 +1,103 @@
+{
+  "kind": "paired-independent-no-trigger-contrast-and-read-only-profiling-preflight",
+  "baseHead": "c80f6008cc3512e986ae2c40461da3286992d511",
+  "baseTree": "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1",
+  "acceptance": {
+    "fullAllProcessAbsenceRequired": true,
+    "original13PhasesUnchanged": true,
+    "originalStrictClassifierUnchanged": true,
+    "originalTriggeredGateUnchanged": true,
+    "originalFailureStillBinding": true,
+    "appRestartFixClaimed": false,
+    "runtimeCallerProven": false
+  },
+  "contrast": {
+    "triggeredDestination": "android/build/restart-race-evidence",
+    "controlDestination": "android/build/restart-race-evidence/no-trigger-control",
+    "freshOwnedEmulatorPerLeg": true,
+    "retainedTriggeredNativeBeforeControl": true,
+    "exclusiveControlDirectory": true,
+    "changedAction": "Only control replaces later external TRIGGER with measured host-only idle; identical warm-up and strict full absence proof retained",
+    "timing": "Host monotonic verified-absence, slot and first-services brackets; SHA/byte-paired receipts and signed differences, never timing equality",
+    "maxReplaySeconds": 10,
+    "controlMaxSeconds": 180,
+    "existingStepReservedSeconds": 40,
+    "forcedKillGraceSeconds": 5,
+    "otherDifferences": [
+      "Sequential fresh AVD identity and scheduling",
+      "Measurement/Python invocation and log/dump command costs",
+      "Actual restart delay and memory-pressure rescheduling",
+      "Runtime grants/process state must be checked, not assumed from source/fingerprint"
+    ],
+    "provenance": "Exact APK hashes, source head/tree and build fingerprint receipts validated; not whole-image or runtime-equivalence proof",
+    "controlResult": "foreground-observed-no-trigger is observation only; no verify-race reattachment or GPS/session acceptance",
+    "failurePriority": "Triggered nonzero preserved; otherwise control nonzero propagates; observed denial1 cannot be erased by metadata or timing uncertainty2; outer124/137 retained separately",
+    "unexpectedTrigger": "Any ENTER/FOREGROUND marker anywhere in fresh control invalidates comparison"
+  },
+  "profilingPreflight": {
+    "timing": "Existing before-preparation/after-terminal metadata flow only; never inside absence",
+    "readOnlyQueries": [
+      "dumpsys activity processes (unfiltered)",
+      "dumpsys package com.android.shell",
+      "ls -ld /data/local/tmp",
+      "cat /apex/apex-info-list.xml",
+      "sha256sum /apex/com.android.art/lib64/libart.so",
+      "getprop persist.sys.dalvik.vm.lib.2",
+      "getprop debug.traceview-buffer-size-mb"
+    ],
+    "stateScope": "AMS-recorded fields only; not-listed does not exclude direct ART profiling; prior profiler must be preserved",
+    "completeness": "native0/empty stderr/strict UTF8/single header/newline and source-proven final mForceBackgroundCheck field; partial/error/oversize remains inconclusive",
+    "installedSourceAnchor": "run116 services.jar SHA256 1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6; dumpProcessesLocked +03d4 calls profiler dump, +04ee..04fc unconditionally prints terminal field",
+    "nativeIdentityLimit": "Candidate library/APEX identity is not a verified loaded native implementation or asynchronous runtime capability",
+    "profilingStartStopPerformed": false,
+    "traceTagActivationPerformed": false,
+    "deviceSettingsOrPermissionsChanged": false
+  },
+  "priorEvidence": {
+    "run": 40273911376,
+    "number": 118,
+    "attempt": 1,
+    "head": "c80f6008cc3512e986ae2c40461da3286992d511",
+    "tree": "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1",
+    "conclusion": "failure",
+    "originalExit": 1,
+    "triggeredDiagnosticExit": 1,
+    "observerExit": 0,
+    "originalLogSha256": "e46d7b4519f1851ac1376d213ac4a5a3a95e6a166a35e8080453413b6d7929e4",
+    "diagnosticLogSha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2",
+    "archiveCommit": "7b3d519a935675055732d32cfdd1d19deae74aef",
+    "archive": "https://github.com/c933103/PassengerCount/blob/7b3d519a935675055732d32cfdd1d19deae74aef/verification/api35-restart-race/run118/README.md",
+    "confound": "Actual mem-pressure rescheduling30000ms to8975ms to0ms retained"
+  },
+  "validation": {
+    "focusedNode": {
+      "passed": 284,
+      "failed": 0
+    },
+    "ownedContrastNode": {
+      "passed": 192,
+      "failed": 0
+    },
+    "profilingPreflightPython": {
+      "passed": 26,
+      "failed": 0
+    },
+    "observerPython": {
+      "passed": 18,
+      "failed": 0
+    },
+    "localAggregate": {
+      "passed": 590,
+      "total": 591,
+      "failure": "Known local government-routes.json.gz materialization limit; no skipped assertion; complete hosted checkout required"
+    },
+    "native": "passed:102 journal,26 session,928 export,304 deletion,14 target-access,22 interruption assertions plus classloader negative control",
+    "syntaxAndDiff": "passed",
+    "nativeIndependentReview": "No remaining material findings after stale-control-directory, pre-kill-trigger contamination and profiler-completeness fixes",
+    "hostTests": "Transport fixtures and actual monotonic/GNU timeout/TERM/forced-kill processes; no Android policy emulation or device claim",
+    "oneTimeComparisons": "Strict analyzeRestartRace function and phase() through EOF are byte-identical to published base; no permanent historical-source hash gate",
+    "exactHeadCodex": "pending fresh request after publication",
+    "exactHeadHosted": "pending natural CI after publication"
+  },
+  "nextStep": "Interpret actual triggered/control provenance, before-service/runtime permission state, schedule events and measured timing together. Separately inspect read-only AMS profiler/candidate ART identity; starting method sampling would be stateful and perturb timing, not a capability query. Atrace/Perfetto category activation remains unperformed."
+}

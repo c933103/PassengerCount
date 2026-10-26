@@ -37,10 +37,20 @@ EXPECTED_QUERIES = [
     ("services.jar-sha256", ["shell", "sha256sum", "/system/framework/services.jar"]),
     ("framework.jar-sha256", ["shell", "sha256sum", "/system/framework/framework.jar"]),
     ("framework-test-packages", ["shell", "pm", "list", "packages", "com.android.frameworks.mockingservicestests"]),
+    ("profiling-processes", ["shell", "dumpsys", "activity", "processes"]),
+    ("profiling-shell-package", ["shell", "dumpsys", "package", "com.android.shell"]),
+    ("profiling-output-directory", ["shell", "ls", "-ld", "/data/local/tmp"]),
+    ("art-apex-identity", ["shell", "cat", "/apex/apex-info-list.xml"]),
+    ("art-candidate-library-sha256", ["shell", "sha256sum", "/apex/com.android.art/lib64/libart.so"]),
+    ("art-library-property", ["shell", "getprop", "persist.sys.dalvik.vm.lib.2"]),
+    ("traceview-buffer-property", ["shell", "getprop", "debug.traceview-buffer-size-mb"]),
 ]
 ORDINARY_QUERIES = [(name, args) for name, args in EXPECTED_QUERIES if name != "jdwp-initial-frame"]
 PARTIAL_OUT = b"partial\x00\xff\n"
 PARTIAL_ERR = "transport error: 部分\n".encode()
+PROCESS_HEADER = b"ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)\n"
+PROCESS_TERMINAL = b"  mForceBackgroundCheck=false\n"
+PROCESS_DUMP = PROCESS_HEADER + PROCESS_TERMINAL
 
 
 def frame_observation(pids=(123,)):
@@ -58,7 +68,7 @@ def frame_observation(pids=(123,)):
 class CollectorTests(unittest.TestCase):
     def run_fake(self, output, fail=None, mode="nonzero", *, sdk_image_dir=None,
                  serial="owned-test-target", adb="adb", transport_output=b"device\n",
-                 frame_result=None, pid_before=b"123\n", pid_after=b"123\n"):
+                 frame_result=None, pid_before=b"123\n", pid_after=b"123\n", profile_dump=PROCESS_DUMP):
         calls = []
 
         def record(command):
@@ -87,7 +97,8 @@ class CollectorTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 7, PARTIAL_OUT, PARTIAL_ERR)
             stdout = {"transport": transport_output,
                       "system-server-pid": pid_before,
-                      "system-server-pid-after": pid_after}.get(name, b"123\n")
+                      "system-server-pid-after": pid_after,
+                      "profiling-processes": profile_dump}.get(name, b"123\n")
             return subprocess.CompletedProcess(command, 0, stdout, b"")
 
         def snapshot(command, **kwargs):
@@ -129,6 +140,81 @@ class CollectorTests(unittest.TestCase):
             self.assertEqual(receipt["jdwpObservation"]["status"], "observed-present")
             self.assertEqual(receipt["kind"], "capability-observation-not-acceptance")
             self.assertFalse(receipt["deviceStateChangedByCollector"])
+
+    def test_no_printed_profiler_fields_are_not_an_art_profiler_absence_or_permission_claim(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest, code, calls = self.run_fake(tmp)
+            self.assertEqual(code, 0)
+            observed = self.receipt(dest)["profilingObservation"]
+            self.assertEqual(observed["status"], "ams-profiler-fields-not-listed")
+            self.assertFalse(observed["directArtProfilerExcluded"])
+            self.assertFalse(observed["profilerActionPerformed"])
+            self.assertTrue(observed["existingProfilerMustBePreserved"])
+            self.assertEqual(observed["stdoutSha256"], hashlib.sha256(PROCESS_DUMP).hexdigest())
+            self.assertTrue(observed["terminalFieldObserved"])
+            self.assertEqual(observed["evidenceCommand"], "profiling-processes")
+            self.assertFalse(any("profile" in c or "atrace" in c or "setprop" in c for c in calls))
+
+    def test_existing_profiler_fields_are_retained_not_replaced_or_treated_as_available(self):
+        for app in ("system", "null"):
+            raw = PROCESS_HEADER + ("  mProfileApp=" + app + " mProfileProc=null\n"
+                                    "  mProfilerInfo:\n    profileFile=/data/local/tmp/existing.trace\n"
+                                    "  mProfileType=0\n").encode() + PROCESS_TERMINAL
+            with self.subTest(app=app), tempfile.TemporaryDirectory() as tmp:
+                dest, code, calls = self.run_fake(tmp, profile_dump=raw)
+                self.assertEqual(code, 0, "capability capture completed, not permission to profile")
+                observed = self.receipt(dest)["profilingObservation"]
+                self.assertEqual(observed["status"], "ams-profiler-fields-observed")
+                self.assertEqual(observed["fields"][0], {"line": 2, "text": "  mProfileApp=" + app + " mProfileProc=null"})
+                self.assertTrue(observed["existingProfilerMustBePreserved"])
+                self.assertEqual((dest / "profiling-processes.stdout").read_bytes(), raw)
+                self.assertEqual(len(calls), len(EXPECTED_QUERIES), "never start/stop to test availability")
+
+    def test_partial_or_malformed_profiler_dump_never_establishes_unlisted_state(self):
+        cases = [(PROCESS_HEADER, 7, 0), (PROCESS_HEADER, 0, 1),
+                 (b"", 0, 0), (PROCESS_HEADER, 0, 0), (PROCESS_HEADER.rstrip(b"\n"), 0, 0),
+                 (PROCESS_HEADER + b"\xff\n", 0, 0),
+                 (PROCESS_HEADER + PROCESS_HEADER, 0, 0),
+                 (PROCESS_HEADER + b"Permission Denial: dump denied\n", 0, 0),
+                 (PROCESS_HEADER + b"Failure dumping service\n", 0, 0),
+                 (PROCESS_HEADER + b"x" * (2 * 1024 * 1024) + b"\n", 0, 0)]
+        for raw, status, stderr in cases:
+            with self.subTest(status=status, stderr=stderr, size=len(raw)):
+                observed = preflight.profiler_state(raw, status, stderr)
+                self.assertEqual(observed["status"], "inconclusive")
+                self.assertFalse(observed["directArtProfilerExcluded"])
+                self.assertFalse(observed["profilerActionPerformed"])
+
+    def test_missing_duplicate_or_nonterminal_footer_never_makes_newline_truncation_complete(self):
+        for raw in (PROCESS_HEADER + b"  mProfileApp=system mProfileProc=existing\n",
+                    PROCESS_DUMP + PROCESS_TERMINAL,
+                    PROCESS_DUMP + b"unexpected later output\n",
+                    PROCESS_HEADER + b"  mForceBackgroundCheck=unknown\n"):
+            with self.subTest(raw=raw):
+                observed = preflight.profiler_state(raw, 0, 0)
+                self.assertEqual(observed["status"], "inconclusive")
+                self.assertFalse(observed["terminalFieldObserved"])
+        partial = preflight.profiler_state(PROCESS_HEADER + b"  mProfileApp=system mProfileProc=existing\n", 0, 0)
+        self.assertEqual(partial["fields"][0]["line"], 2, "positive fields still retained in incomplete output")
+
+    def test_native_success_with_unrecognized_profiler_dump_remains_incomplete(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dest, code, _ = self.run_fake(tmp, profile_dump=b"unexpected native-zero output\n")
+            self.assertEqual(code, 2)
+            observed = self.receipt(dest)["profilingObservation"]
+            self.assertEqual(observed["nativeReturnCode"], 0)
+            self.assertEqual(observed["status"], "inconclusive")
+
+    def test_success_then_bad_profiler_dump_preserves_all_prior_attempt_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            first, code, _ = self.run_fake(tmp)
+            self.assertEqual(code, 0)
+            retained = {p.name: p.read_bytes() for p in first.iterdir()}
+            second, code, _ = self.run_fake(tmp, profile_dump=PROCESS_HEADER + b"DUMP TIMEOUT\n")
+            self.assertEqual(code, 2)
+            self.assertNotEqual(first, second)
+            self.assertEqual(retained, {p.name: p.read_bytes() for p in first.iterdir()})
+            self.assertEqual(self.receipt(second)["profilingObservation"]["status"], "inconclusive")
 
     def test_jdwp_timeout_preserves_partial_bytes_but_is_incomplete(self):
         with tempfile.TemporaryDirectory() as tmp:

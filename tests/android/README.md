@@ -321,3 +321,71 @@ field into the target block. The classifier now separates those boundaries while
 still requiring the exact active TrackService/new PID. Real negative regressions
 retain inconclusive/denied outcomes rather than false foreground restoration;
 ActiveForegroundApp membership alone cannot satisfy the original gate.
+
+### Additional matched-input no-trigger contrast
+
+The independent triggered diagnostic remains at the root evidence destination.
+Only after its native exit and immutable evidence are retained does the wrapper
+attempt another **fresh owned emulator**, under an exclusive `no-trigger-control/`
+child. Existing child evidence is never reused or overwritten. The original
+all-process-absence gate and all 13 lifecycle phases are unchanged; a control flag
+is rejected on that original path.
+
+The additional control uses the same runner, APKs, configured image, warm-up,
+`prepare-race` detached kill, strict full-package-absence proof and log/services
+snapshot sequence. It withholds only the later `TRIGGER` action. Host monotonic
+measurements bracket the verified absence boundary, triggered command slot and
+first services snapshot. The control replays the measured slot (at most 10 seconds)
+using **host-only idle**, then records its actual timing. Raw timing receipts are
+hash-paired; per-leg durations/gaps and deltas are reported, never timing equality.
+First-log capture cost, Python measurement overhead, scheduling, warm-up state and
+memory pressure remain explicit confounds. Run118 actually rescheduled restart
+from 30000ms to8975ms and then0ms; future comparison must retain such events.
+
+The separate control classifier requires actual detached death, sticky restart
+scheduling, a distinct automatic target service process and the target's own
+foreground state or denial. Any unexpected helper ENTER/FOREGROUND marker in this
+fresh control contaminates the comparison. Full-absence raw stdout/stderr/native1,
+scope, exact APK/source/fingerprint receipts and timing identities are separately
+verified. Matching fingerprints do not prove whole-image/runtime-state equality;
+permissions and before-service states remain separate observations. Missing or
+mismatched comparison evidence cannot become a pass or erase a measured denial.
+
+`foreground-observed-no-trigger` means only observed framework foreground state;
+it never invokes `verify-race`, reattaches the UI, or claims GPS/session acceptance.
+Denial remains1, uncertainty2. The triggered nonzero exit remains the paired step's
+exit; only if triggered native0 does a nonzero control propagate instead of being
+hidden. Both native receipts stay separate. The control is bounded to180 seconds
+or the remaining existing eight-minute step budget with40 seconds reserved for
+kill grace, host parsing and reporting. Timeout124/forced-kill137 and partial bytes
+are retained; no workflow timeout or original acceptance was extended or skipped.
+
+[Run118 source-bound observation and failure archive](https://github.com/c933103/PassengerCount/blob/7b3d519a935675055732d32cfdd1d19deae74aef/verification/api35-restart-race/run118/README.md).
+A failure without the extra trigger shows it is unnecessary for that observation,
+not that naturally queued updates are impossible. A differing pair supports a
+stimulus/timing contribution, not a unique caller, failure rate or universal fix.
+
+### Read-only profiling capability and identity preflight
+
+The same before/after-terminal metadata flow now reads full `dumpsys activity
+processes`, the shell package permission state, existing output-directory metadata,
+ART APEX XML/candidate-library hash and existing library/trace-buffer properties.
+No profiler is started/stopped, no trace file is created, and no property, permission
+or security setting is changed. These queries never enter the absence interval.
+
+A complete, well-formed processes dump can report AMS-owned profiler fields or that
+those fields were not printed. Either result is **not permission to start profiling**;
+no fields does not exclude a direct ART profiler. An existing profiler must not be
+replaced. Native error/stderr, malformed, oversized or partial output stays
+inconclusive and preserves previous attempt bytes. Candidate ART identity is not a
+verified loaded native implementation or proof that asynchronous profiling works.
+
+Exact installed services DEX supports a separate system-PID profiling route and
+checks existing `Build.IS_DEBUGGABLE`; empty JDWP snapshots alone do not exclude it.
+However starting profiling mutates transient global state, stops any previous AMS
+profile and perturbs timing. A later sampling experiment needs its own state/identity
+checks and explicit nonzero sampling; never substitute instrumented tracing.
+[Java initialization/sampling path](https://github.com/aosp-mirror/platform_frameworks_base/blob/4e43ad12e1b211f15152e9c5b16b0fe88e6b93f3/core/java/android/app/ActivityThread.java#L1038),
+[prior-profiler replacement](https://github.com/aosp-mirror/platform_frameworks_base/blob/4e43ad12e1b211f15152e9c5b16b0fe88e6b93f3/services/core/java/com/android/server/am/AppProfiler.java#L2038).
+Atrace/Perfetto category activation writes trace-tag properties and is not a
+read-only substitute; it remains unperformed. No runtime caller stack is claimed.
