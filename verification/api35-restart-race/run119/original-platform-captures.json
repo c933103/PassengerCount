@@ -1,0 +1,356 @@
+[
+  {
+    "stage": "after-tests",
+    "receipt": {
+      "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/receipt.json",
+      "bytes": 17396,
+      "sha256": "3b05bf4b8eb6c808fa8b56bc8e2cce2f9383d0234f75eb739e563d8f9a8e5769",
+      "content": "{\n  \"kind\": \"capability-observation-not-acceptance\",\n  \"serial\": \"emulator-5556\",\n  \"commands\": [\n    {\n      \"name\": \"transport\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"get-state\"\n      ],\n      \"startNs\": 1792995468259586432,\n      \"endNs\": 1792995468261556378,\n      \"status\": 0,\n      \"stdoutBytes\": 7,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"c98373c1abef78070f6beef6b4ae4fbf3de348dac280195c7f93441920584af9\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.fingerprint\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.fingerprint\"\n      ],\n      \"startNs\": 1792995468261564380,\n      \"endNs\": 1792995468274786037,\n      \"status\": 0,\n      \"stdoutBytes\": 82,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.id\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.id\"\n      ],\n      \"startNs\": 1792995468274798755,\n      \"endNs\": 1792995468283420300,\n      \"status\": 0,\n      \"stdoutBytes\": 16,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"5a53b5538a91f02bbc7610af36bb023ab5e3ff94813a07c2446adb30a34a4325\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.version.incremental\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.version.incremental\"\n      ],\n      \"startNs\": 1792995468283430755,\n      \"endNs\": 1792995468296541314,\n      \"status\": 0,\n      \"stdoutBytes\": 9,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"eb4588e942fbb0a185b21c2005790c15a88c9e8de79cc62502888c9ae7c1a645\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.version.sdk\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.version.sdk\"\n      ],\n      \"startNs\": 1792995468296555946,\n      \"endNs\": 1792995468310374284,\n      \"status\": 0,\n      \"stdoutBytes\": 3,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"90d7ec0f0acef104d8b6252794295f661a0149634868d02a1ae0c358099638f5\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.version.security_patch\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.version.security_patch\"\n      ],\n      \"startNs\": 1792995468310389998,\n      \"endNs\": 1792995468326051346,\n      \"status\": 0,\n      \"stdoutBytes\": 11,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"6982864f1b80643e83372200a3a3d8b2e9a19a345e14b166d5ce8593ef2eb44e\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.type\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.type\"\n      ],\n      \"startNs\": 1792995468326071887,\n      \"endNs\": 1792995468340142942,\n      \"status\": 0,\n      \"stdoutBytes\": 10,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"eec1d78d9c211d8eec9e0c4152b20709fe156496216f349ba870a71ef774c7a5\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.debuggable\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.debuggable\"\n      ],\n      \"startNs\": 1792995468340160418,\n      \"endNs\": 1792995468355874980,\n      \"status\": 0,\n      \"stdoutBytes\": 2,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.product.cpu.abi\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.product.cpu.abi\"\n      ],\n      \"startNs\": 1792995468355891835,\n      \"endNs\": 1792995468365790687,\n      \"status\": 0,\n      \"stdoutBytes\": 7,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"persist.debug.dalvik.vm.jdwp.enabled\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"persist.debug.dalvik.vm.jdwp.enabled\"\n      ],\n      \"startNs\": 1792995468365804297,\n      \"endNs\": 1792995468378594409,\n      \"status\": 0,\n      \"stdoutBytes\": 1,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"system-server-pid\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"pidof\",\n        \"system_server\"\n      ],\n      \"startNs\": 1792995468378610182,\n      \"endNs\": 1792995468395163467,\n      \"status\": 0,\n      \"stdoutBytes\": 4,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"f53a6829daf602c5828b1645446db8806b9f5377fba827443d2863385fd41ded\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"jdwp-initial-frame\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"track-jdwp\"\n      ],\n      \"startNs\": 1792995468395182295,\n      \"endNs\": 1792995468490761034,\n      \"monotonicStartNs\": 489460150156,\n      \"monotonicEndNs\": 489555728734,\n      \"stdoutBytes\": 4,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n      \"status\": \"complete-frame\",\n      \"nativeReturnCode\": -15,\n      \"frame\": {\n        \"pids\": [],\n        \"length\": 0,\n        \"frameBytes\": 4,\n        \"emptyRegistrySnapshot\": true,\n        \"nonemptyListMayBeTruncated\": false\n      },\n      \"stdoutTruncated\": false,\n      \"stderrTruncated\": false,\n      \"termination\": {\n        \"requested\": true,\n        \"forcedKill\": false,\n        \"reason\": \"complete-frame\",\n        \"cleanupErrors\": []\n      }\n    },\n    {\n      \"name\": \"system-server-pid-after\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"pidof\",\n        \"system_server\"\n      ],\n      \"startNs\": 1792995468490781214,\n      \"endNs\": 1792995468510608161,\n      \"status\": 0,\n      \"stdoutBytes\": 4,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"f53a6829daf602c5828b1645446db8806b9f5377fba827443d2863385fd41ded\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"package\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"package\",\n        \"app.passengercount\"\n      ],\n      \"startNs\": 1792995468510724532,\n      \"endNs\": 1792995468606546028,\n      \"status\": 0,\n      \"stdoutBytes\": 5177,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"dcadd8ac580747de1cd734477c5269c24b4062ce21fda625898002be691c8cb4\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"appops\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"cmd\",\n        \"appops\",\n        \"get\",\n        \"app.passengercount\"\n      ],\n      \"startNs\": 1792995468606568851,\n      \"endNs\": 1792995468623390491,\n      \"status\": 0,\n      \"stdoutBytes\": 1374,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"a7a172d16077e7c69fc3b0aa006f8349283d46e1cd56af86061627b443041841\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"services\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"services\",\n        \"app.passengercount\"\n      ],\n      \"startNs\": 1792995468623407005,\n      \"endNs\": 1792995468640774982,\n      \"status\": 0,\n      \"stdoutBytes\": 2411,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"286a406458790cd04a06433d9d7bb7c86479b32460227b98233322d3706607ad\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"services.jar-sha256\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/services.jar\"\n      ],\n      \"startNs\": 1792995468640791586,\n      \"endNs\": 1792995468754187999,\n      \"status\": 0,\n      \"stdoutBytes\": 97,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"framework.jar-sha256\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/framework.jar\"\n      ],\n      \"startNs\": 1792995468754213066,\n      \"endNs\": 1792995468950914690,\n      \"status\": 0,\n      \"stdoutBytes\": 98,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"c61983f843d4d3745b59299d02537d6fa1059ccf414ac95a0ae09c83ccd77ccb\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"framework-test-packages\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"pm\",\n        \"list\",\n        \"packages\",\n        \"com.android.frameworks.mockingservicestests\"\n      ],\n      \"startNs\": 1792995468950935330,\n      \"endNs\": 1792995468975178414,\n      \"status\": 0,\n      \"stdoutBytes\": 0,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"profiling-processes\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"processes\"\n      ],\n      \"startNs\": 1792995468975194097,\n      \"endNs\": 1792995469012906588,\n      \"status\": 0,\n      \"stdoutBytes\": 396157,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"b1f14b288833bf8464aa0133b17ccb4e832ee46016ac61939c0c85351d8464d0\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"profiling-shell-package\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"package\",\n        \"com.android.shell\"\n      ],\n      \"startNs\": 1792995469029531463,\n      \"endNs\": 1792995469049922334,\n      \"status\": 0,\n      \"stdoutBytes\": 100493,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"3875eaf7d123044670b875e8712ebc410c5145a5bdcd8cbb54ca05bcb61cb267\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"profiling-output-directory\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"ls\",\n        \"-ld\",\n        \"/data/local/tmp\"\n      ],\n      \"startNs\": 1792995469049996443,\n      \"endNs\": 1792995469060639409,\n      \"status\": 0,\n      \"stdoutBytes\": 63,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"086987d76a5b16f4bf1290a21e061f6691fd13d9d106c18927616e355723dfd3\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"art-apex-identity\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"cat\",\n        \"/apex/apex-info-list.xml\"\n      ],\n      \"startNs\": 1792995469060651737,\n      \"endNs\": 1792995469071083072,\n      \"status\": 0,\n      \"stdoutBytes\": 13991,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"02501881cb433f116246730166eab81f60a758baca09f45ee4fabccae8c069d7\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"art-candidate-library-sha256\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/apex/com.android.art/lib64/libart.so\"\n      ],\n      \"startNs\": 1792995469071101499,\n      \"endNs\": 1792995469115030534,\n      \"status\": 0,\n      \"stdoutBytes\": 104,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"e324e64bb10037d590d3a95aaac63e913973a0ab4d96f6bbf183b4cbcd82fd2d\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"art-library-property\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"persist.sys.dalvik.vm.lib.2\"\n      ],\n      \"startNs\": 1792995469115072045,\n      \"endNs\": 1792995469124552332,\n      \"status\": 0,\n      \"stdoutBytes\": 10,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"4f1eb8c18c29a97dc196db935598a40ffed573a1001ba7ae9955105544537ef4\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"traceview-buffer-property\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"debug.traceview-buffer-size-mb\"\n      ],\n      \"startNs\": 1792995469124563388,\n      \"endNs\": 1792995469133324247,\n      \"status\": 0,\n      \"stdoutBytes\": 1,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    }\n  ],\n  \"sdkFiles\": [\n    {\n      \"name\": \"source.properties\",\n      \"bytes\": 357,\n      \"sha256\": \"809a6f5103c048607257f03f18e22dd740137e9009c99d4a496de846b6ee3412\"\n    },\n    {\n      \"name\": \"package.xml\",\n      \"bytes\": 18749,\n      \"sha256\": \"c00c7fa7dd1587d93921b4b43a02799dfdd101a9488bed485e284dacd4ad95e6\"\n    }\n  ],\n  \"jdwpObservation\": {\n    \"status\": \"complete-empty\",\n    \"systemServerPid\": 559,\n    \"pids\": [],\n    \"stablePidBracket\": true,\n    \"scope\": \"initial advertised snapshot only; no attach permission claim\",\n    \"nonemptyListMayBeTruncated\": false\n  },\n  \"profilingObservation\": {\n    \"status\": \"ams-profiler-fields-not-listed\",\n    \"scope\": \"AMS-recorded profiler state only\",\n    \"profilerActionPerformed\": false,\n    \"directArtProfilerExcluded\": false,\n    \"existingProfilerMustBePreserved\": true,\n    \"fields\": [],\n    \"evidenceCommand\": \"profiling-processes\",\n    \"nativeReturnCode\": 0,\n    \"stdoutBytes\": 396157,\n    \"stdoutSha256\": \"b1f14b288833bf8464aa0133b17ccb4e832ee46016ac61939c0c85351d8464d0\",\n    \"stderrBytes\": 0,\n    \"terminalFieldObserved\": true,\n    \"interpretation\": \"Do not start or replace a profiler when existing AMS fields are observed. No printed fields in a complete dump does not exclude direct ART profiling, prove permission/ART support, or authorize a stateful profiling experiment.\"\n  },\n  \"deviceStateChangedByCollector\": false,\n  \"limitations\": [\n    \"Sequential observations, not an atomic snapshot.\",\n    \"A listed JDWP PID does not by itself prove attach permissions or field-event support.\",\n    \"A missing PID in a nonempty frame is not global absence proof; daemon lists may be truncated.\",\n    \"Profiler dumps describe AMS bookkeeping, not all direct ART profiler state or permission to replace it.\",\n    \"ART APEX/candidate-library identity is not a verified loaded-library/native execution match.\",\n    \"No profiler start/stop, trace-tag activation, settings write or output-file creation is performed.\",\n    \"No full-restart test or debugger attachment performed.\"\n  ]\n}\n"
+    },
+    "collectorExit": 0,
+    "allRawCommandAndSdkHashesVerified": true,
+    "selectedRaw": [
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/ro.build.fingerprint.stdout",
+        "bytes": 82,
+        "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+        "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/ro.build.id.stdout",
+        "bytes": 16,
+        "sha256": "5a53b5538a91f02bbc7610af36bb023ab5e3ff94813a07c2446adb30a34a4325",
+        "content": "AE3A.240806.043\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/ro.build.version.incremental.stdout",
+        "bytes": 9,
+        "sha256": "eb4588e942fbb0a185b21c2005790c15a88c9e8de79cc62502888c9ae7c1a645",
+        "content": "12960925\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/ro.debuggable.stdout",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "content": "1\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/package.stdout",
+        "bytes": 5177,
+        "sha256": "dcadd8ac580747de1cd734477c5269c24b4062ce21fda625898002be691c8cb4",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 33,
+            "text": "    versionCode=12 minSdk=26 targetSdk=35"
+          },
+          {
+            "index": 62,
+            "text": "      android.permission.ACCESS_FINE_LOCATION"
+          },
+          {
+            "index": 63,
+            "text": "      android.permission.FOREGROUND_SERVICE"
+          },
+          {
+            "index": 64,
+            "text": "      android.permission.FOREGROUND_SERVICE_LOCATION"
+          },
+          {
+            "index": 66,
+            "text": "      android.permission.ACCESS_COARSE_LOCATION"
+          },
+          {
+            "index": 68,
+            "text": "      android.permission.FOREGROUND_SERVICE: granted=true"
+          },
+          {
+            "index": 69,
+            "text": "      android.permission.FOREGROUND_SERVICE_LOCATION: granted=true"
+          },
+          {
+            "index": 85,
+            "text": "        android.permission.ACCESS_FINE_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]"
+          },
+          {
+            "index": 86,
+            "text": "        android.permission.ACCESS_COARSE_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/appops.stdout",
+        "bytes": 1374,
+        "sha256": "a7a172d16077e7c69fc3b0aa006f8349283d46e1cd56af86061627b443041841",
+        "content": "Uid mode: COARSE_LOCATION: foreground\nFINE_LOCATION: foreground\nREAD_CONTACTS: ignore\nWRITE_CONTACTS: ignore\nREAD_CALL_LOG: ignore\nWRITE_CALL_LOG: ignore\nREAD_CALENDAR: ignore\nWRITE_CALENDAR: ignore\nPOST_NOTIFICATION: ignore\nCALL_PHONE: ignore\nREAD_SMS: ignore\nRECEIVE_SMS: ignore\nRECEIVE_MMS: ignore\nRECEIVE_WAP_PUSH: ignore\nSEND_SMS: ignore\nCAMERA: ignore\nRECORD_AUDIO: ignore\nREAD_PHONE_STATE: ignore\nADD_VOICEMAIL: ignore\nUSE_SIP: ignore\nPROCESS_OUTGOING_CALLS: ignore\nBODY_SENSORS: ignore\nREAD_CELL_BROADCASTS: ignore\nREAD_EXTERNAL_STORAGE: ignore\nWRITE_EXTERNAL_STORAGE: ignore\nGET_ACCOUNTS: ignore\nREAD_PHONE_NUMBERS: ignore\nANSWER_PHONE_CALLS: ignore\nACCEPT_HANDOVER: ignore\nBLUETOOTH_SCAN: ignore\nACTIVITY_RECOGNITION: ignore\nREAD_MEDIA_AUDIO: ignore\nREAD_MEDIA_VIDEO: ignore\nREAD_MEDIA_IMAGES: ignore\nACCESS_MEDIA_LOCATION: ignore\nBLUETOOTH_CONNECT: ignore\nUWB_RANGING: ignore\nBLUETOOTH_ADVERTISE: ignore\nNEARBY_WIFI_DEVICES: ignore\nREAD_MEDIA_VISUAL_USER_SELECTED: ignore\nFINE_LOCATION: allow; time=+4s231ms ago\nGPS: allow; time=+9s778ms ago; duration=+7s547ms\nSYSTEM_ALERT_WINDOW: default; rejectTime=+1s173ms ago\nMONITOR_LOCATION: allow; time=+9s778ms ago; duration=+7s545ms\nMONITOR_HIGH_POWER_LOCATION: allow; time=+9s778ms ago; duration=+7s545ms\nSTART_FOREGROUND: allow; time=+166ms ago (running)\nNO_ISOLATED_STORAGE: deny\nACCESS_RESTRICTED_SETTINGS: default\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/services.jar-sha256.stdout",
+        "bytes": 97,
+        "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+        "content": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6  /system/framework/services.jar\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/framework.jar-sha256.stdout",
+        "bytes": 98,
+        "sha256": "c61983f843d4d3745b59299d02537d6fa1059ccf414ac95a0ae09c83ccd77ccb",
+        "content": "f3a7bca4fadf18b9454d004f7aec9dea9a44cb197e61df80ed545a97e87b107c  /system/framework/framework.jar\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/framework-test-packages.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/profiling-processes.stdout",
+        "bytes": 396157,
+        "sha256": "b1f14b288833bf8464aa0133b17ccb4e832ee46016ac61939c0c85351d8464d0",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 0,
+            "text": "ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)"
+          },
+          {
+            "index": 5365,
+            "text": "  mForceBackgroundCheck=false"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/profiling-shell-package.stdout",
+        "bytes": 100493,
+        "sha256": "3875eaf7d123044670b875e8712ebc410c5145a5bdcd8cbb54ca05bcb61cb267",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 372,
+            "text": "      android.permission.SET_ACTIVITY_WATCHER"
+          },
+          {
+            "index": 881,
+            "text": "      android.permission.SET_ACTIVITY_WATCHER: granted=true"
+          },
+          {
+            "index": 1394,
+            "text": "      android.permission.SET_ACTIVITY_WATCHER: granted=true"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/profiling-output-directory.stdout",
+        "bytes": 63,
+        "sha256": "086987d76a5b16f4bf1290a21e061f6691fd13d9d106c18927616e355723dfd3",
+        "content": "drwxrwx--x 2 shell shell 4096 2026-10-26 06:13 /data/local/tmp\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/art-apex-identity.stdout",
+        "bytes": 13991,
+        "sha256": "02501881cb433f116246730166eab81f60a758baca09f45ee4fabccae8c069d7",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 10,
+            "text": "    <apex-info moduleName=\"com.android.art\" modulePath=\"/data/apex/decompressed/com.android.art@350820300.decompressed.apex\" preinstalledModulePath=\"/system/apex/com.google.android.art.apex\" versionCode=\"350820300\" versionName=\"\" isFactory=\"true\" isActive=\"true\" lastUpdateMillis=\"1792995238\" provideSharedApexLibs=\"false\">"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/art-candidate-library-sha256.stdout",
+        "bytes": 104,
+        "sha256": "e324e64bb10037d590d3a95aaac63e913973a0ab4d96f6bbf183b4cbcd82fd2d",
+        "content": "cf1c0b8e7fe7b9200a89bf30a076f44509c9a21fe18d7b33c63a48f673746cd1  /apex/com.android.art/lib64/libart.so\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/art-library-property.stdout",
+        "bytes": 10,
+        "sha256": "4f1eb8c18c29a97dc196db935598a40ffed573a1001ba7ae9955105544537ef4",
+        "content": "libart.so\n"
+      },
+      {
+        "archivePath": "platform-capability-after-tests.c1zNQk/platform-preflight-po4u60a8/traceview-buffer-property.stdout",
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "content": "\n"
+      }
+    ]
+  },
+  {
+    "stage": "before-tests",
+    "receipt": {
+      "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/receipt.json",
+      "bytes": 17394,
+      "sha256": "dd6d53726805fd3446c61e67e08a455acc0ee6550d33917c6a82aea9cb546608",
+      "content": "{\n  \"kind\": \"capability-observation-not-acceptance\",\n  \"serial\": \"emulator-5556\",\n  \"commands\": [\n    {\n      \"name\": \"transport\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"get-state\"\n      ],\n      \"startNs\": 1792995266489786072,\n      \"endNs\": 1792995266492675671,\n      \"status\": 0,\n      \"stdoutBytes\": 7,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"c98373c1abef78070f6beef6b4ae4fbf3de348dac280195c7f93441920584af9\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.fingerprint\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.fingerprint\"\n      ],\n      \"startNs\": 1792995266492693417,\n      \"endNs\": 1792995266508576103,\n      \"status\": 0,\n      \"stdoutBytes\": 82,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.id\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.id\"\n      ],\n      \"startNs\": 1792995266508598957,\n      \"endNs\": 1792995266527395818,\n      \"status\": 0,\n      \"stdoutBytes\": 16,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"5a53b5538a91f02bbc7610af36bb023ab5e3ff94813a07c2446adb30a34a4325\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.version.incremental\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.version.incremental\"\n      ],\n      \"startNs\": 1792995266527416618,\n      \"endNs\": 1792995266541563594,\n      \"status\": 0,\n      \"stdoutBytes\": 9,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"eb4588e942fbb0a185b21c2005790c15a88c9e8de79cc62502888c9ae7c1a645\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.version.sdk\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.version.sdk\"\n      ],\n      \"startNs\": 1792995266541584595,\n      \"endNs\": 1792995266555735441,\n      \"status\": 0,\n      \"stdoutBytes\": 3,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"90d7ec0f0acef104d8b6252794295f661a0149634868d02a1ae0c358099638f5\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.version.security_patch\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.version.security_patch\"\n      ],\n      \"startNs\": 1792995266555756312,\n      \"endNs\": 1792995266567109759,\n      \"status\": 0,\n      \"stdoutBytes\": 11,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"6982864f1b80643e83372200a3a3d8b2e9a19a345e14b166d5ce8593ef2eb44e\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.build.type\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.build.type\"\n      ],\n      \"startNs\": 1792995266567130249,\n      \"endNs\": 1792995266579590957,\n      \"status\": 0,\n      \"stdoutBytes\": 10,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"eec1d78d9c211d8eec9e0c4152b20709fe156496216f349ba870a71ef774c7a5\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.debuggable\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.debuggable\"\n      ],\n      \"startNs\": 1792995266579608853,\n      \"endNs\": 1792995266589953894,\n      \"status\": 0,\n      \"stdoutBytes\": 2,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"ro.product.cpu.abi\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"ro.product.cpu.abi\"\n      ],\n      \"startNs\": 1792995266589970488,\n      \"endNs\": 1792995266600238146,\n      \"status\": 0,\n      \"stdoutBytes\": 7,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"aaf631698ae5160ceb04a97681a14887fdcab47cd6e0f163c87485b3b1340b62\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"persist.debug.dalvik.vm.jdwp.enabled\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"persist.debug.dalvik.vm.jdwp.enabled\"\n      ],\n      \"startNs\": 1792995266600257935,\n      \"endNs\": 1792995266611099573,\n      \"status\": 0,\n      \"stdoutBytes\": 1,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"system-server-pid\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"pidof\",\n        \"system_server\"\n      ],\n      \"startNs\": 1792995266611118471,\n      \"endNs\": 1792995266637648886,\n      \"status\": 0,\n      \"stdoutBytes\": 4,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"f53a6829daf602c5828b1645446db8806b9f5377fba827443d2863385fd41ded\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"jdwp-initial-frame\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"track-jdwp\"\n      ],\n      \"startNs\": 1792995266637670818,\n      \"endNs\": 1792995266733008991,\n      \"monotonicStartNs\": 287702639169,\n      \"monotonicEndNs\": 287797976742,\n      \"stdoutBytes\": 4,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n      \"status\": \"complete-frame\",\n      \"nativeReturnCode\": -15,\n      \"frame\": {\n        \"pids\": [],\n        \"length\": 0,\n        \"frameBytes\": 4,\n        \"emptyRegistrySnapshot\": true,\n        \"nonemptyListMayBeTruncated\": false\n      },\n      \"stdoutTruncated\": false,\n      \"stderrTruncated\": false,\n      \"termination\": {\n        \"requested\": true,\n        \"forcedKill\": false,\n        \"reason\": \"complete-frame\",\n        \"cleanupErrors\": []\n      }\n    },\n    {\n      \"name\": \"system-server-pid-after\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"pidof\",\n        \"system_server\"\n      ],\n      \"startNs\": 1792995266733049220,\n      \"endNs\": 1792995266749233487,\n      \"status\": 0,\n      \"stdoutBytes\": 4,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"f53a6829daf602c5828b1645446db8806b9f5377fba827443d2863385fd41ded\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"package\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"package\",\n        \"app.passengercount\"\n      ],\n      \"startNs\": 1792995266749414042,\n      \"endNs\": 1792995266831180666,\n      \"status\": 0,\n      \"stdoutBytes\": 4594,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"b5d7b3fdfd8b1415eb1ec0cc172a812832cac336a43dddc0faf3c16c5fd70279\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"appops\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"cmd\",\n        \"appops\",\n        \"get\",\n        \"app.passengercount\"\n      ],\n      \"startNs\": 1792995266831209178,\n      \"endNs\": 1792995266859699116,\n      \"status\": 0,\n      \"stdoutBytes\": 1019,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"14f486bf702f27472b1d56b7213a44dc5fb546d1a546487cd30d7cd583ffc296\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"services\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"services\",\n        \"app.passengercount\"\n      ],\n      \"startNs\": 1792995266859721890,\n      \"endNs\": 1792995266882030981,\n      \"status\": 0,\n      \"stdoutBytes\": 66,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"e9990d2b9ce9e862271712ca1ecd0c280ac8cd7a2fd48fc18fb69623521c33b0\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"services.jar-sha256\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/services.jar\"\n      ],\n      \"startNs\": 1792995266882078531,\n      \"endNs\": 1792995267037128284,\n      \"status\": 0,\n      \"stdoutBytes\": 97,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"framework.jar-sha256\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/framework.jar\"\n      ],\n      \"startNs\": 1792995267037157927,\n      \"endNs\": 1792995267384136319,\n      \"status\": 0,\n      \"stdoutBytes\": 98,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"c61983f843d4d3745b59299d02537d6fa1059ccf414ac95a0ae09c83ccd77ccb\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"framework-test-packages\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"pm\",\n        \"list\",\n        \"packages\",\n        \"com.android.frameworks.mockingservicestests\"\n      ],\n      \"startNs\": 1792995267384164540,\n      \"endNs\": 1792995267445506180,\n      \"status\": 0,\n      \"stdoutBytes\": 0,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"profiling-processes\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"processes\"\n      ],\n      \"startNs\": 1792995267445528723,\n      \"endNs\": 1792995267522973617,\n      \"status\": 0,\n      \"stdoutBytes\": 244903,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"9c336a3af696f36f8cab60a6275f1373ab8bcd84c1cd32d45c3b7daaf5e1ed36\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"profiling-shell-package\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"dumpsys\",\n        \"package\",\n        \"com.android.shell\"\n      ],\n      \"startNs\": 1792995267532081387,\n      \"endNs\": 1792995267662967519,\n      \"status\": 0,\n      \"stdoutBytes\": 100436,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"034dfaa75a12f043908381e780d3b6522be3f1c8c7342194775eb097b355c3fd\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"profiling-output-directory\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"ls\",\n        \"-ld\",\n        \"/data/local/tmp\"\n      ],\n      \"startNs\": 1792995267663069479,\n      \"endNs\": 1792995267694742566,\n      \"status\": 0,\n      \"stdoutBytes\": 63,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"086987d76a5b16f4bf1290a21e061f6691fd13d9d106c18927616e355723dfd3\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"art-apex-identity\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"cat\",\n        \"/apex/apex-info-list.xml\"\n      ],\n      \"startNs\": 1792995267694765379,\n      \"endNs\": 1792995267727831309,\n      \"status\": 0,\n      \"stdoutBytes\": 13991,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"02501881cb433f116246730166eab81f60a758baca09f45ee4fabccae8c069d7\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"art-candidate-library-sha256\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/apex/com.android.art/lib64/libart.so\"\n      ],\n      \"startNs\": 1792995267727862946,\n      \"endNs\": 1792995267830384738,\n      \"status\": 0,\n      \"stdoutBytes\": 104,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"e324e64bb10037d590d3a95aaac63e913973a0ab4d96f6bbf183b4cbcd82fd2d\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"art-library-property\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"persist.sys.dalvik.vm.lib.2\"\n      ],\n      \"startNs\": 1792995267830406530,\n      \"endNs\": 1792995267849603777,\n      \"status\": 0,\n      \"stdoutBytes\": 10,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"4f1eb8c18c29a97dc196db935598a40ffed573a1001ba7ae9955105544537ef4\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    {\n      \"name\": \"traceview-buffer-property\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"getprop\",\n        \"debug.traceview-buffer-size-mb\"\n      ],\n      \"startNs\": 1792995267849626560,\n      \"endNs\": 1792995267962375060,\n      \"status\": 0,\n      \"stdoutBytes\": 1,\n      \"stderrBytes\": 0,\n      \"stdoutSha256\": \"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b\",\n      \"stderrSha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    }\n  ],\n  \"sdkFiles\": [\n    {\n      \"name\": \"source.properties\",\n      \"bytes\": 357,\n      \"sha256\": \"809a6f5103c048607257f03f18e22dd740137e9009c99d4a496de846b6ee3412\"\n    },\n    {\n      \"name\": \"package.xml\",\n      \"bytes\": 18749,\n      \"sha256\": \"c00c7fa7dd1587d93921b4b43a02799dfdd101a9488bed485e284dacd4ad95e6\"\n    }\n  ],\n  \"jdwpObservation\": {\n    \"status\": \"complete-empty\",\n    \"systemServerPid\": 559,\n    \"pids\": [],\n    \"stablePidBracket\": true,\n    \"scope\": \"initial advertised snapshot only; no attach permission claim\",\n    \"nonemptyListMayBeTruncated\": false\n  },\n  \"profilingObservation\": {\n    \"status\": \"ams-profiler-fields-not-listed\",\n    \"scope\": \"AMS-recorded profiler state only\",\n    \"profilerActionPerformed\": false,\n    \"directArtProfilerExcluded\": false,\n    \"existingProfilerMustBePreserved\": true,\n    \"fields\": [],\n    \"evidenceCommand\": \"profiling-processes\",\n    \"nativeReturnCode\": 0,\n    \"stdoutBytes\": 244903,\n    \"stdoutSha256\": \"9c336a3af696f36f8cab60a6275f1373ab8bcd84c1cd32d45c3b7daaf5e1ed36\",\n    \"stderrBytes\": 0,\n    \"terminalFieldObserved\": true,\n    \"interpretation\": \"Do not start or replace a profiler when existing AMS fields are observed. No printed fields in a complete dump does not exclude direct ART profiling, prove permission/ART support, or authorize a stateful profiling experiment.\"\n  },\n  \"deviceStateChangedByCollector\": false,\n  \"limitations\": [\n    \"Sequential observations, not an atomic snapshot.\",\n    \"A listed JDWP PID does not by itself prove attach permissions or field-event support.\",\n    \"A missing PID in a nonempty frame is not global absence proof; daemon lists may be truncated.\",\n    \"Profiler dumps describe AMS bookkeeping, not all direct ART profiler state or permission to replace it.\",\n    \"ART APEX/candidate-library identity is not a verified loaded-library/native execution match.\",\n    \"No profiler start/stop, trace-tag activation, settings write or output-file creation is performed.\",\n    \"No full-restart test or debugger attachment performed.\"\n  ]\n}\n"
+    },
+    "collectorExit": 0,
+    "allRawCommandAndSdkHashesVerified": true,
+    "selectedRaw": [
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/ro.build.fingerprint.stdout",
+        "bytes": 82,
+        "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+        "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/ro.build.id.stdout",
+        "bytes": 16,
+        "sha256": "5a53b5538a91f02bbc7610af36bb023ab5e3ff94813a07c2446adb30a34a4325",
+        "content": "AE3A.240806.043\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/ro.build.version.incremental.stdout",
+        "bytes": 9,
+        "sha256": "eb4588e942fbb0a185b21c2005790c15a88c9e8de79cc62502888c9ae7c1a645",
+        "content": "12960925\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/ro.debuggable.stdout",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "content": "1\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/package.stdout",
+        "bytes": 4594,
+        "sha256": "b5d7b3fdfd8b1415eb1ec0cc172a812832cac336a43dddc0faf3c16c5fd70279",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 33,
+            "text": "    versionCode=12 minSdk=26 targetSdk=35"
+          },
+          {
+            "index": 62,
+            "text": "      android.permission.ACCESS_FINE_LOCATION"
+          },
+          {
+            "index": 63,
+            "text": "      android.permission.FOREGROUND_SERVICE"
+          },
+          {
+            "index": 64,
+            "text": "      android.permission.FOREGROUND_SERVICE_LOCATION"
+          },
+          {
+            "index": 66,
+            "text": "      android.permission.ACCESS_COARSE_LOCATION"
+          },
+          {
+            "index": 68,
+            "text": "      android.permission.FOREGROUND_SERVICE: granted=true"
+          },
+          {
+            "index": 69,
+            "text": "      android.permission.FOREGROUND_SERVICE_LOCATION: granted=true"
+          },
+          {
+            "index": 85,
+            "text": "        android.permission.ACCESS_FINE_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]"
+          },
+          {
+            "index": 86,
+            "text": "        android.permission.ACCESS_COARSE_LOCATION: granted=true, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/appops.stdout",
+        "bytes": 1019,
+        "sha256": "14f486bf702f27472b1d56b7213a44dc5fb546d1a546487cd30d7cd583ffc296",
+        "content": "Uid mode: COARSE_LOCATION: foreground\nFINE_LOCATION: foreground\nREAD_CONTACTS: ignore\nWRITE_CONTACTS: ignore\nREAD_CALL_LOG: ignore\nWRITE_CALL_LOG: ignore\nREAD_CALENDAR: ignore\nWRITE_CALENDAR: ignore\nPOST_NOTIFICATION: ignore\nCALL_PHONE: ignore\nREAD_SMS: ignore\nRECEIVE_SMS: ignore\nRECEIVE_MMS: ignore\nRECEIVE_WAP_PUSH: ignore\nSEND_SMS: ignore\nCAMERA: ignore\nRECORD_AUDIO: ignore\nREAD_PHONE_STATE: ignore\nADD_VOICEMAIL: ignore\nUSE_SIP: ignore\nPROCESS_OUTGOING_CALLS: ignore\nBODY_SENSORS: ignore\nREAD_CELL_BROADCASTS: ignore\nREAD_EXTERNAL_STORAGE: ignore\nWRITE_EXTERNAL_STORAGE: ignore\nGET_ACCOUNTS: ignore\nREAD_PHONE_NUMBERS: ignore\nANSWER_PHONE_CALLS: ignore\nACCEPT_HANDOVER: ignore\nBLUETOOTH_SCAN: ignore\nACTIVITY_RECOGNITION: ignore\nREAD_MEDIA_AUDIO: ignore\nREAD_MEDIA_VIDEO: ignore\nREAD_MEDIA_IMAGES: ignore\nACCESS_MEDIA_LOCATION: ignore\nBLUETOOTH_CONNECT: ignore\nUWB_RANGING: ignore\nBLUETOOTH_ADVERTISE: ignore\nNEARBY_WIFI_DEVICES: ignore\nREAD_MEDIA_VISUAL_USER_SELECTED: ignore\nACCESS_RESTRICTED_SETTINGS: default\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/services.jar-sha256.stdout",
+        "bytes": 97,
+        "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+        "content": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6  /system/framework/services.jar\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/framework.jar-sha256.stdout",
+        "bytes": 98,
+        "sha256": "c61983f843d4d3745b59299d02537d6fa1059ccf414ac95a0ae09c83ccd77ccb",
+        "content": "f3a7bca4fadf18b9454d004f7aec9dea9a44cb197e61df80ed545a97e87b107c  /system/framework/framework.jar\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/framework-test-packages.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/profiling-processes.stdout",
+        "bytes": 244903,
+        "sha256": "9c336a3af696f36f8cab60a6275f1373ab8bcd84c1cd32d45c3b7daaf5e1ed36",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 0,
+            "text": "ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)"
+          },
+          {
+            "index": 3234,
+            "text": "  mForceBackgroundCheck=false"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/profiling-shell-package.stdout",
+        "bytes": 100436,
+        "sha256": "034dfaa75a12f043908381e780d3b6522be3f1c8c7342194775eb097b355c3fd",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 372,
+            "text": "      android.permission.SET_ACTIVITY_WATCHER"
+          },
+          {
+            "index": 881,
+            "text": "      android.permission.SET_ACTIVITY_WATCHER: granted=true"
+          },
+          {
+            "index": 1392,
+            "text": "      android.permission.SET_ACTIVITY_WATCHER: granted=true"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/profiling-output-directory.stdout",
+        "bytes": 63,
+        "sha256": "086987d76a5b16f4bf1290a21e061f6691fd13d9d106c18927616e355723dfd3",
+        "content": "drwxrwx--x 2 shell shell 4096 2026-10-26 06:13 /data/local/tmp\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/art-apex-identity.stdout",
+        "bytes": 13991,
+        "sha256": "02501881cb433f116246730166eab81f60a758baca09f45ee4fabccae8c069d7",
+        "indexConvention": "zero-based raw lines",
+        "lines": [
+          {
+            "index": 10,
+            "text": "    <apex-info moduleName=\"com.android.art\" modulePath=\"/data/apex/decompressed/com.android.art@350820300.decompressed.apex\" preinstalledModulePath=\"/system/apex/com.google.android.art.apex\" versionCode=\"350820300\" versionName=\"\" isFactory=\"true\" isActive=\"true\" lastUpdateMillis=\"1792995238\" provideSharedApexLibs=\"false\">"
+          }
+        ]
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/art-candidate-library-sha256.stdout",
+        "bytes": 104,
+        "sha256": "e324e64bb10037d590d3a95aaac63e913973a0ab4d96f6bbf183b4cbcd82fd2d",
+        "content": "cf1c0b8e7fe7b9200a89bf30a076f44509c9a21fe18d7b33c63a48f673746cd1  /apex/com.android.art/lib64/libart.so\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/art-library-property.stdout",
+        "bytes": 10,
+        "sha256": "4f1eb8c18c29a97dc196db935598a40ffed573a1001ba7ae9955105544537ef4",
+        "content": "libart.so\n"
+      },
+      {
+        "archivePath": "platform-capability-before-tests.CJHXqX/platform-preflight-p7v1sz4w/traceview-buffer-property.stdout",
+        "bytes": 1,
+        "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "content": "\n"
+      }
+    ]
+  }
+]

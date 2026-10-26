@@ -1,0 +1,2470 @@
+[
+  {
+    "archivePath": "race-before-services.txt",
+    "bytes": 312752,
+    "sha256": "dae0564267a15f774352fa5ad522088fb6e026cde2e115bae00b39e3692b8d10",
+    "lines": [
+      {
+        "index": 204,
+        "text": ""
+      },
+      {
+        "index": 205,
+        "text": "  * ServiceRecord{c44a268 u0 app.passengercount/.TrackService c:app.passengercount}"
+      },
+      {
+        "index": 206,
+        "text": "    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}"
+      },
+      {
+        "index": 207,
+        "text": "    packageName=app.passengercount"
+      },
+      {
+        "index": 208,
+        "text": "    processName=app.passengercount:tracking"
+      },
+      {
+        "index": 209,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 210,
+        "text": "    baseDir=/data/app/~~71DJAX6s0OThh8ZypnWkEw==/app.passengercount-JISlAi7mKDOW1qGDQJKA4Q==/base.apk"
+      },
+      {
+        "index": 211,
+        "text": "    dataDir=/data/user/0/app.passengercount"
+      },
+      {
+        "index": 212,
+        "text": "    app=ProcessRecord{9c8b132 3131:app.passengercount:tracking/u0a209}"
+      },
+      {
+        "index": 213,
+        "text": "    useNewWiuLogic_forCapabilities()=true"
+      },
+      {
+        "index": 214,
+        "text": "    useNewWiuLogic_forStart()=true"
+      },
+      {
+        "index": 215,
+        "text": "    useNewBfslLogic()=true"
+      },
+      {
+        "index": 216,
+        "text": "    mAllowWiu_noBinding=PROC_STATE_TOP"
+      },
+      {
+        "index": 217,
+        "text": "    mAllowWiu_inBindService=DENIED"
+      },
+      {
+        "index": 218,
+        "text": "    mAllowWiu_byBindings=DENIED"
+      },
+      {
+        "index": 219,
+        "text": "    getFgsAllowWiu_legacy=PROC_STATE_TOP"
+      },
+      {
+        "index": 220,
+        "text": "    getFgsAllowWiu_new=PROC_STATE_TOP"
+      },
+      {
+        "index": 221,
+        "text": "    getFgsAllowWiu_forStart=PROC_STATE_TOP"
+      },
+      {
+        "index": 222,
+        "text": "    getFgsAllowWiu_forCapabilities=PROC_STATE_TOP"
+      },
+      {
+        "index": 223,
+        "text": "    allowUiJobScheduling=true"
+      },
+      {
+        "index": 224,
+        "text": "    recentCallingPackage=app.passengercount"
+      },
+      {
+        "index": 225,
+        "text": "    recentCallingUid=10209"
+      },
+      {
+        "index": 226,
+        "text": "    mAllowStart_noBinding=PROC_STATE_TOP"
+      },
+      {
+        "index": 227,
+        "text": "    mAllowStart_inBindService=DENIED"
+      },
+      {
+        "index": 228,
+        "text": "    mAllowStart_byBindings=DENIED"
+      },
+      {
+        "index": 229,
+        "text": "    getFgsAllowStart_legacy=PROC_STATE_TOP"
+      },
+      {
+        "index": 230,
+        "text": "    getFgsAllowStart_new=PROC_STATE_TOP"
+      },
+      {
+        "index": 231,
+        "text": "    getFgsAllowStart=PROC_STATE_TOP"
+      },
+      {
+        "index": 232,
+        "text": "    startForegroundCount=1"
+      },
+      {
+        "index": 233,
+        "text": "    infoAllowStartForeground=[callingPackage: app.passengercount; callingUid: 10209; uidState: TOP ; uidBFSL: [BFSL]; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService (has extras) }; code:PROC_STATE_TOP; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:0; bindFromPackage:null: isBindService:false]"
+      },
+      {
+        "index": 234,
+        "text": "    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)"
+      },
+      {
+        "index": 235,
+        "text": "    createTime=-5s800ms startingBgTimeout=--"
+      },
+      {
+        "index": 236,
+        "text": "    lastActivity=-5s796ms restartTime=-5s796ms createdFromFg=true"
+      },
+      {
+        "index": 237,
+        "text": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1"
+      },
+      {
+        "index": 238,
+        "text": " startCommandResult=1"
+      },
+      {
+        "index": 239,
+        "text": ""
+      },
+      {
+        "index": 240,
+        "text": "  * ServiceRecord{8d2deee u0 com.google.android.gms/.icing.service.AppIndexingService c:com.google.android.gms}"
+      },
+      {
+        "index": 241,
+        "text": "    intent={act=com.google.android.gms.icing.APP_INDEXING_SERVICE pkg=com.google.android.gms}"
+      },
+      {
+        "index": 4438,
+        "text": "Active foreground apps - user 0:"
+      },
+      {
+        "index": 4439,
+        "text": "  #0: app.passengercount"
+      },
+      {
+        "index": 4440,
+        "text": "    mNumActive=1 mAppOnTop=false mShownWhileTop=true mShownWhileScreenOn=true"
+      },
+      {
+        "index": 4441,
+        "text": "    mStartTime=-5s944ms mStartVisibleTime=-5s944ms"
+      }
+    ]
+  },
+  {
+    "archivePath": "race-observation.EElv4h/services.txt",
+    "bytes": 321019,
+    "sha256": "7f1cd400fa3f6ba675b125feb1c0cccf7e71c5613fe0911fb17b7f798057995a",
+    "lines": [
+      {
+        "index": 3143,
+        "text": "    intent={act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService}"
+      },
+      {
+        "index": 3144,
+        "text": "    packageName=app.passengercount.tests"
+      },
+      {
+        "index": 3145,
+        "text": "    processName=app.passengercount.tests"
+      },
+      {
+        "index": 3146,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 3147,
+        "text": "    baseDir=/data/app/~~_OHvdm4U03nwm_svIL1HyQ==/app.passengercount.tests-2agxve4Upc0-IG2bNbys5A==/base.apk"
+      }
+    ]
+  },
+  {
+    "archivePath": "race-observation.S765xI/services.txt",
+    "bytes": 338323,
+    "sha256": "1f69e75a13630979d6d2e06c7af5e70aa56009f457d3d745a0962d9be733a1de",
+    "lines": [
+      {
+        "index": 292,
+        "text": ""
+      },
+      {
+        "index": 293,
+        "text": "  * ServiceRecord{c44a268 u0 app.passengercount/.TrackService c:app.passengercount}"
+      },
+      {
+        "index": 294,
+        "text": "    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}"
+      },
+      {
+        "index": 295,
+        "text": "    packageName=app.passengercount"
+      },
+      {
+        "index": 296,
+        "text": "    processName=app.passengercount:tracking"
+      },
+      {
+        "index": 297,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 298,
+        "text": "    baseDir=/data/app/~~71DJAX6s0OThh8ZypnWkEw==/app.passengercount-JISlAi7mKDOW1qGDQJKA4Q==/base.apk"
+      },
+      {
+        "index": 299,
+        "text": "    dataDir=/data/user/0/app.passengercount"
+      },
+      {
+        "index": 300,
+        "text": "    app=null"
+      },
+      {
+        "index": 301,
+        "text": "    useNewWiuLogic_forCapabilities()=true"
+      },
+      {
+        "index": 302,
+        "text": "    useNewWiuLogic_forStart()=true"
+      },
+      {
+        "index": 303,
+        "text": "    useNewBfslLogic()=true"
+      },
+      {
+        "index": 304,
+        "text": "    mAllowWiu_noBinding=DENIED"
+      },
+      {
+        "index": 305,
+        "text": "    mAllowWiu_inBindService=DENIED"
+      },
+      {
+        "index": 306,
+        "text": "    mAllowWiu_byBindings=DENIED"
+      },
+      {
+        "index": 307,
+        "text": "    getFgsAllowWiu_legacy=DENIED"
+      },
+      {
+        "index": 308,
+        "text": "    getFgsAllowWiu_new=DENIED"
+      },
+      {
+        "index": 309,
+        "text": "    getFgsAllowWiu_forStart=DENIED"
+      },
+      {
+        "index": 310,
+        "text": "    getFgsAllowWiu_forCapabilities=DENIED"
+      },
+      {
+        "index": 311,
+        "text": "    allowUiJobScheduling=false"
+      },
+      {
+        "index": 312,
+        "text": "    recentCallingPackage=app.passengercount"
+      },
+      {
+        "index": 313,
+        "text": "    recentCallingUid=10209"
+      },
+      {
+        "index": 314,
+        "text": "    mAllowStart_noBinding=DENIED"
+      },
+      {
+        "index": 315,
+        "text": "    mAllowStart_inBindService=DENIED"
+      },
+      {
+        "index": 316,
+        "text": "    mAllowStart_byBindings=DENIED"
+      },
+      {
+        "index": 317,
+        "text": "    getFgsAllowStart_legacy=DENIED"
+      },
+      {
+        "index": 318,
+        "text": "    getFgsAllowStart_new=DENIED"
+      },
+      {
+        "index": 319,
+        "text": "    getFgsAllowStart=DENIED"
+      },
+      {
+        "index": 320,
+        "text": "    startForegroundCount=1"
+      },
+      {
+        "index": 321,
+        "text": "    infoAllowStartForeground=null"
+      },
+      {
+        "index": 322,
+        "text": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)"
+      },
+      {
+        "index": 323,
+        "text": "    createTime=-14s956ms startingBgTimeout=--"
+      },
+      {
+        "index": 324,
+        "text": "    lastActivity=-14s952ms restartTime=-14s952ms createdFromFg=false"
+      },
+      {
+        "index": 325,
+        "text": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1"
+      },
+      {
+        "index": 326,
+        "text": " startCommandResult=1"
+      },
+      {
+        "index": 327,
+        "text": "    restartCount=1 restartDelay=-54s370ms nextRestartTime=+17s911ms crashCount=0"
+      },
+      {
+        "index": 328,
+        "text": ""
+      },
+      {
+        "index": 329,
+        "text": "  * ServiceRecord{8d2deee u0 com.google.android.gms/.icing.service.AppIndexingService c:com.google.android.gms}"
+      },
+      {
+        "index": 330,
+        "text": "    intent={act=com.google.android.gms.icing.APP_INDEXING_SERVICE pkg=com.google.android.gms}"
+      },
+      {
+        "index": 3308,
+        "text": "    intent={act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService}"
+      },
+      {
+        "index": 3309,
+        "text": "    packageName=app.passengercount.tests"
+      },
+      {
+        "index": 3310,
+        "text": "    processName=app.passengercount.tests"
+      },
+      {
+        "index": 3311,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 3312,
+        "text": "    baseDir=/data/app/~~_OHvdm4U03nwm_svIL1HyQ==/app.passengercount.tests-2agxve4Upc0-IG2bNbys5A==/base.apk"
+      },
+      {
+        "index": 4355,
+        "text": "  Restarting services:"
+      },
+      {
+        "index": 4356,
+        "text": "  * Restarting ServiceRecord{c44a268 u0 app.passengercount/.TrackService c:app.passengercount}"
+      },
+      {
+        "index": 4357,
+        "text": "    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}"
+      },
+      {
+        "index": 4358,
+        "text": "    packageName=app.passengercount"
+      },
+      {
+        "index": 4359,
+        "text": "    processName=app.passengercount:tracking"
+      },
+      {
+        "index": 4360,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 4361,
+        "text": "    baseDir=/data/app/~~71DJAX6s0OThh8ZypnWkEw==/app.passengercount-JISlAi7mKDOW1qGDQJKA4Q==/base.apk"
+      },
+      {
+        "index": 4362,
+        "text": "    dataDir=/data/user/0/app.passengercount"
+      },
+      {
+        "index": 4363,
+        "text": "    app=null"
+      },
+      {
+        "index": 4364,
+        "text": "    useNewWiuLogic_forCapabilities()=true"
+      },
+      {
+        "index": 4365,
+        "text": "    useNewWiuLogic_forStart()=true"
+      },
+      {
+        "index": 4366,
+        "text": "    useNewBfslLogic()=true"
+      },
+      {
+        "index": 4367,
+        "text": "    mAllowWiu_noBinding=DENIED"
+      },
+      {
+        "index": 4368,
+        "text": "    mAllowWiu_inBindService=DENIED"
+      },
+      {
+        "index": 4369,
+        "text": "    mAllowWiu_byBindings=DENIED"
+      },
+      {
+        "index": 4370,
+        "text": "    getFgsAllowWiu_legacy=DENIED"
+      },
+      {
+        "index": 4371,
+        "text": "    getFgsAllowWiu_new=DENIED"
+      },
+      {
+        "index": 4372,
+        "text": "    getFgsAllowWiu_forStart=DENIED"
+      },
+      {
+        "index": 4373,
+        "text": "    getFgsAllowWiu_forCapabilities=DENIED"
+      },
+      {
+        "index": 4374,
+        "text": "    allowUiJobScheduling=false"
+      },
+      {
+        "index": 4375,
+        "text": "    recentCallingPackage=app.passengercount"
+      },
+      {
+        "index": 4376,
+        "text": "    recentCallingUid=10209"
+      },
+      {
+        "index": 4377,
+        "text": "    mAllowStart_noBinding=DENIED"
+      },
+      {
+        "index": 4378,
+        "text": "    mAllowStart_inBindService=DENIED"
+      },
+      {
+        "index": 4379,
+        "text": "    mAllowStart_byBindings=DENIED"
+      },
+      {
+        "index": 4380,
+        "text": "    getFgsAllowStart_legacy=DENIED"
+      },
+      {
+        "index": 4381,
+        "text": "    getFgsAllowStart_new=DENIED"
+      },
+      {
+        "index": 4382,
+        "text": "    getFgsAllowStart=DENIED"
+      },
+      {
+        "index": 4383,
+        "text": "    startForegroundCount=1"
+      },
+      {
+        "index": 4384,
+        "text": "    infoAllowStartForeground=null"
+      },
+      {
+        "index": 4385,
+        "text": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)"
+      },
+      {
+        "index": 4386,
+        "text": "    createTime=-14s993ms startingBgTimeout=--"
+      },
+      {
+        "index": 4387,
+        "text": "    lastActivity=-14s989ms restartTime=-14s989ms createdFromFg=false"
+      },
+      {
+        "index": 4388,
+        "text": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1"
+      },
+      {
+        "index": 4389,
+        "text": " startCommandResult=1"
+      },
+      {
+        "index": 4390,
+        "text": "    restartCount=1 restartDelay=-54s407ms nextRestartTime=+17s874ms crashCount=0"
+      },
+      {
+        "index": 4391,
+        "text": ""
+      },
+      {
+        "index": 4392,
+        "text": "  Destroying services:"
+      },
+      {
+        "index": 4393,
+        "text": "  * Destroy ServiceRecord{85fcdde u0 com.google.android.gms/.wearable.service.WearableControlService c:com.google.android.gms}"
+      },
+      {
+        "index": 4394,
+        "text": "    intent={act=com.google.android.gms.wearable.ACTION_PACKAGE_CHANGED dat=package:com.android.vending cmp=com.google.android.gms/.wearable.service.WearableControlService}"
+      }
+    ]
+  },
+  {
+    "archivePath": "race-observation.viErkL/services.txt",
+    "bytes": 319412,
+    "sha256": "6bebb7877a775d0aca85f07502efa8a52d6b572083f58894ddf0e8baa8c0dce0",
+    "lines": [
+      {
+        "index": 292,
+        "text": ""
+      },
+      {
+        "index": 293,
+        "text": "  * ServiceRecord{c44a268 u0 app.passengercount/.TrackService c:app.passengercount}"
+      },
+      {
+        "index": 294,
+        "text": "    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}"
+      },
+      {
+        "index": 295,
+        "text": "    packageName=app.passengercount"
+      },
+      {
+        "index": 296,
+        "text": "    processName=app.passengercount:tracking"
+      },
+      {
+        "index": 297,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 298,
+        "text": "    baseDir=/data/app/~~71DJAX6s0OThh8ZypnWkEw==/app.passengercount-JISlAi7mKDOW1qGDQJKA4Q==/base.apk"
+      },
+      {
+        "index": 299,
+        "text": "    dataDir=/data/user/0/app.passengercount"
+      },
+      {
+        "index": 300,
+        "text": "    app=null"
+      },
+      {
+        "index": 301,
+        "text": "    useNewWiuLogic_forCapabilities()=true"
+      },
+      {
+        "index": 302,
+        "text": "    useNewWiuLogic_forStart()=true"
+      },
+      {
+        "index": 303,
+        "text": "    useNewBfslLogic()=true"
+      },
+      {
+        "index": 304,
+        "text": "    mAllowWiu_noBinding=DENIED"
+      },
+      {
+        "index": 305,
+        "text": "    mAllowWiu_inBindService=DENIED"
+      },
+      {
+        "index": 306,
+        "text": "    mAllowWiu_byBindings=DENIED"
+      },
+      {
+        "index": 307,
+        "text": "    getFgsAllowWiu_legacy=DENIED"
+      },
+      {
+        "index": 308,
+        "text": "    getFgsAllowWiu_new=DENIED"
+      },
+      {
+        "index": 309,
+        "text": "    getFgsAllowWiu_forStart=DENIED"
+      },
+      {
+        "index": 310,
+        "text": "    getFgsAllowWiu_forCapabilities=DENIED"
+      },
+      {
+        "index": 311,
+        "text": "    allowUiJobScheduling=false"
+      },
+      {
+        "index": 312,
+        "text": "    recentCallingPackage=app.passengercount"
+      },
+      {
+        "index": 313,
+        "text": "    recentCallingUid=10209"
+      },
+      {
+        "index": 314,
+        "text": "    mAllowStart_noBinding=DENIED"
+      },
+      {
+        "index": 315,
+        "text": "    mAllowStart_inBindService=DENIED"
+      },
+      {
+        "index": 316,
+        "text": "    mAllowStart_byBindings=DENIED"
+      },
+      {
+        "index": 317,
+        "text": "    getFgsAllowStart_legacy=DENIED"
+      },
+      {
+        "index": 318,
+        "text": "    getFgsAllowStart_new=DENIED"
+      },
+      {
+        "index": 319,
+        "text": "    getFgsAllowStart=DENIED"
+      },
+      {
+        "index": 320,
+        "text": "    startForegroundCount=1"
+      },
+      {
+        "index": 321,
+        "text": "    infoAllowStartForeground=null"
+      },
+      {
+        "index": 322,
+        "text": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)"
+      },
+      {
+        "index": 323,
+        "text": "    createTime=-13s887ms startingBgTimeout=--"
+      },
+      {
+        "index": 324,
+        "text": "    lastActivity=-13s883ms restartTime=-13s883ms createdFromFg=false"
+      },
+      {
+        "index": 325,
+        "text": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1"
+      },
+      {
+        "index": 326,
+        "text": " startCommandResult=1"
+      },
+      {
+        "index": 327,
+        "text": "    restartCount=1 restartDelay=-53s301ms nextRestartTime=+18s980ms crashCount=0"
+      },
+      {
+        "index": 328,
+        "text": ""
+      },
+      {
+        "index": 329,
+        "text": "  * ServiceRecord{8d2deee u0 com.google.android.gms/.icing.service.AppIndexingService c:com.google.android.gms}"
+      },
+      {
+        "index": 330,
+        "text": "    intent={act=com.google.android.gms.icing.APP_INDEXING_SERVICE pkg=com.google.android.gms}"
+      },
+      {
+        "index": 3122,
+        "text": "    intent={act=app.passengercount.tests.TRIGGER cmp=app.passengercount.tests/app.passengercount.RestartRaceTriggerService}"
+      },
+      {
+        "index": 3123,
+        "text": "    packageName=app.passengercount.tests"
+      },
+      {
+        "index": 3124,
+        "text": "    processName=app.passengercount.tests"
+      },
+      {
+        "index": 3125,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 3126,
+        "text": "    baseDir=/data/app/~~_OHvdm4U03nwm_svIL1HyQ==/app.passengercount.tests-2agxve4Upc0-IG2bNbys5A==/base.apk"
+      },
+      {
+        "index": 4124,
+        "text": "  Restarting services:"
+      },
+      {
+        "index": 4125,
+        "text": "  * Restarting ServiceRecord{c44a268 u0 app.passengercount/.TrackService c:app.passengercount}"
+      },
+      {
+        "index": 4126,
+        "text": "    intent={act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService}"
+      },
+      {
+        "index": 4127,
+        "text": "    packageName=app.passengercount"
+      },
+      {
+        "index": 4128,
+        "text": "    processName=app.passengercount:tracking"
+      },
+      {
+        "index": 4129,
+        "text": "    targetSdkVersion=35"
+      },
+      {
+        "index": 4130,
+        "text": "    baseDir=/data/app/~~71DJAX6s0OThh8ZypnWkEw==/app.passengercount-JISlAi7mKDOW1qGDQJKA4Q==/base.apk"
+      },
+      {
+        "index": 4131,
+        "text": "    dataDir=/data/user/0/app.passengercount"
+      },
+      {
+        "index": 4132,
+        "text": "    app=null"
+      },
+      {
+        "index": 4133,
+        "text": "    useNewWiuLogic_forCapabilities()=true"
+      },
+      {
+        "index": 4134,
+        "text": "    useNewWiuLogic_forStart()=true"
+      },
+      {
+        "index": 4135,
+        "text": "    useNewBfslLogic()=true"
+      },
+      {
+        "index": 4136,
+        "text": "    mAllowWiu_noBinding=DENIED"
+      },
+      {
+        "index": 4137,
+        "text": "    mAllowWiu_inBindService=DENIED"
+      },
+      {
+        "index": 4138,
+        "text": "    mAllowWiu_byBindings=DENIED"
+      },
+      {
+        "index": 4139,
+        "text": "    getFgsAllowWiu_legacy=DENIED"
+      },
+      {
+        "index": 4140,
+        "text": "    getFgsAllowWiu_new=DENIED"
+      },
+      {
+        "index": 4141,
+        "text": "    getFgsAllowWiu_forStart=DENIED"
+      },
+      {
+        "index": 4142,
+        "text": "    getFgsAllowWiu_forCapabilities=DENIED"
+      },
+      {
+        "index": 4143,
+        "text": "    allowUiJobScheduling=false"
+      },
+      {
+        "index": 4144,
+        "text": "    recentCallingPackage=app.passengercount"
+      },
+      {
+        "index": 4145,
+        "text": "    recentCallingUid=10209"
+      },
+      {
+        "index": 4146,
+        "text": "    mAllowStart_noBinding=DENIED"
+      },
+      {
+        "index": 4147,
+        "text": "    mAllowStart_inBindService=DENIED"
+      },
+      {
+        "index": 4148,
+        "text": "    mAllowStart_byBindings=DENIED"
+      },
+      {
+        "index": 4149,
+        "text": "    getFgsAllowStart_legacy=DENIED"
+      },
+      {
+        "index": 4150,
+        "text": "    getFgsAllowStart_new=DENIED"
+      },
+      {
+        "index": 4151,
+        "text": "    getFgsAllowStart=DENIED"
+      },
+      {
+        "index": 4152,
+        "text": "    startForegroundCount=1"
+      },
+      {
+        "index": 4153,
+        "text": "    infoAllowStartForeground=null"
+      },
+      {
+        "index": 4154,
+        "text": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)"
+      },
+      {
+        "index": 4155,
+        "text": "    createTime=-13s932ms startingBgTimeout=--"
+      },
+      {
+        "index": 4156,
+        "text": "    lastActivity=-13s928ms restartTime=-13s928ms createdFromFg=false"
+      },
+      {
+        "index": 4157,
+        "text": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1"
+      },
+      {
+        "index": 4158,
+        "text": " startCommandResult=1"
+      },
+      {
+        "index": 4159,
+        "text": "    restartCount=1 restartDelay=-53s346ms nextRestartTime=+18s935ms crashCount=0"
+      },
+      {
+        "index": 4160,
+        "text": ""
+      },
+      {
+        "index": 4161,
+        "text": "  Connection bindings to services:"
+      },
+      {
+        "index": 4162,
+        "text": "  * ConnectionRecord{c5d7689 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@282d90 flags=0x1081}"
+      },
+      {
+        "index": 4163,
+        "text": "    binding=AppBindRecord{a023da8 com.google.android.gms/.chimera.PersistentApiService:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4164,
+        "text": "    conn=android.os.BinderProxy@282d90 flags=0x1081"
+      },
+      {
+        "index": 4165,
+        "text": "  * ConnectionRecord{1da846 u0 CR !FG !VIS com.google.android.gms/com.google.android.location.internal.server.HardwareArProviderService:@394c21 flags=0x40000005}"
+      },
+      {
+        "index": 4166,
+        "text": "    binding=AppBindRecord{bd26228 com.google.android.gms/com.google.android.location.internal.server.HardwareArProviderService:system}"
+      },
+      {
+        "index": 4167,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@394c21 flags=0x40000005"
+      },
+      {
+        "index": 4168,
+        "text": "  * ConnectionRecord{350f3cd u0 CR WACT CAPS com.google.android.gms/.icing.service.IndexService:@5a0564 flags=0x1081}"
+      },
+      {
+        "index": 4169,
+        "text": "    binding=AppBindRecord{8dbaebe com.google.android.gms/.icing.service.IndexService:com.google.android.gms}"
+      },
+      {
+        "index": 4170,
+        "text": "    conn=android.os.BinderProxy@5a0564 flags=0x1081"
+      },
+      {
+        "index": 4171,
+        "text": "  * ConnectionRecord{53902e4 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@611677 flags=0x1081}"
+      },
+      {
+        "index": 4172,
+        "text": "    binding=AppBindRecord{449d470 com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4173,
+        "text": "    conn=android.os.BinderProxy@611677 flags=0x1081"
+      },
+      {
+        "index": 4174,
+        "text": "  * ConnectionRecord{252cf7f u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@64189e flags=0x1081}"
+      },
+      {
+        "index": 4175,
+        "text": "    binding=AppBindRecord{4075d4 com.google.android.gms/.chimera.PersistentApiService:com.google.android.apps.wellbeing}"
+      },
+      {
+        "index": 4176,
+        "text": "    conn=android.os.BinderProxy@64189e flags=0x1081"
+      },
+      {
+        "index": 4177,
+        "text": "  * ConnectionRecord{58ec812 u0 CR WACT CAPS com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:@771b9d flags=0x1081}"
+      },
+      {
+        "index": 4178,
+        "text": "    binding=AppBindRecord{aa48a7b com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:com.google.android.settings.intelligence}"
+      },
+      {
+        "index": 4179,
+        "text": "    conn=android.os.BinderProxy@771b9d flags=0x1081"
+      },
+      {
+        "index": 4180,
+        "text": "  * ConnectionRecord{aca716 u0 CR FGS com.google.android.gms/.chimera.PersistentBoundBrokerService:@dcc431 flags=0x4000001}"
+      },
+      {
+        "index": 4181,
+        "text": "    binding=AppBindRecord{d624fcc com.google.android.gms/.chimera.PersistentBoundBrokerService:system}"
+      },
+      {
+        "index": 4182,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@dcc431 flags=0x4000001"
+      },
+      {
+        "index": 4183,
+        "text": "  * ConnectionRecord{e77065f u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@ed5efe flags=0x1081}"
+      },
+      {
+        "index": 4184,
+        "text": "    binding=AppBindRecord{ecf986e com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms.unstable}"
+      },
+      {
+        "index": 4185,
+        "text": "    conn=android.os.BinderProxy@ed5efe flags=0x1081"
+      },
+      {
+        "index": 4186,
+        "text": "  * ConnectionRecord{abe31aa u0 CR WACT CAPS com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:@f24c95 flags=0x1081}"
+      },
+      {
+        "index": 4187,
+        "text": "    binding=AppBindRecord{86d15d9 com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4188,
+        "text": "    conn=android.os.BinderProxy@f24c95 flags=0x1081"
+      },
+      {
+        "index": 4189,
+        "text": "  * ConnectionRecord{3fc1e7a u0 CR !FG !VIS com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:@113aaa5 flags=0x40000005}"
+      },
+      {
+        "index": 4190,
+        "text": "    binding=AppBindRecord{11b64d6 com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:system}"
+      },
+      {
+        "index": 4191,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@113aaa5 flags=0x40000005"
+      },
+      {
+        "index": 4192,
+        "text": "  * ConnectionRecord{280a6ce u0 CR !FG !VIS com.google.android.gms/.location.geocode.GeocodeService:@1368fc9 flags=0x40000005}"
+      },
+      {
+        "index": 4193,
+        "text": "    binding=AppBindRecord{471f45d com.google.android.gms/.location.geocode.GeocodeService:system}"
+      },
+      {
+        "index": 4194,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@1368fc9 flags=0x40000005"
+      },
+      {
+        "index": 4195,
+        "text": "  * ConnectionRecord{912533c u0 com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:@176912f flags=0x0}"
+      },
+      {
+        "index": 4196,
+        "text": "    binding=AppBindRecord{d76a558 com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:com.google.android.apps.nexuslauncher}"
+      },
+      {
+        "index": 4197,
+        "text": "    activity=ActivityRecord{b47ddba u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t7}"
+      },
+      {
+        "index": 4198,
+        "text": "    conn=android.os.BinderProxy@176912f flags=0x0"
+      },
+      {
+        "index": 4199,
+        "text": "  * ConnectionRecord{b12b0a4 u0 CR WACT CAPS com.google.android.gms/.auth.be.appcert.AppCertService:@181e337 flags=0x1081}"
+      },
+      {
+        "index": 4200,
+        "text": "    binding=AppBindRecord{324f64c com.google.android.gms/.auth.be.appcert.AppCertService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4201,
+        "text": "    conn=android.os.BinderProxy@181e337 flags=0x1081"
+      },
+      {
+        "index": 4202,
+        "text": "  * ConnectionRecord{ae62ad1 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@19d65f8 flags=0x1081}"
+      },
+      {
+        "index": 4203,
+        "text": "    binding=AppBindRecord{f4efafa com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.apps.wellbeing}"
+      },
+      {
+        "index": 4204,
+        "text": "    conn=android.os.BinderProxy@19d65f8 flags=0x1081"
+      },
+      {
+        "index": 4205,
+        "text": "  * ConnectionRecord{5896bfd u0 CR WACT CAPS com.google.android.gms/.auth.GetToken:@1a58054 flags=0x1081}"
+      },
+      {
+        "index": 4206,
+        "text": "    binding=AppBindRecord{e11c4b4 com.google.android.gms/.auth.GetToken:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4207,
+        "text": "    conn=android.os.BinderProxy@1a58054 flags=0x1081"
+      },
+      {
+        "index": 4208,
+        "text": "  * ConnectionRecord{5ebbbc3 u0 CR com.google.android.as/com.google.android.apps.miphone.aiai.common.superpacks.impl.AiAiSuperpacksService:@1bfbb72 flags=0x1}"
+      },
+      {
+        "index": 4209,
+        "text": "    binding=AppBindRecord{ab4626a com.google.android.as/com.google.android.apps.miphone.aiai.common.superpacks.impl.AiAiSuperpacksService:com.google.android.as}"
+      },
+      {
+        "index": 4210,
+        "text": "    conn=android.os.BinderProxy@1bfbb72 flags=0x1"
+      },
+      {
+        "index": 4211,
+        "text": "  * ConnectionRecord{cf3b820 u0 CR com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService:@1c4ab23 flags=0x1}"
+      },
+      {
+        "index": 4212,
+        "text": "    binding=AppBindRecord{7670b99 com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService:system}"
+      },
+      {
+        "index": 4213,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@1c4ab23 flags=0x1"
+      },
+      {
+        "index": 4214,
+        "text": "  * ConnectionRecord{4bb65eb u0 CR WACT CAPS com.google.android.gms/com.google.android.location.reporting.service.ReportingAndroidService:@1c8953a flags=0x1081}"
+      },
+      {
+        "index": 4215,
+        "text": "    binding=AppBindRecord{84db008 com.google.android.gms/com.google.android.location.reporting.service.ReportingAndroidService:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4216,
+        "text": "    conn=android.os.BinderProxy@1c8953a flags=0x1081"
+      },
+      {
+        "index": 4217,
+        "text": "  * ConnectionRecord{dedfcf8 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@1cc1c5b flags=0x1081}"
+      },
+      {
+        "index": 4218,
+        "text": "    binding=AppBindRecord{819a29b com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4219,
+        "text": "    conn=android.os.BinderProxy@1cc1c5b flags=0x1081"
+      },
+      {
+        "index": 4220,
+        "text": "  * ConnectionRecord{be875c7 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@21acb06 flags=0x1081}"
+      },
+      {
+        "index": 4221,
+        "text": "    binding=AppBindRecord{d2519c0 com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4222,
+        "text": "    conn=android.os.BinderProxy@21acb06 flags=0x1081"
+      },
+      {
+        "index": 4223,
+        "text": "  * ConnectionRecord{2efa015 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@22215cc flags=0x1081}"
+      },
+      {
+        "index": 4224,
+        "text": "    binding=AppBindRecord{67e0f43 com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4225,
+        "text": "    conn=android.os.BinderProxy@22215cc flags=0x1081"
+      },
+      {
+        "index": 4226,
+        "text": "  * ConnectionRecord{6af495d u0 CR WACT CAPS com.google.android.gms/.chimera.GmsBoundBrokerService:@22cf734 flags=0x1081}"
+      },
+      {
+        "index": 4227,
+        "text": "    binding=AppBindRecord{3dab284 com.google.android.gms/.chimera.GmsBoundBrokerService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4228,
+        "text": "    conn=android.os.BinderProxy@22cf734 flags=0x1081"
+      },
+      {
+        "index": 4229,
+        "text": "  * ConnectionRecord{3eef393 u0 CR FGS CAPS com.google.android.as/com.google.android.apps.miphone.aiai.captions.SystemCaptionsManagerService:@290b082 flags=0x4001001}"
+      },
+      {
+        "index": 4230,
+        "text": "    binding=AppBindRecord{2ebe23f com.google.android.as/com.google.android.apps.miphone.aiai.captions.SystemCaptionsManagerService:system}"
+      },
+      {
+        "index": 4231,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@290b082 flags=0x4001001"
+      },
+      {
+        "index": 4232,
+        "text": "  * ConnectionRecord{a91ad9a u0 CR com.android.carrierconfig/.DefaultCarrierConfigService:@2978245 flags=0x1}"
+      },
+      {
+        "index": 4233,
+        "text": "    binding=AppBindRecord{88dc047 com.android.carrierconfig/.DefaultCarrierConfigService:com.android.phone}"
+      },
+      {
+        "index": 4234,
+        "text": "    conn=android.os.BinderProxy@2978245 flags=0x1"
+      },
+      {
+        "index": 4235,
+        "text": "  * ConnectionRecord{ea9a5ea u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@2cde9d5 flags=0x1081}"
+      },
+      {
+        "index": 4236,
+        "text": "    binding=AppBindRecord{c004069 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4237,
+        "text": "    conn=android.os.BinderProxy@2cde9d5 flags=0x1081"
+      },
+      {
+        "index": 4238,
+        "text": "  * ConnectionRecord{df6e5f9 u0 CR com.google.android.as/com.google.android.apps.miphone.aiai.common.superpacks.impl.AiAiSuperpacksService:@2ecf4c0 flags=0x1}"
+      },
+      {
+        "index": 4239,
+        "text": "    binding=AppBindRecord{ab4626a com.google.android.as/com.google.android.apps.miphone.aiai.common.superpacks.impl.AiAiSuperpacksService:com.google.android.as}"
+      },
+      {
+        "index": 4240,
+        "text": "    conn=android.os.BinderProxy@2ecf4c0 flags=0x1"
+      },
+      {
+        "index": 4241,
+        "text": "  * ConnectionRecord{b089192 u0 CR WACT CAPS com.google.android.gms/.auth.GetToken:@2fc1b1d flags=0x1081}"
+      },
+      {
+        "index": 4242,
+        "text": "    binding=AppBindRecord{71f7d87 com.google.android.gms/.auth.GetToken:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4243,
+        "text": "    conn=android.os.BinderProxy@2fc1b1d flags=0x1081"
+      },
+      {
+        "index": 4244,
+        "text": "  * ConnectionRecord{726c482 u0 CR !FG !VIS com.google.android.gms/com.google.android.location.network.NetworkLocationService:@31883cd flags=0x40000005}"
+      },
+      {
+        "index": 4245,
+        "text": "    binding=AppBindRecord{72fd75f com.google.android.gms/com.google.android.location.network.NetworkLocationService:system}"
+      },
+      {
+        "index": 4246,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@31883cd flags=0x40000005"
+      },
+      {
+        "index": 4247,
+        "text": "  * ConnectionRecord{be8d6d4 u0 CR FGS CAPS com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiPredictionService:@3bd0427 flags=0x4001001}"
+      },
+      {
+        "index": 4248,
+        "text": "    binding=AppBindRecord{81d0d68 com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiPredictionService:system}"
+      },
+      {
+        "index": 4249,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@3bd0427 flags=0x4001001"
+      },
+      {
+        "index": 4250,
+        "text": "  * ConnectionRecord{24ee820 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@3ce9b23 flags=0x1081}"
+      },
+      {
+        "index": 4251,
+        "text": "    binding=AppBindRecord{e470611 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4252,
+        "text": "    conn=android.os.BinderProxy@3ce9b23 flags=0x1081"
+      },
+      {
+        "index": 4253,
+        "text": "  * ConnectionRecord{fafb0d5 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiServiceNoInstantApps:@408f18c flags=0x1081}"
+      },
+      {
+        "index": 4254,
+        "text": "    binding=AppBindRecord{e0dad0d com.google.android.gms/.chimera.PersistentApiServiceNoInstantApps:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4255,
+        "text": "    conn=android.os.BinderProxy@408f18c flags=0x1081"
+      },
+      {
+        "index": 4256,
+        "text": "  * ConnectionRecord{87f31c7 u0 CR com.google.android.googlequicksearchbox/androidx.room.MultiInstanceInvalidationService:@426f706 flags=0x1}"
+      },
+      {
+        "index": 4257,
+        "text": "    binding=AppBindRecord{bf72cd5 com.google.android.googlequicksearchbox/androidx.room.MultiInstanceInvalidationService:com.google.android.googlequicksearchbox:interactor}"
+      },
+      {
+        "index": 4258,
+        "text": "    conn=android.os.BinderProxy@426f706 flags=0x1"
+      },
+      {
+        "index": 4259,
+        "text": "  * ConnectionRecord{ec5a100 u0 CR WACT CAPS com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:@43b2b83 flags=0x1081}"
+      },
+      {
+        "index": 4260,
+        "text": "    binding=AppBindRecord{a607820 com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4261,
+        "text": "    conn=android.os.BinderProxy@43b2b83 flags=0x1081"
+      },
+      {
+        "index": 4262,
+        "text": "  * ConnectionRecord{f8b3a8c u0 CR com.google.android.as/androidx.room.MultiInstanceInvalidationService:@45043bf flags=0x1}"
+      },
+      {
+        "index": 4263,
+        "text": "    binding=AppBindRecord{f5c6ef4 com.google.android.as/androidx.room.MultiInstanceInvalidationService:com.google.android.as}"
+      },
+      {
+        "index": 4264,
+        "text": "    conn=android.os.BinderProxy@45043bf flags=0x1"
+      },
+      {
+        "index": 4265,
+        "text": "  * ConnectionRecord{456ec7 u0 CR com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService:@45c0806 flags=0x1}"
+      },
+      {
+        "index": 4266,
+        "text": "    binding=AppBindRecord{7670b99 com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService:system}"
+      },
+      {
+        "index": 4267,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@45c0806 flags=0x1"
+      },
+      {
+        "index": 4268,
+        "text": "  * ConnectionRecord{3312ada u0 CR FGS com.google.android.gms/.chimera.PersistentBoundBrokerService:@4bdac85 flags=0x4000001}"
+      },
+      {
+        "index": 4269,
+        "text": "    binding=AppBindRecord{13daecd com.google.android.gms/.chimera.PersistentBoundBrokerService:system}"
+      },
+      {
+        "index": 4270,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@4bdac85 flags=0x4000001"
+      },
+      {
+        "index": 4271,
+        "text": "  * ConnectionRecord{49f6254 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@5508da7 flags=0x1081}"
+      },
+      {
+        "index": 4272,
+        "text": "    binding=AppBindRecord{643cdf0 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.googlequicksearchbox:interactor}"
+      },
+      {
+        "index": 4273,
+        "text": "    conn=android.os.BinderProxy@5508da7 flags=0x1081"
+      },
+      {
+        "index": 4274,
+        "text": "  * ConnectionRecord{4d91a2a u0 CR !FG !VIS com.google.android.gms/.geotimezone.GeoTimeZoneService:@57d8715 flags=0x40000005}"
+      },
+      {
+        "index": 4275,
+        "text": "    binding=AppBindRecord{9fcd102 com.google.android.gms/.geotimezone.GeoTimeZoneService:system}"
+      },
+      {
+        "index": 4276,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@57d8715 flags=0x40000005"
+      },
+      {
+        "index": 4277,
+        "text": "  * ConnectionRecord{3d5cf1e u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@5a0e759 flags=0x1081}"
+      },
+      {
+        "index": 4278,
+        "text": "    binding=AppBindRecord{8daa49a com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4279,
+        "text": "    conn=android.os.BinderProxy@5a0e759 flags=0x1081"
+      },
+      {
+        "index": 4280,
+        "text": "  * ConnectionRecord{cf60804 u0 CR IMP com.google.android.apps.safetyhub/.fcmreceiver.FcmReceiverService:@5c87c17 flags=0x41}"
+      },
+      {
+        "index": 4281,
+        "text": "    binding=AppBindRecord{b1460d8 com.google.android.apps.safetyhub/.fcmreceiver.FcmReceiverService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4282,
+        "text": "    conn=android.os.BinderProxy@5c87c17 flags=0x41"
+      },
+      {
+        "index": 4283,
+        "text": "  * ConnectionRecord{d7c1296 u0 CR com.google.android.gms/.chimera.GmsInternalBoundBrokerService:@5e0adb1 flags=0x1}"
+      },
+      {
+        "index": 4284,
+        "text": "    binding=AppBindRecord{60ee27 com.google.android.gms/.chimera.GmsInternalBoundBrokerService:com.google.android.gms}"
+      },
+      {
+        "index": 4285,
+        "text": "    conn=android.os.BinderProxy@5e0adb1 flags=0x1"
+      },
+      {
+        "index": 4286,
+        "text": "  * ConnectionRecord{7dbfa78 u0 CR WACT CAPS com.google.android.gms/.chimera.GmsBoundBrokerService:@5e59fdb flags=0x1081}"
+      },
+      {
+        "index": 4287,
+        "text": "    binding=AppBindRecord{c9a6a6d com.google.android.gms/.chimera.GmsBoundBrokerService:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4288,
+        "text": "    conn=android.os.BinderProxy@5e59fdb flags=0x1081"
+      },
+      {
+        "index": 4289,
+        "text": "  * ConnectionRecord{b299810 u0 CR FGS CAPS com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiSearchUiService:@60754d3 flags=0x4001001}"
+      },
+      {
+        "index": 4290,
+        "text": "    binding=AppBindRecord{3af436e com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiSearchUiService:system}"
+      },
+      {
+        "index": 4291,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@60754d3 flags=0x4001001"
+      },
+      {
+        "index": 4292,
+        "text": "  * ConnectionRecord{e4b66ce u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@6744fc9 flags=0x1081}"
+      },
+      {
+        "index": 4293,
+        "text": "    binding=AppBindRecord{b27ab8f com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4294,
+        "text": "    conn=android.os.BinderProxy@6744fc9 flags=0x1081"
+      },
+      {
+        "index": 4295,
+        "text": "  * ConnectionRecord{53cde4f u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiServiceNoInstantApps:@6a4e0ae flags=0x1081}"
+      },
+      {
+        "index": 4296,
+        "text": "    binding=AppBindRecord{3ae3b36 com.google.android.gms/.chimera.PersistentApiServiceNoInstantApps:com.google.android.settings.intelligence}"
+      },
+      {
+        "index": 4297,
+        "text": "    conn=android.os.BinderProxy@6a4e0ae flags=0x1081"
+      },
+      {
+        "index": 4298,
+        "text": "  * ConnectionRecord{a412f70 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentBoundBrokerService:@6ab2db3 flags=0x1081}"
+      },
+      {
+        "index": 4299,
+        "text": "    binding=AppBindRecord{e184ad0 com.google.android.gms/.chimera.PersistentBoundBrokerService:com.google.android.gms}"
+      },
+      {
+        "index": 4300,
+        "text": "    conn=android.os.BinderProxy@6ab2db3 flags=0x1081"
+      },
+      {
+        "index": 4301,
+        "text": "  * ConnectionRecord{d0bb3e5 u0 CR IMP com.google.android.networkstack/com.android.server.NetworkStackService:@6b5d6dc flags=0x41}"
+      },
+      {
+        "index": 4302,
+        "text": "    binding=AppBindRecord{8b5fc8 com.google.android.networkstack/com.android.server.NetworkStackService:system}"
+      },
+      {
+        "index": 4303,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@6b5d6dc flags=0x41"
+      },
+      {
+        "index": 4304,
+        "text": "  * ConnectionRecord{1ae4124 u0 CR com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService:@70765b7 flags=0x1}"
+      },
+      {
+        "index": 4305,
+        "text": "    binding=AppBindRecord{7670b99 com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiAugmentedAutofillService:system}"
+      },
+      {
+        "index": 4306,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@70765b7 flags=0x1"
+      },
+      {
+        "index": 4307,
+        "text": "  * ConnectionRecord{84c1469 u0 CR WACT CAPS com.google.android.gms/.icing.service.AppIndexingService:@71916f0 flags=0x1081}"
+      },
+      {
+        "index": 4308,
+        "text": "    binding=AppBindRecord{97cf7b0 com.google.android.gms/.icing.service.AppIndexingService:com.google.android.gms}"
+      },
+      {
+        "index": 4309,
+        "text": "    conn=android.os.BinderProxy@71916f0 flags=0x1081"
+      },
+      {
+        "index": 4310,
+        "text": "  * ConnectionRecord{8bd7bc5 u0 CR FGS CAPS com.google.android.googlequicksearchbox/com.google.android.voiceinteraction.GsaVoiceInteractionService:@734523c flags=0x4101001}"
+      },
+      {
+        "index": 4311,
+        "text": "    binding=AppBindRecord{700e25b com.google.android.googlequicksearchbox/com.google.android.voiceinteraction.GsaVoiceInteractionService:system}"
+      },
+      {
+        "index": 4312,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@734523c flags=0x4101001"
+      },
+      {
+        "index": 4313,
+        "text": "  * ConnectionRecord{89a14a2 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@744806d flags=0x1081}"
+      },
+      {
+        "index": 4314,
+        "text": "    binding=AppBindRecord{550f37d com.google.android.gms/.chimera.PersistentApiService:com.google.android.inputmethod.latin}"
+      },
+      {
+        "index": 4315,
+        "text": "    conn=android.os.BinderProxy@744806d flags=0x1081"
+      },
+      {
+        "index": 4316,
+        "text": "  * ConnectionRecord{822e5b0 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@744d4f3 flags=0x1081}"
+      },
+      {
+        "index": 4317,
+        "text": "    binding=AppBindRecord{1ae2925 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.partnersetup}"
+      },
+      {
+        "index": 4318,
+        "text": "    conn=android.os.BinderProxy@744d4f3 flags=0x1081"
+      },
+      {
+        "index": 4319,
+        "text": "  * ConnectionRecord{eeb6078 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@79adddb flags=0x1081}"
+      },
+      {
+        "index": 4320,
+        "text": "    binding=AppBindRecord{e1894d9 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4321,
+        "text": "    conn=android.os.BinderProxy@79adddb flags=0x1081"
+      },
+      {
+        "index": 4322,
+        "text": "  * ConnectionRecord{b4dd2c u0 CR com.android.phone/com.android.internal.telephony.data.CellularDataService:@7a64cdf flags=0x1}"
+      },
+      {
+        "index": 4323,
+        "text": "    binding=AppBindRecord{8174cbc com.android.phone/com.android.internal.telephony.data.CellularDataService:com.android.phone}"
+      },
+      {
+        "index": 4324,
+        "text": "    conn=android.os.BinderProxy@7a64cdf flags=0x1"
+      },
+      {
+        "index": 4325,
+        "text": "  * ConnectionRecord{5b78497 u0 CR !FG !PRCP com.google.android.partnersetup/.PhenotypeJobService:@7b49316 flags=0x8105}"
+      },
+      {
+        "index": 4326,
+        "text": "    binding=AppBindRecord{e168076 com.google.android.partnersetup/.PhenotypeJobService:system}"
+      },
+      {
+        "index": 4327,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@7b49316 flags=0x8105"
+      },
+      {
+        "index": 4328,
+        "text": "  * ConnectionRecord{8043545 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@7e401bc flags=0x1081}"
+      },
+      {
+        "index": 4329,
+        "text": "    binding=AppBindRecord{a142fb4 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4330,
+        "text": "    conn=android.os.BinderProxy@7e401bc flags=0x1081"
+      },
+      {
+        "index": 4331,
+        "text": "  * ConnectionRecord{c1a9823 u0 CR !FG IMPB SLTA !VIS com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME:@7e8cd52 flags=0x40880005}"
+      },
+      {
+        "index": 4332,
+        "text": "    binding=AppBindRecord{223cdf3 com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME:system}"
+      },
+      {
+        "index": 4333,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@7e8cd52 flags=0x40880005"
+      },
+      {
+        "index": 4334,
+        "text": "  * ConnectionRecord{387ba86 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@8133f61 flags=0x1081}"
+      },
+      {
+        "index": 4335,
+        "text": "    binding=AppBindRecord{173a9af com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4336,
+        "text": "    conn=android.os.BinderProxy@8133f61 flags=0x1081"
+      },
+      {
+        "index": 4337,
+        "text": "  * ConnectionRecord{8d09987 u0 CR com.android.systemui/.keyguard.KeyguardService:@84225c6 flags=0x1}"
+      },
+      {
+        "index": 4338,
+        "text": "    binding=AppBindRecord{334874f com.android.systemui/.keyguard.KeyguardService:system}"
+      },
+      {
+        "index": 4339,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@84225c6 flags=0x1"
+      },
+      {
+        "index": 4340,
+        "text": "  * ConnectionRecord{50bf6cb u0 CR WACT CAPS com.google.android.gms/.chimera.GmsBoundBrokerService:@86f5d9a flags=0x1081}"
+      },
+      {
+        "index": 4341,
+        "text": "    binding=AppBindRecord{d034097 com.google.android.gms/.chimera.GmsBoundBrokerService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4342,
+        "text": "    conn=android.os.BinderProxy@86f5d9a flags=0x1081"
+      },
+      {
+        "index": 4343,
+        "text": "  * ConnectionRecord{5034a30 u0 CR WACT CAPS com.google.android.gms/.instantapps.service.InstantAppsService:@88dfb73 flags=0x1081}"
+      },
+      {
+        "index": 4344,
+        "text": "    binding=AppBindRecord{2d34989 com.google.android.gms/.instantapps.service.InstantAppsService:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4345,
+        "text": "    conn=android.os.BinderProxy@88dfb73 flags=0x1081"
+      },
+      {
+        "index": 4346,
+        "text": "  * ConnectionRecord{1d7829a u0 CR com.google.android.googlequicksearchbox/androidx.room.MultiInstanceInvalidationService:@8ab8b45 flags=0x1}"
+      },
+      {
+        "index": 4347,
+        "text": "    binding=AppBindRecord{9a52cea com.google.android.googlequicksearchbox/androidx.room.MultiInstanceInvalidationService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4348,
+        "text": "    conn=android.os.BinderProxy@8ab8b45 flags=0x1"
+      },
+      {
+        "index": 4349,
+        "text": "  * ConnectionRecord{93a6daf u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@8ab918e flags=0x1081}"
+      },
+      {
+        "index": 4350,
+        "text": "    binding=AppBindRecord{5c3ce1c com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4351,
+        "text": "    conn=android.os.BinderProxy@8ab918e flags=0x1081"
+      },
+      {
+        "index": 4352,
+        "text": "  * ConnectionRecord{bee6726 u0 CR WPRI FGSA com.google.android.permissioncontroller/com.android.permissioncontroller.permission.service.v33.SafetyCenterQsTileService:@8ac3a81 flags=0x2000021}"
+      },
+      {
+        "index": 4353,
+        "text": "    binding=AppBindRecord{ec408bd com.google.android.permissioncontroller/com.android.permissioncontroller.permission.service.v33.SafetyCenterQsTileService:com.android.systemui}"
+      },
+      {
+        "index": 4354,
+        "text": "    conn=android.os.BinderProxy@8ac3a81 flags=0x2000021"
+      },
+      {
+        "index": 4355,
+        "text": "  * ConnectionRecord{3c1289c u0 CR IMP com.google.android.bluetooth/com.android.bluetooth.btservice.AdapterService:@8afe00f flags=0x41}"
+      },
+      {
+        "index": 4356,
+        "text": "    binding=AppBindRecord{da72626 com.google.android.bluetooth/com.android.bluetooth.btservice.AdapterService:system}"
+      },
+      {
+        "index": 4357,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@8afe00f flags=0x41"
+      },
+      {
+        "index": 4358,
+        "text": "  * ConnectionRecord{548b752 u0 CR WACT CAPS com.google.android.gms/.icing.service.IndexService:@8b23fdd flags=0x1081}"
+      },
+      {
+        "index": 4359,
+        "text": "    binding=AppBindRecord{9bb7b1f com.google.android.gms/.icing.service.IndexService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4360,
+        "text": "    conn=android.os.BinderProxy@8b23fdd flags=0x1081"
+      },
+      {
+        "index": 4361,
+        "text": "  * ConnectionRecord{477541d u0 CR WPRI com.google.android.googlequicksearchbox/org.chromium.content.app.SandboxedProcessService0:0:@8b774f4 flags=0x80000021}"
+      },
+      {
+        "index": 4362,
+        "text": "    binding=AppBindRecord{1ec6b23 com.google.android.googlequicksearchbox/org.chromium.content.app.SandboxedProcessService0:0:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4363,
+        "text": "    conn=android.os.BinderProxy@8b774f4 flags=0x80000021"
+      },
+      {
+        "index": 4364,
+        "text": "  * ConnectionRecord{afbfb61 u0 CR IMP FGS com.android.server.telecom/.components.TelecomService:@8bcdec8 flags=0x4000041}"
+      },
+      {
+        "index": 4365,
+        "text": "    binding=AppBindRecord{7c402e5 com.android.server.telecom/.components.TelecomService:system}"
+      },
+      {
+        "index": 4366,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@8bcdec8 flags=0x4000041"
+      },
+      {
+        "index": 4367,
+        "text": "  * ConnectionRecord{6844ee8 u0 CR com.google.android.googlequicksearchbox/com.google.frameworks.client.data.android.server.tiktok.SearchProcessEndpointService:@8c1c00b flags=0x1}"
+      },
+      {
+        "index": 4368,
+        "text": "    binding=AppBindRecord{2226b44 com.google.android.googlequicksearchbox/com.google.frameworks.client.data.android.server.tiktok.SearchProcessEndpointService:com.google.android.googlequicksearchbox:interactor}"
+      },
+      {
+        "index": 4369,
+        "text": "    conn=android.os.BinderProxy@8c1c00b flags=0x1"
+      },
+      {
+        "index": 4370,
+        "text": "  * ConnectionRecord{bc5947a u0 CR !FG !PRCP com.google.android.settings.intelligence/.modules.appsearchindexing.impl.AppSearchIndexUpdateJobService:@8e138a5 flags=0x8105}"
+      },
+      {
+        "index": 4371,
+        "text": "    binding=AppBindRecord{8221b9b com.google.android.settings.intelligence/.modules.appsearchindexing.impl.AppSearchIndexUpdateJobService:system}"
+      },
+      {
+        "index": 4372,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@8e138a5 flags=0x8105"
+      },
+      {
+        "index": 4373,
+        "text": "  * ConnectionRecord{2a1b440 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentBoundBrokerService:@8fa83c3 flags=0x1081}"
+      },
+      {
+        "index": 4374,
+        "text": "    binding=AppBindRecord{c3f3c31 com.google.android.gms/.chimera.PersistentBoundBrokerService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4375,
+        "text": "    conn=android.os.BinderProxy@8fa83c3 flags=0x1081"
+      },
+      {
+        "index": 4376,
+        "text": "  * ConnectionRecord{a206846 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@98f0c21 flags=0x1081}"
+      },
+      {
+        "index": 4377,
+        "text": "    binding=AppBindRecord{82211ec com.google.android.gms/.chimera.PersistentApiService:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4378,
+        "text": "    conn=android.os.BinderProxy@98f0c21 flags=0x1081"
+      },
+      {
+        "index": 4379,
+        "text": "  * ConnectionRecord{6e74409 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@9aac110 flags=0x1081}"
+      },
+      {
+        "index": 4380,
+        "text": "    binding=AppBindRecord{191b40 com.google.android.gms/.chimera.PersistentApiService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4381,
+        "text": "    conn=android.os.BinderProxy@9aac110 flags=0x1081"
+      },
+      {
+        "index": 4382,
+        "text": "  * ConnectionRecord{3ff127c u0 CR com.google.android.webview/org.chromium.android_webview.services.MetricsBridgeService:@9adc56f flags=0x1}"
+      },
+      {
+        "index": 4383,
+        "text": "    binding=AppBindRecord{7ef8312 com.google.android.webview/org.chromium.android_webview.services.MetricsBridgeService:com.google.android.webview:webview_apk}"
+      },
+      {
+        "index": 4384,
+        "text": "    conn=android.os.BinderProxy@9adc56f flags=0x1"
+      },
+      {
+        "index": 4385,
+        "text": "  * ConnectionRecord{b65119 u0 CR com.google.android.permissioncontroller/com.android.permissioncontroller.permission.service.PermissionControllerServiceImpl:@9e89860 flags=0x1}"
+      },
+      {
+        "index": 4386,
+        "text": "    binding=AppBindRecord{6a4970a com.google.android.permissioncontroller/com.android.permissioncontroller.permission.service.PermissionControllerServiceImpl:system}"
+      },
+      {
+        "index": 4387,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@9e89860 flags=0x1"
+      },
+      {
+        "index": 4388,
+        "text": "  * ConnectionRecord{5855026 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@a192781 flags=0x1081}"
+      },
+      {
+        "index": 4389,
+        "text": "    binding=AppBindRecord{3c7d9a2 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.apps.wellbeing}"
+      },
+      {
+        "index": 4390,
+        "text": "    conn=android.os.BinderProxy@a192781 flags=0x1081"
+      },
+      {
+        "index": 4391,
+        "text": "  * ConnectionRecord{67696bd u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@a359e14 flags=0x1081}"
+      },
+      {
+        "index": 4392,
+        "text": "    binding=AppBindRecord{124a6f9 com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4393,
+        "text": "    conn=android.os.BinderProxy@a359e14 flags=0x1081"
+      },
+      {
+        "index": 4394,
+        "text": "  * ConnectionRecord{5c6aef6 u0 CR !FG !VIS com.google.android.gms/com.google.android.location.fused.FusedLocationService:@a3c7f91 flags=0x40000005}"
+      },
+      {
+        "index": 4395,
+        "text": "    binding=AppBindRecord{1fdca63 com.google.android.gms/com.google.android.location.fused.FusedLocationService:system}"
+      },
+      {
+        "index": 4396,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@a3c7f91 flags=0x40000005"
+      },
+      {
+        "index": 4397,
+        "text": "  * ConnectionRecord{2baf42 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@a47618d flags=0x1081}"
+      },
+      {
+        "index": 4398,
+        "text": "    binding=AppBindRecord{a5957dd com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4399,
+        "text": "    conn=android.os.BinderProxy@a47618d flags=0x1081"
+      },
+      {
+        "index": 4400,
+        "text": "  * ConnectionRecord{7d7d2c4 u0 CR com.google.android.googlequicksearchbox/org.chromium.content.app.SandboxedProcessService0:0:@abbb9d7 flags=0x80000001}"
+      },
+      {
+        "index": 4401,
+        "text": "    binding=AppBindRecord{1ec6b23 com.google.android.googlequicksearchbox/org.chromium.content.app.SandboxedProcessService0:0:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4402,
+        "text": "    conn=android.os.BinderProxy@abbb9d7 flags=0x80000001"
+      },
+      {
+        "index": 4403,
+        "text": "  * ConnectionRecord{993106b u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@ae259ba flags=0x1081}"
+      },
+      {
+        "index": 4404,
+        "text": "    binding=AppBindRecord{46f6b08 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.settings.intelligence}"
+      },
+      {
+        "index": 4405,
+        "text": "    conn=android.os.BinderProxy@ae259ba flags=0x1081"
+      },
+      {
+        "index": 4406,
+        "text": "  * ConnectionRecord{bdb19e2 u0 CR FGSA com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:@afd52ad flags=0x2000001}"
+      },
+      {
+        "index": 4407,
+        "text": "    binding=AppBindRecord{51ff8ca com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:com.android.systemui}"
+      },
+      {
+        "index": 4408,
+        "text": "    conn=android.os.BinderProxy@afd52ad flags=0x2000001"
+      },
+      {
+        "index": 4409,
+        "text": "  * ConnectionRecord{f78b9c8 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@b2b8a6b flags=0x1081}"
+      },
+      {
+        "index": 4410,
+        "text": "    binding=AppBindRecord{1eab5ed com.google.android.gms/.chimera.PersistentApiService:com.google.android.settings.intelligence}"
+      },
+      {
+        "index": 4411,
+        "text": "    conn=android.os.BinderProxy@b2b8a6b flags=0x1081"
+      },
+      {
+        "index": 4412,
+        "text": "  * ConnectionRecord{3200b53 u0 CR android/.hardware.location.GeofenceHardwareService:@b7c4f42 flags=0x1}"
+      },
+      {
+        "index": 4413,
+        "text": "    binding=AppBindRecord{264b797 android/.hardware.location.GeofenceHardwareService:system}"
+      },
+      {
+        "index": 4414,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@b7c4f42 flags=0x1"
+      },
+      {
+        "index": 4415,
+        "text": "  * ConnectionRecord{b61ca49 u0 CR IMP com.google.android.providers.media.module/com.android.providers.media.fuse.ExternalStorageServiceImpl:@b7e7850 flags=0x41}"
+      },
+      {
+        "index": 4416,
+        "text": "    binding=AppBindRecord{34a1242 com.google.android.providers.media.module/com.android.providers.media.fuse.ExternalStorageServiceImpl:system}"
+      },
+      {
+        "index": 4417,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@b7e7850 flags=0x41"
+      },
+      {
+        "index": 4418,
+        "text": "  * ConnectionRecord{cc3ae78 u0 CR com.google.android.googlequicksearchbox/com.google.android.apps.search.googleapp.search.suggest.plugins.onesearch.server.OneSearchSuggestService:@b8ba3db flags=0x1}"
+      },
+      {
+        "index": 4419,
+        "text": "    binding=AppBindRecord{b279a0c com.google.android.googlequicksearchbox/com.google.android.apps.search.googleapp.search.suggest.plugins.onesearch.server.OneSearchSuggestService:com.google.android.apps.nexuslauncher}"
+      },
+      {
+        "index": 4420,
+        "text": "    conn=android.os.BinderProxy@b8ba3db flags=0x1"
+      },
+      {
+        "index": 4421,
+        "text": "  * ConnectionRecord{4be41e1 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@b9a2f48 flags=0x1081}"
+      },
+      {
+        "index": 4422,
+        "text": "    binding=AppBindRecord{e077fa com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4423,
+        "text": "    conn=android.os.BinderProxy@b9a2f48 flags=0x1081"
+      },
+      {
+        "index": 4424,
+        "text": "  * ConnectionRecord{602376a u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@bcfd155 flags=0x1081}"
+      },
+      {
+        "index": 4425,
+        "text": "    binding=AppBindRecord{3a326c3 com.google.android.gms/.chimera.PersistentApiService:com.google.android.tts}"
+      },
+      {
+        "index": 4426,
+        "text": "    conn=android.os.BinderProxy@bcfd155 flags=0x1081"
+      },
+      {
+        "index": 4427,
+        "text": "  * ConnectionRecord{5e39376 u0 CR WPRI FGSA com.google.android.gms/.nearby.sharing.SharingTileService:@be42611 flags=0x2000021}"
+      },
+      {
+        "index": 4428,
+        "text": "    binding=AppBindRecord{25b4299 com.google.android.gms/.nearby.sharing.SharingTileService:com.android.systemui}"
+      },
+      {
+        "index": 4429,
+        "text": "    conn=android.os.BinderProxy@be42611 flags=0x2000021"
+      },
+      {
+        "index": 4430,
+        "text": "  * ConnectionRecord{bea2a73 u0 CR com.android.phone/com.android.internal.telephony.CellularNetworkService:@becf6e2 flags=0x1}"
+      },
+      {
+        "index": 4431,
+        "text": "    binding=AppBindRecord{a5e7959 com.android.phone/com.android.internal.telephony.CellularNetworkService:com.android.phone}"
+      },
+      {
+        "index": 4432,
+        "text": "    conn=android.os.BinderProxy@becf6e2 flags=0x1"
+      },
+      {
+        "index": 4433,
+        "text": "  * ConnectionRecord{e2f2b0 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@bf8f5f3 flags=0x1081}"
+      },
+      {
+        "index": 4434,
+        "text": "    binding=AppBindRecord{f2ed92b com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4435,
+        "text": "    conn=android.os.BinderProxy@bf8f5f3 flags=0x1081"
+      },
+      {
+        "index": 4436,
+        "text": "  * ConnectionRecord{1f5776c u0 CR !FG !PRCP com.google.android.providers.media.module/com.android.providers.media.MediaService:@bfbe81f flags=0x8105}"
+      },
+      {
+        "index": 4437,
+        "text": "    binding=AppBindRecord{e3b6649 com.google.android.providers.media.module/com.android.providers.media.MediaService:system}"
+      },
+      {
+        "index": 4438,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@bfbe81f flags=0x8105"
+      },
+      {
+        "index": 4439,
+        "text": "  * ConnectionRecord{8ff058d u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentBoundBrokerService:@c124624 flags=0x1081}"
+      },
+      {
+        "index": 4440,
+        "text": "    binding=AppBindRecord{a29bf16 com.google.android.gms/.chimera.PersistentBoundBrokerService:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4441,
+        "text": "    conn=android.os.BinderProxy@c124624 flags=0x1081"
+      },
+      {
+        "index": 4442,
+        "text": "  * ConnectionRecord{c6e1ce8 u0 CR WACT CAPS com.google.android.gms/.gcm.http.GoogleHttpService:@c1a060b flags=0x1081}"
+      },
+      {
+        "index": 4443,
+        "text": "    binding=AppBindRecord{d9272f0 com.google.android.gms/.gcm.http.GoogleHttpService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4444,
+        "text": "    conn=android.os.BinderProxy@c1a060b flags=0x1081"
+      },
+      {
+        "index": 4445,
+        "text": "  * ConnectionRecord{6f940fa u0 CR com.google.android.cellbroadcastservice/com.android.cellbroadcastservice.DefaultCellBroadcastService:@c1dc725 flags=0x1}"
+      },
+      {
+        "index": 4446,
+        "text": "    binding=AppBindRecord{cd225b3 com.google.android.cellbroadcastservice/com.android.cellbroadcastservice.DefaultCellBroadcastService:com.android.phone}"
+      },
+      {
+        "index": 4447,
+        "text": "    conn=android.os.BinderProxy@c1dc725 flags=0x1"
+      },
+      {
+        "index": 4448,
+        "text": "  * ConnectionRecord{99ed813 u0 CR com.google.android.cellbroadcastservice/com.android.cellbroadcastservice.DefaultCellBroadcastService:@c1dc725 flags=0x1}"
+      },
+      {
+        "index": 4449,
+        "text": "    binding=AppBindRecord{cd225b3 com.google.android.cellbroadcastservice/com.android.cellbroadcastservice.DefaultCellBroadcastService:com.android.phone}"
+      },
+      {
+        "index": 4450,
+        "text": "    conn=android.os.BinderProxy@c1dc725 flags=0x1"
+      },
+      {
+        "index": 4451,
+        "text": "  * ConnectionRecord{334b2f3 u0 CR com.android.systemui/com.google.android.systemui.power.batteryevent.domain.BatteryEventService:@c225162 flags=0x1}"
+      },
+      {
+        "index": 4452,
+        "text": "    binding=AppBindRecord{f1c3e12 com.android.systemui/com.google.android.systemui.power.batteryevent.domain.BatteryEventService:com.android.systemui}"
+      },
+      {
+        "index": 4453,
+        "text": "    conn=android.os.BinderProxy@c225162 flags=0x1"
+      },
+      {
+        "index": 4454,
+        "text": "  * ConnectionRecord{172cfae u0 CR com.google.android.googlequicksearchbox/com.google.frameworks.client.data.android.server.tiktok.InteractorProcessEndpointService:@c265029 flags=0x1}"
+      },
+      {
+        "index": 4455,
+        "text": "    binding=AppBindRecord{9c0a8b5 com.google.android.googlequicksearchbox/com.google.frameworks.client.data.android.server.tiktok.InteractorProcessEndpointService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4456,
+        "text": "    conn=android.os.BinderProxy@c265029 flags=0x1"
+      },
+      {
+        "index": 4457,
+        "text": "  * ConnectionRecord{acc28fe u0 CR FGS !PRCP com.google.android.as/com.google.android.apps.miphone.aiai.common.notification.service.AiAiNotificationListenerService:@c32fcb9 flags=0x5000101}"
+      },
+      {
+        "index": 4458,
+        "text": "    binding=AppBindRecord{782b93e com.google.android.as/com.google.android.apps.miphone.aiai.common.notification.service.AiAiNotificationListenerService:system}"
+      },
+      {
+        "index": 4459,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@c32fcb9 flags=0x5000101"
+      },
+      {
+        "index": 4460,
+        "text": "  * ConnectionRecord{8d53d97 u0 CR com.google.android.webview/org.chromium.android_webview.services.MetricsBridgeService:@c419016 flags=0x1}"
+      },
+      {
+        "index": 4461,
+        "text": "    binding=AppBindRecord{f49e29d com.google.android.webview/org.chromium.android_webview.services.MetricsBridgeService:com.google.android.webview:webview_service}"
+      },
+      {
+        "index": 4462,
+        "text": "    conn=android.os.BinderProxy@c419016 flags=0x1"
+      },
+      {
+        "index": 4463,
+        "text": "  * ConnectionRecord{193f1f4 u0 CR WACT CAPS com.google.android.gms/.chimera.GmsInternalApiService:@c4517c7 flags=0x1081}"
+      },
+      {
+        "index": 4464,
+        "text": "    binding=AppBindRecord{40ac151 com.google.android.gms/.chimera.GmsInternalApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4465,
+        "text": "    conn=android.os.BinderProxy@c4517c7 flags=0x1081"
+      },
+      {
+        "index": 4466,
+        "text": "  * ConnectionRecord{3d1e4c u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@c505e7f flags=0x1081}"
+      },
+      {
+        "index": 4467,
+        "text": "    binding=AppBindRecord{156fc04 com.google.android.gms/.chimera.PersistentApiService:com.google.android.apps.wellbeing}"
+      },
+      {
+        "index": 4468,
+        "text": "    conn=android.os.BinderProxy@c505e7f flags=0x1081"
+      },
+      {
+        "index": 4469,
+        "text": "  * ConnectionRecord{fe0c0b3 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@c62fe22 flags=0x1081}"
+      },
+      {
+        "index": 4470,
+        "text": "    binding=AppBindRecord{6a7ae9e com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4471,
+        "text": "    conn=android.os.BinderProxy@c62fe22 flags=0x1081"
+      },
+      {
+        "index": 4472,
+        "text": "  * ConnectionRecord{3b7f705 u0 CR FGS !PRCP com.google.android.apps.nexuslauncher/com.android.launcher3.notification.NotificationListener:@c6ab27c flags=0x5000101}"
+      },
+      {
+        "index": 4473,
+        "text": "    binding=AppBindRecord{7a83643 com.google.android.apps.nexuslauncher/com.android.launcher3.notification.NotificationListener:system}"
+      },
+      {
+        "index": 4474,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@c6ab27c flags=0x5000101"
+      },
+      {
+        "index": 4475,
+        "text": "  * ConnectionRecord{f1aee6e u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@c74b1e9 flags=0x1081}"
+      },
+      {
+        "index": 4476,
+        "text": "    binding=AppBindRecord{97d71ab com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4477,
+        "text": "    conn=android.os.BinderProxy@c74b1e9 flags=0x1081"
+      },
+      {
+        "index": 4478,
+        "text": "  * ConnectionRecord{644fb18 u0 CR !FG !PRCP com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService:@c85befb flags=0x8105}"
+      },
+      {
+        "index": 4479,
+        "text": "    binding=AppBindRecord{18d6ba com.google.android.googlequicksearchbox/com.google.android.apps.gsa.tasks.BackgroundTasksJobService:system}"
+      },
+      {
+        "index": 4480,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@c85befb flags=0x8105"
+      },
+      {
+        "index": 4481,
+        "text": "  * ConnectionRecord{6c0dc19 u0 CR WACT CAPS com.google.android.gms/.chimera.GmsBoundBrokerService:@caa6f60 flags=0x1081}"
+      },
+      {
+        "index": 4482,
+        "text": "    binding=AppBindRecord{5a17130 com.google.android.gms/.chimera.GmsBoundBrokerService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4483,
+        "text": "    conn=android.os.BinderProxy@caa6f60 flags=0x1081"
+      },
+      {
+        "index": 4484,
+        "text": "  * ConnectionRecord{622aa1 u0 CR WACT CAPS com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:@cad4308 flags=0x1081}"
+      },
+      {
+        "index": 4485,
+        "text": "    binding=AppBindRecord{764320a com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4486,
+        "text": "    conn=android.os.BinderProxy@cad4308 flags=0x1081"
+      },
+      {
+        "index": 4487,
+        "text": "  * ConnectionRecord{aed112b u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@cd4e57a flags=0x1081}"
+      },
+      {
+        "index": 4488,
+        "text": "    binding=AppBindRecord{c9c3e9 com.google.android.gms/.chimera.PersistentApiService:com.google.android.gms}"
+      },
+      {
+        "index": 4489,
+        "text": "    conn=android.os.BinderProxy@cd4e57a flags=0x1081"
+      },
+      {
+        "index": 4490,
+        "text": "  * ConnectionRecord{993b36a u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@d09bd55 flags=0x1081}"
+      },
+      {
+        "index": 4491,
+        "text": "    binding=AppBindRecord{2d37a25 com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4492,
+        "text": "    conn=android.os.BinderProxy@d09bd55 flags=0x1081"
+      },
+      {
+        "index": 4493,
+        "text": "  * ConnectionRecord{134d582 u0 CR FGSA UI CAPS com.android.systemui/.wallpapers.ImageWallpaper:@d4038cd flags=0x22001001}"
+      },
+      {
+        "index": 4494,
+        "text": "    binding=AppBindRecord{49e4746 com.android.systemui/.wallpapers.ImageWallpaper:system}"
+      },
+      {
+        "index": 4495,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@d4038cd flags=0x22001001"
+      },
+      {
+        "index": 4496,
+        "text": "  * ConnectionRecord{615c8ad u0 CR WACT CAPS com.google.android.gms/.droidguard.DroidGuardService:@d4ba1c4 flags=0x1081}"
+      },
+      {
+        "index": 4497,
+        "text": "    binding=AppBindRecord{98a6f42 com.google.android.gms/.droidguard.DroidGuardService:com.google.android.gms}"
+      },
+      {
+        "index": 4498,
+        "text": "    conn=android.os.BinderProxy@d4ba1c4 flags=0x1081"
+      },
+      {
+        "index": 4499,
+        "text": "  * ConnectionRecord{70b3c5 u0 CR com.google.android.googlequicksearchbox/com.google.android.apps.gsa.nga.engine.viss.NgaService:@d516a3c flags=0x1}"
+      },
+      {
+        "index": 4500,
+        "text": "    binding=AppBindRecord{6427754 com.google.android.googlequicksearchbox/com.google.android.apps.gsa.nga.engine.viss.NgaService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4501,
+        "text": "    conn=android.os.BinderProxy@d516a3c flags=0x1"
+      },
+      {
+        "index": 4502,
+        "text": "  * ConnectionRecord{6fb2b35 u0 CR WACT CAPS com.google.android.gms/.checkin.CheckinApiService:@d86596c flags=0x1081}"
+      },
+      {
+        "index": 4503,
+        "text": "    binding=AppBindRecord{10287a com.google.android.gms/.checkin.CheckinApiService:com.google.android.gms.unstable}"
+      },
+      {
+        "index": 4504,
+        "text": "    conn=android.os.BinderProxy@d86596c flags=0x1081"
+      },
+      {
+        "index": 4505,
+        "text": "  * ConnectionRecord{9ce5d27 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@d9433e6 flags=0x1081}"
+      },
+      {
+        "index": 4506,
+        "text": "    binding=AppBindRecord{d55f272 com.google.android.gms/.chimera.PersistentApiService:com.google.android.googlequicksearchbox:interactor}"
+      },
+      {
+        "index": 4507,
+        "text": "    conn=android.os.BinderProxy@d9433e6 flags=0x1081"
+      },
+      {
+        "index": 4508,
+        "text": "  * ConnectionRecord{84e4587 u0 CR FGS com.google.android.as/com.google.android.apps.miphone.aiai.common.notification.service.AiAiNotificationAssistantService:@dbb01c6 flags=0x5000001}"
+      },
+      {
+        "index": 4509,
+        "text": "    binding=AppBindRecord{61c340d com.google.android.as/com.google.android.apps.miphone.aiai.common.notification.service.AiAiNotificationAssistantService:system}"
+      },
+      {
+        "index": 4510,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@dbb01c6 flags=0x5000001"
+      },
+      {
+        "index": 4511,
+        "text": "  * ConnectionRecord{4c16b7d u0 CR FGS CAPS com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiSmartspaceService:@dc7cdd4 flags=0x4001001}"
+      },
+      {
+        "index": 4512,
+        "text": "    binding=AppBindRecord{6bdfb3c com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiSmartspaceService:system}"
+      },
+      {
+        "index": 4513,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@dc7cdd4 flags=0x4001001"
+      },
+      {
+        "index": 4514,
+        "text": "  * ConnectionRecord{a068892 u0 CR !FG !PRCP com.google.android.as/com.google.android.apps.miphone.aiai.common.superpacks.impl.AiAiPersistentDownloadJobService:@deb8e1d flags=0x8105}"
+      },
+      {
+        "index": 4515,
+        "text": "    binding=AppBindRecord{37c2d72 com.google.android.as/com.google.android.apps.miphone.aiai.common.superpacks.impl.AiAiPersistentDownloadJobService:system}"
+      },
+      {
+        "index": 4516,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@deb8e1d flags=0x8105"
+      },
+      {
+        "index": 4517,
+        "text": "  * ConnectionRecord{788dd3b u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@e1a8b4b flags=0x1081}"
+      },
+      {
+        "index": 4518,
+        "text": "    binding=AppBindRecord{43bf27 com.google.android.gms/.chimera.PersistentApiService:com.google.android.partnersetup}"
+      },
+      {
+        "index": 4519,
+        "text": "    conn=android.os.BinderProxy@e1a8b4b flags=0x1081"
+      },
+      {
+        "index": 4520,
+        "text": "  * ConnectionRecord{d3db013 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@e2a8f02 flags=0x1081}"
+      },
+      {
+        "index": 4521,
+        "text": "    binding=AppBindRecord{8cdad7f com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.gms.unstable}"
+      },
+      {
+        "index": 4522,
+        "text": "    conn=android.os.BinderProxy@e2a8f02 flags=0x1081"
+      },
+      {
+        "index": 4523,
+        "text": "  * ConnectionRecord{4f9f074 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@ea20047 flags=0x1081}"
+      },
+      {
+        "index": 4524,
+        "text": "    binding=AppBindRecord{16dedee com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4525,
+        "text": "    conn=android.os.BinderProxy@ea20047 flags=0x1081"
+      },
+      {
+        "index": 4526,
+        "text": "  * ConnectionRecord{f2af9e0 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentBoundBrokerService:@eacdbe3 flags=0x1081}"
+      },
+      {
+        "index": 4527,
+        "text": "    binding=AppBindRecord{6bc631b com.google.android.gms/.chimera.PersistentBoundBrokerService:com.google.android.googlequicksearchbox:search}"
+      },
+      {
+        "index": 4528,
+        "text": "    conn=android.os.BinderProxy@eacdbe3 flags=0x1081"
+      },
+      {
+        "index": 4529,
+        "text": "  * ConnectionRecord{a42c62f u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:@eb3fc0e flags=0x1081}"
+      },
+      {
+        "index": 4530,
+        "text": "    binding=AppBindRecord{9f19aee com.google.android.gms/.chimera.PersistentDirectBootAwareApiService:com.google.android.apps.messaging}"
+      },
+      {
+        "index": 4531,
+        "text": "    conn=android.os.BinderProxy@eb3fc0e flags=0x1081"
+      },
+      {
+        "index": 4532,
+        "text": "  * ConnectionRecord{18b16d u0 CR com.google.android.googlequicksearchbox/com.google.android.apps.search.googleapp.search.suggest.plugins.onesearch.server.OneSearchSuggestService:@ed9b584 flags=0x1}"
+      },
+      {
+        "index": 4533,
+        "text": "    binding=AppBindRecord{b279a0c com.google.android.googlequicksearchbox/com.google.android.apps.search.googleapp.search.suggest.plugins.onesearch.server.OneSearchSuggestService:com.google.android.apps.nexuslauncher}"
+      },
+      {
+        "index": 4534,
+        "text": "    conn=android.os.BinderProxy@ed9b584 flags=0x1"
+      },
+      {
+        "index": 4535,
+        "text": "  * ConnectionRecord{7bb82ba u0 CR com.google.android.as.oss/com.google.android.apps.miphone.astrea.grpc.AstreaGrpcService:@edcf7e5 flags=0x1}"
+      },
+      {
+        "index": 4536,
+        "text": "    binding=AppBindRecord{83049f1 com.google.android.as.oss/com.google.android.apps.miphone.astrea.grpc.AstreaGrpcService:com.google.android.as}"
+      },
+      {
+        "index": 4537,
+        "text": "    conn=android.os.BinderProxy@edcf7e5 flags=0x1"
+      },
+      {
+        "index": 4538,
+        "text": "  * ConnectionRecord{dc9734 u0 CR !FG !PRCP com.google.android.gms/.phenotype.service.sync.PhenotypeConfigurator:@ee00a07 flags=0x105}"
+      },
+      {
+        "index": 4539,
+        "text": "    binding=AppBindRecord{26bf3de com.google.android.gms/.phenotype.service.sync.PhenotypeConfigurator:com.google.android.gms.persistent}"
+      },
+      {
+        "index": 4540,
+        "text": "    conn=android.os.BinderProxy@ee00a07 flags=0x105"
+      },
+      {
+        "index": 4541,
+        "text": "  * ConnectionRecord{642dbcf u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiServiceNoInstantApps:@f36642e flags=0x1081}"
+      },
+      {
+        "index": 4542,
+        "text": "    binding=AppBindRecord{d543d8e com.google.android.gms/.chimera.PersistentApiServiceNoInstantApps:com.google.android.gms.ui}"
+      },
+      {
+        "index": 4543,
+        "text": "    conn=android.os.BinderProxy@f36642e flags=0x1081"
+      },
+      {
+        "index": 4544,
+        "text": "  * ConnectionRecord{e4ea84a u0 CR FGS CAPS com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiContentCaptureService:@f75f9b5 flags=0x4001001}"
+      },
+      {
+        "index": 4545,
+        "text": "    binding=AppBindRecord{2522180 com.google.android.as/com.google.android.apps.miphone.aiai.app.AiAiContentCaptureService:system}"
+      },
+      {
+        "index": 4546,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@f75f9b5 flags=0x4001001"
+      },
+      {
+        "index": 4547,
+        "text": "  * ConnectionRecord{4775545 u0 CR FGSA UI CAPS com.android.systemui/.wallpapers.ImageWallpaper:@fafa1bc flags=0x22001001}"
+      },
+      {
+        "index": 4548,
+        "text": "    binding=AppBindRecord{49e4746 com.android.systemui/.wallpapers.ImageWallpaper:system}"
+      },
+      {
+        "index": 4549,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@fafa1bc flags=0x22001001"
+      },
+      {
+        "index": 4550,
+        "text": "  * ConnectionRecord{232ccf5 u0 CR WACT CAPS com.google.android.gms/.chimera.PersistentApiService:@fb46a2c flags=0x1081}"
+      },
+      {
+        "index": 4551,
+        "text": "    binding=AppBindRecord{c5b31cb com.google.android.gms/.chimera.PersistentApiService:com.google.android.apps.safetyhub}"
+      },
+      {
+        "index": 4552,
+        "text": "    conn=android.os.BinderProxy@fb46a2c flags=0x1081"
+      },
+      {
+        "index": 4553,
+        "text": "  * ConnectionRecord{e11dc86 u0 CR IMP com.google.android.networkstack.tethering/com.android.networkstack.tethering.TetheringService:@fc8a961 flags=0x41}"
+      },
+      {
+        "index": 4554,
+        "text": "    binding=AppBindRecord{b57a56f com.google.android.networkstack.tethering/com.android.networkstack.tethering.TetheringService:system}"
+      },
+      {
+        "index": 4555,
+        "text": "    conn=android.app.LoadedApk$ServiceDispatcher$InnerConnection@fc8a961 flags=0x41"
+      },
+      {
+        "index": 4556,
+        "text": ""
+      },
+      {
+        "index": 4557,
+        "text": "Active foreground apps - user 0:"
+      },
+      {
+        "index": 4558,
+        "text": "  #1: app.passengercount.tests"
+      }
+    ]
+  }
+]

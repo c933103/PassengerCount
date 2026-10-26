@@ -1,0 +1,74 @@
+[
+  {
+    "archivePath": "exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "source.txt",
+    "bytes": 82,
+    "sha256": "fae7685a35acef991c520787314912784cb5d0cae285ae36c8252b0b26c27b0f",
+    "content": "e4fbfcacc112addcb3d1ae8d76e600a377b22864\nf5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb\n"
+  },
+  {
+    "archivePath": "apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "b1f532e7544d947a0cf3ad8c788424344a8fcb9ecf00404b78c8f453f836b3c7",
+    "content": "980e762f386e0bbaad950a462995cf34b081b27e12763427009edeee0a0c6e11  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\nb65c67513aac671f4c1122225cdb098d330353452cf996b58190fd67bb74c0f3  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "device-fingerprint.txt",
+    "bytes": 82,
+    "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+    "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+  },
+  {
+    "archivePath": "race-process-scope.txt",
+    "bytes": 48,
+    "sha256": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "content": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n"
+  },
+  {
+    "archivePath": "race-absent-pids.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "race-absent-pids.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "race-absent-pids.exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "race-trigger-slot.json",
+    "bytes": 633,
+    "sha256": "fb5d2d6249427de54ec84f1f671d8c3bb9f3ac96ebb9f1820404a979b908e7b1",
+    "content": "{\n  \"kind\": \"host-timing-observation-not-acceptance\",\n  \"clock\": \"time.monotonic_ns\",\n  \"clockImplementation\": \"clock_gettime(CLOCK_MONOTONIC)\",\n  \"clockResolutionSeconds\": 1e-09,\n  \"limitations\": [\n    \"Host timestamps bracket command slots, not device events.\",\n    \"Separate emulator boot/warmup, scheduling and memory pressure are uncontrolled confounds.\",\n    \"Idle replay is not timing equality or a causal/acceptance result.\"\n  ],\n  \"mode\": \"triggered\",\n  \"status\": \"measured\",\n  \"verifiedAbsenceNs\": 564447100063,\n  \"slotStartNs\": 564497340159,\n  \"slotEndNs\": 564603367688,\n  \"elapsedNs\": 106027529,\n  \"captureExitCode\": 0\n}\n"
+  },
+  {
+    "archivePath": "race-first-services-timing.json",
+    "bytes": 948,
+    "sha256": "6dca73c1230fe19c8a9d116c7e26766e17333ce5995bb1fe66c1f937d3fcff41",
+    "content": "{\n  \"kind\": \"host-timing-observation-not-acceptance\",\n  \"clock\": \"time.monotonic_ns\",\n  \"clockImplementation\": \"clock_gettime(CLOCK_MONOTONIC)\",\n  \"clockResolutionSeconds\": 1e-09,\n  \"limitations\": [\n    \"Host timestamps bracket command slots, not device events.\",\n    \"Separate emulator boot/warmup, scheduling and memory pressure are uncontrolled confounds.\",\n    \"Idle replay is not timing equality or a causal/acceptance result.\"\n  ],\n  \"mode\": \"triggered\",\n  \"status\": \"measured\",\n  \"verifiedAbsenceNs\": 564447100063,\n  \"firstServicesStartNs\": 565060962317,\n  \"firstServicesEndNs\": 565159848953,\n  \"servicesElapsedNs\": 98886636,\n  \"gapAfterSlotNs\": 457594629,\n  \"elapsedFromAbsenceNs\": 613862254,\n  \"slotEvidence\": {\n    \"path\": \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/race-trigger-slot.json\",\n    \"bytes\": 633,\n    \"sha256\": \"fb5d2d6249427de54ec84f1f671d8c3bb9f3ac96ebb9f1820404a979b908e7b1\"\n  }\n}\n"
+  },
+  {
+    "archivePath": "original-validation-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "diagnostic-step-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  }
+]

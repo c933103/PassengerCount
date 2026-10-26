@@ -1,0 +1,113 @@
+[
+  {
+    "result": {
+      "archivePath": "no-trigger-control/race-observation.KJvngs/result.json",
+      "bytes": 5770,
+      "sha256": "866261ef28fc13d21340a8f0f93003e1989458dc81ab8f178c6ffd254bb5f7fc",
+      "content": "{\n  \"outcome\": \"foreground-observed-no-trigger\",\n  \"process\": \"app.passengercount:tracking\",\n  \"oldPid\": \"3049\",\n  \"newPid\": \"3871\",\n  \"interleaved\": false,\n  \"cleanupDuringAbsence\": false,\n  \"triggerBeforeCleanup\": false,\n  \"foreground\": true,\n  \"lines\": {\n    \"marker\": 48150,\n    \"death\": 48232,\n    \"scheduled\": 48233,\n    \"entering\": -1,\n    \"promoted\": -1,\n    \"reset\": -1,\n    \"start\": 48694,\n    \"denied\": -1\n  },\n  \"kind\": \"independent-no-trigger-observation-not-acceptance\",\n  \"comparisonEligible\": true,\n  \"lifecycleVerified\": true,\n  \"unexpectedTrigger\": -1,\n  \"comparisonStatus\": \"observable\",\n  \"limitations\": [\n    \"No acceptance or GPS/session-continuity verdict; no helper reattachment.\",\n    \"Full process absence and host timing require the paired shell receipts.\",\n    \"Separate fresh emulators, warmup and runtime memory-pressure scheduling can differ; not a causal proof.\"\n  ],\n  \"evidence\": {\n    \"log\": {\n      \"path\": \"race-observation.KJvngs/logcat.txt\",\n      \"bytes\": 6750152,\n      \"sha256\": \"7e16d940a458742aaade72803890873cdf3adaa04a05edb1e6c20e5fedd51c2b\"\n    },\n    \"services\": {\n      \"path\": \"race-observation.KJvngs/services.txt\",\n      \"bytes\": 338187,\n      \"sha256\": \"e60ca6846b7775372a921e1f2f47d0e203cf394fc0b22a3150602fc1683b7fb0\"\n    },\n    \"absenceScope\": {\n      \"path\": \"race-process-scope.txt\",\n      \"bytes\": 54,\n      \"sha256\": \"e77b4dcb3af9203a2c4b7b1b2d0d00349b0cb82e32eb666447c9b0b5ff958684\"\n    },\n    \"absenceExit\": {\n      \"path\": \"race-absent-pids.exit-code.txt\",\n      \"bytes\": 2,\n      \"sha256\": \"4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865\"\n    },\n    \"absenceStdout\": {\n      \"path\": \"race-absent-pids.txt\",\n      \"bytes\": 0,\n      \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    \"absenceStderr\": {\n      \"path\": \"race-absent-pids.stderr\",\n      \"bytes\": 0,\n      \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\"\n    },\n    \"controlapkHashes\": {\n      \"path\": \"apk-sha256.txt\",\n      \"bytes\": 326,\n      \"sha256\": \"5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e\"\n    },\n    \"triggeredapkHashes\": {\n      \"path\": \"../apk-sha256.txt\",\n      \"bytes\": 326,\n      \"sha256\": \"5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e\"\n    },\n    \"controlfingerprint\": {\n      \"path\": \"device-fingerprint.txt\",\n      \"bytes\": 82,\n      \"sha256\": \"633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a\"\n    },\n    \"triggeredfingerprint\": {\n      \"path\": \"../device-fingerprint.txt\",\n      \"bytes\": 82,\n      \"sha256\": \"633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a\"\n    },\n    \"controlsource\": {\n      \"path\": \"source.txt\",\n      \"bytes\": 82,\n      \"sha256\": \"372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582\"\n    },\n    \"triggeredsource\": {\n      \"path\": \"../source.txt\",\n      \"bytes\": 82,\n      \"sha256\": \"372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582\"\n    },\n    \"controlSlotTiming\": {\n      \"path\": \"race-trigger-slot.json\",\n      \"bytes\": 949,\n      \"sha256\": \"a894b979cc14af7de024aacd3810bdb1084124e023ab44470636c2a8fac6eb33\"\n    },\n    \"firstServicesTiming\": {\n      \"path\": \"race-first-services-timing.json\",\n      \"bytes\": 977,\n      \"sha256\": \"f37e277b33881b6df46655e7a7534e072abf3f0efd6f702b1272dc3aa4c09fa5\"\n    },\n    \"triggeredSlotTiming\": {\n      \"path\": \"../race-trigger-slot.json\",\n      \"bytes\": 633,\n      \"sha256\": \"597bcb0f50562d2c54fbe7262f1a8be01361f3cb7043c599a0ea48bf650661bd\"\n    },\n    \"triggeredFirstServicesTiming\": {\n      \"path\": \"../race-first-services-timing.json\",\n      \"bytes\": 949,\n      \"sha256\": \"811937ff8dd5902ff946eeaeb19f351d3dc8d6c80ed2c488e1cbf96199ef4572\"\n    }\n  },\n  \"fullAbsenceReceiptVerified\": true,\n  \"comparisonTiming\": {\n    \"status\": \"measured-differences-not-matched\",\n    \"clock\": \"time.monotonic_ns\",\n    \"timingEqualityEstablished\": false,\n    \"triggered\": {\n      \"slotElapsedNs\": 231616666,\n      \"firstServicesFromAbsenceNs\": 762208599,\n      \"firstServicesAfterSlotNs\": 467910265,\n      \"servicesElapsedNs\": 146164700\n    },\n    \"control\": {\n      \"slotElapsedNs\": 232275173,\n      \"firstServicesFromAbsenceNs\": 681041349,\n      \"firstServicesAfterSlotNs\": 412901263,\n      \"servicesElapsedNs\": 140517710\n    },\n    \"controlMinusTriggered\": {\n      \"slotElapsedNs\": 658507,\n      \"firstServicesFromAbsenceNs\": -81167250,\n      \"firstServicesAfterSlotNs\": -55009002,\n      \"servicesElapsedNs\": -5646990\n    },\n    \"requestedReplayNs\": 231616666,\n    \"replayDifferenceNs\": 658507,\n    \"limitations\": [\n      \"Host-bracket measurements do not establish device-event timing equivalence.\",\n      \"Separate fresh emulators, warmup and memory-pressure restart rescheduling remain confounds.\"\n    ]\n  },\n  \"pairProvenance\": {\n    \"status\": \"matching-exact-receipts\",\n    \"apkSha256\": {\n      \"target\": \"79c31e14ebd3692d19c836c802ad25296f9d7a4aee959f6382781db2c620030f\",\n      \"fixture\": \"56aa24b39d0a28e2342ca1972d56fae9aaeb4b0c1a9e085650eb17cba3fc7820\"\n    },\n    \"installedFingerprint\": \"google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\",\n    \"source\": {\n      \"head\": \"5e1e340bba1299b670ee8ba2e39a402c7c2ab2af\",\n      \"tree\": \"8525b3ab50ef239a72465ac7d6b619223d635f38\"\n    },\n    \"wholeImageOrRuntimeEquivalenceEstablished\": false,\n    \"limitations\": [\n      \"Equal APK hashes, source head/tree and installed fingerprint receipts do not prove whole-image byte identity.\",\n      \"Runtime grants, process state, warmup and memory pressure are separate observations, not inferred equal.\"\n    ]\n  },\n  \"comparisonEligibilityScope\": \"Verified lifecycle and retained evidence only; not timing equivalence or causality.\",\n  \"controlEvidenceErrors\": []\n}\n"
+    },
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "no-trigger-control/race-observation.KJvngs/logcat.txt",
+        "bytes": 6750152,
+        "sha256": "7e16d940a458742aaade72803890873cdf3adaa04a05edb1e6c20e5fedd51c2b",
+        "captureExit": 0,
+        "stderrBytes": 0
+      },
+      {
+        "kind": "services",
+        "archivePath": "no-trigger-control/race-observation.KJvngs/services.txt",
+        "bytes": 338187,
+        "sha256": "e60ca6846b7775372a921e1f2f47d0e203cf394fc0b22a3150602fc1683b7fb0",
+        "captureExit": 0,
+        "stderrBytes": 0
+      },
+      {
+        "kind": "absenceScope",
+        "archivePath": "no-trigger-control/race-process-scope.txt",
+        "bytes": 54,
+        "sha256": "e77b4dcb3af9203a2c4b7b1b2d0d00349b0cb82e32eb666447c9b0b5ff958684"
+      },
+      {
+        "kind": "absenceExit",
+        "archivePath": "no-trigger-control/race-absent-pids.exit-code.txt",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "kind": "absenceStdout",
+        "archivePath": "no-trigger-control/race-absent-pids.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "kind": "absenceStderr",
+        "archivePath": "no-trigger-control/race-absent-pids.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "kind": "controlapkHashes",
+        "archivePath": "no-trigger-control/apk-sha256.txt",
+        "bytes": 326,
+        "sha256": "5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e"
+      },
+      {
+        "kind": "triggeredapkHashes",
+        "archivePath": "apk-sha256.txt",
+        "bytes": 326,
+        "sha256": "5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e"
+      },
+      {
+        "kind": "controlfingerprint",
+        "archivePath": "no-trigger-control/device-fingerprint.txt",
+        "bytes": 82,
+        "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+      },
+      {
+        "kind": "triggeredfingerprint",
+        "archivePath": "device-fingerprint.txt",
+        "bytes": 82,
+        "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+      },
+      {
+        "kind": "controlsource",
+        "archivePath": "no-trigger-control/source.txt",
+        "bytes": 82,
+        "sha256": "372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582"
+      },
+      {
+        "kind": "triggeredsource",
+        "archivePath": "source.txt",
+        "bytes": 82,
+        "sha256": "372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582"
+      },
+      {
+        "kind": "controlSlotTiming",
+        "archivePath": "no-trigger-control/race-trigger-slot.json",
+        "bytes": 949,
+        "sha256": "a894b979cc14af7de024aacd3810bdb1084124e023ab44470636c2a8fac6eb33"
+      },
+      {
+        "kind": "firstServicesTiming",
+        "archivePath": "no-trigger-control/race-first-services-timing.json",
+        "bytes": 977,
+        "sha256": "f37e277b33881b6df46655e7a7534e072abf3f0efd6f702b1272dc3aa4c09fa5"
+      },
+      {
+        "kind": "triggeredSlotTiming",
+        "archivePath": "race-trigger-slot.json",
+        "bytes": 633,
+        "sha256": "597bcb0f50562d2c54fbe7262f1a8be01361f3cb7043c599a0ea48bf650661bd"
+      },
+      {
+        "kind": "triggeredFirstServicesTiming",
+        "archivePath": "race-first-services-timing.json",
+        "bytes": 949,
+        "sha256": "811937ff8dd5902ff946eeaeb19f351d3dc8d6c80ed2c488e1cbf96199ef4572"
+      }
+    ],
+    "classifierExitCode": 0
+  }
+]

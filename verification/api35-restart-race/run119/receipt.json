@@ -1,0 +1,354 @@
+{
+  "source": {
+    "head": "61c3c6b156136ebf0cb4bf7e2ff2609b2ad67d5d",
+    "testedMerge": "e4fbfcacc112addcb3d1ae8d76e600a377b22864",
+    "tree": "f5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb",
+    "parents": [
+      "77fcc7685ceb4652c6089c14360fc166ebbe778d",
+      "61c3c6b156136ebf0cb4bf7e2ff2609b2ad67d5d"
+    ],
+    "runId": 40278271990,
+    "attempt": 1
+  },
+  "fullGateAccepted": false,
+  "conclusion": "failure",
+  "artifacts": [
+    {
+      "id": 12631801309,
+      "name": "PassengerCount-API35-lifecycle-e4fbfcacc112addcb3d1ae8d76e600a377b22864",
+      "size_in_bytes": 91534525,
+      "digest": "sha256:f8ed621444d2e4ef766e5784e24737be544dca20df2bd3751e70ea36585c9458",
+      "expires_at": "2027-01-24T06:10:26Z",
+      "zipVerified": true
+    },
+    {
+      "id": 12631048750,
+      "name": "PassengerCount-API35-restart-diagnostic-e4fbfcacc112addcb3d1ae8d76e600a377b22864",
+      "size_in_bytes": 137344696,
+      "digest": "sha256:8124977da5979d516a53043c6cc5aa7252e50a002bec244c71a7479c1a8184e7",
+      "expires_at": "2027-01-24T06:10:26Z",
+      "zipVerified": true
+    }
+  ],
+  "roles": {
+    "original": {
+      "artifactId": 12631801309,
+      "exitCode": 1,
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6778",
+        "newPid": "7027",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": false,
+        "lines": {
+          "marker": 79793,
+          "death": 79795,
+          "scheduled": 79796,
+          "entering": 79849,
+          "promoted": 79851,
+          "reset": -1,
+          "start": 79861,
+          "denied": 79879
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.r1SzCP/logcat.txt",
+            "bytes": 11531357,
+            "sha256": "b281a118fa31525d134a761a435c19279e72daabf48295bf9c88bb97dbba8b3c"
+          },
+          "services": {
+            "path": "race-observation.r1SzCP/services.txt",
+            "bytes": 2414,
+            "sha256": "0d6f064ad6bf80fc39c803d29c3b20c9478642ab5adbc35da6b4fac6faad5b4c"
+          }
+        }
+      },
+      "phaseCommandStatuses": {
+        "basics-command-exit-code.txt": "0\n",
+        "bootstrap-command-exit-code.txt": "0\n",
+        "ipc-basics-command-exit-code.txt": "0\n",
+        "ipc-death-command-exit-code.txt": "0\n",
+        "ipc-drain-command-exit-code.txt": "0\n",
+        "ipc-prepare-ui-death-command-exit-code.txt": "0\n",
+        "prepare-deleted-command-exit-code.txt": "0\n",
+        "prepare-denied-command-exit-code.txt": "0\n",
+        "prepare-ipc-barrier-command-exit-code.txt": "0\n",
+        "prepare-ipc-death-command-exit-code.txt": "0\n",
+        "prepare-ipc-pipe-command-exit-code.txt": "0\n",
+        "prepare-race-command-exit-code.txt": "0\n",
+        "prepare-valid-command-exit-code.txt": "0\n",
+        "receipts-final-command-exit-code.txt": "0\n",
+        "receipts-prepare-command-exit-code.txt": "0\n",
+        "receipts-recover-command-exit-code.txt": "0\n",
+        "recover-command-exit-code.txt": "0\n",
+        "recover-denied-command-exit-code.txt": "0\n",
+        "service-only-race/prepare-split-command-exit-code.txt": "0\n",
+        "service-only-race/verify-split-command-exit-code.txt": "0\n",
+        "verify-deleted-command-exit-code.txt": "0\n",
+        "verify-denied-command-exit-code.txt": "0\n",
+        "verify-ui-death-command-exit-code.txt": "0\n",
+        "verify-valid-command-exit-code.txt": "0\n"
+      },
+      "serviceOnlyResult": {
+        "outcome": "foreground-restored",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6242",
+        "newPid": "6778",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": true,
+        "lines": {
+          "marker": 78936,
+          "death": 78938,
+          "scheduled": 78939,
+          "entering": 78971,
+          "promoted": 78973,
+          "reset": -1,
+          "start": 78981,
+          "denied": -1
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.Vgkkxs/logcat.txt",
+            "bytes": 11384578,
+            "sha256": "f7a514aee9b4aff59b6fa00e75ee509670993f9e70e2d772948581903b3d9218"
+          },
+          "services": {
+            "path": "race-observation.Vgkkxs/services.txt",
+            "bytes": 8289,
+            "sha256": "ce0baefba6be33d0a9129af615302b8c3d2ac25813303978bf45c4e1c09a53d8"
+          }
+        }
+      }
+    },
+    "triggered": {
+      "artifactId": 12631048750,
+      "exitCode": 1,
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "3084",
+        "newPid": "3957",
+        "interleaved": true,
+        "cleanupDuringAbsence": true,
+        "triggerBeforeCleanup": true,
+        "foreground": false,
+        "lines": {
+          "marker": 47998,
+          "death": 48069,
+          "scheduled": 48070,
+          "entering": 48223,
+          "promoted": 48225,
+          "reset": 48226,
+          "start": 48335,
+          "denied": 48371
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.EUeNoO/logcat.txt",
+            "bytes": 6714826,
+            "sha256": "b90d46513084354ec5a12bccd959c6e686aa19d34d8bc645a861c3c423abe82d"
+          },
+          "services": {
+            "path": "race-observation.EUeNoO/services.txt",
+            "bytes": 319787,
+            "sha256": "228c76ed026957ea47bd569172cf60d6da6e5c09d021d3267d81192bb501a3c2"
+          }
+        }
+      }
+    },
+    "control": {
+      "artifactId": 12631048750,
+      "exitCode": 0,
+      "result": {
+        "outcome": "foreground-observed-no-trigger",
+        "process": "app.passengercount:tracking",
+        "oldPid": "3003",
+        "newPid": "4025",
+        "interleaved": false,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": true,
+        "lines": {
+          "marker": 48985,
+          "death": 48999,
+          "scheduled": 49000,
+          "entering": -1,
+          "promoted": -1,
+          "reset": -1,
+          "start": 49152,
+          "denied": -1
+        },
+        "kind": "independent-no-trigger-observation-not-acceptance",
+        "comparisonEligible": true,
+        "lifecycleVerified": true,
+        "unexpectedTrigger": -1,
+        "comparisonStatus": "observable",
+        "limitations": [
+          "No acceptance or GPS/session-continuity verdict; no helper reattachment.",
+          "Full process absence and host timing require the paired shell receipts.",
+          "Separate fresh emulators, warmup and runtime memory-pressure scheduling can differ; not a causal proof."
+        ],
+        "evidence": {
+          "log": {
+            "path": "race-observation.s51fsc/logcat.txt",
+            "bytes": 6759656,
+            "sha256": "f1c26bee9bd9e3c61984ef542eaaa50b9337b6a2ff46a54ce0248df9b0598ed8"
+          },
+          "services": {
+            "path": "race-observation.s51fsc/services.txt",
+            "bytes": 336846,
+            "sha256": "d43d844b411ca664be15e206094d679f7dad671dedd03b9d331f6b2d5bb79719"
+          },
+          "absenceScope": {
+            "path": "race-process-scope.txt",
+            "bytes": 54,
+            "sha256": "e77b4dcb3af9203a2c4b7b1b2d0d00349b0cb82e32eb666447c9b0b5ff958684"
+          },
+          "absenceExit": {
+            "path": "race-absent-pids.exit-code.txt",
+            "bytes": 2,
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+          },
+          "absenceStdout": {
+            "path": "race-absent-pids.txt",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "absenceStderr": {
+            "path": "race-absent-pids.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "controlapkHashes": {
+            "path": "apk-sha256.txt",
+            "bytes": 326,
+            "sha256": "b1f532e7544d947a0cf3ad8c788424344a8fcb9ecf00404b78c8f453f836b3c7"
+          },
+          "triggeredapkHashes": {
+            "path": "../apk-sha256.txt",
+            "bytes": 326,
+            "sha256": "b1f532e7544d947a0cf3ad8c788424344a8fcb9ecf00404b78c8f453f836b3c7"
+          },
+          "controlfingerprint": {
+            "path": "device-fingerprint.txt",
+            "bytes": 82,
+            "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+          },
+          "triggeredfingerprint": {
+            "path": "../device-fingerprint.txt",
+            "bytes": 82,
+            "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+          },
+          "controlsource": {
+            "path": "source.txt",
+            "bytes": 82,
+            "sha256": "fae7685a35acef991c520787314912784cb5d0cae285ae36c8252b0b26c27b0f"
+          },
+          "triggeredsource": {
+            "path": "../source.txt",
+            "bytes": 82,
+            "sha256": "fae7685a35acef991c520787314912784cb5d0cae285ae36c8252b0b26c27b0f"
+          },
+          "controlSlotTiming": {
+            "path": "race-trigger-slot.json",
+            "bytes": 948,
+            "sha256": "03d26718a97d9310a0e0c0c3e5ec483822110484031e52d0658c1303afb44f4b"
+          },
+          "firstServicesTiming": {
+            "path": "race-first-services-timing.json",
+            "bytes": 976,
+            "sha256": "27c660192fc8e4c25109ae978dc5d1b110c0981a144e16a26726e5f963da23d7"
+          },
+          "triggeredSlotTiming": {
+            "path": "../race-trigger-slot.json",
+            "bytes": 633,
+            "sha256": "fb5d2d6249427de54ec84f1f671d8c3bb9f3ac96ebb9f1820404a979b908e7b1"
+          },
+          "triggeredFirstServicesTiming": {
+            "path": "../race-first-services-timing.json",
+            "bytes": 948,
+            "sha256": "6dca73c1230fe19c8a9d116c7e26766e17333ce5995bb1fe66c1f937d3fcff41"
+          }
+        },
+        "fullAbsenceReceiptVerified": true,
+        "comparisonTiming": {
+          "status": "measured-differences-not-matched",
+          "clock": "time.monotonic_ns",
+          "timingEqualityEstablished": false,
+          "triggered": {
+            "slotElapsedNs": 106027529,
+            "firstServicesFromAbsenceNs": 613862254,
+            "firstServicesAfterSlotNs": 457594629,
+            "servicesElapsedNs": 98886636
+          },
+          "control": {
+            "slotElapsedNs": 106110954,
+            "firstServicesFromAbsenceNs": 352495609,
+            "firstServicesAfterSlotNs": 217143814,
+            "servicesElapsedNs": 48256821
+          },
+          "controlMinusTriggered": {
+            "slotElapsedNs": 83425,
+            "firstServicesFromAbsenceNs": -261366645,
+            "firstServicesAfterSlotNs": -240450815,
+            "servicesElapsedNs": -50629815
+          },
+          "requestedReplayNs": 106027529,
+          "replayDifferenceNs": 83425,
+          "limitations": [
+            "Host-bracket measurements do not establish device-event timing equivalence.",
+            "Separate fresh emulators, warmup and memory-pressure restart rescheduling remain confounds."
+          ]
+        },
+        "pairProvenance": {
+          "status": "matching-exact-receipts",
+          "apkSha256": {
+            "target": "980e762f386e0bbaad950a462995cf34b081b27e12763427009edeee0a0c6e11",
+            "fixture": "b65c67513aac671f4c1122225cdb098d330353452cf996b58190fd67bb74c0f3"
+          },
+          "installedFingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+          "source": {
+            "head": "e4fbfcacc112addcb3d1ae8d76e600a377b22864",
+            "tree": "f5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb"
+          },
+          "wholeImageOrRuntimeEquivalenceEstablished": false,
+          "limitations": [
+            "Equal APK hashes, source head/tree and installed fingerprint receipts do not prove whole-image byte identity.",
+            "Runtime grants, process state, warmup and memory pressure are separate observations, not inferred equal."
+          ]
+        },
+        "comparisonEligibilityScope": "Verified lifecycle and retained evidence only; not timing equivalence or causality.",
+        "controlEvidenceErrors": []
+      },
+      "triggeredEvidenceGuard": {
+        "rawReceipt": {
+          "archivePath": "no-trigger-control/triggered-input-hashes.txt",
+          "bytes": 49305,
+          "sha256": "9a3038e4a294c2e3dd11ac8b0fb00c98a23d975ef720fdaac084cacf0fbdd853"
+        },
+        "filesIndependentlyRehashed": 229,
+        "status": "verified-unchanged"
+      }
+    }
+  },
+  "jobLog": {
+    "bytes": 339460,
+    "sha256": "62c93ec6a0c29ba3558ffa30262e041b8a92b96272c810f15c12d1b28b98f536"
+  },
+  "hosted": {
+    "node": {
+      "passed": 591,
+      "failed": 0
+    },
+    "native": "passed",
+    "browser": "passed",
+    "appBuild": "passed",
+    "testBuild": "passed",
+    "originalLifecyclePhases": 13
+  }
+}

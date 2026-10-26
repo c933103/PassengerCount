@@ -1,0 +1,32 @@
+{
+  "outcome": "automatic-restart-denied",
+  "process": "app.passengercount:tracking",
+  "oldPid": "6670",
+  "newPid": "6903",
+  "interleaved": true,
+  "cleanupDuringAbsence": false,
+  "triggerBeforeCleanup": false,
+  "foreground": false,
+  "lines": {
+    "marker": 83439,
+    "death": 83445,
+    "scheduled": 83449,
+    "entering": 83556,
+    "promoted": 83558,
+    "reset": -1,
+    "start": 83562,
+    "denied": 83579
+  },
+  "evidence": {
+    "log": {
+      "path": "race-observation.BlQ7gc/logcat.txt",
+      "bytes": 11909578,
+      "sha256": "51f8d8a43dc9f88e3a62d30ac74492a17984d7301994fcf376aa73b7a5561664"
+    },
+    "services": {
+      "path": "race-observation.BlQ7gc/services.txt",
+      "bytes": 2403,
+      "sha256": "1f7f7f6013de863fb441352547506730995363d5bfb722609cd23783a5c9478b"
+    }
+  }
+}

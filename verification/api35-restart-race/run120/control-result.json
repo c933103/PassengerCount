@@ -1,0 +1,161 @@
+{
+  "outcome": "foreground-observed-no-trigger",
+  "process": "app.passengercount:tracking",
+  "oldPid": "3049",
+  "newPid": "3871",
+  "interleaved": false,
+  "cleanupDuringAbsence": false,
+  "triggerBeforeCleanup": false,
+  "foreground": true,
+  "lines": {
+    "marker": 48150,
+    "death": 48232,
+    "scheduled": 48233,
+    "entering": -1,
+    "promoted": -1,
+    "reset": -1,
+    "start": 48694,
+    "denied": -1
+  },
+  "kind": "independent-no-trigger-observation-not-acceptance",
+  "comparisonEligible": true,
+  "lifecycleVerified": true,
+  "unexpectedTrigger": -1,
+  "comparisonStatus": "observable",
+  "limitations": [
+    "No acceptance or GPS/session-continuity verdict; no helper reattachment.",
+    "Full process absence and host timing require the paired shell receipts.",
+    "Separate fresh emulators, warmup and runtime memory-pressure scheduling can differ; not a causal proof."
+  ],
+  "evidence": {
+    "log": {
+      "path": "race-observation.KJvngs/logcat.txt",
+      "bytes": 6750152,
+      "sha256": "7e16d940a458742aaade72803890873cdf3adaa04a05edb1e6c20e5fedd51c2b"
+    },
+    "services": {
+      "path": "race-observation.KJvngs/services.txt",
+      "bytes": 338187,
+      "sha256": "e60ca6846b7775372a921e1f2f47d0e203cf394fc0b22a3150602fc1683b7fb0"
+    },
+    "absenceScope": {
+      "path": "race-process-scope.txt",
+      "bytes": 54,
+      "sha256": "e77b4dcb3af9203a2c4b7b1b2d0d00349b0cb82e32eb666447c9b0b5ff958684"
+    },
+    "absenceExit": {
+      "path": "race-absent-pids.exit-code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "absenceStdout": {
+      "path": "race-absent-pids.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "absenceStderr": {
+      "path": "race-absent-pids.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "controlapkHashes": {
+      "path": "apk-sha256.txt",
+      "bytes": 326,
+      "sha256": "5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e"
+    },
+    "triggeredapkHashes": {
+      "path": "../apk-sha256.txt",
+      "bytes": 326,
+      "sha256": "5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e"
+    },
+    "controlfingerprint": {
+      "path": "device-fingerprint.txt",
+      "bytes": 82,
+      "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+    },
+    "triggeredfingerprint": {
+      "path": "../device-fingerprint.txt",
+      "bytes": 82,
+      "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a"
+    },
+    "controlsource": {
+      "path": "source.txt",
+      "bytes": 82,
+      "sha256": "372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582"
+    },
+    "triggeredsource": {
+      "path": "../source.txt",
+      "bytes": 82,
+      "sha256": "372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582"
+    },
+    "controlSlotTiming": {
+      "path": "race-trigger-slot.json",
+      "bytes": 949,
+      "sha256": "a894b979cc14af7de024aacd3810bdb1084124e023ab44470636c2a8fac6eb33"
+    },
+    "firstServicesTiming": {
+      "path": "race-first-services-timing.json",
+      "bytes": 977,
+      "sha256": "f37e277b33881b6df46655e7a7534e072abf3f0efd6f702b1272dc3aa4c09fa5"
+    },
+    "triggeredSlotTiming": {
+      "path": "../race-trigger-slot.json",
+      "bytes": 633,
+      "sha256": "597bcb0f50562d2c54fbe7262f1a8be01361f3cb7043c599a0ea48bf650661bd"
+    },
+    "triggeredFirstServicesTiming": {
+      "path": "../race-first-services-timing.json",
+      "bytes": 949,
+      "sha256": "811937ff8dd5902ff946eeaeb19f351d3dc8d6c80ed2c488e1cbf96199ef4572"
+    }
+  },
+  "fullAbsenceReceiptVerified": true,
+  "comparisonTiming": {
+    "status": "measured-differences-not-matched",
+    "clock": "time.monotonic_ns",
+    "timingEqualityEstablished": false,
+    "triggered": {
+      "slotElapsedNs": 231616666,
+      "firstServicesFromAbsenceNs": 762208599,
+      "firstServicesAfterSlotNs": 467910265,
+      "servicesElapsedNs": 146164700
+    },
+    "control": {
+      "slotElapsedNs": 232275173,
+      "firstServicesFromAbsenceNs": 681041349,
+      "firstServicesAfterSlotNs": 412901263,
+      "servicesElapsedNs": 140517710
+    },
+    "controlMinusTriggered": {
+      "slotElapsedNs": 658507,
+      "firstServicesFromAbsenceNs": -81167250,
+      "firstServicesAfterSlotNs": -55009002,
+      "servicesElapsedNs": -5646990
+    },
+    "requestedReplayNs": 231616666,
+    "replayDifferenceNs": 658507,
+    "limitations": [
+      "Host-bracket measurements do not establish device-event timing equivalence.",
+      "Separate fresh emulators, warmup and memory-pressure restart rescheduling remain confounds."
+    ]
+  },
+  "pairProvenance": {
+    "status": "matching-exact-receipts",
+    "apkSha256": {
+      "target": "79c31e14ebd3692d19c836c802ad25296f9d7a4aee959f6382781db2c620030f",
+      "fixture": "56aa24b39d0a28e2342ca1972d56fae9aaeb4b0c1a9e085650eb17cba3fc7820"
+    },
+    "installedFingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+    "source": {
+      "head": "5e1e340bba1299b670ee8ba2e39a402c7c2ab2af",
+      "tree": "8525b3ab50ef239a72465ac7d6b619223d635f38"
+    },
+    "wholeImageOrRuntimeEquivalenceEstablished": false,
+    "limitations": [
+      "Equal APK hashes, source head/tree and installed fingerprint receipts do not prove whole-image byte identity.",
+      "Runtime grants, process state, warmup and memory pressure are separate observations, not inferred equal."
+    ]
+  },
+  "comparisonEligibilityScope": "Verified lifecycle and retained evidence only; not timing equivalence or causality.",
+  "controlEvidenceErrors": []
+}

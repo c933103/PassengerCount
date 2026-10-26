@@ -1,0 +1,379 @@
+{
+  "schemaVersion": 1,
+  "kind": "framework-bookkeeping-observation-not-acceptance",
+  "analysisAttempt": "foreground-observation-analysis.ha1kla7c",
+  "status": "complete",
+  "target": {
+    "package": "app.passengercount",
+    "userId": 0,
+    "service": "app.passengercount/.TrackService"
+  },
+  "limits": {
+    "maxSourceBytes": 33554432,
+    "maxTotalBytes": 134217728,
+    "maxObservations": 512
+  },
+  "errors": [],
+  "observations": [
+    {
+      "phase": "before",
+      "captureAttempt": null,
+      "status": "complete",
+      "evidence": {
+        "stdout": {
+          "path": "race-before-services.txt",
+          "bytes": 332700,
+          "sha256": "57b2c1a853a3d25975e2336e73a36a4c379d190d656b312df61f2a22c6176923",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-before-services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-before-services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-before-services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "command": [
+        "adb",
+        "shell",
+        "dumpsys",
+        "activity",
+        "services"
+      ],
+      "fields": {
+        "kind": "framework-bookkeeping-observation-not-acceptance",
+        "sha256": "57b2c1a853a3d25975e2336e73a36a4c379d190d656b312df61f2a22c6176923",
+        "bytes": 332700,
+        "package": "app.passengercount",
+        "userId": 0,
+        "commandComplete": true,
+        "unfilteredFrameworkDump": true,
+        "headerPresent": true,
+        "decodedWithReplacement": false,
+        "activeForegroundApps": [
+          {
+            "userId": 0,
+            "packageName": "app.passengercount",
+            "index": 0,
+            "lineStart": 4694,
+            "mNumActive": 1,
+            "mAppOnTop": false,
+            "mShownWhileTop": true,
+            "mShownWhileScreenOn": true,
+            "mStartTime": "-5s526ms",
+            "mStartVisibleTime": "-5s526ms",
+            "mEndTime": null,
+            "mEndTimeStatus": "not-printed",
+            "timeEncoding": "Relative durations as printed, not absolute timestamps; no value assigned to omission.",
+            "lineEnd": 4696
+          }
+        ],
+        "trackServices": [
+          {
+            "token": "991688",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "active",
+            "lineStart": 290,
+            "lineEnd": 324,
+            "app": "ProcessRecord{6e68a98 3003:app.passengercount:tracking/u0a209}",
+            "appIsNull": false,
+            "startForegroundCount": 1,
+            "isForeground": true,
+            "foregroundServiceType": "0x00000008",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "PROC_STATE_TOP",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "PROC_STATE_TOP",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          }
+        ],
+        "parseErrors": [],
+        "targetUserForegroundSectionCount": 1,
+        "limitations": [
+          "Not atomic with other commands; dump takes AMS locks and can affect timing.",
+          "No runtime caller/stack, causation, UID/process absence or acceptance claim.",
+          "Not-listed means not printed in this capture, not runtime absence."
+        ],
+        "status": "complete",
+        "activeForegroundAppsStatus": "observed",
+        "trackServicesStatus": "observed"
+      }
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.XjGzVY",
+      "status": "complete",
+      "evidence": {
+        "stdout": {
+          "path": "race-observation.XjGzVY/services.txt",
+          "bytes": 339639,
+          "sha256": "bfb9b954a0286357f2672d9fd3c1045d87ed709c583eb4dbb24e731fbcaf80b7",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-observation.XjGzVY/services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-observation.XjGzVY/services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-observation.XjGzVY/services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "command": [
+        "adb",
+        "shell",
+        "dumpsys",
+        "activity",
+        "services"
+      ],
+      "fields": {
+        "kind": "framework-bookkeeping-observation-not-acceptance",
+        "sha256": "bfb9b954a0286357f2672d9fd3c1045d87ed709c583eb4dbb24e731fbcaf80b7",
+        "bytes": 339639,
+        "package": "app.passengercount",
+        "userId": 0,
+        "commandComplete": true,
+        "unfilteredFrameworkDump": true,
+        "headerPresent": true,
+        "decodedWithReplacement": false,
+        "activeForegroundApps": [
+          {
+            "userId": 0,
+            "packageName": "app.passengercount",
+            "index": 0,
+            "lineStart": 4772,
+            "mNumActive": 1,
+            "mAppOnTop": false,
+            "mShownWhileTop": true,
+            "mShownWhileScreenOn": true,
+            "mStartTime": "-13s86ms",
+            "mStartVisibleTime": "-13s86ms",
+            "mEndTime": null,
+            "mEndTimeStatus": "not-printed",
+            "timeEncoding": "Relative durations as printed, not absolute timestamps; no value assigned to omission.",
+            "lineEnd": 4774
+          }
+        ],
+        "trackServices": [
+          {
+            "token": "991688",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "active",
+            "lineStart": 371,
+            "lineEnd": 406,
+            "app": "null",
+            "appIsNull": true,
+            "startForegroundCount": 1,
+            "isForeground": true,
+            "foregroundServiceType": "0x00000008",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "PROC_STATE_TOP",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "PROC_STATE_TOP",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          },
+          {
+            "token": "991688",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "restarting",
+            "lineStart": 4267,
+            "lineEnd": 4770,
+            "app": "null",
+            "appIsNull": true,
+            "startForegroundCount": 1,
+            "isForeground": true,
+            "foregroundServiceType": "0x00000008",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "PROC_STATE_TOP",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "PROC_STATE_TOP",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          }
+        ],
+        "parseErrors": [],
+        "targetUserForegroundSectionCount": 1,
+        "limitations": [
+          "Not atomic with other commands; dump takes AMS locks and can affect timing.",
+          "No runtime caller/stack, causation, UID/process absence or acceptance claim.",
+          "Not-listed means not printed in this capture, not runtime absence."
+        ],
+        "status": "complete",
+        "activeForegroundAppsStatus": "observed",
+        "trackServicesStatus": "observed"
+      }
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.s51fsc",
+      "status": "complete",
+      "evidence": {
+        "stdout": {
+          "path": "race-observation.s51fsc/services.txt",
+          "bytes": 336846,
+          "sha256": "d43d844b411ca664be15e206094d679f7dad671dedd03b9d331f6b2d5bb79719",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-observation.s51fsc/services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-observation.s51fsc/services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-observation.s51fsc/services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "command": [
+        "adb",
+        "shell",
+        "dumpsys",
+        "activity",
+        "services"
+      ],
+      "fields": {
+        "kind": "framework-bookkeeping-observation-not-acceptance",
+        "sha256": "d43d844b411ca664be15e206094d679f7dad671dedd03b9d331f6b2d5bb79719",
+        "bytes": 336846,
+        "package": "app.passengercount",
+        "userId": 0,
+        "commandComplete": true,
+        "unfilteredFrameworkDump": true,
+        "headerPresent": true,
+        "decodedWithReplacement": false,
+        "activeForegroundApps": [
+          {
+            "userId": 0,
+            "packageName": "app.passengercount",
+            "index": 0,
+            "lineStart": 4728,
+            "mNumActive": 1,
+            "mAppOnTop": false,
+            "mShownWhileTop": true,
+            "mShownWhileScreenOn": true,
+            "mStartTime": "-13s618ms",
+            "mStartVisibleTime": "-13s618ms",
+            "mEndTime": null,
+            "mEndTimeStatus": "not-printed",
+            "timeEncoding": "Relative durations as printed, not absolute timestamps; no value assigned to omission.",
+            "lineEnd": 4730
+          }
+        ],
+        "trackServices": [
+          {
+            "token": "991688",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "active",
+            "lineStart": 371,
+            "lineEnd": 406,
+            "app": "ProcessRecord{4c6e39e 4025:app.passengercount:tracking/u0a209}",
+            "appIsNull": false,
+            "startForegroundCount": 1,
+            "isForeground": true,
+            "foregroundServiceType": "0x00000008",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "PROC_STATE_TOP",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "PROC_STATE_TOP",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          }
+        ],
+        "parseErrors": [],
+        "targetUserForegroundSectionCount": 1,
+        "limitations": [
+          "Not atomic with other commands; dump takes AMS locks and can affect timing.",
+          "No runtime caller/stack, causation, UID/process absence or acceptance claim.",
+          "Not-listed means not printed in this capture, not runtime absence."
+        ],
+        "status": "complete",
+        "activeForegroundAppsStatus": "observed",
+        "trackServicesStatus": "observed"
+      }
+    }
+  ],
+  "ordering": "Presentation only: random attempt names do not establish chronology.",
+  "limitations": [
+    "Sampled fields, not runtime caller/stack, cause or policy emulation.",
+    "Dump takes AMS locks and can affect timing; not atomic with other commands.",
+    "No UID/process absence, recovery or acceptance verdict."
+  ]
+}

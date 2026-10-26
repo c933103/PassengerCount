@@ -1,0 +1,110 @@
+[
+  {
+    "result": {
+      "archivePath": "race-observation.BlQ7gc/result.json",
+      "bytes": 809,
+      "sha256": "f2fd3b16c72fc172676296836b8242ad95e10c7a5d690846d9f871f7967cde0f",
+      "content": "{\n  \"outcome\": \"automatic-restart-denied\",\n  \"process\": \"app.passengercount:tracking\",\n  \"oldPid\": \"6670\",\n  \"newPid\": \"6903\",\n  \"interleaved\": true,\n  \"cleanupDuringAbsence\": false,\n  \"triggerBeforeCleanup\": false,\n  \"foreground\": false,\n  \"lines\": {\n    \"marker\": 83439,\n    \"death\": 83445,\n    \"scheduled\": 83449,\n    \"entering\": 83556,\n    \"promoted\": 83558,\n    \"reset\": -1,\n    \"start\": 83562,\n    \"denied\": 83579\n  },\n  \"evidence\": {\n    \"log\": {\n      \"path\": \"race-observation.BlQ7gc/logcat.txt\",\n      \"bytes\": 11909578,\n      \"sha256\": \"51f8d8a43dc9f88e3a62d30ac74492a17984d7301994fcf376aa73b7a5561664\"\n    },\n    \"services\": {\n      \"path\": \"race-observation.BlQ7gc/services.txt\",\n      \"bytes\": 2403,\n      \"sha256\": \"1f7f7f6013de863fb441352547506730995363d5bfb722609cd23783a5c9478b\"\n    }\n  }\n}\n"
+    },
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "race-observation.BlQ7gc/logcat.txt",
+        "bytes": 11909578,
+        "sha256": "51f8d8a43dc9f88e3a62d30ac74492a17984d7301994fcf376aa73b7a5561664",
+        "captureExit": 0,
+        "stderrBytes": 0
+      },
+      {
+        "kind": "services",
+        "archivePath": "race-observation.BlQ7gc/services.txt",
+        "bytes": 2403,
+        "sha256": "1f7f7f6013de863fb441352547506730995363d5bfb722609cd23783a5c9478b",
+        "captureExit": 0,
+        "stderrBytes": 0
+      }
+    ],
+    "classifierExitCode": 10
+  },
+  {
+    "result": {
+      "archivePath": "race-observation.RiKOYb/result.json",
+      "bytes": 801,
+      "sha256": "ec46527536a534f38d56189ab3498ae2f8f6c84762eaab465a36b0d9f970d3c8",
+      "content": "{\n  \"outcome\": \"interleaving-unverified\",\n  \"process\": \"app.passengercount:tracking\",\n  \"oldPid\": \"6670\",\n  \"newPid\": null,\n  \"interleaved\": false,\n  \"cleanupDuringAbsence\": false,\n  \"triggerBeforeCleanup\": false,\n  \"foreground\": false,\n  \"lines\": {\n    \"marker\": 83439,\n    \"death\": 83445,\n    \"scheduled\": 83449,\n    \"entering\": 83556,\n    \"promoted\": 83558,\n    \"reset\": -1,\n    \"start\": -1,\n    \"denied\": -1\n  },\n  \"evidence\": {\n    \"log\": {\n      \"path\": \"race-observation.RiKOYb/logcat.txt\",\n      \"bytes\": 11903211,\n      \"sha256\": \"dad42ba4114e51a9dc6f69be7733334b6fe151a6e905b7eaa23951272d7f0fd5\"\n    },\n    \"services\": {\n      \"path\": \"race-observation.RiKOYb/services.txt\",\n      \"bytes\": 5856,\n      \"sha256\": \"cd0be4ec4a0be6502163ee4090e61c20bdd6ebfd8cb1b65d916e39bb180ba725\"\n    }\n  }\n}\n"
+    },
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "race-observation.RiKOYb/logcat.txt",
+        "bytes": 11903211,
+        "sha256": "dad42ba4114e51a9dc6f69be7733334b6fe151a6e905b7eaa23951272d7f0fd5",
+        "captureExit": 0,
+        "stderrBytes": 0
+      },
+      {
+        "kind": "services",
+        "archivePath": "race-observation.RiKOYb/services.txt",
+        "bytes": 5856,
+        "sha256": "cd0be4ec4a0be6502163ee4090e61c20bdd6ebfd8cb1b65d916e39bb180ba725",
+        "captureExit": 0,
+        "stderrBytes": 0
+      }
+    ],
+    "classifierExitCode": 2
+  },
+  {
+    "result": {
+      "archivePath": "service-only-race/race-observation.SMFvyu/result.json",
+      "bytes": 800,
+      "sha256": "b951573f85d6bf0fa8b748ff30e228e22d28a7d4a8305793de66e5d514a64ff2",
+      "content": "{\n  \"outcome\": \"foreground-restored\",\n  \"process\": \"app.passengercount:tracking\",\n  \"oldPid\": \"6170\",\n  \"newPid\": \"6670\",\n  \"interleaved\": true,\n  \"cleanupDuringAbsence\": false,\n  \"triggerBeforeCleanup\": false,\n  \"foreground\": true,\n  \"lines\": {\n    \"marker\": 82654,\n    \"death\": 82656,\n    \"scheduled\": 82661,\n    \"entering\": 82688,\n    \"promoted\": 82690,\n    \"reset\": -1,\n    \"start\": 82699,\n    \"denied\": -1\n  },\n  \"evidence\": {\n    \"log\": {\n      \"path\": \"race-observation.SMFvyu/logcat.txt\",\n      \"bytes\": 11769799,\n      \"sha256\": \"aec236279f7ab49be68efcf04e7ef385bad09dc2209b8e4de901fcabbd40080a\"\n    },\n    \"services\": {\n      \"path\": \"race-observation.SMFvyu/services.txt\",\n      \"bytes\": 8291,\n      \"sha256\": \"5c343766f98d4f1c168e626374c9dda3d38f49501bb5e8b54d0fe36c24261c51\"\n    }\n  }\n}\n"
+    },
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "service-only-race/race-observation.SMFvyu/logcat.txt",
+        "bytes": 11769799,
+        "sha256": "aec236279f7ab49be68efcf04e7ef385bad09dc2209b8e4de901fcabbd40080a",
+        "captureExit": 0,
+        "stderrBytes": 0
+      },
+      {
+        "kind": "services",
+        "archivePath": "service-only-race/race-observation.SMFvyu/services.txt",
+        "bytes": 8291,
+        "sha256": "5c343766f98d4f1c168e626374c9dda3d38f49501bb5e8b54d0fe36c24261c51",
+        "captureExit": 0,
+        "stderrBytes": 0
+      }
+    ],
+    "classifierExitCode": 0
+  },
+  {
+    "result": {
+      "archivePath": "service-only-race/race-observation.lU9QJ8/result.json",
+      "bytes": 802,
+      "sha256": "e0f693c99fd5cf1287e16cdbfcb5c95e80e66d0408a0fcdf00c00be47753813c",
+      "content": "{\n  \"outcome\": \"interleaving-unverified\",\n  \"process\": \"app.passengercount:tracking\",\n  \"oldPid\": \"6170\",\n  \"newPid\": null,\n  \"interleaved\": false,\n  \"cleanupDuringAbsence\": false,\n  \"triggerBeforeCleanup\": false,\n  \"foreground\": false,\n  \"lines\": {\n    \"marker\": 82654,\n    \"death\": 82656,\n    \"scheduled\": 82661,\n    \"entering\": 82688,\n    \"promoted\": 82690,\n    \"reset\": -1,\n    \"start\": -1,\n    \"denied\": -1\n  },\n  \"evidence\": {\n    \"log\": {\n      \"path\": \"race-observation.lU9QJ8/logcat.txt\",\n      \"bytes\": 11763812,\n      \"sha256\": \"1b04748e01bff04dafed5a58da81fcbe90f4bbd3182333427f7020045d43bf09\"\n    },\n    \"services\": {\n      \"path\": \"race-observation.lU9QJ8/services.txt\",\n      \"bytes\": 10402,\n      \"sha256\": \"eb3c445e61af7104785c9b3ab680ef9c8c3cad3082f177975b67c76678cfb01a\"\n    }\n  }\n}\n"
+    },
+    "inputs": [
+      {
+        "kind": "log",
+        "archivePath": "service-only-race/race-observation.lU9QJ8/logcat.txt",
+        "bytes": 11763812,
+        "sha256": "1b04748e01bff04dafed5a58da81fcbe90f4bbd3182333427f7020045d43bf09",
+        "captureExit": 0,
+        "stderrBytes": 0
+      },
+      {
+        "kind": "services",
+        "archivePath": "service-only-race/race-observation.lU9QJ8/services.txt",
+        "bytes": 10402,
+        "sha256": "eb3c445e61af7104785c9b3ab680ef9c8c3cad3082f177975b67c76678cfb01a",
+        "captureExit": 0,
+        "stderrBytes": 0
+      }
+    ],
+    "classifierExitCode": 2
+  }
+]

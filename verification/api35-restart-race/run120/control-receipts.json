@@ -1,0 +1,92 @@
+[
+  {
+    "archivePath": "no-trigger-control/exit-code.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "content": "0\n"
+  },
+  {
+    "archivePath": "no-trigger-control/source.txt",
+    "bytes": 82,
+    "sha256": "372571de33df7969d35ffb5f70e20839765928752dbfb3372270c2fdf00e5582",
+    "content": "5e1e340bba1299b670ee8ba2e39a402c7c2ab2af\n8525b3ab50ef239a72465ac7d6b619223d635f38\n"
+  },
+  {
+    "archivePath": "no-trigger-control/apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "5ec8304dd9ab8e05343f20debe8258e08bfb64bea3f954efbfd4e0a4e601521e",
+    "content": "79c31e14ebd3692d19c836c802ad25296f9d7a4aee959f6382781db2c620030f  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\n56aa24b39d0a28e2342ca1972d56fae9aaeb4b0c1a9e085650eb17cba3fc7820  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "no-trigger-control/device-fingerprint.txt",
+    "bytes": 82,
+    "sha256": "633fbfc3b92b012914165717ce367282664c75ad9f6e533b4a1ad6e2418ec93a",
+    "content": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys\n"
+  },
+  {
+    "archivePath": "no-trigger-control/race-process-scope.txt",
+    "bytes": 54,
+    "sha256": "e77b4dcb3af9203a2c4b7b1b2d0d00349b0cb82e32eb666447c9b0b5ff958684",
+    "content": "ALL_PACKAGE_PROCESSES_ABSENT before_control_idle=true\n"
+  },
+  {
+    "archivePath": "no-trigger-control/race-absent-pids.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "no-trigger-control/race-absent-pids.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "no-trigger-control/race-absent-pids.exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "no-trigger-control/race-trigger-slot.json",
+    "bytes": 949,
+    "sha256": "a894b979cc14af7de024aacd3810bdb1084124e023ab44470636c2a8fac6eb33",
+    "content": "{\n  \"kind\": \"host-timing-observation-not-acceptance\",\n  \"clock\": \"time.monotonic_ns\",\n  \"clockImplementation\": \"clock_gettime(CLOCK_MONOTONIC)\",\n  \"clockResolutionSeconds\": 1e-09,\n  \"limitations\": [\n    \"Host timestamps bracket command slots, not device events.\",\n    \"Separate emulator boot/warmup, scheduling and memory pressure are uncontrolled confounds.\",\n    \"Idle replay is not timing equality or a causal/acceptance result.\"\n  ],\n  \"mode\": \"no-trigger-control\",\n  \"status\": \"measured\",\n  \"verifiedAbsenceNs\": 637226182750,\n  \"slotStartNs\": 637262047663,\n  \"slotEndNs\": 637494322836,\n  \"elapsedNs\": 232275173,\n  \"requestedReplayNs\": 231616666,\n  \"replayDifferenceNs\": 658507,\n  \"reference\": {\n    \"path\": \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/no-trigger-control/../race-trigger-slot.json\",\n    \"bytes\": 633,\n    \"sha256\": \"597bcb0f50562d2c54fbe7262f1a8be01361f3cb7043c599a0ea48bf650661bd\"\n  }\n}\n"
+  },
+  {
+    "archivePath": "no-trigger-control/race-first-services-timing.json",
+    "bytes": 977,
+    "sha256": "f37e277b33881b6df46655e7a7534e072abf3f0efd6f702b1272dc3aa4c09fa5",
+    "content": "{\n  \"kind\": \"host-timing-observation-not-acceptance\",\n  \"clock\": \"time.monotonic_ns\",\n  \"clockImplementation\": \"clock_gettime(CLOCK_MONOTONIC)\",\n  \"clockResolutionSeconds\": 1e-09,\n  \"limitations\": [\n    \"Host timestamps bracket command slots, not device events.\",\n    \"Separate emulator boot/warmup, scheduling and memory pressure are uncontrolled confounds.\",\n    \"Idle replay is not timing equality or a causal/acceptance result.\"\n  ],\n  \"mode\": \"no-trigger-control\",\n  \"status\": \"measured\",\n  \"verifiedAbsenceNs\": 637226182750,\n  \"firstServicesStartNs\": 637907224099,\n  \"firstServicesEndNs\": 638047741809,\n  \"servicesElapsedNs\": 140517710,\n  \"gapAfterSlotNs\": 412901263,\n  \"elapsedFromAbsenceNs\": 681041349,\n  \"slotEvidence\": {\n    \"path\": \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/no-trigger-control/race-trigger-slot.json\",\n    \"bytes\": 949,\n    \"sha256\": \"a894b979cc14af7de024aacd3810bdb1084124e023ab44470636c2a8fac6eb33\"\n  }\n}\n"
+  },
+  {
+    "archivePath": "no-trigger-control/paired-wrapper-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "no-trigger-control/control-status.txt",
+    "bytes": 30,
+    "sha256": "7552fc094f63ffa2ee70f35f3636b7f59eabca82962558ab35867093f07c0d19",
+    "content": "process-exited-not-acceptance\n"
+  },
+  {
+    "archivePath": "no-trigger-control/control-exit-code.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "content": "0\n"
+  },
+  {
+    "archivePath": "no-trigger-control/triggered-native-exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "no-trigger-control/triggered-evidence-status.txt",
+    "bytes": 19,
+    "sha256": "374ea3581d83bdc9ceb5a8c6ef33d5f0f405fad024bcf7d528daa1019bee42aa",
+    "content": "verified-unchanged\n"
+  }
+]
