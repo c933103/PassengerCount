@@ -354,7 +354,9 @@ scheduling, a distinct automatic target service process and the target's own
 foreground state or denial. Any unexpected helper ENTER/FOREGROUND marker in this
 fresh control contaminates the comparison. Full-absence raw stdout/stderr/native1,
 scope, exact APK/source/fingerprint receipts and timing identities are separately
-verified. Matching fingerprints do not prove whole-image/runtime-state equality;
+verified. Independent rejected absence probes also retain their native status before
+returning2; a returned PID or transport/stderr problem still prevents the trigger,
+alignment and comparison. No absent status is inferred from printed PIDs. Matching fingerprints do not prove whole-image/runtime-state equality;
 permissions and before-service states remain separate observations. Missing or
 mismatched comparison evidence cannot become a pass or erase a measured denial.
 

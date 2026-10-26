@@ -217,13 +217,17 @@ restart_race() {
       if adb shell pidof "$PACKAGE" "$process" > "$OUT/race-absent-pids.txt" 2> "$OUT/race-absent-pids.stderr"; then
         absence_code=0
       else absence_code=$?; fi
+      # Retain the actual native status even when this observation is rejected.
+      # Diagnostic metadata only: the original gate's command/timing path stays unchanged.
+      if [[ "$independent" == 1 ]]; then
+        printf '%s\n' "$absence_code" > "$OUT/race-absent-pids.exit-code.txt" || true
+      fi
       if [[ "$absence_code" != 1 || -s "$OUT/race-absent-pids.txt" || -s "$OUT/race-absent-pids.stderr" ]] \
         || ! grep -Fq "ActivityManager: Process $PACKAGE (pid $ui_pid) has died:" "$OUT/race-scheduling-logcat.txt"; then
         echo 'RACE_ALL_PROCESS_ABSENCE_UNVERIFIED'; return 2;
       fi
       if [[ "$independent" == 1 ]]; then
         absence_ns="$(race_host_timing now)" || true
-        printf '%s\n' "$absence_code" > "$OUT/race-absent-pids.exit-code.txt" || true
       fi
       if [[ "$control" == 1 ]]; then
         printf 'ALL_PACKAGE_PROCESSES_ABSENT before_control_idle=true\n' > "$OUT/race-process-scope.txt" || return 2

@@ -1,7 +1,7 @@
 {
   "kind": "paired-independent-no-trigger-contrast-and-read-only-profiling-preflight",
-  "baseHead": "bf28a3aa9af0ca1f2d302b5b18722979448cc829",
-  "baseTree": "8525b3ab50ef239a72465ac7d6b619223d635f38",
+  "baseHead": "8b985de9fb048dde130bd1aed476ea892f83848d",
+  "baseTree": "da0dda15e0492b36f18a2c1e0cce22c2a97617f6",
   "acceptance": {
     "fullAllProcessAbsenceRequired": true,
     "original13PhasesUnchanged": true,
@@ -52,7 +52,8 @@
       "pairing": "Exact triggered slot/first-services and own slot hashes plus native status/stdout/stderr; arithmetic validated before comparison eligibility",
       "failure": "Still capture real log/services; known denial1 retained; uncertain comparison2 otherwise",
       "limitation": "Host bracket precedes receipt/stdout publication, process exit and shell dispatch; not equal device events, scheduling or causality"
-    }
+    },
+    "rejectedAbsenceEvidence": "Record actual independent pidof native status before validation, including returned-PID and transport/stderr rejection. Never infer missing status, relax empty-output/native1 criterion, issue trigger or align after rejection."
   },
   "profilingPreflight": {
     "timing": "Existing before-preparation/after-terminal metadata flow only; never inside absence",
@@ -91,11 +92,11 @@
   },
   "validation": {
     "focusedNode": {
-      "passed": 337,
+      "passed": 342,
       "failed": 0
     },
     "ownedContrastNode": {
-      "passed": 245,
+      "passed": 250,
       "failed": 0
     },
     "profilingPreflightPython": {
@@ -107,14 +108,14 @@
       "failed": 0
     },
     "localAggregate": {
-      "passed": 643,
-      "total": 644,
+      "passed": 648,
+      "total": 649,
       "failure": "Known local government-routes.json.gz materialization limit; no skipped assertion; complete hosted checkout required"
     },
-    "native": "Native/production inputs unchanged; hosted run120 native passed",
+    "native": "Native/production inputs unchanged; hosted run121 native passed",
     "syntaxAndDiff": "passed",
-    "nativeIndependentReview": "Prior reviewed test-only readiness fix clean on bf28a3a; current narrow alignment gets fresh exact-head Codex",
-    "hostTests": "337 focused Node tests including real clock late case, controlled-clock early/late branch transport checks, actual control shell device-command equivalence, metadata/failure/exclusive-output boundaries; no Android policy emulation",
+    "nativeIndependentReview": "Prior alignment clean exact-head Codex on8b985de; narrow rejected-native-status correction gets fresh exact-head review",
+    "hostTests": "342 focused Node tests; new returned-PID, native0/1/255, empty/stderr and triggered/control rejection cases assert no trigger/alignment or classification. No Android policy emulation.",
     "oneTimeComparisons": "Strict analyzeRestartRace function and phase() through EOF are byte-identical to published base; no permanent historical-source hash gate",
     "exactHeadCodex": "pending fresh exact-head request after publication",
     "exactHeadHosted": "pending natural CI after publication",
@@ -126,7 +127,7 @@
       "productionBudgetsOrSourceChanged": false
     }
   },
-  "nextStep": "Execute natural hosted paired observation with bounded host-only first-services deadline targeting. Compare actual lateness/overshoot, log-prefix ordering and memory-pressure events; no runtime caller or APK fix claim. Full gate remains binding. Profiling/atrace activation remains paused; preflight does not authorize a stateful experiment.",
+  "nextStep": "Natural hosted validation of rejected-absence native-status retention, retaining the already-reviewed bounded deadline alignment for an actually observed full-absence control. Run121 never reached alignment, so no output inferred. Original gate remains unchanged and failed; no unchanged manual rerun or profiling activation.",
   "priorExecutedContrast119": {
     "run": 40278271990,
     "number": 119,
@@ -152,7 +153,7 @@
     "artCandidateSha256": "cf1c0b8e7fe7b9200a89bf30a076f44509c9a21fe18d7b33c63a48f673746cd1",
     "receipt": "https://github.com/c933103/PassengerCount/blob/e44d42de22775d778e8e5a66f4ba2787f670d2cf/verification/api35-restart-race/run119/README.md"
   },
-  "latestExecutedPriorHead": {
+  "priorExecutedContrast120": {
     "run": 40280094337,
     "number": 120,
     "attempt": 1,
@@ -176,5 +177,29 @@
     "originalLogSha256": "51f8d8a43dc9f88e3a62d30ac74492a17984d7301994fcf376aa73b7a5561664",
     "triggeredLogSha256": "9d65252ae53be8fb06a0186e5b6c7e058223b98ac3da0b71b38415208f89f49f",
     "controlLogSha256": "7e16d940a458742aaade72803890873cdf3adaa04a05edb1e6c20e5fedd51c2b"
+  },
+  "latestExecutedPriorHead": {
+    "run": 40282796603,
+    "number": 121,
+    "attempt": 1,
+    "head": "8b985de9fb048dde130bd1aed476ea892f83848d",
+    "tree": "da0dda15e0492b36f18a2c1e0cce22c2a97617f6",
+    "conclusion": "failure",
+    "hostedNode": {
+      "passed": 644,
+      "total": 644
+    },
+    "codex": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6410241990",
+    "originalExit": 255,
+    "originalStatus": "Stopped after deleted-phase detachment; terminal services dump says adb device offline; precise initial failing command/cause unproven. Later original phases/full race not reached.",
+    "triggeredExit": 1,
+    "triggeredOutcome": "automatic-restart-denied3032\u21923919",
+    "controlExit": 2,
+    "controlStatus": "RACE_ALL_PROCESS_ABSENCE_UNVERIFIED with returned PID3874, empty stderr; prior code did not retain native absence status on this rejected branch",
+    "alignmentExecuted": false,
+    "controlClassifierResultProduced": false,
+    "pairedWrapperExit": 1,
+    "priorFullRestartFailuresStillBinding": true,
+    "receipt": "https://github.com/c933103/PassengerCount/actions/runs/40282796603"
   }
 }

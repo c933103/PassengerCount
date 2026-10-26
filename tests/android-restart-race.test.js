@@ -503,11 +503,16 @@ test('original race mode rejects a leaked control flag before any device command
   assert.equal(r.status,2,r.stdout+r.stderr);assert.equal(r.calls,undefined);
   assert.match(r.stdout,/NO_TRIGGER_CONTROL_REQUIRES_INDEPENDENT/);
 });
-for(const options of [{absenceExit:0,absenceOutput:'444'},{absenceExit:255,absenceStderr:'offline'}])
+for(const options of [{absenceExit:0,absenceOutput:'444'},{absenceExit:255,absenceStderr:'offline'},
+  {absenceExit:0},{absenceExit:1,absenceOutput:'3874'},{absenceExit:1,absenceStderr:'partial'}])
 test('control cannot weaken all-process absence: '+JSON.stringify(options),()=>{
   const r=runShell(controlEvents(true),'',false,true,{kind:'race',uiAlive:false,...options},null,true,true);
   assert.equal(r.status,2,r.stdout+r.stderr); assert.equal(r.result,null);
   assert.equal(r.files['race-trigger-slot.json'],undefined);
+  assert.equal(r.files['race-absent-pids.exit-code.txt'],options.absenceExit+'\n');
+  assert.equal(r.files['race-absent-pids.txt'],options.absenceOutput?options.absenceOutput+'\n':'');
+  assert.equal(r.files['race-absent-pids.stderr'],options.absenceStderr?options.absenceStderr+'\n':'');
+  assert.equal(r.files['race-first-services-alignment.json'],undefined);
 });
 
 function controlPublicationFixture(fn) {
@@ -802,3 +807,11 @@ test('host deadline rejects '+fault+' before wait/publication',()=>controlPublic
   const r=alignmentCall(parent,out,output,[8000000,8000000,8000000,8002000,8002500]);
   assert.equal(r.status,2,r.stdout+r.stderr);assert.match(r.stderr,/RACE_HOST_TIMING_UNVERIFIED/);assert.equal(fs.existsSync(output),false);
 }));
+
+for(const options of [{absenceExit:0,absenceOutput:'3874'},{absenceExit:255,absenceStderr:'offline'}])
+test('independent triggered rejected absence preserves native status without issuing trigger: '+JSON.stringify(options),()=>{
+  const r=runShell(splitEvents('race',true),'',false,true,{kind:'race',uiAlive:false,...options},null,true,false);
+  assert.equal(r.status,2,r.stdout+r.stderr);assert.equal(r.result,null);
+  assert.equal(r.files['race-absent-pids.exit-code.txt'],options.absenceExit+'\n');
+  assert.doesNotMatch(r.calls,/app.passengercount.tests.TRIGGER/);assert.equal(r.files['race-trigger-slot.json'],undefined);
+});
