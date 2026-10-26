@@ -1,6 +1,6 @@
 {
   "kind": "exact-installed-framework-static-diagnostic",
-  "baseHead": "9586a9125ad21abed97dfd7a2e6433779ae5b7ee",
+  "baseHead": "142fcaf81a37b198aa9c90f7ce0dd271942c0396",
   "scope": [
     "Post-result read-only fixed services.jar capture on the already owned emulator",
     "Triple device-before/device-after/local SHA256 pairing and isolated attempts",
@@ -32,7 +32,7 @@
       "failed": 0,
       "includes": {
         "frameworkWiringNode": 16,
-        "frameworkPython": 21,
+        "frameworkPython": 22,
         "existingPreflightNode": 19,
         "existingCollectorPython": 20,
         "framedTransportPython": 15
@@ -48,7 +48,13 @@
     "codexExactHead": "pending publication and fresh request",
     "syntaxAndDiff": "passed",
     "phaseAcceptanceSequence": "One-time byte comparison from phase() onward equals original sequence; no historical hash gate added",
-    "reviewHardening": "Scoped SIGTERM latch preserves interrupted command/native status and reaps TERM-resistant child; outer kill-after last resort tested"
+    "reviewHardening": "Scoped SIGTERM latch preserves interrupted command/native status and reaps TERM-resistant child; outer kill-after last resort tested",
+    "reviewFindingFixed": {
+      "url": "https://github.com/c933103/PassengerCount/pull/19#discussion_r4374018363",
+      "finding": "Uncaught zlib.error from hash-matched invalid DEFLATE could omit structured receipt",
+      "fix": "Catch decompression failure as incomplete format error; retain selected-entry provenance before decompression",
+      "regression": "Success then genuine invalid second-entry DEFLATE preserves earlier successful attempt, completed first DEX, raw archive/native statuses and incomplete receipt"
+    }
   },
   "limits": {
     "internalSeconds": 90,

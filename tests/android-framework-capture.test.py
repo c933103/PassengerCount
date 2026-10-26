@@ -267,6 +267,39 @@ if mode.get('changeTool'): pathlib.Path(__file__).write_text('# changed')
         self.fixture.write_bytes(contents.replace(b"dex\n039\x00", b"dex\n038\x00", 1))
         self.assert_failure(self.run_capture(), "capture-or-format-error")
 
+    def test_success_then_invalid_deflate_keeps_incomplete_receipt_and_prior_attempt(self):
+        first, code, _ = self.run_capture()
+        self.assertEqual(code, 0)
+        original = {path.name: path.read_bytes() for path in first.iterdir()}
+        with zipfile.ZipFile(self.fixture) as archive:
+            entry = archive.getinfo("classes2.dex")
+            self.assertEqual(entry.compress_type, zipfile.ZIP_DEFLATED)
+            header_offset = entry.header_offset
+        data = bytearray(self.fixture.read_bytes())
+        name_bytes, extra_bytes = struct.unpack_from("<HH", data, header_offset + 26)
+        compressed_offset = header_offset + 30 + name_bytes + extra_bytes
+        # A genuine invalid DEFLATE block: BFINAL=1 and reserved BTYPE=3. The ZIP
+        # central directory remains valid; this raises zlib.error, not BadZipFile.
+        data[compressed_offset] = 0x07
+        self.fixture.write_bytes(data)
+        with zipfile.ZipFile(self.fixture) as archive, self.assertRaises(zlib.error):
+            archive.read("classes2.dex")
+        second, receipt = self.assert_failure(self.run_capture(), "capture-or-format-error")
+        self.assertNotEqual(first, second)
+        self.assertEqual(original, {path.name: path.read_bytes() for path in first.iterdir()})
+        self.assertEqual((second / "services.jar").read_bytes(), data)
+        self.assertTrue(receipt["hashAgreement"])
+        self.assertEqual(receipt["archive"]["sha256"], hashlib.sha256(data).hexdigest())
+        self.assertEqual(receipt["deviceHashBefore"], receipt["deviceHashAfter"])
+        self.assertEqual(receipt["dexFiles"][0]["status"], "disassembled")
+        self.assertEqual(receipt["dexFiles"][1]["entry"], "classes2.dex")
+        self.assertEqual(receipt["dexFiles"][1]["status"], "incomplete")
+        self.assertNotIn("file", receipt["dexFiles"][1])
+        self.assertFalse((second / "classes2.dex").exists())
+        self.assertEqual(receipt["commands"][-1]["name"], "classes.dex-dexdump")
+        for command in receipt["commands"]:
+            self.assertEqual(command["nativeReturnCode"], 0)
+
     def test_failed_empty_or_stderr_disassembler_never_completes(self):
         for mode, expected in (({"dumpFail": True}, "nonzero-exit"),
                                ({"emptyDump": True}, "dexdump-output-incomplete"),

@@ -327,16 +327,20 @@ def _collect(serial, output_root, dexdump, adb, limits, interruption):
             disassembly_bytes = 0
             for entry in dexes:
                 remaining()
+                # Record the selected entry before decompression: an invalid
+                # compressed block must retain its provenance and prior work.
+                dex = {"entry": entry.filename, "status": "incomplete",
+                       "zipCompressedBytes": entry.compress_size,
+                       "zipUncompressedBytes": entry.file_size,
+                       "zipCrc32": f"{entry.CRC:08x}"}
+                receipt["dexFiles"].append(dex)
                 with archive.open(entry) as source:
                     data = source.read(limits.dex_bytes + 1)
                 if len(data) != entry.file_size or len(data) > limits.dex_bytes:
                     raise Incomplete("archive-limit", "Expanded DEX size mismatch or limit exceeded")
                 path = dest / entry.filename  # Only validated canonical root DEX names.
                 path.write_bytes(data)
-                dex = {"entry": entry.filename, "file": path.name,
-                       "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
-                       "status": "incomplete"}
-                receipt["dexFiles"].append(dex)
+                dex.update(file=path.name, bytes=len(data), sha256=hashlib.sha256(data).hexdigest())
                 dex["header"] = dex_header(data)
                 if identity(tool, limits.tool_bytes) != tool_id:
                     raise Incomplete("tool-changed", "dexdump bytes changed before execution")
@@ -357,7 +361,7 @@ def _collect(serial, output_root, dexdump, adb, limits, interruption):
         receipt["status"] = "complete-static-analysis"
     except Incomplete as error:
         receipt.update(failure={"status": error.status, "message": str(error)})
-    except (OSError, ValueError, zipfile.BadZipFile, RuntimeError, NotImplementedError) as error:
+    except (OSError, ValueError, zipfile.BadZipFile, zlib.error, RuntimeError, NotImplementedError) as error:
         receipt.update(failure={"status": "capture-or-format-error", "message": str(error)})
     # A failed pull can leave useful partial bytes. Bind them too, without
     # claiming hash agreement or rewriting any earlier attempt's evidence.
