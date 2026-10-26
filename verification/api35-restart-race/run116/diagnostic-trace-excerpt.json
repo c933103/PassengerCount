@@ -1,0 +1,39 @@
+{
+  "archivePath": "race-observation.LuCjFL/logcat.txt",
+  "sha256": "51969376294a0b5b6b0292d9f3ad28c85d162639155a816a309fd8b89738cad6",
+  "indexConvention": "zero-based classifier indices",
+  "lines": [
+    {
+      "index": 47657,
+      "text": "10-26 04:48:39.202  3062  3062 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=3062"
+    },
+    {
+      "index": 47777,
+      "text": "10-26 04:48:39.327   558  1006 I ActivityManager: Process app.passengercount:tracking (pid 3062) has died: prcp FGS "
+    },
+    {
+      "index": 47778,
+      "text": "10-26 04:48:39.329   558  1006 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+    },
+    {
+      "index": 47855,
+      "text": "10-26 04:48:39.595  2819  2819 I PassengerRaceTrigger: RACE_TRIGGER_ENTER pid=2819 uid=10210"
+    },
+    {
+      "index": 47858,
+      "text": "10-26 04:48:39.609  2819  2819 I PassengerRaceTrigger: RACE_TRIGGER_FOREGROUND pid=2819 uid=10210"
+    },
+    {
+      "index": 47860,
+      "text": "10-26 04:48:39.612   558   614 E AppOps  : Operation not started: uid=10209 pkg=app.passengercount(null) op=START_FOREGROUND"
+    },
+    {
+      "index": 48244,
+      "text": "10-26 04:48:40.345   558   615 I ActivityManager: Start proc 4038:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}"
+    },
+    {
+      "index": 48414,
+      "text": "10-26 04:48:40.535   558  1781 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+    }
+  ]
+}
