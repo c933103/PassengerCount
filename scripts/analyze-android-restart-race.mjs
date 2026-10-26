@@ -162,9 +162,32 @@ export function publishRestartRace(logPath, servicesPath, oldPid, kind, targetPr
           || !validFirst(first, slot, evidence.controlSlotTiming)
           || !validFirst(triggeredFirst, triggered, evidence.triggeredSlotTiming))
         throw new Error('Control/triggered host timing structure or exact-byte pairing is incomplete');
+      const alignment = JSON.parse(read('firstServicesAlignment', path.join(outputDirectory, 'race-first-services-alignment.json')));
+      if (read('alignmentExit', path.join(outputDirectory, 'host-first-services-alignment.exit-code.txt')) !== '0\n'
+          || read('alignmentStderr', path.join(outputDirectory, 'host-first-services-alignment.stderr')) !== ''
+          || read('alignmentStdout', path.join(outputDirectory, 'host-first-services-alignment.stdout')) !== first.firstServicesStartNs + '\n'
+          || alignment.kind !== 'host-timing-observation-not-acceptance' || alignment.mode !== 'no-trigger-control'
+          || alignment.clock !== slot.clock
+          || !integers(alignment, ['verifiedAbsenceNs', 'targetFromAbsenceNs', 'deadlineNs', 'waitStartedNs',
+            'waitCompletedNs', 'waitedNs', 'requestedWaitNs', 'initialLatenessNs', 'overshootNs'])
+          || alignment.verifiedAbsenceNs !== slot.verifiedAbsenceNs
+          || alignment.targetFromAbsenceNs !== triggeredFirst.elapsedFromAbsenceNs || alignment.targetFromAbsenceNs > 10_000_000_000
+          || alignment.deadlineNs !== slot.verifiedAbsenceNs + alignment.targetFromAbsenceNs
+          || alignment.waitStartedNs < slot.slotEndNs || alignment.waitCompletedNs < alignment.waitStartedNs
+          || alignment.waitCompletedNs !== first.firstServicesStartNs || alignment.waitCompletedNs < alignment.deadlineNs
+          || alignment.waitedNs !== alignment.waitCompletedNs - alignment.waitStartedNs
+          || alignment.requestedWaitNs !== Math.max(0, alignment.deadlineNs - alignment.waitStartedNs)
+          || alignment.initialLatenessNs !== Math.max(0, alignment.waitStartedNs - alignment.deadlineNs)
+          || alignment.overshootNs !== alignment.waitCompletedNs - alignment.deadlineNs
+          || alignment.status !== (alignment.waitStartedNs > alignment.deadlineNs ? 'deadline-already-passed' : 'deadline-reached')
+          || !identityMatches(alignment.triggeredSlotEvidence, evidence.triggeredSlotTiming)
+          || !identityMatches(alignment.triggeredFirstServicesEvidence, evidence.triggeredFirstServicesTiming)
+          || !identityMatches(alignment.controlSlotEvidence, evidence.controlSlotTiming))
+        throw new Error('First-services alignment status, arithmetic or exact-byte pairing is incomplete');
       result.comparisonEligibilityScope = 'Verified lifecycle and retained evidence only; not timing equivalence or causality.';
       result.comparisonTiming = {
-        status: 'measured-differences-not-matched', clock: slot.clock, timingEqualityEstablished: false,
+        status: 'host-deadline-targeted-not-equivalent', clock: slot.clock, timingEqualityEstablished: false,
+        firstServicesAlignment: alignment,
         triggered: {slotElapsedNs: triggered.elapsedNs, firstServicesFromAbsenceNs: triggeredFirst.elapsedFromAbsenceNs,
           firstServicesAfterSlotNs: triggeredFirst.gapAfterSlotNs, servicesElapsedNs: triggeredFirst.servicesElapsedNs},
         control: {slotElapsedNs: slot.elapsedNs, firstServicesFromAbsenceNs: first.elapsedFromAbsenceNs,
@@ -175,6 +198,7 @@ export function publishRestartRace(logPath, servicesPath, oldPid, kind, targetPr
           servicesElapsedNs: first.servicesElapsedNs-triggeredFirst.servicesElapsedNs},
         requestedReplayNs: slot.requestedReplayNs, replayDifferenceNs: slot.replayDifferenceNs,
         limitations: ['Host-bracket measurements do not establish device-event timing equivalence.',
+          'Alignment receipt/stdout publication and shell dispatch still precede the device command; lateness is never hidden.',
           'Separate fresh emulators, warmup and memory-pressure restart rescheduling remain confounds.']
       };
     } catch (error) { errors.push(error.message); }

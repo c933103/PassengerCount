@@ -35,7 +35,9 @@ def read_receipt(name):
     with path.open('rb') as source:
         raw = source.read(65537)
     if len(raw) > 65536: raise ValueError('Timing receipt exceeds limit')
-    return json.loads(raw), {'path': str(path), 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+    value = json.loads(raw)
+    if not isinstance(value, dict): raise ValueError('Timing receipt must be an object')
+    return value, {'path': str(path), 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
 
 def write(name, value):
     with pathlib.Path(name).open('x') as output:
@@ -85,6 +87,53 @@ try:
             slotStartNs=start, slotEndNs=end, elapsedNs=end-start, requestedReplayNs=duration,
             replayDifferenceNs=end-start-duration, reference=identity)
         write(output, receipt)
+    elif mode == 'align-first-services':
+        trigger_file, first_file, own_file, output = args
+        trigger, trigger_id = read_receipt(trigger_file)
+        first, first_id = read_receipt(first_file)
+        own, own_id = read_receipt(own_file)
+        def valid_slot(value, mode):
+            return (value.get('kind') == receipt['kind'] and value.get('clock') == receipt['clock']
+                and value.get('mode') == mode and value.get('status') == 'measured'
+                and all(type(value.get(key)) is int for key in ('verifiedAbsenceNs', 'slotStartNs', 'slotEndNs', 'elapsedNs'))
+                and 0 < value['verifiedAbsenceNs'] <= value['slotStartNs'] <= value['slotEndNs']
+                and value['elapsedNs'] == value['slotEndNs'] - value['slotStartNs'])
+        def matches(value, identity):
+            return isinstance(value, dict) and all(value.get(key) == identity[key] for key in ('bytes', 'sha256'))
+        if (not valid_slot(trigger, 'triggered') or type(trigger.get('captureExitCode')) is not int or trigger['captureExitCode'] != 0
+            or not 0 <= trigger['elapsedNs'] <= 10_000_000_000
+            or not valid_slot(own, 'no-trigger-control') or not matches(own.get('reference'), trigger_id)
+            or type(own.get('requestedReplayNs')) is not int or own['requestedReplayNs'] != trigger['elapsedNs']
+            or type(own.get('replayDifferenceNs')) is not int or own['elapsedNs'] < trigger['elapsedNs']
+            or own['replayDifferenceNs'] != own['elapsedNs'] - trigger['elapsedNs']
+            or first.get('kind') != receipt['kind'] or first.get('mode') != 'triggered'
+            or first.get('status') != 'measured' or first.get('clock') != receipt['clock']
+            or not matches(first.get('slotEvidence'), trigger_id)
+            or any(type(first.get(key)) is not int for key in ('verifiedAbsenceNs', 'firstServicesStartNs',
+                'firstServicesEndNs', 'servicesElapsedNs', 'gapAfterSlotNs', 'elapsedFromAbsenceNs'))
+            or first['verifiedAbsenceNs'] != trigger['verifiedAbsenceNs']
+            or not trigger['slotEndNs'] <= first['firstServicesStartNs'] <= first['firstServicesEndNs']
+            or first['servicesElapsedNs'] != first['firstServicesEndNs'] - first['firstServicesStartNs']
+            or first['gapAfterSlotNs'] != first['firstServicesStartNs'] - trigger['slotEndNs']
+            or first['elapsedFromAbsenceNs'] != first['firstServicesStartNs'] - trigger['verifiedAbsenceNs']
+            or not 0 <= first['elapsedFromAbsenceNs'] <= 10_000_000_000):
+            raise ValueError('No verified bounded first-services deadline to align')
+        start = time.monotonic_ns()
+        if start < own['slotEndNs']: raise ValueError('Control slot is after the host clock')
+        deadline = own['verifiedAbsenceNs'] + first['elapsedFromAbsenceNs']
+        while time.monotonic_ns() < deadline:
+            time.sleep(max(0, deadline-time.monotonic_ns())/1_000_000_000)
+        end = time.monotonic_ns()
+        receipt.update(mode='no-trigger-control', status='deadline-already-passed' if start > deadline else 'deadline-reached',
+            verifiedAbsenceNs=own['verifiedAbsenceNs'], targetFromAbsenceNs=first['elapsedFromAbsenceNs'],
+            deadlineNs=deadline, waitStartedNs=start, waitCompletedNs=end, waitedNs=end-start,
+            requestedWaitNs=max(0, deadline-start), initialLatenessNs=max(0, start-deadline),
+            overshootNs=end-deadline, triggeredSlotEvidence=trigger_id,
+            triggeredFirstServicesEvidence=first_id, controlSlotEvidence=own_id)
+        write(output, receipt)
+        # This is a host bracket, not a device event. Receipt/stdout publication,
+        # process exit and shell dispatch still intervene before the ADB command.
+        print(end)
     elif mode == 'first-services':
         slot_file, output, start, end = args
         slot, identity = read_receipt(slot_file)
@@ -216,7 +265,20 @@ restart_race() {
     observation="$(mktemp -d "$OUT/race-observation.XXXXXX")" || return 2
     race_capture "$observation/logcat.txt" logcat -d -v threadtime || return 2
     if [[ "$independent" == 1 && "$first_observation" == true ]]; then
-      first_services_start="$(race_host_timing now)" || true
+      if [[ "$control" == 1 ]]; then
+        local alignment_code
+        if first_services_start="$(race_host_timing align-first-services "$OUT/../race-trigger-slot.json" \
+          "$OUT/../race-first-services-timing.json" "$OUT/race-trigger-slot.json" \
+          "$OUT/race-first-services-alignment.json" 2> "$OUT/host-first-services-alignment.stderr")"; then
+          alignment_code=0
+        else alignment_code=$?; fi
+        printf '%s\n' "$first_services_start" > "$OUT/host-first-services-alignment.stdout" || true
+        printf '%s\n' "$alignment_code" > "$OUT/host-first-services-alignment.exit-code.txt" || true
+        # Alignment failure never skips the real snapshot or hides a denial.
+        if [[ "$alignment_code" != 0 ]]; then first_services_start="$(race_host_timing now)" || true; fi
+      else
+        first_services_start="$(race_host_timing now)" || true
+      fi
     fi
     race_capture_services "$observation/services.txt" || return 2
     if [[ "$independent" == 1 && "$first_observation" == true ]]; then

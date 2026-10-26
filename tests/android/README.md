@@ -336,8 +336,15 @@ The additional control uses the same runner, APKs, configured image, warm-up,
 snapshot sequence. It withholds only the later `TRIGGER` action. Host monotonic
 measurements bracket the verified absence boundary, triggered command slot and
 first services snapshot. The control replays the measured slot (at most 10 seconds)
-using **host-only idle**, then records its actual timing. Raw timing receipts are
-hash-paired; per-leg durations/gaps and deltas are reported, never timing equality.
+using **host-only idle**, then records its actual timing. Before the control's
+first services capture, a second host-only wait targets the triggered leg's
+measured elapsed-from-absence deadline (also bounded to10 seconds). Already-late
+arrival, requested wait, actual wait and overshoot are explicit; no device command
+is added. Receipt/stdout publication and shell dispatch still intervene after the
+host timestamp, so even an exact bracket target is not equal device-event timing.
+Raw status/stdout/stderr and all timing receipts are hash-paired; durations/gaps
+and deltas are reported, never timing equality. Invalid alignment still collects
+the actual snapshot and preserves known denial1; comparison becomes ineligible.
 First-log capture cost, Python measurement overhead, scheduling, warm-up state and
 memory pressure remain explicit confounds. Run118 actually rescheduled restart
 from 30000ms to8975ms and then0ms; future comparison must retain such events.
@@ -364,6 +371,15 @@ are retained; no workflow timeout or original acceptance was extended or skipped
 A failure without the extra trigger shows it is unnecessary for that observation,
 not that naturally queued updates are impossible. A differing pair supports a
 stimulus/timing contribution, not a unique caller, failure rate or universal fix.
+
+Run119 and120 both actually observed foreground in separate no-trigger controls,
+while original/triggered gates failed. Control first dumps were261.37ms and81.17ms
+earlier respectively; host-deadline alignment addresses this measured confound,
+not memory-pressure rescheduling or whole-runtime equivalence. Crucially run120
+cleanup precedes helper ENTER/FOREGROUND: helper foreground promotion is **not**
+the established immediate cause. A command/activity-launch effect before helper
+logging is only a hypothesis; other convergent framework callers remain possible.
+[Preserved run119/120 evidence](https://github.com/c933103/PassengerCount/blob/e44d42de22775d778e8e5a66f4ba2787f670d2cf/verification/api35-restart-race/run120/README.md).
 
 ### Read-only profiling capability and identity preflight
 

@@ -1,7 +1,7 @@
 {
   "kind": "paired-independent-no-trigger-contrast-and-read-only-profiling-preflight",
-  "baseHead": "61c3c6b156136ebf0cb4bf7e2ff2609b2ad67d5d",
-  "baseTree": "f5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb",
+  "baseHead": "bf28a3aa9af0ca1f2d302b5b18722979448cc829",
+  "baseTree": "8525b3ab50ef239a72465ac7d6b619223d635f38",
   "acceptance": {
     "fullAllProcessAbsenceRequired": true,
     "original13PhasesUnchanged": true,
@@ -17,7 +17,7 @@
     "freshOwnedEmulatorPerLeg": true,
     "retainedTriggeredNativeBeforeControl": true,
     "exclusiveControlDirectory": true,
-    "changedAction": "Only control replaces later external TRIGGER with measured host-only idle; identical warm-up and strict full absence proof retained",
+    "changedAction": "Control withholds later external TRIGGER, replays measured host-only slot, then targets triggered first-services elapsed-from-absence with bounded host-only deadline wait; same device-command sequence/full absence proof",
     "timing": "Host monotonic verified-absence, slot and first-services brackets; SHA/byte-paired receipts and signed differences, never timing equality",
     "maxReplaySeconds": 10,
     "controlMaxSeconds": 180,
@@ -32,7 +32,27 @@
     "provenance": "Exact APK hashes, source head/tree and build fingerprint receipts validated; not whole-image or runtime-equivalence proof",
     "controlResult": "foreground-observed-no-trigger is observation only; no verify-race reattachment or GPS/session acceptance",
     "failurePriority": "Triggered nonzero preserved; otherwise control nonzero propagates; observed denial1 cannot be erased by metadata or timing uncertainty2; outer124/137 retained separately",
-    "unexpectedTrigger": "Any ENTER/FOREGROUND marker anywhere in fresh control invalidates comparison"
+    "unexpectedTrigger": "Any ENTER/FOREGROUND marker anywhere in fresh control invalidates comparison",
+    "firstServicesAlignment": {
+      "maxReferenceSeconds": 10,
+      "clock": "time.monotonic_ns",
+      "controlOnly": true,
+      "extraDeviceCommands": 0,
+      "lateDeadline": "Explicit deadline-already-passed; never pretend waiting occurred",
+      "fields": [
+        "targetFromAbsenceNs",
+        "deadlineNs",
+        "waitStartedNs",
+        "waitCompletedNs",
+        "requestedWaitNs",
+        "waitedNs",
+        "initialLatenessNs",
+        "overshootNs"
+      ],
+      "pairing": "Exact triggered slot/first-services and own slot hashes plus native status/stdout/stderr; arithmetic validated before comparison eligibility",
+      "failure": "Still capture real log/services; known denial1 retained; uncertain comparison2 otherwise",
+      "limitation": "Host bracket precedes receipt/stdout publication, process exit and shell dispatch; not equal device events, scheduling or causality"
+    }
   },
   "profilingPreflight": {
     "timing": "Existing before-preparation/after-terminal metadata flow only; never inside absence",
@@ -71,11 +91,11 @@
   },
   "validation": {
     "focusedNode": {
-      "passed": 286,
+      "passed": 337,
       "failed": 0
     },
     "ownedContrastNode": {
-      "passed": 194,
+      "passed": 245,
       "failed": 0
     },
     "profilingPreflightPython": {
@@ -87,16 +107,16 @@
       "failed": 0
     },
     "localAggregate": {
-      "passed": 592,
-      "total": 593,
+      "passed": 643,
+      "total": 644,
       "failure": "Known local government-routes.json.gz materialization limit; no skipped assertion; complete hosted checkout required"
     },
-    "native": "Passed on unchanged native/production inputs; hosted run119 native also passed",
+    "native": "Native/production inputs unchanged; hosted run120 native passed",
     "syntaxAndDiff": "passed",
-    "nativeIndependentReview": "No remaining material findings after stale-control-directory, pre-kill-trigger contamination and profiler-completeness fixes",
-    "hostTests": "Transport fixtures and actual monotonic/GNU timeout/TERM/forced-kill processes; no Android policy emulation or device claim",
+    "nativeIndependentReview": "Prior reviewed test-only readiness fix clean on bf28a3a; current narrow alignment gets fresh exact-head Codex",
+    "hostTests": "337 focused Node tests including real clock late case, controlled-clock early/late branch transport checks, actual control shell device-command equivalence, metadata/failure/exclusive-output boundaries; no Android policy emulation",
     "oneTimeComparisons": "Strict analyzeRestartRace function and phase() through EOF are byte-identical to published base; no permanent historical-source hash gate",
-    "exactHeadCodex": "pending fresh request after publication",
+    "exactHeadCodex": "pending fresh exact-head request after publication",
     "exactHeadHosted": "pending natural CI after publication",
     "reviewFindingFixed": {
       "url": "https://github.com/c933103/PassengerCount/pull/19#discussion_r4374448080",
@@ -106,8 +126,8 @@
       "productionBudgetsOrSourceChanged": false
     }
   },
-  "nextStep": "Interpret actual triggered/control provenance, before-service/runtime permission state, schedule events and measured timing together. Separately inspect read-only AMS profiler/candidate ART identity; starting method sampling would be stateful and perturb timing, not a capability query. Atrace/Perfetto category activation remains unperformed.",
-  "latestExecutedPriorHead": {
+  "nextStep": "Execute natural hosted paired observation with bounded host-only first-services deadline targeting. Compare actual lateness/overshoot, log-prefix ordering and memory-pressure events; no runtime caller or APK fix claim. Full gate remains binding. Profiling/atrace activation remains paused; preflight does not authorize a stateful experiment.",
+  "priorExecutedContrast119": {
     "run": 40278271990,
     "number": 119,
     "attempt": 1,
@@ -130,6 +150,31 @@
     "controlFirstServicesEarlierNs": 261366645,
     "profilingState": "Six complete snapshots have no AMS profile fields, shell permission granted; not direct ART absence/native support proof",
     "artCandidateSha256": "cf1c0b8e7fe7b9200a89bf30a076f44509c9a21fe18d7b33c63a48f673746cd1",
-    "receipt": "https://github.com/c933103/PassengerCount/actions/runs/40278271990"
+    "receipt": "https://github.com/c933103/PassengerCount/blob/e44d42de22775d778e8e5a66f4ba2787f670d2cf/verification/api35-restart-race/run119/README.md"
+  },
+  "latestExecutedPriorHead": {
+    "run": 40280094337,
+    "number": 120,
+    "attempt": 1,
+    "head": "bf28a3aa9af0ca1f2d302b5b18722979448cc829",
+    "tree": "8525b3ab50ef239a72465ac7d6b619223d635f38",
+    "conclusion": "failure",
+    "hostedNode": {
+      "passed": 593,
+      "total": 593
+    },
+    "originalExit": 1,
+    "triggeredExit": 1,
+    "controlExit": 0,
+    "pairedWrapperExit": 1,
+    "controlOutcome": "foreground-observed-no-trigger; no reattachment/GPS/session acceptance",
+    "timingEqualityEstablished": false,
+    "controlFirstServicesEarlierNs": 81167250,
+    "counterevidence": "Cleanup06:37:47.951 precedes helper ENTER48.071/FOREGROUND48.099; helper promotion is not established immediate cause; pre-log command/launch effects only hypothesis",
+    "memoryPressure": "Initial both10000ms; triggered19798\u21927771\u21920ms, control363ms",
+    "receipt": "https://github.com/c933103/PassengerCount/blob/e44d42de22775d778e8e5a66f4ba2787f670d2cf/verification/api35-restart-race/run120/README.md",
+    "originalLogSha256": "51f8d8a43dc9f88e3a62d30ac74492a17984d7301994fcf376aa73b7a5561664",
+    "triggeredLogSha256": "9d65252ae53be8fb06a0186e5b6c7e058223b98ac3da0b71b38415208f89f49f",
+    "controlLogSha256": "7e16d940a458742aaade72803890873cdf3adaa04a05edb1e6c20e5fedd51c2b"
   }
 }

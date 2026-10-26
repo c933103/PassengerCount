@@ -75,6 +75,7 @@ function runShell(events,dump=service,transportError=false,warmReady=true,scope=
   if(control) { fs.mkdirSync(out); timingFixture(base); provenanceFixture(base,out);
     if(fault?.stage==='timing') fs.writeFileSync(path.join(base,'race-trigger-slot.json'),'{"status":"measured"}');
     if(fault?.stage==='control-receipt') fs.mkdirSync(path.join(out,fault.name));
+    if(fault?.stage==='alignment') fs.writeFileSync(path.join(base,'race-first-services-timing.json'),'{\"status\":\"partial\"}');
   }
   try {
     fs.writeFileSync(path.join(out,'input.log'),(warmReady?['10-15 09:09:30.000 333 333 I PassengerRaceTrigger: RACE_WARM_READY pid=333 uid=10210',...events]:events).join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
@@ -471,7 +472,10 @@ test('actual control shell omits only trigger slot, keeps full absence/snapshot 
   assert.equal(control.result.outcome,'foreground-observed-no-trigger');
   assert.equal(control.result.fullAbsenceReceiptVerified,true);assert.equal(control.result.comparisonEligible,true);
   assert.equal(control.result.comparisonTiming.timingEqualityEstablished,false);
-  assert.equal(control.result.comparisonTiming.status,'measured-differences-not-matched');
+  assert.equal(control.result.comparisonTiming.status,'host-deadline-targeted-not-equivalent');
+  assert.ok(control.result.comparisonTiming.controlMinusTriggered.firstServicesFromAbsenceNs>=0);
+  assert.equal(control.files['host-first-services-alignment.exit-code.txt'],'0\n');
+  assert.equal(control.files['host-first-services-alignment.stderr'],'');
   assert.doesNotMatch(control.calls,/app.passengercount.tests.TRIGGER|phase verify-/);
   assert.doesNotMatch(control.stdout,/PASS:/); assert.match(control.files['race-result.txt'],/OBSERVATION ONLY/);
   const commands=r=>r.calls.split('\n').filter(line=>line.startsWith('adb ')&&!line.includes('.TRIGGER'));
@@ -520,9 +524,20 @@ function controlPublicationFixture(fn) {
     verifiedAbsenceNs:slot.verifiedAbsenceNs,firstServicesStartNs:8500000,firstServicesEndNs:9500000,
     servicesElapsedNs:1000000,gapAfterSlotNs:1300000,elapsedFromAbsenceNs:3500000,
     slotEvidence:{bytes:Buffer.byteLength(slotBytes),sha256:digest(slotBytes)}};
+  const triggeredFirstBytes=fs.readFileSync(path.join(parent,'race-first-services-timing.json'));
+  const alignment={kind:slot.kind,mode:slot.mode,status:'deadline-already-passed',clock:slot.clock,
+    verifiedAbsenceNs:slot.verifiedAbsenceNs,targetFromAbsenceNs:3001000,deadlineNs:8001000,
+    waitStartedNs:8400000,waitCompletedNs:8500000,waitedNs:100000,requestedWaitNs:0,
+    initialLatenessNs:399000,overshootNs:499000,
+    triggeredSlotEvidence:{bytes:triggeredBytes.length,sha256:digest(triggeredBytes)},
+    triggeredFirstServicesEvidence:{bytes:triggeredFirstBytes.length,sha256:digest(triggeredFirstBytes)},
+    controlSlotEvidence:{bytes:Buffer.byteLength(slotBytes),sha256:digest(slotBytes)}};
   for(const [name,value] of Object.entries({'race-process-scope.txt':'ALL_PACKAGE_PROCESSES_ABSENT before_control_idle=true\n',
     'race-absent-pids.exit-code.txt':'1\n','race-absent-pids.txt':'','race-absent-pids.stderr':'',
-    'race-trigger-slot.json':slotBytes,'race-first-services-timing.json':JSON.stringify(first)+'\n'})) fs.writeFileSync(path.join(out,name),value);
+    'race-trigger-slot.json':slotBytes,'race-first-services-timing.json':JSON.stringify(first)+'\n',
+    'race-first-services-alignment.json':JSON.stringify(alignment)+'\n',
+    'host-first-services-alignment.exit-code.txt':'0\n','host-first-services-alignment.stdout':'8500000\n',
+    'host-first-services-alignment.stderr':''})) fs.writeFileSync(path.join(out,name),value);
   const attempt=(name,denial=false)=>{
     const directory=path.join(out,name);fs.mkdirSync(directory);
     for(const [file,content] of [['logcat.txt',controlEvents(denial).join('\n')],['services.txt',trackerService]]) {
@@ -531,7 +546,7 @@ function controlPublicationFixture(fn) {
     }
     return [path.join(directory,'logcat.txt'),path.join(directory,'services.txt'),'111','race','app.passengercount:tracking',path.join(out,'race-result.json'),true];
   };
-  try {fn({out,parent,slot,first,attempt});} finally {fs.rmSync(parent,{recursive:true,force:true});}
+  try {fn({out,parent,slot,first,alignment,attempt});} finally {fs.rmSync(parent,{recursive:true,force:true});}
 }
 test('control publication binds exact timing receipts and reports differences instead of equality',()=>controlPublicationFixture(({attempt})=>{
   const result=publishRestartRace(...attempt('first'));
@@ -696,3 +711,94 @@ test('control-only receipt write failure is uncertainty2: '+name,()=>{
   assert.equal(r.status,2,r.stdout+r.stderr);assert.doesNotMatch(r.calls,/phase verify-/);
   if(name==='race-result.txt') assert.equal(r.result.outcome,'foreground-observed-no-trigger');
 });
+
+// Deadline alignment observes host time only; no fake Android policy is used.
+for(const fault of ['missing','oversized','exit','stderr','stdout','wrong-kind','wrong-clock','wrong-mode','status','absence','target',
+  'deadline','started','completed','waited','requested','lateness','overshoot','negative','unsafe','trigger-slot','trigger-first','own-slot'])
+test('alignment '+fault+' is explicit uncertainty without turning a denial green',()=>{
+  for(const denial of [false,true]) controlPublicationFixture(({out,alignment,attempt})=>{
+    const file=path.join(out,'race-first-services-alignment.json');
+    const changes={'wrong-kind':['kind','bad'],'wrong-clock':['clock','bad'],'wrong-mode':['mode','triggered'],
+      status:['status','deadline-reached'],absence:['verifiedAbsenceNs',1],target:['targetFromAbsenceNs',1],deadline:['deadlineNs',1],
+      started:['waitStartedNs',1],completed:['waitCompletedNs',1],waited:['waitedNs',1],requested:['requestedWaitNs',1],
+      lateness:['initialLatenessNs',1],overshoot:['overshootNs',1],negative:['waitedNs',-1],unsafe:['waitedNs',Number.MAX_SAFE_INTEGER+1]};
+    if(changes[fault]) alignment[changes[fault][0]]=changes[fault][1];
+    for(const [key,field] of [['trigger-slot','triggeredSlotEvidence'],['trigger-first','triggeredFirstServicesEvidence'],['own-slot','controlSlotEvidence']])
+      if(fault===key)alignment[field].sha256='bad';
+    fs.writeFileSync(file,JSON.stringify(alignment)+'\n');
+    if(fault==='missing')fs.unlinkSync(file);
+    if(fault==='oversized')fs.writeFileSync(file,' '.repeat(65537));
+    if(fault==='exit')fs.writeFileSync(path.join(out,'host-first-services-alignment.exit-code.txt'),'2\n');
+    if(fault==='stderr')fs.writeFileSync(path.join(out,'host-first-services-alignment.stderr'),'partial');
+    if(fault==='stdout')fs.writeFileSync(path.join(out,'host-first-services-alignment.stdout'),'8400000\n');
+    const result=publishRestartRace(...attempt('attempt',denial));
+    assert.equal(result.comparisonEligible,false);assert.equal(result.comparisonTiming.status,'unverified');
+    assert.equal(result.outcome,denial?'automatic-restart-denied':'control-comparison-unverified');
+  });
+});
+test('alignment failure still executes services/log collection and preserves native denial',()=>{
+  for(const denial of [false,true]) {
+    const r=runShell(controlEvents(denial),trackerService,false,true,{kind:'race',uiAlive:false},{stage:'alignment'},true,true);
+    assert.equal(r.status,denial?1:2,r.stdout+r.stderr);assert.equal(r.result.comparisonEligible,false);
+    assert.equal(r.files['host-first-services-alignment.exit-code.txt'],'2\n');
+    assert.match(r.files['host-first-services-alignment.stderr'],/RACE_HOST_TIMING_UNVERIFIED/);
+    assert.match(r.calls,/adb shell dumpsys activity services/);assert.doesNotMatch(r.calls,/\.TRIGGER|phase verify-/);
+  }
+});
+test('control preserves cleanup-before-helper counterevidence without claiming helper causation',()=>{
+  const r=analyzeRestartRace([death,died,scheduled,cleanup,entering,promoted,start,denied].join('\n'),'',111);
+  assert.equal(r.outcome,'automatic-restart-denied');assert.equal(r.cleanupDuringAbsence,true);
+  assert.equal(r.triggerBeforeCleanup,false);assert.ok(r.lines.reset<r.lines.entering);
+});
+function alignmentCall(parent,out,output,clock=null) {
+  const source=clock?hostTiming.replace('    mode, *args = sys.argv[1:]',
+    `    time.monotonic_ns = iter(${JSON.stringify(clock)}).__next__\n    time.sleep = lambda seconds: None\n    mode, *args = sys.argv[1:]`):hostTiming;
+  return spawnSync('bash',['-c',`${source}\nrace_host_timing align-first-services "$@"`,'_',
+    path.join(parent,'race-trigger-slot.json'),path.join(parent,'race-first-services-timing.json'),
+    path.join(out,'race-trigger-slot.json'),output],{encoding:'utf8',timeout:4000});
+}
+for(const [label,clock,expected] of [
+  ['early',[8000000,8000000,8000000,8002000,8002500],{status:'deadline-reached',requestedWaitNs:1000,initialLatenessNs:0,overshootNs:1500,waitedNs:2500}],
+  ['late',[8400000,8400000,8500000],{status:'deadline-already-passed',requestedWaitNs:0,initialLatenessNs:399000,overshootNs:499000,waitedNs:100000}],
+]) test('actual host-helper branch reports '+label+' deadline and overshoot without changing reference bytes',()=>controlPublicationFixture(({parent,out})=>{
+  const output=path.join(out,'new-alignment.json'),prior=fs.readFileSync(path.join(parent,'race-first-services-timing.json'));
+  const r=alignmentCall(parent,out,output,clock);assert.equal(r.status,0,r.stderr);
+  const result=JSON.parse(fs.readFileSync(output));
+  for(const [key,value] of Object.entries(expected))assert.equal(result[key],value,key);
+  assert.equal(Number(r.stdout),result.waitCompletedNs);
+  assert.deepEqual(fs.readFileSync(path.join(parent,'race-first-services-timing.json')),prior);
+  const bytes=fs.readFileSync(output);
+  assert.equal(alignmentCall(parent,out,output,clock).status,2,'exclusive receipt cannot overwrite prior valid evidence');
+  assert.deepEqual(fs.readFileSync(output),bytes);
+}));
+test('real monotonic alignment reports a naturally late deadline rather than sleeping or claiming equality',()=>controlPublicationFixture(({parent,out})=>{
+  const file=path.join(out,'real-alignment.json'),r=alignmentCall(parent,out,file);
+  assert.equal(r.status,0,r.stderr);const result=JSON.parse(fs.readFileSync(file));
+  assert.equal(result.status,'deadline-already-passed');assert.equal(result.requestedWaitNs,0);
+  assert.ok(result.initialLatenessNs>0);assert.ok(result.overshootNs>=result.initialLatenessNs);
+}));
+for(const fault of ['first-missing','first-oversized','first-json','first-array','trigger-bool','first-clock','first-status','first-reference','first-absence','first-order','first-gap','first-duration','first-elapsed','first-over-limit','first-bool',
+  'trigger-status','trigger-capture','trigger-reference','own-reference','own-replay','own-order','own-future','output-parent'])
+test('host deadline rejects '+fault+' before wait/publication',()=>controlPublicationFixture(({parent,out,slot,first})=>{
+  const tpath=path.join(parent,'race-trigger-slot.json'),fpath=path.join(parent,'race-first-services-timing.json'),opath=path.join(out,'race-trigger-slot.json');
+  const triggered=JSON.parse(fs.readFileSync(tpath)),reference=JSON.parse(fs.readFileSync(fpath));
+  if(fault==='first-clock')reference.clock='wall';if(fault==='first-status')reference.status='partial';
+  if(fault==='first-reference')reference.slotEvidence.sha256='bad';if(fault==='first-absence')reference.verifiedAbsenceNs++;
+  if(fault==='first-order')reference.firstServicesStartNs=1;if(fault==='first-gap')reference.gapAfterSlotNs++;
+  if(fault==='first-duration')reference.servicesElapsedNs++;if(fault==='first-elapsed')reference.elapsedFromAbsenceNs++;
+  if(fault==='first-bool')reference.servicesElapsedNs=true;
+  if(fault==='first-over-limit') {reference.firstServicesStartNs=triggered.verifiedAbsenceNs+10000000001;reference.firstServicesEndNs=reference.firstServicesStartNs+1;
+    reference.servicesElapsedNs=1;reference.gapAfterSlotNs=reference.firstServicesStartNs-triggered.slotEndNs;reference.elapsedFromAbsenceNs=10000000001;}
+  if(fault==='trigger-status')triggered.status='partial';if(fault==='trigger-capture')triggered.captureExitCode=1;
+  if(fault==='trigger-bool')triggered.captureExitCode=false;
+  if(fault==='trigger-reference')triggered.slotEndNs++;
+  if(fault==='own-reference')slot.reference.sha256='bad';if(fault==='own-replay')slot.replayDifferenceNs++;
+  if(fault==='own-order')slot.slotStartNs=0;
+  if(fault==='own-future') {slot.verifiedAbsenceNs+=1e15;slot.slotStartNs+=1e15;slot.slotEndNs+=1e15;}
+  fs.writeFileSync(tpath,JSON.stringify(triggered)+'\n');fs.writeFileSync(fpath,JSON.stringify(reference)+'\n');fs.writeFileSync(opath,JSON.stringify(slot)+'\n');
+  if(fault==='first-missing')fs.unlinkSync(fpath);if(fault==='first-oversized')fs.writeFileSync(fpath,' '.repeat(65537));
+  if(fault==='first-json')fs.writeFileSync(fpath,'{partial');if(fault==='first-array')fs.writeFileSync(fpath,'[]');
+  const output=path.join(out,fault==='output-parent'?'missing/output.json':'invalid-alignment.json');
+  const r=alignmentCall(parent,out,output,[8000000,8000000,8000000,8002000,8002500]);
+  assert.equal(r.status,2,r.stdout+r.stderr);assert.match(r.stderr,/RACE_HOST_TIMING_UNVERIFIED/);assert.equal(fs.existsSync(output),false);
+}));
