@@ -162,3 +162,38 @@ References: [instrumentation process list](https://developer.android.com/guide/t
 [secondary process attachment](https://android.googlesource.com/platform/frameworks/base/+/android-15.0.0_r1/services/core/java/com/android/server/am/AppProfiler.java).
 Installed execution remains required; host relay tests cannot establish Android
 Binder or restart behavior.
+
+
+## Read-only platform capability/source-identity capture
+
+The existing restart-race opt-in also captures platform metadata **after install
+and grants but before any test/session preparation**, and again from EXIT cleanup
+**after the test's terminal result**, before stopping the owned emulator. It adds
+no observation call to the all-process-absence interval and does not change any
+original lifecycle, permission, race or acceptance check.
+
+`scripts/capture-android-platform-preflight.py` requires the explicitly selected
+owned emulator serial; blank serials are rejected. It reads fixed build/JDWP
+properties, system_server PID and the finite `adb jdwp` PID snapshot, target
+package/app-op/service state, framework JAR digests, platform-test package presence
+and SDK image metadata. It does not attach a debugger, start/stop an app, install,
+root, set properties, reboot, forward ports or change permissions/settings.
+Userdebug alone does not prove that system_server is available to JDWP.
+
+Each `platform-capability-before-tests.*` / `platform-capability-after-tests.*`
+directory retains the outer collector stdout, stderr and exit status; its unique
+nested attempt retains exact command bytes, statuses, SHA-256 hashes and timings.
+Any failed/timed-out query or stderr is incomplete (collector exit 2), never a
+restart result. The wrapper bounds the whole collector to 35 seconds; an outer
+timeout remains recorded as 124. Missing SDK metadata remains an explicit error.
+Repeated/partial captures cannot overwrite earlier attempts. The original gate
+exit is saved **before** cleanup metadata, which cannot change that exit, rewrite
+race-result.json or turn a failed installed step green.
+
+Host Python tests mock transport only, not Android policy. Node tests execute the
+actual shell wrapper/EXIT cleanup across success, failure, timeout and transport
+boundaries, and verify placement outside test preparation/absence. Real installed
+full-restart acceptance still requires the unchanged device gate. This is a
+meaningfully new diagnostic capture, not an APK restart fix or a platform patch.
+The prior observed transition and alternative tracing/build routes are archived
+[here](https://github.com/c933103/PassengerCount/blob/dd80561e8cb5c9b94ffe4786c201a443275fea69/verification/api35-restart-race/route-20261026/route-plan.md).

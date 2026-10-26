@@ -31,19 +31,43 @@ PACKAGE=app.passengercount
 TRACK_PROCESS=app.passengercount:tracking
 UI_RUNNER=app.passengercount.tests/app.passengercount.UiLifecycleInstrumentation
 RUNNER=app.passengercount.tests/app.passengercount.JournalLifecycleInstrumentation
-EMU_PID= GPS_PID= LOG_PID=
+EMU_PID= GPS_PID= LOG_PID= PLATFORM_PREFLIGHT_READY=0
 adb() { "$ADB" -s "$SERIAL" "$@"; }
+# Metadata only, before test preparation and after its terminal result. Never
+# sample in the process-absence interval or substitute this status for a gate.
+platform_preflight() {
+  local stage=$1 directory code
+  if ! directory="$(mktemp -d "$OUT/platform-capability-$stage.XXXXXX")"; then
+    echo 'PLATFORM_CAPABILITY_CAPTURE_UNAVAILABLE: output directory' >&2
+    return 2
+  fi
+  if timeout 35s python3 "$ROOT/scripts/capture-android-platform-preflight.py" \
+    --serial "$SERIAL" --adb "$ADB" --output-root "$directory" \
+    --sdk-image-dir "$ANDROID_HOME/system-images/android-35/google_apis/x86_64" \
+    > "$directory/collector.stdout" 2> "$directory/collector.stderr"; then code=0; else code=$?; fi
+  if ! printf '%s\n' "$code" > "$directory/collector-exit-code.txt"; then
+    echo 'PLATFORM_CAPABILITY_CAPTURE_UNAVAILABLE: status receipt' >&2
+    return 2
+  fi
+  return "$code"
+}
 cleanup() {
   local code=$?
+  # Commit the original gate status before any diagnostic or teardown can fail.
+  if ! printf '%s\n' "$code" > "$OUT/exit-code.txt"; then
+    echo "ORIGINAL_EXIT_RECEIPT_UNAVAILABLE: exit=$code; retaining process exit and attempting owned-emulator teardown" >&2
+  fi
   if [[ -n "$EMU_PID" ]]; then
     adb shell dumpsys activity services "$PACKAGE" > "$OUT/services-final.txt" 2>&1 || true
     adb logcat -d -v threadtime > "$OUT/logcat-final.txt" 2>&1 || true
+    if [[ "$PLATFORM_PREFLIGHT_READY" == 1 ]]; then
+      platform_preflight after-tests || echo "PLATFORM_CAPABILITY_INCOMPLETE after-tests exit=$? (original exit=$code retained)" >&2
+    fi
   fi
   [[ -z "$GPS_PID" ]] || kill "$GPS_PID" 2>/dev/null || true
   [[ -z "$LOG_PID" ]] || kill "$LOG_PID" 2>/dev/null || true
   # Only the process/device started by this script is stopped. No shared SDK/device cleanup.
   [[ -z "$EMU_PID" ]] || { adb emu kill >/dev/null 2>&1 || true; wait "$EMU_PID" 2>/dev/null || true; }
-  printf '%s\n' "$code" > "$OUT/exit-code.txt"
 }
 trap cleanup EXIT
 git -C "$ROOT" rev-parse HEAD HEAD^{tree} > "$OUT/source.txt"
@@ -109,6 +133,10 @@ adb install "$ROOT/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.
 adb shell pm grant "$PACKAGE" android.permission.ACCESS_FINE_LOCATION
 adb shell pm grant "$PACKAGE" android.permission.ACCESS_COARSE_LOCATION
 adb shell dumpsys package "$PACKAGE" > "$OUT/package.txt"
+if [[ "${PASSENGER_RESTART_RACE:-0}" == 1 ]]; then
+  PLATFORM_PREFLIGHT_READY=1
+  platform_preflight before-tests || echo "PLATFORM_CAPABILITY_INCOMPLETE before-tests exit=$? (not an acceptance result)" >&2
+fi
 adb logcat -v threadtime > "$OUT/logcat-live.txt" 2>&1 & LOG_PID=$!
 (
   for ((i=0;i<420;i++)); do
