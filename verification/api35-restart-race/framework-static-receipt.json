@@ -1,0 +1,65 @@
+{
+  "kind": "exact-installed-framework-static-diagnostic",
+  "baseHead": "9586a9125ad21abed97dfd7a2e6433779ae5b7ee",
+  "scope": [
+    "Post-result read-only fixed services.jar capture on the already owned emulator",
+    "Triple device-before/device-after/local SHA256 pairing and isolated attempts",
+    "Existing SDK35 dexdump provenance and every validated classes*.dex disassembly",
+    "No production/app/manifest/workflow/gate change"
+  ],
+  "acceptance": {
+    "fullAllProcessAbsenceRequired": true,
+    "originalFailureStillBinding": true,
+    "runtimeCallerStackObserved": false,
+    "apkRestartFixClaimed": false
+  },
+  "priorEvidence": {
+    "run": 40268169329,
+    "attempt": 1,
+    "head": "9586a9125ad21abed97dfd7a2e6433779ae5b7ee",
+    "testedTree": "dd61212fdfade7050da544d70c679a332dd7d930",
+    "archiveCommit": "5fcb5f0dce4ffb27d2035f449192b215e2585772",
+    "receipt": "https://github.com/c933103/PassengerCount/blob/5fcb5f0dce4ffb27d2035f449192b215e2585772/verification/api35-restart-race/run115/receipt.json",
+    "initialFrameHex": "30303030",
+    "initialFrameSha256": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+    "observedScope": "Four complete-empty snapshots with stable system_server bracket; not permanent absence or policy denial",
+    "originalExit": 1,
+    "independentExit": 1
+  },
+  "validation": {
+    "focusedNode": {
+      "passed": 163,
+      "failed": 0,
+      "includes": {
+        "frameworkWiringNode": 16,
+        "frameworkPython": 21,
+        "existingPreflightNode": 19,
+        "existingCollectorPython": 20,
+        "framedTransportPython": 15
+      }
+    },
+    "native": "passed; production sources unchanged",
+    "localAggregate": {
+      "passed": 469,
+      "total": 470,
+      "failure": "Existing unavailable local data/government-routes.json.gz fixture; no skipped assertion or product regression claim"
+    },
+    "hostedExactHead": "pending publication and natural CI",
+    "codexExactHead": "pending publication and fresh request",
+    "syntaxAndDiff": "passed",
+    "phaseAcceptanceSequence": "One-time byte comparison from phase() onward equals original sequence; no historical hash gate added",
+    "reviewHardening": "Scoped SIGTERM latch preserves interrupted command/native status and reaps TERM-resistant child; outer kill-after last resort tested"
+  },
+  "limits": {
+    "internalSeconds": 90,
+    "outerSeconds": 120,
+    "outerForcedKillGraceSeconds": 5,
+    "jarMiB": 256,
+    "expandedZipMiB": 512,
+    "perDexMiB": 128,
+    "dexCount": 64,
+    "perDisassemblyMiB": 256,
+    "totalDisassemblyMiB": 1024
+  },
+  "interpretation": "Static binary write/caller sites can narrow a build/source mismatch but cannot establish executed transition order or runtime cause."
+}

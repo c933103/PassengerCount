@@ -227,3 +227,53 @@ empty/partial/malformed data, stderr/native failure, output bounds and client
 termination/reaping; separate collector tests check target identity and provenance.
 Neither suite models or substitutes for real Android policy. Original acceptance
 checks and their exit 1 failures are unchanged.
+
+### Exact installed framework binary and host DEX analysis
+
+[Run115](https://github.com/c933103/PassengerCount/blob/5fcb5f0dce4ffb27d2035f449192b215e2585772/verification/api35-restart-race/run115/README.md)
+returned exactly `0000` in all four snapshots, with stable system_server PID 555
+or 556. Both original/independent full-absence restarts still failed with exit 1.
+Empty advertised snapshots do not establish a global debugger-policy denial or
+make a full AOSP build a prerequisite for all further investigation.
+
+The next bounded diagnostic reads the **actual installed**
+`/system/framework/services.jar` and disassembles its DEX using the already
+installed SDK 35 `dexdump`. It runs only in EXIT cleanup, after the original exit
+and platform metadata have been saved; never before tests or inside the absence
+interval. `scripts/capture-android-framework.py` receives the explicitly owned
+serial and explicit existing host-tool path. It does not install a tool, query
+another target, attach a debugger, forward a port or change device/security state.
+
+Each `framework-static.*` directory retains outer stdout/stderr/exit status and a
+unique nested `framework-binary-*` attempt. Device-before/device-after/local JAR
+SHA256 must agree before static analysis. Exact host-tool bytes/path and adjacent
+SDK package metadata establish tool provenance, not a vendor-signature claim.
+Validated canonical ZIP entries and every contiguous `classes*.dex` are retained
+with hashes, header/checksum results and bounded raw `dexdump -d` output. Missing
+tools/metadata/DEX, unsupported formats, mismatched hashes, partial transfers,
+command errors, output caps and timeouts remain incomplete; they cannot replace
+the original gate exit or overwrite earlier evidence. Native pull progress on
+stderr is preserved; completion additionally requires agreeing archive hashes.
+
+The helper latches SIGTERM without throwing across a subprocess-spawn/cleanup
+boundary, then terminates/reaps only its own native child and records interruption
+with the actual native status. Its previous signal handler is restored. Host tests
+exercise both outer 124 with a resistant native child and the outer 137 last resort.
+The helper has a 90-second total budget; the outer wrapper 120 seconds plus a 5-second
+forced-kill grace for its own local collector process group. A forced termination
+can leave a missing inner receipt; the raw partial files and outer 124/137 remain
+explicitly incomplete, never fabricated as a complete capture. JAR 256 MiB,
+expanded ZIP 512 MiB, per-DEX 128 MiB/count 64 and disassembly 256 MiB per DEX/1 GiB total
+are ceilings, not measured resource requirements. Exceeding a limit is incomplete,
+not accepted clipped evidence. Partial archives and raw command statuses remain
+available for diagnosis. Missing/unsupported DEX does not imply recoverable VDEX:
+that section is optional in ART. A custom-image/OAT toolchain is not silently
+substituted.
+
+The goal is to examine actual `ServiceRecord` restriction-field writes and their
+caller/control-flow sites across all captured DEX, then compare just those methods
+with public Android 15 source. Static candidate sites are **not** an observed
+runtime caller stack, exact executed interleaving or a proven restart cause.
+Host fixture tests validate transport/archive orchestration, not Android policy.
+Original 13 phases, all-process absence, negative controls and failure exits stay
+binding. Complete capture/disassembly likewise cannot turn a failed restart green.

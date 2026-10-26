@@ -51,6 +51,24 @@ platform_preflight() {
   fi
   return "$code"
 }
+# Exact installed binary/static analysis, after the terminal result only. This
+# has a separate namespace/status and never installs tools or attaches a debugger.
+framework_binary_capture() {
+  local directory code
+  if ! directory="$(mktemp -d "$OUT/framework-static.XXXXXX")"; then
+    echo 'FRAMEWORK_STATIC_CAPTURE_UNAVAILABLE: output directory' >&2
+    return 2
+  fi
+  if timeout --kill-after=5s 120s python3 "$ROOT/scripts/capture-android-framework.py" \
+    --serial "$SERIAL" --adb "$ADB" --output-root "$directory" \
+    --dexdump "$ANDROID_HOME/build-tools/35.0.0/dexdump" \
+    > "$directory/collector.stdout" 2> "$directory/collector.stderr"; then code=0; else code=$?; fi
+  if ! printf '%s\n' "$code" > "$directory/collector-exit-code.txt"; then
+    echo 'FRAMEWORK_STATIC_CAPTURE_UNAVAILABLE: status receipt' >&2
+    return 2
+  fi
+  return "$code"
+}
 cleanup() {
   local code=$?
   # Commit the original gate status before any diagnostic or teardown can fail.
@@ -62,6 +80,7 @@ cleanup() {
     adb logcat -d -v threadtime > "$OUT/logcat-final.txt" 2>&1 || true
     if [[ "$PLATFORM_PREFLIGHT_READY" == 1 ]]; then
       platform_preflight after-tests || echo "PLATFORM_CAPABILITY_INCOMPLETE after-tests exit=$? (original exit=$code retained)" >&2
+      framework_binary_capture || echo "FRAMEWORK_STATIC_INCOMPLETE exit=$? (original exit=$code retained)" >&2
     fi
   fi
   [[ -z "$GPS_PID" ]] || kill "$GPS_PID" 2>/dev/null || true
