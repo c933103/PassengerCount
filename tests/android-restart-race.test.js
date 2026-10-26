@@ -69,12 +69,13 @@ test('no helper requirement for historical natural control; no app-op cleanup al
 const root=fileURLToPath(new URL('../',import.meta.url));
 const shell=fs.readFileSync(new URL('../scripts/android-restart-race.sh',import.meta.url),'utf8')
   .replace(/\bSECONDS\b/g,'fixtureClock').replace('fixtureClock+75','fixtureClock+5');
-function runShell(events,dump=service,transportError=false,warmReady=true,scope=null,fault=null) {
+function runShell(events,dump=service,transportError=false,warmReady=true,scope=null,fault=null,diagnostic=false) {
   const out=fs.mkdtempSync(path.join(os.tmpdir(),'pc-race-'));
   try {
     fs.writeFileSync(path.join(out,'input.log'),(warmReady?['10-15 09:09:30.000 333 333 I PassengerRaceTrigger: RACE_WARM_READY pid=333 uid=10210',...events]:events).join('\n'));fs.writeFileSync(path.join(out,'input.services'),dump);
     const r=spawnSync('bash',['-c',`set -euo pipefail
 ROOT=${JSON.stringify(root)}; OUT=${JSON.stringify(out)}; CI=true; EMU_PID=99; SERIAL=emulator-5556; PACKAGE=app.passengercount
+PASSENGER_RESTART_RACE_ONLY=${diagnostic?'1':'0'}
 ${scope ? "TRACK_PROCESS=app.passengercount:tracking" : ""}
 fixtureClock=0
 observation_logs=0; observation_services=0; classifier_calls=0
@@ -102,7 +103,7 @@ adb(){
     ${fault?.stage === 'log' ? `if [[ "$observation_logs" == ${fault.at ?? 2} ]]; then printf 'partial log'; ${fault.stderr ? `echo ${JSON.stringify(fault.stderr)} >&2;` : ''} return ${fault.exit ?? 1}; fi` : ''}
    fi
    cat "$OUT/input.log";;
-  'shell dumpsys activity services app.passengercount')
+  'shell dumpsys activity services app.passengercount'|'shell dumpsys activity services')
    if [[ -f "$OUT/triggered" ]]; then
     observation_services=$((observation_services+1))
     ${fault?.stage === 'services' ? `if [[ "$observation_services" == ${fault.at ?? 2} ]]; then printf 'partial services'; ${fault.stderr ? `echo ${JSON.stringify(fault.stderr)} >&2;` : ''} return ${fault.exit ?? 1}; fi` : ''}
@@ -128,6 +129,42 @@ test('actual shell requires foreground proof before GPS verification reattaches'
 test('actual shell returns failure immediately on denied restart without reattaching',()=>{
   const r=runShell([death,died,scheduled,entering,promoted,cleanup,start,denied],'');
   assert.equal(r.status,1,r.stdout+r.stderr);assert.doesNotMatch(r.calls,/phase verify-race/);
+});
+
+test('independent observation reuses service command slots without client callbacks or gate relaxation',()=>{
+  const fullDump=service+`\n  * ServiceRecord{other u0 app.other/.Service c:app.other}\n    isForeground=true foregroundId=701 types=0x00000800\n\n  Active foreground apps - user 0:\n  #0: app.passengercount\n    mNumActive=1 mAppOnTop=false\n`;
+  const events=[death,died,scheduled,entering,promoted,start,denied];
+  const original=runShell(events,fullDump);
+  const diagnostic=runShell(events,fullDump,false,true,null,null,true);
+  for(const r of [original,diagnostic]) {
+    assert.equal(r.status,1,r.stdout+r.stderr);
+    assert.equal(r.result.outcome,'automatic-restart-denied');
+    assert.doesNotMatch(r.calls,/phase verify-race/);
+  }
+  const originalCalls=original.calls.split('\n').filter(l=>l.startsWith('adb shell dumpsys activity services'));
+  const diagnosticCalls=diagnostic.calls.split('\n').filter(l=>l.startsWith('adb shell dumpsys activity services'));
+  assert.equal(diagnosticCalls.length,originalCalls.length,'no added in-interval snapshot command');
+  assert.ok(originalCalls.every(l=>l==='adb shell dumpsys activity services app.passengercount'));
+  assert.ok(diagnosticCalls.every(l=>l==='adb shell dumpsys activity services'));
+  assert.doesNotMatch(diagnostic.calls,/dumpsys activity -(?:p|c)/);
+  assert.equal(diagnostic.files['race-before-services.txt.scope.txt'],'ALL_SERVICES_NO_CLIENTS_DIAGNOSTIC_ONLY\n');
+  assert.ok(!Object.keys(original.files).some(n=>n.endsWith('.scope.txt')));
+  const scoped=Object.keys(diagnostic.files).filter(n=>n.endsWith('services.txt.scope.txt'));
+  assert.equal(scoped.length,diagnosticCalls.length);
+});
+
+test('an active foreground-app bookkeeping entry cannot establish target service foreground restoration',()=>{
+  const bookkeepingOnly=`ACTIVITY MANAGER SERVICES (dumpsys activity services)\n  * ServiceRecord{other u0 app.other/.Service c:app.other}\n    isForeground=true foregroundId=701 types=0x00000800\n  Active foreground apps - user 0:\n  #0: app.passengercount\n    mNumActive=1 mAppOnTop=false\n`;
+  assert.equal(analyzeRestartRace(log,bookkeepingOnly,111).outcome,'inconclusive');
+});
+for(const listing of ['Pending','Restarting','Destroy'])
+test(`classifier cannot borrow foreground state from an unrelated ${listing} ServiceRecord`,()=>{
+  const dump=service.replace('isForeground=true','isForeground=false')+
+    `  * ${listing} ServiceRecord{other u0 app.other/.Other c:app.other}\n    app=ProcessRecord{other 333:app.other/u0a333}\n    isForeground=true foregroundId=701 types=0x00000800\n`;
+  const observation=analyzeRestartRace(log,dump,111);
+  assert.equal(observation.foreground,false);
+  assert.equal(observation.outcome,'inconclusive');
+  assert.equal(analyzeRestartRace(log+'\n'+denied,dump,111).outcome,'automatic-restart-denied');
 });
 test('actual shell preserves a missed interleaving as unverified, not success',()=>{
   const r=runShell([death,died,scheduled,start,entering,promoted]);
@@ -207,6 +244,20 @@ test('actual split shell requires original UI PID survival before claiming servi
 test('actual all-process shell retains denial after proven OS and ActivityManager absence',()=>{
   const r=runShell(splitEvents('race',true),'',false,true,{kind:'race',uiAlive:false});
   assert.equal(r.status,1,r.stdout+r.stderr);assert.equal(r.result.outcome,'automatic-restart-denied');
+});
+test('richer independent snapshots retain the exact all-process absence requirement and denial',()=>{
+  const observed=runShell(splitEvents('race',true),'',false,true,{kind:'race',uiAlive:false},null,true);
+  assert.equal(observed.status,1,observed.stdout+observed.stderr);
+  assert.equal(observed.result.outcome,'automatic-restart-denied');
+  for(const [options,uiDeath] of [
+    [{absenceExit:255,absenceStderr:'error: device offline'},true],
+    [{absenceExit:0,absenceOutput:'444'},true],
+    [{},false],
+  ]) {
+    const r=runShell(splitEvents('race',true,uiDeath),'',false,true,{kind:'race',uiAlive:false,...options},null,true);
+    assert.equal(r.status,2,r.stdout+r.stderr);
+    assert.doesNotMatch(r.calls,/app.passengercount.tests.TRIGGER/);
+  }
 });
 for(const [label,options,deathObserved] of [
   ['transport error',{absenceExit:255,absenceStderr:'error: device offline'},true],

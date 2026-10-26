@@ -25,7 +25,7 @@ export function analyzeRestartRace(log, services, oldPid, kind = 'race', process
   const interleaved = !invalid && entering > scheduled && promoted > entering && promoted < start;
   // A service dump may include other service records, so scope every field to
   // TrackService's own block instead of independently grepping the whole dump.
-  const blocks = services.split(/(?=^\s*\* ServiceRecord\{)/m);
+  const blocks = services.split(/(?=^\s*\* (?:(?:Pending|Restarting|Destroy) )?ServiceRecord\{)/m);
   const own = blocks.filter(block => /^\s*\* ServiceRecord\{[^\n]* app\.passengercount\/\.TrackService(?:[ }])/m.test(block));
   const foreground = own.some(block => new RegExp(`app=ProcessRecord\\{[^\\n]* ${newPid}:${processPattern}/`).test(block)
     && /^\s*isForeground=true(?:\s|$)/m.test(block));

@@ -11,6 +11,19 @@ race_capture() {
   cat "$output.stderr" >&2
   return 2
 }
+race_capture_services() {
+  local output=$1
+  if [[ "${PASSENGER_RESTART_RACE_ONLY:-0}" == 1 ]]; then
+    # The independent post-failure observation reuses this same command slot.
+    # A positional package suppresses ActiveForegroundApps; no -p/-c option is
+    # used because those can enable application dump callbacks. Original gates
+    # retain their existing package-filtered command and timing sequence.
+    printf 'ALL_SERVICES_NO_CLIENTS_DIAGNOSTIC_ONLY\n' > "$output.scope.txt" || return 2
+    race_capture "$output" shell dumpsys activity services
+  else
+    race_capture "$output" shell dumpsys activity services "$PACKAGE"
+  fi
+}
 restart_race() {
   [[ "${CI:-}" == true && -n "${EMU_PID:-}" && "${SERIAL:-}" == emulator-5556 ]] || {
     echo 'RACE_ENVIRONMENT_UNVERIFIED: use test-android-installed.sh'; return 2;
@@ -40,7 +53,7 @@ restart_race() {
   [[ "$oldpid" =~ ^[0-9]+$ ]] || return 2
   background_home
   activity_state background-race 4 "$oldpid" "$process"
-  race_capture "$OUT/race-before-services.txt" shell dumpsys activity services "$PACKAGE"
+  race_capture_services "$OUT/race-before-services.txt"
   detached race "$oldpid" "$process"
   printf '%s\n' "$oldpid" > "$OUT/race-old-pid.txt"
   local deadline=$((SECONDS+20)) scheduled=false
@@ -87,7 +100,7 @@ restart_race() {
     # complete classification. Keep every attempt, including failed raw output.
     observation="$(mktemp -d "$OUT/race-observation.XXXXXX")" || return 2
     race_capture "$observation/logcat.txt" logcat -d -v threadtime || return 2
-    race_capture "$observation/services.txt" shell dumpsys activity services "$PACKAGE" || return 2
+    race_capture_services "$observation/services.txt" || return 2
     if node "$ROOT/scripts/analyze-android-restart-race.mjs" \
       "$observation/logcat.txt" "$observation/services.txt" "$oldpid" "$kind" "$process" \
       --publish "$OUT/race-result.json" > "$observation/classifier.stdout" 2> "$observation/classifier.stderr"; then

@@ -277,3 +277,47 @@ runtime caller stack, exact executed interleaving or a proven restart cause.
 Host fixture tests validate transport/archive orchestration, not Android policy.
 Original 13 phases, all-process absence, negative controls and failure exits stay
 binding. Complete capture/disassembly likewise cannot turn a failed restart green.
+
+### Independent ActiveForegroundApp bookkeeping observation
+
+The exact installed binary analysis identifies a concrete candidate chain:
+new active-FGS package entry → same-user `updateForegroundApps` message → missing
+UID/package process yields false allowance → `stopAllForegroundServicesLocked`
+→ demotion and restriction reset. Existing retained-record snapshots fit this
+pattern, but do not identify the executed caller. See the
+[actual-bytecode report and offsets](https://github.com/c933103/PassengerCount/blob/f689fbcac329c01b980ea6abe9bf22156c75e639/verification/api35-restart-race/installed-binary-analysis/active/report.md).
+
+Only `PASSENGER_RESTART_RACE_ONLY=1`, the separate post-failure diagnostic, replaces
+its existing before/attempt service-dump command with plain
+`dumpsys activity services`. Omitting the positional package enables
+`ItemMatcher.all` and prints ActiveForegroundApps. Adding `-a` to the old filtered
+command would not do this. No `-p`/`-c` is used: those can enable application dump
+callbacks. This route uses the existing framework dump under AMS locks, does not
+start a target component, change settings/permissions, or attach a debugger.
+The original gate retains its exact package-filtered command, all 13 lifecycle
+phases and full all-process-absence checks. No ADB command slot is added, but the
+larger dump can still perturb timing; this is **not** timing-equivalent acceptance.
+
+The independent snapshots carry an explicit scope sidecar. After the diagnostic
+has terminated, `analyze-android-foreground-observation.py` reads only host files,
+binds raw bytes/SHA256 plus native exit/stderr/scope, and extracts exact user0
+PassengerCount ActiveForegroundApp and TrackService fields. Relative time strings
+remain as printed; omitted `mEndTime` is not invented as zero. Random directory
+names do not establish chronology. `section-not-listed`/`target-not-listed` mean
+only not printed, never UID/process absence, a callback trace, or successful
+restart. Existing absence checks/logs retain that separate evidence.
+
+Every analysis has a new attempt directory. Only a complete summary atomically
+publishes `foreground-observation.json`; partial later input or publication failure
+retains earlier valid output and all raw captures. Parser output/status is separate
+from both gate exits. Host analysis has a 15-second deadline plus 2-second forced
+kill grace, and input/count limits; diagnostic receipt-write failure also retains
+the actual diagnostic process exit. No Python/JavaScript policy model substitutes
+for the real framework observation.
+
+Richer output also exposed an existing classifier boundary bug: Pending,
+Restarting and Destroy ServiceRecord blocks could leak an unrelated foreground
+field into the target block. The classifier now separates those boundaries while
+still requiring the exact active TrackService/new PID. Real negative regressions
+retain inconclusive/denied outcomes rather than false foreground restoration;
+ActiveForegroundApp membership alone cannot satisfy the original gate.

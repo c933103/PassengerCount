@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 const runner=fs.readFileSync(new URL('../scripts/test-android-restart-after-failure.sh',import.meta.url),'utf8');
-function run({original=1,diagnostic=0,optIn='1',missing=false,mutate=false,kvmExit=0}={}) {
+function run({original=1,diagnostic=0,optIn='1',missing=false,mutate=false,kvmExit=0,observation=0,diagnosticReceiptFailure=false}={}) {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'pc-post-failure-'));
   try {
     const originalDir=path.join(root,'android/build/lifecycle-evidence');
@@ -14,6 +14,7 @@ function run({original=1,diagnostic=0,optIn='1',missing=false,mutate=false,kvmEx
     fs.writeFileSync(path.join(originalDir,'source.txt'),'original-commit\noriginal-tree\n');
     fs.writeFileSync(path.join(originalDir,'logcat-final.txt'),'ORIGINAL FAILURE TRACE\n');
     fs.writeFileSync(path.join(root,'scripts/test-android-restart-after-failure.sh'),runner);
+    fs.writeFileSync(path.join(root,'scripts/analyze-android-foreground-observation.py'),`import sys\nprint('host observation fixture')\nraise SystemExit(${observation})\n`);
     fs.writeFileSync(path.join(root,'scripts/ensure-android-kvm.sh'),`#!/bin/bash
 [[ "$1" == diagnostic ]] || exit 9
 printf 'KVM fixture check\\n'
@@ -24,18 +25,31 @@ set -euo pipefail
 [[ "$PASSENGER_RESTART_RACE_ONLY" == 1 && "$PASSENGER_RESTART_RACE" == 1 ]]
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 printf 'separate diagnostic executed\\n' > "$ROOT/android/build/restart-race-evidence/fixture-executed.txt"
+${diagnosticReceiptFailure?'mkdir "$ROOT/android/build/restart-race-evidence/diagnostic-step-exit-code.txt"':''}
 ${mutate?'printf corrupted > "$ROOT/android/build/lifecycle-evidence/logcat-final.txt"':''}
 exit ${diagnostic}
 `);
     const r=spawnSync('bash',[path.join(root,'scripts/test-android-restart-after-failure.sh')],{encoding:'utf8',env:{...process.env,CI:'true',PASSENGER_RESTART_RACE:optIn}});
     const diag=path.join(root,'android/build/restart-race-evidence');
-    return {...r,originalCode:missing?null:fs.readFileSync(path.join(originalDir,'exit-code.txt'),'utf8'),originalLog:fs.readFileSync(path.join(originalDir,'logcat-final.txt'),'utf8'),ran:fs.existsSync(path.join(diag,'fixture-executed.txt')),diagnosticCode:fs.existsSync(path.join(diag,'diagnostic-step-exit-code.txt'))?fs.readFileSync(path.join(diag,'diagnostic-step-exit-code.txt'),'utf8'):null,retainedCode:fs.existsSync(path.join(diag,'original-validation-exit-code.txt'))?fs.readFileSync(path.join(diag,'original-validation-exit-code.txt'),'utf8'):null};
+    return {...r,observationCode:fs.existsSync(path.join(diag,'foreground-observation-exit-code.txt'))?fs.readFileSync(path.join(diag,'foreground-observation-exit-code.txt'),'utf8'):null,originalCode:missing?null:fs.readFileSync(path.join(originalDir,'exit-code.txt'),'utf8'),originalLog:fs.readFileSync(path.join(originalDir,'logcat-final.txt'),'utf8'),ran:fs.existsSync(path.join(diag,'fixture-executed.txt')),diagnosticCode:fs.existsSync(path.join(diag,'diagnostic-step-exit-code.txt'))&&fs.statSync(path.join(diag,'diagnostic-step-exit-code.txt')).isFile()?fs.readFileSync(path.join(diag,'diagnostic-step-exit-code.txt'),'utf8'):null,retainedCode:fs.existsSync(path.join(diag,'original-validation-exit-code.txt'))?fs.readFileSync(path.join(diag,'original-validation-exit-code.txt'),'utf8'):null};
   } finally {fs.rmSync(root,{recursive:true,force:true});}
 }
 for(const diagnostic of [0,1,2])test(`original failure remains retained when independent diagnostic exits ${diagnostic}`,()=>{
   const r=run({diagnostic});assert.equal(r.status,diagnostic,r.stdout+r.stderr);assert.equal(r.ran,true);
   assert.equal(r.originalCode,'1\n');assert.equal(r.retainedCode,'1\n');assert.equal(r.originalLog,'ORIGINAL FAILURE TRACE\n');assert.equal(r.diagnosticCode,`${diagnostic}\n`);
   assert.match(r.stdout,/Original lifecycle remains FAILED \(exit=1\)/);
+});
+for(const [diagnostic,observation] of [[1,0],[1,2],[1,7],[2,0],[255,2]])
+test(`host observation ${observation} cannot replace diagnostic ${diagnostic} or original failure`,()=>{
+ const r=run({diagnostic,observation});assert.equal(r.status,diagnostic,r.stdout+r.stderr);
+ assert.equal(r.observationCode,`${observation}\n`);assert.equal(r.diagnosticCode,`${diagnostic}\n`);
+ assert.equal(r.originalCode,'1\n');assert.equal(r.originalLog,'ORIGINAL FAILURE TRACE\n');
+});
+for(const diagnostic of [1,2,255])test(`diagnostic receipt write failure retains process exit ${diagnostic}`,()=>{
+ const r=run({diagnostic,diagnosticReceiptFailure:true});
+ assert.equal(r.status,diagnostic,r.stdout+r.stderr);assert.equal(r.diagnosticCode,null);
+ assert.equal(r.originalCode,'1\n');assert.equal(r.originalLog,'ORIGINAL FAILURE TRACE\n');
+ assert.match(r.stderr,/DIAGNOSTIC_EXIT_RECEIPT_UNAVAILABLE/);
 });
 for(const [label,args] of [['no opt-in',{optIn:'0'}],['original passed',{original:0}],['missing receipt',{missing:true}]])test('post-failure diagnostic refuses '+label,()=>{
  const r=run(args);assert.equal(r.status,2);assert.equal(r.ran,false);assert.equal(r.originalLog,'ORIGINAL FAILURE TRACE\n');
