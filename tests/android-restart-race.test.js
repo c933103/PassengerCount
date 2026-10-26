@@ -81,7 +81,7 @@ observation_logs=0; observation_services=0; classifier_calls=0
 sleep(){ fixtureClock=$((fixtureClock+1)); }
 node(){
  classifier_calls=$((classifier_calls+1))
- ${fault?.stage === 'classifier' ? `if [[ "$classifier_calls" == ${fault.at ?? 2} ]]; then echo 'injected classifier failure' >&2; return 3; fi` : ''}
+ ${fault?.stage === 'classifier' ? `if [[ "$classifier_calls" == ${fault.at ?? 2} ]]; then echo 'injected classifier failure' >&2; return ${fault.exit ?? 3}; fi` : ''}
  command node "$@"
 }
 launch_home(){ echo launch_home >> "$OUT/calls"; }
@@ -240,6 +240,7 @@ for(const [label,fault] of [
   ['partial service dump after new complete log',{stage:'services',exit:1}],
   ['service dump/zero exit with stderr',{stage:'services',exit:0,stderr:'transport warning'}],
   ['classifier failure after both captures',{stage:'classifier'}],
+  ['classifier launch exit 1 after both captures',{stage:'classifier',exit:1}],
 ]) test('last complete evidence survives later '+label,()=>{
   // Complete observation, but missed timing: continue polling without calling
   // this a product success, then reproduce run111's later partial capture.
@@ -253,7 +254,7 @@ for(const [label,fault] of [
   assert.equal(attempts.length,2);
   const failed=attempts.find(p=>p!==path.dirname(r.result.evidence.log.path));
   assert.equal(r.files[failed+'/result.json'],undefined);
-  if(fault.stage==='classifier') assert.equal(r.files[failed+'/classifier-exit-code.txt'],'3\n');
+  if(fault.stage==='classifier') assert.equal(r.files[failed+'/classifier-exit-code.txt'],`${fault.exit ?? 3}\n`);
   else {
     const file=failed+(fault.stage==='log'?'/logcat.txt':'/services.txt');
     assert.match(r.files[file],/^partial /);
@@ -339,8 +340,20 @@ test('a publication failure cannot downgrade an observed denial to inconclusive'
   // established from complete inputs and the previously published pair.
   fs.writeFileSync(path.join(path.dirname(next[0]),'result.json'),'existing');
   const r=spawnSync(process.execPath,[path.join(root,'scripts/analyze-android-restart-race.mjs'),...next.slice(0,5),'--publish',next[5]],{encoding:'utf8'});
-  assert.equal(r.status,1,r.stdout+r.stderr);
+  assert.equal(r.status,10,r.stdout+r.stderr);
   assert.match(r.stderr,/RACE_AUTOMATIC_RESTART_DENIED/);
   assert.match(r.stderr,/result publication failed/);
   assert.deepEqual(fs.readFileSync(first[5]),previous);
+}));
+test('standalone classifier retains its established success/denial/inconclusive exit codes',()=>publicationFixture(({attempt})=>{
+  for(const [name,events,expected] of [
+    ['restored',log,0],
+    ['denied',[death,died,scheduled,entering,promoted,start,denied].join('\n'),1],
+    ['late',[death,died,scheduled,start,entering,promoted].join('\n'),2],
+  ]) {
+    const args=attempt(name,events);
+    const r=spawnSync(process.execPath,[path.join(root,'scripts/analyze-android-restart-race.mjs'),...args.slice(0,5)],{encoding:'utf8'});
+    assert.equal(r.status,expected,r.stdout+r.stderr);
+    assert.equal(JSON.parse(r.stdout).evidence,undefined);
+  }
 }));

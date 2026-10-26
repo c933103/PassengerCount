@@ -94,10 +94,12 @@ restart_race() {
       code=0
     else code=$?; fi
     if ! printf '%s\n' "$code" > "$observation/classifier-exit-code.txt"; then
-      [[ "$code" != 1 ]] || return 1
+      [[ "$code" != 10 ]] || return 1
       return 2
     fi
-    if [[ "$code" != 0 && "$code" != 1 && "$code" != 2 ]]; then
+    if [[ "$code" == 10 ]]; then
+      code=1
+    elif [[ "$code" != 0 && "$code" != 2 ]]; then
       cat "$observation/classifier.stderr" >&2
       return 2
     fi

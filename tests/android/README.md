@@ -95,8 +95,10 @@ A later partial capture or failed publication cannot overwrite the preceding
 complete pair. Failed attempts remain separate and the overall run is still
 inconclusive (exit 2), not the old result's success. A denial already observed
 in complete inputs remains failure (exit 1), including a later publication
-error. Internal classifier errors use 3 and are mapped to inconclusive 2 by
-the owned runner; they cannot be mistaken for product denial.
+error. Publish-mode classified denial uses internal code 10, mapped to the
+unchanged product exit 1. A generic Node/shell launch exit 1 and internal
+classifier error 3 are mapped to inconclusive 2, never to an Android denial.
+The standalone classifier keeps its existing 0/1/2 interface.
 
 Follow the `evidence` paths when reading a classifier, not the preparatory
 `race-scheduling-logcat.txt`. That earlier capture proves restart scheduling and

@@ -89,12 +89,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       ? publishRestartRace(logPath, servicesPath, oldPid, kind, targetProcess, outputPath)
       : analyzeRestartRace(fs.readFileSync(logPath, 'utf8'), fs.readFileSync(servicesPath, 'utf8'), oldPid, kind, targetProcess);
     if (mode !== '--publish') console.log(JSON.stringify(result, null, 2));
-    process.exitCode = result.outcome === 'foreground-restored' ? 0 : result.outcome === 'automatic-restart-denied' ? 1 : 2;
+    // Publish-mode 10 is an explicit classified denial, unlike Node/shell's
+    // generic launch-error 1. The runner maps only this signal to product 1.
+    // Preserve the standalone classifier's established 0/1/2 interface.
+    process.exitCode = result.outcome === 'foreground-restored' ? 0
+      : result.outcome === 'automatic-restart-denied' ? (mode === '--publish' ? 10 : 1) : 2;
   } catch (error) {
     console.error('RACE_CLASSIFICATION_UNVERIFIED: ' + error.message);
     // Internal observation/publication errors are distinct from product denial.
     // The owned shell maps this internal code to its existing inconclusive 2.
     if (error.automaticRestartDenied) console.error('RACE_AUTOMATIC_RESTART_DENIED: complete inputs record denial; result publication failed');
-    process.exitCode = error.automaticRestartDenied ? 1 : 3;
+    process.exitCode = error.automaticRestartDenied ? 10 : 3;
   }
 }
