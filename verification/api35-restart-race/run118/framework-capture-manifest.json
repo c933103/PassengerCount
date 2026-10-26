@@ -1,0 +1,864 @@
+[
+  {
+    "role": "diagnostic",
+    "artifactId": 12630165446,
+    "receipt": {
+      "kind": "exact-framework-static-analysis-not-acceptance",
+      "serial": "emulator-5556",
+      "remotePath": "/system/framework/services.jar",
+      "status": "complete-static-analysis",
+      "commands": [
+        {
+          "name": "device-hash-before",
+          "command": [
+            "/usr/local/lib/android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5556",
+            "shell",
+            "sha256sum",
+            "/system/framework/services.jar"
+          ],
+          "startNs": 1792992683621979104,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "device-hash-before.stdout",
+            "bytes": 97,
+            "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "device-hash-before.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992683721378713
+        },
+        {
+          "name": "pull-services",
+          "command": [
+            "/usr/local/lib/android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5556",
+            "pull",
+            "/system/framework/services.jar",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/services.jar"
+          ],
+          "startNs": 1792992683721721109,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "pull-services.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "pull-services.stderr",
+            "bytes": 96,
+            "sha256": "3a0fc166058a4a0320c8bdbff00988f718f12c21ac3427eac9bff8646e7b5c10",
+            "truncated": false
+          },
+          "endNs": 1792992683868991982
+        },
+        {
+          "name": "device-hash-after",
+          "command": [
+            "/usr/local/lib/android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5556",
+            "shell",
+            "sha256sum",
+            "/system/framework/services.jar"
+          ],
+          "startNs": 1792992683869036698,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "device-hash-after.stdout",
+            "bytes": 97,
+            "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "device-hash-after.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992683976026422
+        },
+        {
+          "name": "classes.dex-dexdump",
+          "command": [
+            "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+            "-d",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/classes.dex"
+          ],
+          "startNs": 1792992684026607666,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "classes.dex-dexdump.stdout",
+            "bytes": 162144538,
+            "sha256": "cbd84d5316b9583ae659a9cb1c2e04feeb85599dfab5e3c8a4e86dbb15f0ac8c",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "classes.dex-dexdump.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992685615327832
+        },
+        {
+          "name": "classes2.dex-dexdump",
+          "command": [
+            "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+            "-d",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/classes2.dex"
+          ],
+          "startNs": 1792992685642564771,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "classes2.dex-dexdump.stdout",
+            "bytes": 156678977,
+            "sha256": "8497ee88539ed0d42796e2db23e6aea3f68a290cfa9f6cd97f6c7c1fb7db1c04",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "classes2.dex-dexdump.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992687248834966
+        },
+        {
+          "name": "classes3.dex-dexdump",
+          "command": [
+            "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+            "-d",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/classes3.dex"
+          ],
+          "startNs": 1792992687259133648,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "classes3.dex-dexdump.stdout",
+            "bytes": 42043987,
+            "sha256": "589ca779ff657fd1503f85d482dde8f6bb2fc2983a55c01168ce3bb1a9e06568",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "classes3.dex-dexdump.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992687724859531
+        }
+      ],
+      "dexFiles": [
+        {
+          "entry": "classes.dex",
+          "status": "disassembled",
+          "zipCompressedBytes": 9848536,
+          "zipUncompressedBytes": 9848536,
+          "zipCrc32": "cc71acd9",
+          "file": "classes.dex",
+          "bytes": 9848536,
+          "sha256": "51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85",
+          "header": {
+            "version": "039",
+            "headerBytes": 112,
+            "headerAndChecksumsValid": true,
+            "requiredHostAnalysis": "SDK dexdump -d"
+          },
+          "disassemblyCommand": "classes.dex-dexdump",
+          "disassembly": {
+            "file": "classes.dex-dexdump.stdout",
+            "bytes": 162144538,
+            "sha256": "cbd84d5316b9583ae659a9cb1c2e04feeb85599dfab5e3c8a4e86dbb15f0ac8c",
+            "truncated": false
+          }
+        },
+        {
+          "entry": "classes2.dex",
+          "status": "disassembled",
+          "zipCompressedBytes": 9084864,
+          "zipUncompressedBytes": 9084864,
+          "zipCrc32": "dd3d1980",
+          "file": "classes2.dex",
+          "bytes": 9084864,
+          "sha256": "5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a",
+          "header": {
+            "version": "039",
+            "headerBytes": 112,
+            "headerAndChecksumsValid": true,
+            "requiredHostAnalysis": "SDK dexdump -d"
+          },
+          "disassemblyCommand": "classes2.dex-dexdump",
+          "disassembly": {
+            "file": "classes2.dex-dexdump.stdout",
+            "bytes": 156678977,
+            "sha256": "8497ee88539ed0d42796e2db23e6aea3f68a290cfa9f6cd97f6c7c1fb7db1c04",
+            "truncated": false
+          }
+        },
+        {
+          "entry": "classes3.dex",
+          "status": "disassembled",
+          "zipCompressedBytes": 2408764,
+          "zipUncompressedBytes": 2408764,
+          "zipCrc32": "65d89e35",
+          "file": "classes3.dex",
+          "bytes": 2408764,
+          "sha256": "318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9",
+          "header": {
+            "version": "039",
+            "headerBytes": 112,
+            "headerAndChecksumsValid": true,
+            "requiredHostAnalysis": "SDK dexdump -d"
+          },
+          "disassemblyCommand": "classes3.dex-dexdump",
+          "disassembly": {
+            "file": "classes3.dex-dexdump.stdout",
+            "bytes": 42043987,
+            "sha256": "589ca779ff657fd1503f85d482dde8f6bb2fc2983a55c01168ce3bb1a9e06568",
+            "truncated": false
+          }
+        }
+      ],
+      "limits": {
+        "total_seconds": 90.0,
+        "hash_seconds": 8.0,
+        "pull_seconds": 20.0,
+        "dex_seconds": 30.0,
+        "jar_bytes": 268435456,
+        "tool_bytes": 134217728,
+        "expanded_bytes": 536870912,
+        "dex_bytes": 134217728,
+        "dex_count": 64,
+        "zip_entries": 4096,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 1048576,
+        "disassembly_bytes": 268435456,
+        "total_disassembly_bytes": 1073741824
+      },
+      "deviceStateChangedByCollector": false,
+      "limitations": [
+        "Static disassembly is not a runtime transition, caller stack or cause.",
+        "No full-restart acceptance, debugger attachment or device mutation.",
+        "SDK tool provenance is local path, bytes and package metadata; not a vendor signature."
+      ],
+      "hostTool": {
+        "suppliedPath": "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+        "resolvedPath": "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+        "bytes": 3620016,
+        "sha256": "ef273cb9e5a01ccbba046ea7c80d73203f0c908d2779b4c58e21091753c86049",
+        "packageMetadata": {
+          "file": "dexdump-source.properties",
+          "bytes": 63,
+          "sha256": "084847d70abc41284feee7ea717e7c92eab0d1be05f048c27445a359cfe109d8"
+        },
+        "packageRevision": "35.0.0"
+      },
+      "deviceHashBefore": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+      "deviceHashAfter": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+      "archive": {
+        "file": "services.jar",
+        "bytes": 21446452,
+        "sha256": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6"
+      },
+      "hashAgreement": true,
+      "dexEntryCount": 3
+    },
+    "members": [
+      {
+        "archivePath": "framework-static.pqOLE4/collector-exit-code.txt",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "content": "0\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/collector.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/collector.stdout",
+        "bytes": 134,
+        "sha256": "1a7b8750d90833e83306b2bf468a95c5d722a33969033ad3badd80ad8be61e7e",
+        "content": "/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes.dex",
+        "bytes": 9848536,
+        "sha256": "51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes.dex-dexdump.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes.dex-dexdump.stdout",
+        "bytes": 162144538,
+        "sha256": "cbd84d5316b9583ae659a9cb1c2e04feeb85599dfab5e3c8a4e86dbb15f0ac8c"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes2.dex",
+        "bytes": 9084864,
+        "sha256": "5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes2.dex-dexdump.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes2.dex-dexdump.stdout",
+        "bytes": 156678977,
+        "sha256": "8497ee88539ed0d42796e2db23e6aea3f68a290cfa9f6cd97f6c7c1fb7db1c04"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes3.dex",
+        "bytes": 2408764,
+        "sha256": "318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes3.dex-dexdump.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/classes3.dex-dexdump.stdout",
+        "bytes": 42043987,
+        "sha256": "589ca779ff657fd1503f85d482dde8f6bb2fc2983a55c01168ce3bb1a9e06568"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/device-hash-after.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/device-hash-after.stdout",
+        "bytes": 97,
+        "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+        "content": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6  /system/framework/services.jar\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/device-hash-before.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/device-hash-before.stdout",
+        "bytes": 97,
+        "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+        "content": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6  /system/framework/services.jar\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/dexdump-source.properties",
+        "bytes": 63,
+        "sha256": "084847d70abc41284feee7ea717e7c92eab0d1be05f048c27445a359cfe109d8",
+        "content": "Pkg.UserSrc=false\nPkg.Revision=35.0.0\n#Pkg.Revision=35.0.0 rc4\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/pull-services.stderr",
+        "bytes": 96,
+        "sha256": "3a0fc166058a4a0320c8bdbff00988f718f12c21ac3427eac9bff8646e7b5c10",
+        "content": "/system/framework/services.jar: 1 file pulled, 0 skipped. 148.4 MB/s (21446452 bytes in 0.138s)\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/pull-services.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/receipt.json",
+        "bytes": 9862,
+        "sha256": "fb4be972a1e572de363ec28a8335c6798d092ae3c67070633711679f4a717aab",
+        "content": "{\n  \"kind\": \"exact-framework-static-analysis-not-acceptance\",\n  \"serial\": \"emulator-5556\",\n  \"remotePath\": \"/system/framework/services.jar\",\n  \"status\": \"complete-static-analysis\",\n  \"commands\": [\n    {\n      \"name\": \"device-hash-before\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/services.jar\"\n      ],\n      \"startNs\": 1792992683621979104,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"device-hash-before.stdout\",\n        \"bytes\": 97,\n        \"sha256\": \"d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"device-hash-before.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992683721378713\n    },\n    {\n      \"name\": \"pull-services\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"pull\",\n        \"/system/framework/services.jar\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/services.jar\"\n      ],\n      \"startNs\": 1792992683721721109,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"pull-services.stdout\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"pull-services.stderr\",\n        \"bytes\": 96,\n        \"sha256\": \"3a0fc166058a4a0320c8bdbff00988f718f12c21ac3427eac9bff8646e7b5c10\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992683868991982\n    },\n    {\n      \"name\": \"device-hash-after\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/services.jar\"\n      ],\n      \"startNs\": 1792992683869036698,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"device-hash-after.stdout\",\n        \"bytes\": 97,\n        \"sha256\": \"d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"device-hash-after.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992683976026422\n    },\n    {\n      \"name\": \"classes.dex-dexdump\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n        \"-d\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/classes.dex\"\n      ],\n      \"startNs\": 1792992684026607666,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"classes.dex-dexdump.stdout\",\n        \"bytes\": 162144538,\n        \"sha256\": \"cbd84d5316b9583ae659a9cb1c2e04feeb85599dfab5e3c8a4e86dbb15f0ac8c\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"classes.dex-dexdump.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992685615327832\n    },\n    {\n      \"name\": \"classes2.dex-dexdump\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n        \"-d\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/classes2.dex\"\n      ],\n      \"startNs\": 1792992685642564771,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"classes2.dex-dexdump.stdout\",\n        \"bytes\": 156678977,\n        \"sha256\": \"8497ee88539ed0d42796e2db23e6aea3f68a290cfa9f6cd97f6c7c1fb7db1c04\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"classes2.dex-dexdump.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992687248834966\n    },\n    {\n      \"name\": \"classes3.dex-dexdump\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n        \"-d\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/framework-static.pqOLE4/framework-binary-sob5bfe5/classes3.dex\"\n      ],\n      \"startNs\": 1792992687259133648,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"classes3.dex-dexdump.stdout\",\n        \"bytes\": 42043987,\n        \"sha256\": \"589ca779ff657fd1503f85d482dde8f6bb2fc2983a55c01168ce3bb1a9e06568\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"classes3.dex-dexdump.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992687724859531\n    }\n  ],\n  \"dexFiles\": [\n    {\n      \"entry\": \"classes.dex\",\n      \"status\": \"disassembled\",\n      \"zipCompressedBytes\": 9848536,\n      \"zipUncompressedBytes\": 9848536,\n      \"zipCrc32\": \"cc71acd9\",\n      \"file\": \"classes.dex\",\n      \"bytes\": 9848536,\n      \"sha256\": \"51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85\",\n      \"header\": {\n        \"version\": \"039\",\n        \"headerBytes\": 112,\n        \"headerAndChecksumsValid\": true,\n        \"requiredHostAnalysis\": \"SDK dexdump -d\"\n      },\n      \"disassemblyCommand\": \"classes.dex-dexdump\",\n      \"disassembly\": {\n        \"file\": \"classes.dex-dexdump.stdout\",\n        \"bytes\": 162144538,\n        \"sha256\": \"cbd84d5316b9583ae659a9cb1c2e04feeb85599dfab5e3c8a4e86dbb15f0ac8c\",\n        \"truncated\": false\n      }\n    },\n    {\n      \"entry\": \"classes2.dex\",\n      \"status\": \"disassembled\",\n      \"zipCompressedBytes\": 9084864,\n      \"zipUncompressedBytes\": 9084864,\n      \"zipCrc32\": \"dd3d1980\",\n      \"file\": \"classes2.dex\",\n      \"bytes\": 9084864,\n      \"sha256\": \"5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a\",\n      \"header\": {\n        \"version\": \"039\",\n        \"headerBytes\": 112,\n        \"headerAndChecksumsValid\": true,\n        \"requiredHostAnalysis\": \"SDK dexdump -d\"\n      },\n      \"disassemblyCommand\": \"classes2.dex-dexdump\",\n      \"disassembly\": {\n        \"file\": \"classes2.dex-dexdump.stdout\",\n        \"bytes\": 156678977,\n        \"sha256\": \"8497ee88539ed0d42796e2db23e6aea3f68a290cfa9f6cd97f6c7c1fb7db1c04\",\n        \"truncated\": false\n      }\n    },\n    {\n      \"entry\": \"classes3.dex\",\n      \"status\": \"disassembled\",\n      \"zipCompressedBytes\": 2408764,\n      \"zipUncompressedBytes\": 2408764,\n      \"zipCrc32\": \"65d89e35\",\n      \"file\": \"classes3.dex\",\n      \"bytes\": 2408764,\n      \"sha256\": \"318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9\",\n      \"header\": {\n        \"version\": \"039\",\n        \"headerBytes\": 112,\n        \"headerAndChecksumsValid\": true,\n        \"requiredHostAnalysis\": \"SDK dexdump -d\"\n      },\n      \"disassemblyCommand\": \"classes3.dex-dexdump\",\n      \"disassembly\": {\n        \"file\": \"classes3.dex-dexdump.stdout\",\n        \"bytes\": 42043987,\n        \"sha256\": \"589ca779ff657fd1503f85d482dde8f6bb2fc2983a55c01168ce3bb1a9e06568\",\n        \"truncated\": false\n      }\n    }\n  ],\n  \"limits\": {\n    \"total_seconds\": 90.0,\n    \"hash_seconds\": 8.0,\n    \"pull_seconds\": 20.0,\n    \"dex_seconds\": 30.0,\n    \"jar_bytes\": 268435456,\n    \"tool_bytes\": 134217728,\n    \"expanded_bytes\": 536870912,\n    \"dex_bytes\": 134217728,\n    \"dex_count\": 64,\n    \"zip_entries\": 4096,\n    \"stdout_bytes\": 1048576,\n    \"stderr_bytes\": 1048576,\n    \"disassembly_bytes\": 268435456,\n    \"total_disassembly_bytes\": 1073741824\n  },\n  \"deviceStateChangedByCollector\": false,\n  \"limitations\": [\n    \"Static disassembly is not a runtime transition, caller stack or cause.\",\n    \"No full-restart acceptance, debugger attachment or device mutation.\",\n    \"SDK tool provenance is local path, bytes and package metadata; not a vendor signature.\"\n  ],\n  \"hostTool\": {\n    \"suppliedPath\": \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n    \"resolvedPath\": \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n    \"bytes\": 3620016,\n    \"sha256\": \"ef273cb9e5a01ccbba046ea7c80d73203f0c908d2779b4c58e21091753c86049\",\n    \"packageMetadata\": {\n      \"file\": \"dexdump-source.properties\",\n      \"bytes\": 63,\n      \"sha256\": \"084847d70abc41284feee7ea717e7c92eab0d1be05f048c27445a359cfe109d8\"\n    },\n    \"packageRevision\": \"35.0.0\"\n  },\n  \"deviceHashBefore\": \"1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6\",\n  \"deviceHashAfter\": \"1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6\",\n  \"archive\": {\n    \"file\": \"services.jar\",\n    \"bytes\": 21446452,\n    \"sha256\": \"1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6\"\n  },\n  \"hashAgreement\": true,\n  \"dexEntryCount\": 3\n}\n"
+      },
+      {
+        "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/services.jar",
+        "bytes": 21446452,
+        "sha256": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6"
+      }
+    ],
+    "allRecordedByteHashesVerified": true
+  },
+  {
+    "role": "original",
+    "artifactId": 12629821306,
+    "receipt": {
+      "kind": "exact-framework-static-analysis-not-acceptance",
+      "serial": "emulator-5556",
+      "remotePath": "/system/framework/services.jar",
+      "status": "complete-static-analysis",
+      "commands": [
+        {
+          "name": "device-hash-before",
+          "command": [
+            "/usr/local/lib/android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5556",
+            "shell",
+            "sha256sum",
+            "/system/framework/services.jar"
+          ],
+          "startNs": 1792992608837844837,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "device-hash-before.stdout",
+            "bytes": 97,
+            "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "device-hash-before.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992608896940573
+        },
+        {
+          "name": "pull-services",
+          "command": [
+            "/usr/local/lib/android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5556",
+            "pull",
+            "/system/framework/services.jar",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/services.jar"
+          ],
+          "startNs": 1792992608897171714,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "pull-services.stdout",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "pull-services.stderr",
+            "bytes": 96,
+            "sha256": "6b62f77a0448b9776e7b2a7d5973ef8700c38679ce228df19019aed370afaabb",
+            "truncated": false
+          },
+          "endNs": 1792992609002313859
+        },
+        {
+          "name": "device-hash-after",
+          "command": [
+            "/usr/local/lib/android/sdk/platform-tools/adb",
+            "-s",
+            "emulator-5556",
+            "shell",
+            "sha256sum",
+            "/system/framework/services.jar"
+          ],
+          "startNs": 1792992609002340579,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "device-hash-after.stdout",
+            "bytes": 97,
+            "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "device-hash-after.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992609060247647
+        },
+        {
+          "name": "classes.dex-dexdump",
+          "command": [
+            "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+            "-d",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/classes.dex"
+          ],
+          "startNs": 1792992609101486420,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "classes.dex-dexdump.stdout",
+            "bytes": 162144532,
+            "sha256": "67a57170f3b81ad8863d285b052bc0a1baf9a32130fdbdc2d0bef56a38f4f5e5",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "classes.dex-dexdump.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992609931086978
+        },
+        {
+          "name": "classes2.dex-dexdump",
+          "command": [
+            "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+            "-d",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/classes2.dex"
+          ],
+          "startNs": 1792992609956818650,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "classes2.dex-dexdump.stdout",
+            "bytes": 156678971,
+            "sha256": "035e537e0e5e66790d714c2623174432503e817083a977d396e373883076f16b",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "classes2.dex-dexdump.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992610882644013
+        },
+        {
+          "name": "classes3.dex-dexdump",
+          "command": [
+            "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+            "-d",
+            "/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/classes3.dex"
+          ],
+          "startNs": 1792992610891841387,
+          "status": "completed",
+          "nativeReturnCode": 0,
+          "termination": {
+            "requested": false,
+            "forcedKill": false,
+            "errors": []
+          },
+          "stdout": {
+            "file": "classes3.dex-dexdump.stdout",
+            "bytes": 42043981,
+            "sha256": "60e7ca3efec9f81b8ddd0d9cc0885b2cafc6f1f76941c7e02f9480770f43a348",
+            "truncated": false
+          },
+          "stderr": {
+            "file": "classes3.dex-dexdump.stderr",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncated": false
+          },
+          "endNs": 1792992611128346911
+        }
+      ],
+      "dexFiles": [
+        {
+          "entry": "classes.dex",
+          "status": "disassembled",
+          "zipCompressedBytes": 9848536,
+          "zipUncompressedBytes": 9848536,
+          "zipCrc32": "cc71acd9",
+          "file": "classes.dex",
+          "bytes": 9848536,
+          "sha256": "51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85",
+          "header": {
+            "version": "039",
+            "headerBytes": 112,
+            "headerAndChecksumsValid": true,
+            "requiredHostAnalysis": "SDK dexdump -d"
+          },
+          "disassemblyCommand": "classes.dex-dexdump",
+          "disassembly": {
+            "file": "classes.dex-dexdump.stdout",
+            "bytes": 162144532,
+            "sha256": "67a57170f3b81ad8863d285b052bc0a1baf9a32130fdbdc2d0bef56a38f4f5e5",
+            "truncated": false
+          }
+        },
+        {
+          "entry": "classes2.dex",
+          "status": "disassembled",
+          "zipCompressedBytes": 9084864,
+          "zipUncompressedBytes": 9084864,
+          "zipCrc32": "dd3d1980",
+          "file": "classes2.dex",
+          "bytes": 9084864,
+          "sha256": "5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a",
+          "header": {
+            "version": "039",
+            "headerBytes": 112,
+            "headerAndChecksumsValid": true,
+            "requiredHostAnalysis": "SDK dexdump -d"
+          },
+          "disassemblyCommand": "classes2.dex-dexdump",
+          "disassembly": {
+            "file": "classes2.dex-dexdump.stdout",
+            "bytes": 156678971,
+            "sha256": "035e537e0e5e66790d714c2623174432503e817083a977d396e373883076f16b",
+            "truncated": false
+          }
+        },
+        {
+          "entry": "classes3.dex",
+          "status": "disassembled",
+          "zipCompressedBytes": 2408764,
+          "zipUncompressedBytes": 2408764,
+          "zipCrc32": "65d89e35",
+          "file": "classes3.dex",
+          "bytes": 2408764,
+          "sha256": "318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9",
+          "header": {
+            "version": "039",
+            "headerBytes": 112,
+            "headerAndChecksumsValid": true,
+            "requiredHostAnalysis": "SDK dexdump -d"
+          },
+          "disassemblyCommand": "classes3.dex-dexdump",
+          "disassembly": {
+            "file": "classes3.dex-dexdump.stdout",
+            "bytes": 42043981,
+            "sha256": "60e7ca3efec9f81b8ddd0d9cc0885b2cafc6f1f76941c7e02f9480770f43a348",
+            "truncated": false
+          }
+        }
+      ],
+      "limits": {
+        "total_seconds": 90.0,
+        "hash_seconds": 8.0,
+        "pull_seconds": 20.0,
+        "dex_seconds": 30.0,
+        "jar_bytes": 268435456,
+        "tool_bytes": 134217728,
+        "expanded_bytes": 536870912,
+        "dex_bytes": 134217728,
+        "dex_count": 64,
+        "zip_entries": 4096,
+        "stdout_bytes": 1048576,
+        "stderr_bytes": 1048576,
+        "disassembly_bytes": 268435456,
+        "total_disassembly_bytes": 1073741824
+      },
+      "deviceStateChangedByCollector": false,
+      "limitations": [
+        "Static disassembly is not a runtime transition, caller stack or cause.",
+        "No full-restart acceptance, debugger attachment or device mutation.",
+        "SDK tool provenance is local path, bytes and package metadata; not a vendor signature."
+      ],
+      "hostTool": {
+        "suppliedPath": "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+        "resolvedPath": "/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump",
+        "bytes": 3620016,
+        "sha256": "ef273cb9e5a01ccbba046ea7c80d73203f0c908d2779b4c58e21091753c86049",
+        "packageMetadata": {
+          "file": "dexdump-source.properties",
+          "bytes": 63,
+          "sha256": "084847d70abc41284feee7ea717e7c92eab0d1be05f048c27445a359cfe109d8"
+        },
+        "packageRevision": "35.0.0"
+      },
+      "deviceHashBefore": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+      "deviceHashAfter": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+      "archive": {
+        "file": "services.jar",
+        "bytes": 21446452,
+        "sha256": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6"
+      },
+      "hashAgreement": true,
+      "dexEntryCount": 3
+    },
+    "members": [
+      {
+        "archivePath": "framework-static.S67rQO/collector-exit-code.txt",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "content": "0\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/collector.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/collector.stdout",
+        "bytes": 131,
+        "sha256": "a30dd31d6d937fd5ba4107790a21ed7d7cbfec773761a8f56316d0f1a925a1ad",
+        "content": "/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes.dex",
+        "bytes": 9848536,
+        "sha256": "51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes.dex-dexdump.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes.dex-dexdump.stdout",
+        "bytes": 162144532,
+        "sha256": "67a57170f3b81ad8863d285b052bc0a1baf9a32130fdbdc2d0bef56a38f4f5e5"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes2.dex",
+        "bytes": 9084864,
+        "sha256": "5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes2.dex-dexdump.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes2.dex-dexdump.stdout",
+        "bytes": 156678971,
+        "sha256": "035e537e0e5e66790d714c2623174432503e817083a977d396e373883076f16b"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes3.dex",
+        "bytes": 2408764,
+        "sha256": "318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes3.dex-dexdump.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/classes3.dex-dexdump.stdout",
+        "bytes": 42043981,
+        "sha256": "60e7ca3efec9f81b8ddd0d9cc0885b2cafc6f1f76941c7e02f9480770f43a348"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/device-hash-after.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/device-hash-after.stdout",
+        "bytes": 97,
+        "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+        "content": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6  /system/framework/services.jar\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/device-hash-before.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/device-hash-before.stdout",
+        "bytes": 97,
+        "sha256": "d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4",
+        "content": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6  /system/framework/services.jar\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/dexdump-source.properties",
+        "bytes": 63,
+        "sha256": "084847d70abc41284feee7ea717e7c92eab0d1be05f048c27445a359cfe109d8",
+        "content": "Pkg.UserSrc=false\nPkg.Revision=35.0.0\n#Pkg.Revision=35.0.0 rc4\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/pull-services.stderr",
+        "bytes": 96,
+        "sha256": "6b62f77a0448b9776e7b2a7d5973ef8700c38679ce228df19019aed370afaabb",
+        "content": "/system/framework/services.jar: 1 file pulled, 0 skipped. 202.9 MB/s (21446452 bytes in 0.101s)\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/pull-services.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "content": ""
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/receipt.json",
+        "bytes": 9850,
+        "sha256": "2123fa8ccc44f014d44e2a5bb4d87facbfc73bee7faf04a0ecb074904b2c395b",
+        "content": "{\n  \"kind\": \"exact-framework-static-analysis-not-acceptance\",\n  \"serial\": \"emulator-5556\",\n  \"remotePath\": \"/system/framework/services.jar\",\n  \"status\": \"complete-static-analysis\",\n  \"commands\": [\n    {\n      \"name\": \"device-hash-before\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/services.jar\"\n      ],\n      \"startNs\": 1792992608837844837,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"device-hash-before.stdout\",\n        \"bytes\": 97,\n        \"sha256\": \"d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"device-hash-before.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992608896940573\n    },\n    {\n      \"name\": \"pull-services\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"pull\",\n        \"/system/framework/services.jar\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/services.jar\"\n      ],\n      \"startNs\": 1792992608897171714,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"pull-services.stdout\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"pull-services.stderr\",\n        \"bytes\": 96,\n        \"sha256\": \"6b62f77a0448b9776e7b2a7d5973ef8700c38679ce228df19019aed370afaabb\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992609002313859\n    },\n    {\n      \"name\": \"device-hash-after\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/platform-tools/adb\",\n        \"-s\",\n        \"emulator-5556\",\n        \"shell\",\n        \"sha256sum\",\n        \"/system/framework/services.jar\"\n      ],\n      \"startNs\": 1792992609002340579,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"device-hash-after.stdout\",\n        \"bytes\": 97,\n        \"sha256\": \"d6bb854b1f3246c9d750f00b253c5bcbc45df9d69f9bf1ee9f186a7c728113f4\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"device-hash-after.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992609060247647\n    },\n    {\n      \"name\": \"classes.dex-dexdump\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n        \"-d\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/classes.dex\"\n      ],\n      \"startNs\": 1792992609101486420,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"classes.dex-dexdump.stdout\",\n        \"bytes\": 162144532,\n        \"sha256\": \"67a57170f3b81ad8863d285b052bc0a1baf9a32130fdbdc2d0bef56a38f4f5e5\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"classes.dex-dexdump.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992609931086978\n    },\n    {\n      \"name\": \"classes2.dex-dexdump\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n        \"-d\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/classes2.dex\"\n      ],\n      \"startNs\": 1792992609956818650,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"classes2.dex-dexdump.stdout\",\n        \"bytes\": 156678971,\n        \"sha256\": \"035e537e0e5e66790d714c2623174432503e817083a977d396e373883076f16b\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"classes2.dex-dexdump.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992610882644013\n    },\n    {\n      \"name\": \"classes3.dex-dexdump\",\n      \"command\": [\n        \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n        \"-d\",\n        \"/home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-evidence/framework-static.S67rQO/framework-binary-v5ae44af/classes3.dex\"\n      ],\n      \"startNs\": 1792992610891841387,\n      \"status\": \"completed\",\n      \"nativeReturnCode\": 0,\n      \"termination\": {\n        \"requested\": false,\n        \"forcedKill\": false,\n        \"errors\": []\n      },\n      \"stdout\": {\n        \"file\": \"classes3.dex-dexdump.stdout\",\n        \"bytes\": 42043981,\n        \"sha256\": \"60e7ca3efec9f81b8ddd0d9cc0885b2cafc6f1f76941c7e02f9480770f43a348\",\n        \"truncated\": false\n      },\n      \"stderr\": {\n        \"file\": \"classes3.dex-dexdump.stderr\",\n        \"bytes\": 0,\n        \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n        \"truncated\": false\n      },\n      \"endNs\": 1792992611128346911\n    }\n  ],\n  \"dexFiles\": [\n    {\n      \"entry\": \"classes.dex\",\n      \"status\": \"disassembled\",\n      \"zipCompressedBytes\": 9848536,\n      \"zipUncompressedBytes\": 9848536,\n      \"zipCrc32\": \"cc71acd9\",\n      \"file\": \"classes.dex\",\n      \"bytes\": 9848536,\n      \"sha256\": \"51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85\",\n      \"header\": {\n        \"version\": \"039\",\n        \"headerBytes\": 112,\n        \"headerAndChecksumsValid\": true,\n        \"requiredHostAnalysis\": \"SDK dexdump -d\"\n      },\n      \"disassemblyCommand\": \"classes.dex-dexdump\",\n      \"disassembly\": {\n        \"file\": \"classes.dex-dexdump.stdout\",\n        \"bytes\": 162144532,\n        \"sha256\": \"67a57170f3b81ad8863d285b052bc0a1baf9a32130fdbdc2d0bef56a38f4f5e5\",\n        \"truncated\": false\n      }\n    },\n    {\n      \"entry\": \"classes2.dex\",\n      \"status\": \"disassembled\",\n      \"zipCompressedBytes\": 9084864,\n      \"zipUncompressedBytes\": 9084864,\n      \"zipCrc32\": \"dd3d1980\",\n      \"file\": \"classes2.dex\",\n      \"bytes\": 9084864,\n      \"sha256\": \"5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a\",\n      \"header\": {\n        \"version\": \"039\",\n        \"headerBytes\": 112,\n        \"headerAndChecksumsValid\": true,\n        \"requiredHostAnalysis\": \"SDK dexdump -d\"\n      },\n      \"disassemblyCommand\": \"classes2.dex-dexdump\",\n      \"disassembly\": {\n        \"file\": \"classes2.dex-dexdump.stdout\",\n        \"bytes\": 156678971,\n        \"sha256\": \"035e537e0e5e66790d714c2623174432503e817083a977d396e373883076f16b\",\n        \"truncated\": false\n      }\n    },\n    {\n      \"entry\": \"classes3.dex\",\n      \"status\": \"disassembled\",\n      \"zipCompressedBytes\": 2408764,\n      \"zipUncompressedBytes\": 2408764,\n      \"zipCrc32\": \"65d89e35\",\n      \"file\": \"classes3.dex\",\n      \"bytes\": 2408764,\n      \"sha256\": \"318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9\",\n      \"header\": {\n        \"version\": \"039\",\n        \"headerBytes\": 112,\n        \"headerAndChecksumsValid\": true,\n        \"requiredHostAnalysis\": \"SDK dexdump -d\"\n      },\n      \"disassemblyCommand\": \"classes3.dex-dexdump\",\n      \"disassembly\": {\n        \"file\": \"classes3.dex-dexdump.stdout\",\n        \"bytes\": 42043981,\n        \"sha256\": \"60e7ca3efec9f81b8ddd0d9cc0885b2cafc6f1f76941c7e02f9480770f43a348\",\n        \"truncated\": false\n      }\n    }\n  ],\n  \"limits\": {\n    \"total_seconds\": 90.0,\n    \"hash_seconds\": 8.0,\n    \"pull_seconds\": 20.0,\n    \"dex_seconds\": 30.0,\n    \"jar_bytes\": 268435456,\n    \"tool_bytes\": 134217728,\n    \"expanded_bytes\": 536870912,\n    \"dex_bytes\": 134217728,\n    \"dex_count\": 64,\n    \"zip_entries\": 4096,\n    \"stdout_bytes\": 1048576,\n    \"stderr_bytes\": 1048576,\n    \"disassembly_bytes\": 268435456,\n    \"total_disassembly_bytes\": 1073741824\n  },\n  \"deviceStateChangedByCollector\": false,\n  \"limitations\": [\n    \"Static disassembly is not a runtime transition, caller stack or cause.\",\n    \"No full-restart acceptance, debugger attachment or device mutation.\",\n    \"SDK tool provenance is local path, bytes and package metadata; not a vendor signature.\"\n  ],\n  \"hostTool\": {\n    \"suppliedPath\": \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n    \"resolvedPath\": \"/usr/local/lib/android/sdk/build-tools/35.0.0/dexdump\",\n    \"bytes\": 3620016,\n    \"sha256\": \"ef273cb9e5a01ccbba046ea7c80d73203f0c908d2779b4c58e21091753c86049\",\n    \"packageMetadata\": {\n      \"file\": \"dexdump-source.properties\",\n      \"bytes\": 63,\n      \"sha256\": \"084847d70abc41284feee7ea717e7c92eab0d1be05f048c27445a359cfe109d8\"\n    },\n    \"packageRevision\": \"35.0.0\"\n  },\n  \"deviceHashBefore\": \"1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6\",\n  \"deviceHashAfter\": \"1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6\",\n  \"archive\": {\n    \"file\": \"services.jar\",\n    \"bytes\": 21446452,\n    \"sha256\": \"1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6\"\n  },\n  \"hashAgreement\": true,\n  \"dexEntryCount\": 3\n}\n"
+      },
+      {
+        "archivePath": "framework-static.S67rQO/framework-binary-v5ae44af/services.jar",
+        "bytes": 21446452,
+        "sha256": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6"
+      }
+    ],
+    "allRecordedByteHashesVerified": true
+  }
+]

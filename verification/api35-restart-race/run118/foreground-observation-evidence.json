@@ -1,0 +1,1351 @@
+{
+  "schemaVersion": 1,
+  "kind": "hash-bound-framework-bookkeeping-observation-not-acceptance",
+  "run": 40273911376,
+  "runNumber": 118,
+  "runAttempt": 1,
+  "runUrl": "https://github.com/c933103/PassengerCount/actions/runs/40273911376",
+  "head": "c80f6008cc3512e986ae2c40461da3286992d511",
+  "testedMerge": "da0a060fc343cfaca3cbad367edf7de30a465ce1",
+  "tree": "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1",
+  "runConclusion": "failure",
+  "originalFullAllProcessAbsenceAcceptanceSatisfied": false,
+  "artifact": {
+    "id": 12630165446,
+    "name": "PassengerCount-API35-restart-diagnostic-da0a060fc343cfaca3cbad367edf7de30a465ce1",
+    "url": "https://github.com/c933103/PassengerCount/actions/runs/40273911376/artifacts/12630165446",
+    "zipBytes": 69642362,
+    "zipSha256": "59ae1452028a588362ff179fd9d40806594b0617e2794184758b8b00be1bb8ad",
+    "zipVerified": true
+  },
+  "sourceReceipt": {
+    "archivePath": "source.txt",
+    "bytes": 82,
+    "sha256": "bd4350a1b8a79a0f3d8b10daae242941c307808a3621a60bf99200215764c8aa",
+    "rawEncoding": "utf-8",
+    "raw": "da0a060fc343cfaca3cbad367edf7de30a465ce1\n5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1\n"
+  },
+  "freshAnalysis": {
+    "attempt": "foreground-observation-analysis.8n5z2n9q",
+    "stdout": {
+      "archivePath": "foreground-observation.stdout",
+      "bytes": 240,
+      "sha256": "ac2198533dc365e92509a86a3fd4992af5d2d794ebbe5e9939bdc095ee140edf",
+      "rawEncoding": "utf-8",
+      "raw": "{\"status\": \"complete\", \"summaryStatus\": \"complete\", \"published\": true, \"reportPath\": \"/home/runner/work/PassengerCount/PassengerCount/android/build/restart-race-evidence/foreground-observation-analysis.8n5z2n9q/report.json\", \"exitCode\": 0}\n"
+    },
+    "stderr": {
+      "archivePath": "foreground-observation.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawEncoding": "utf-8",
+      "raw": ""
+    },
+    "nativeStatus": {
+      "archivePath": "foreground-observation-exit-code.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "rawEncoding": "utf-8",
+      "raw": "0\n"
+    },
+    "rootReportIdentity": {
+      "archivePath": "foreground-observation.json",
+      "bytes": 15440,
+      "sha256": "f9574b1a3e6c35053021420f11990bbc127e20d12bfb04d5955878d5a495cc62"
+    },
+    "attemptReport": {
+      "archivePath": "foreground-observation-analysis.8n5z2n9q/report.json",
+      "bytes": 15440,
+      "sha256": "f9574b1a3e6c35053021420f11990bbc127e20d12bfb04d5955878d5a495cc62",
+      "rawEncoding": "utf-8",
+      "raw": "{\n  \"schemaVersion\": 1,\n  \"kind\": \"framework-bookkeeping-observation-not-acceptance\",\n  \"analysisAttempt\": \"foreground-observation-analysis.8n5z2n9q\",\n  \"status\": \"complete\",\n  \"target\": {\n    \"package\": \"app.passengercount\",\n    \"userId\": 0,\n    \"service\": \"app.passengercount/.TrackService\"\n  },\n  \"limits\": {\n    \"maxSourceBytes\": 33554432,\n    \"maxTotalBytes\": 134217728,\n    \"maxObservations\": 512\n  },\n  \"errors\": [],\n  \"observations\": [\n    {\n      \"phase\": \"before\",\n      \"captureAttempt\": null,\n      \"status\": \"complete\",\n      \"evidence\": {\n        \"stdout\": {\n          \"path\": \"race-before-services.txt\",\n          \"bytes\": 319606,\n          \"sha256\": \"da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f\",\n          \"readStatus\": \"complete\"\n        },\n        \"stderr\": {\n          \"path\": \"race-before-services.txt.stderr\",\n          \"bytes\": 0,\n          \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n          \"readStatus\": \"complete\"\n        },\n        \"exitCode\": {\n          \"path\": \"race-before-services.txt.exit-code.txt\",\n          \"bytes\": 2,\n          \"sha256\": \"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa\",\n          \"readStatus\": \"complete\"\n        },\n        \"scope\": {\n          \"path\": \"race-before-services.txt.scope.txt\",\n          \"bytes\": 40,\n          \"sha256\": \"489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22\",\n          \"readStatus\": \"complete\"\n        }\n      },\n      \"nativeExitCode\": 0,\n      \"captureStatus\": \"complete\",\n      \"scopeVerified\": true,\n      \"command\": [\n        \"adb\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"services\"\n      ],\n      \"fields\": {\n        \"kind\": \"framework-bookkeeping-observation-not-acceptance\",\n        \"sha256\": \"da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f\",\n        \"bytes\": 319606,\n        \"package\": \"app.passengercount\",\n        \"userId\": 0,\n        \"commandComplete\": true,\n        \"unfilteredFrameworkDump\": true,\n        \"headerPresent\": true,\n        \"decodedWithReplacement\": false,\n        \"activeForegroundApps\": [\n          {\n            \"userId\": 0,\n            \"packageName\": \"app.passengercount\",\n            \"index\": 0,\n            \"lineStart\": 4527,\n            \"mNumActive\": 1,\n            \"mAppOnTop\": false,\n            \"mShownWhileTop\": true,\n            \"mShownWhileScreenOn\": true,\n            \"mStartTime\": \"-5s445ms\",\n            \"mStartVisibleTime\": \"-5s445ms\",\n            \"mEndTime\": null,\n            \"mEndTimeStatus\": \"not-printed\",\n            \"timeEncoding\": \"Relative durations as printed, not absolute timestamps; no value assigned to omission.\",\n            \"lineEnd\": 4529\n          }\n        ],\n        \"trackServices\": [\n          {\n            \"token\": \"d5f580\",\n            \"userId\": 0,\n            \"component\": \"app.passengercount/.TrackService\",\n            \"listing\": \"active\",\n            \"lineStart\": 248,\n            \"lineEnd\": 282,\n            \"app\": \"ProcessRecord{b81872b 3059:app.passengercount:tracking/u0a209}\",\n            \"appIsNull\": false,\n            \"startForegroundCount\": 1,\n            \"isForeground\": true,\n            \"foregroundServiceType\": \"0x00000008\",\n            \"foregroundId\": 19,\n            \"startRequested\": true,\n            \"stopIfKilled\": false,\n            \"callStart\": true,\n            \"startCommandResult\": 1,\n            \"reasons\": {\n              \"mAllowWiu_noBinding\": \"PROC_STATE_TOP\",\n              \"mAllowWiu_inBindService\": \"DENIED\",\n              \"mAllowWiu_byBindings\": \"DENIED\",\n              \"mAllowStart_noBinding\": \"PROC_STATE_TOP\",\n              \"mAllowStart_inBindService\": \"DENIED\",\n              \"mAllowStart_byBindings\": \"DENIED\"\n            },\n            \"fieldsComplete\": true\n          }\n        ],\n        \"parseErrors\": [],\n        \"targetUserForegroundSectionCount\": 1,\n        \"limitations\": [\n          \"Not atomic with other commands; dump takes AMS locks and can affect timing.\",\n          \"No runtime caller/stack, causation, UID/process absence or acceptance claim.\",\n          \"Not-listed means not printed in this capture, not runtime absence.\"\n        ],\n        \"status\": \"complete\",\n        \"activeForegroundAppsStatus\": \"observed\",\n        \"trackServicesStatus\": \"observed\"\n      }\n    },\n    {\n      \"phase\": \"attempt\",\n      \"captureAttempt\": \"race-observation.De6EOw\",\n      \"status\": \"complete\",\n      \"evidence\": {\n        \"stdout\": {\n          \"path\": \"race-observation.De6EOw/services.txt\",\n          \"bytes\": 360262,\n          \"sha256\": \"7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928\",\n          \"readStatus\": \"complete\"\n        },\n        \"stderr\": {\n          \"path\": \"race-observation.De6EOw/services.txt.stderr\",\n          \"bytes\": 0,\n          \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n          \"readStatus\": \"complete\"\n        },\n        \"exitCode\": {\n          \"path\": \"race-observation.De6EOw/services.txt.exit-code.txt\",\n          \"bytes\": 2,\n          \"sha256\": \"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa\",\n          \"readStatus\": \"complete\"\n        },\n        \"scope\": {\n          \"path\": \"race-observation.De6EOw/services.txt.scope.txt\",\n          \"bytes\": 40,\n          \"sha256\": \"489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22\",\n          \"readStatus\": \"complete\"\n        }\n      },\n      \"nativeExitCode\": 0,\n      \"captureStatus\": \"complete\",\n      \"scopeVerified\": true,\n      \"command\": [\n        \"adb\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"services\"\n      ],\n      \"fields\": {\n        \"kind\": \"framework-bookkeeping-observation-not-acceptance\",\n        \"sha256\": \"7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928\",\n        \"bytes\": 360262,\n        \"package\": \"app.passengercount\",\n        \"userId\": 0,\n        \"commandComplete\": true,\n        \"unfilteredFrameworkDump\": true,\n        \"headerPresent\": true,\n        \"decodedWithReplacement\": false,\n        \"activeForegroundApps\": [],\n        \"trackServices\": [\n          {\n            \"token\": \"d5f580\",\n            \"userId\": 0,\n            \"component\": \"app.passengercount/.TrackService\",\n            \"listing\": \"active\",\n            \"lineStart\": 414,\n            \"lineEnd\": 449,\n            \"app\": \"null\",\n            \"appIsNull\": true,\n            \"startForegroundCount\": 1,\n            \"isForeground\": false,\n            \"foregroundServiceType\": \"0x00000000\",\n            \"foregroundId\": 19,\n            \"startRequested\": true,\n            \"stopIfKilled\": false,\n            \"callStart\": true,\n            \"startCommandResult\": 1,\n            \"reasons\": {\n              \"mAllowWiu_noBinding\": \"DENIED\",\n              \"mAllowWiu_inBindService\": \"DENIED\",\n              \"mAllowWiu_byBindings\": \"DENIED\",\n              \"mAllowStart_noBinding\": \"DENIED\",\n              \"mAllowStart_inBindService\": \"DENIED\",\n              \"mAllowStart_byBindings\": \"DENIED\"\n            },\n            \"fieldsComplete\": true\n          },\n          {\n            \"token\": \"d5f580\",\n            \"userId\": 0,\n            \"component\": \"app.passengercount/.TrackService\",\n            \"listing\": \"pending\",\n            \"lineStart\": 4531,\n            \"lineEnd\": 4567,\n            \"app\": \"null\",\n            \"appIsNull\": true,\n            \"startForegroundCount\": 1,\n            \"isForeground\": false,\n            \"foregroundServiceType\": \"0x00000000\",\n            \"foregroundId\": 19,\n            \"startRequested\": true,\n            \"stopIfKilled\": false,\n            \"callStart\": true,\n            \"startCommandResult\": 1,\n            \"reasons\": {\n              \"mAllowWiu_noBinding\": \"DENIED\",\n              \"mAllowWiu_inBindService\": \"DENIED\",\n              \"mAllowWiu_byBindings\": \"DENIED\",\n              \"mAllowStart_noBinding\": \"DENIED\",\n              \"mAllowStart_inBindService\": \"DENIED\",\n              \"mAllowStart_byBindings\": \"DENIED\"\n            },\n            \"fieldsComplete\": true\n          }\n        ],\n        \"parseErrors\": [],\n        \"targetUserForegroundSectionCount\": 1,\n        \"limitations\": [\n          \"Not atomic with other commands; dump takes AMS locks and can affect timing.\",\n          \"No runtime caller/stack, causation, UID/process absence or acceptance claim.\",\n          \"Not-listed means not printed in this capture, not runtime absence.\"\n        ],\n        \"status\": \"complete\",\n        \"activeForegroundAppsStatus\": \"target-not-listed\",\n        \"trackServicesStatus\": \"observed\"\n      }\n    },\n    {\n      \"phase\": \"attempt\",\n      \"captureAttempt\": \"race-observation.kqpePd\",\n      \"status\": \"complete\",\n      \"evidence\": {\n        \"stdout\": {\n          \"path\": \"race-observation.kqpePd/services.txt\",\n          \"bytes\": 368180,\n          \"sha256\": \"3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794\",\n          \"readStatus\": \"complete\"\n        },\n        \"stderr\": {\n          \"path\": \"race-observation.kqpePd/services.txt.stderr\",\n          \"bytes\": 0,\n          \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n          \"readStatus\": \"complete\"\n        },\n        \"exitCode\": {\n          \"path\": \"race-observation.kqpePd/services.txt.exit-code.txt\",\n          \"bytes\": 2,\n          \"sha256\": \"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa\",\n          \"readStatus\": \"complete\"\n        },\n        \"scope\": {\n          \"path\": \"race-observation.kqpePd/services.txt.scope.txt\",\n          \"bytes\": 40,\n          \"sha256\": \"489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22\",\n          \"readStatus\": \"complete\"\n        }\n      },\n      \"nativeExitCode\": 0,\n      \"captureStatus\": \"complete\",\n      \"scopeVerified\": true,\n      \"command\": [\n        \"adb\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"services\"\n      ],\n      \"fields\": {\n        \"kind\": \"framework-bookkeeping-observation-not-acceptance\",\n        \"sha256\": \"3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794\",\n        \"bytes\": 368180,\n        \"package\": \"app.passengercount\",\n        \"userId\": 0,\n        \"commandComplete\": true,\n        \"unfilteredFrameworkDump\": true,\n        \"headerPresent\": true,\n        \"decodedWithReplacement\": false,\n        \"activeForegroundApps\": [],\n        \"trackServices\": [\n          {\n            \"token\": \"d5f580\",\n            \"userId\": 0,\n            \"component\": \"app.passengercount/.TrackService\",\n            \"listing\": \"active\",\n            \"lineStart\": 377,\n            \"lineEnd\": 412,\n            \"app\": \"null\",\n            \"appIsNull\": true,\n            \"startForegroundCount\": 1,\n            \"isForeground\": false,\n            \"foregroundServiceType\": \"0x00000000\",\n            \"foregroundId\": 19,\n            \"startRequested\": true,\n            \"stopIfKilled\": false,\n            \"callStart\": true,\n            \"startCommandResult\": 1,\n            \"reasons\": {\n              \"mAllowWiu_noBinding\": \"DENIED\",\n              \"mAllowWiu_inBindService\": \"DENIED\",\n              \"mAllowWiu_byBindings\": \"DENIED\",\n              \"mAllowStart_noBinding\": \"DENIED\",\n              \"mAllowStart_inBindService\": \"DENIED\",\n              \"mAllowStart_byBindings\": \"DENIED\"\n            },\n            \"fieldsComplete\": true\n          },\n          {\n            \"token\": \"d5f580\",\n            \"userId\": 0,\n            \"component\": \"app.passengercount/.TrackService\",\n            \"listing\": \"restarting\",\n            \"lineStart\": 4602,\n            \"lineEnd\": 4638,\n            \"app\": \"null\",\n            \"appIsNull\": true,\n            \"startForegroundCount\": 1,\n            \"isForeground\": false,\n            \"foregroundServiceType\": \"0x00000000\",\n            \"foregroundId\": 19,\n            \"startRequested\": true,\n            \"stopIfKilled\": false,\n            \"callStart\": true,\n            \"startCommandResult\": 1,\n            \"reasons\": {\n              \"mAllowWiu_noBinding\": \"DENIED\",\n              \"mAllowWiu_inBindService\": \"DENIED\",\n              \"mAllowWiu_byBindings\": \"DENIED\",\n              \"mAllowStart_noBinding\": \"DENIED\",\n              \"mAllowStart_inBindService\": \"DENIED\",\n              \"mAllowStart_byBindings\": \"DENIED\"\n            },\n            \"fieldsComplete\": true\n          }\n        ],\n        \"parseErrors\": [],\n        \"targetUserForegroundSectionCount\": 1,\n        \"limitations\": [\n          \"Not atomic with other commands; dump takes AMS locks and can affect timing.\",\n          \"No runtime caller/stack, causation, UID/process absence or acceptance claim.\",\n          \"Not-listed means not printed in this capture, not runtime absence.\"\n        ],\n        \"status\": \"complete\",\n        \"activeForegroundAppsStatus\": \"target-not-listed\",\n        \"trackServicesStatus\": \"observed\"\n      }\n    },\n    {\n      \"phase\": \"attempt\",\n      \"captureAttempt\": \"race-observation.mo4kMN\",\n      \"status\": \"complete\",\n      \"evidence\": {\n        \"stdout\": {\n          \"path\": \"race-observation.mo4kMN/services.txt\",\n          \"bytes\": 344616,\n          \"sha256\": \"4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9\",\n          \"readStatus\": \"complete\"\n        },\n        \"stderr\": {\n          \"path\": \"race-observation.mo4kMN/services.txt.stderr\",\n          \"bytes\": 0,\n          \"sha256\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n          \"readStatus\": \"complete\"\n        },\n        \"exitCode\": {\n          \"path\": \"race-observation.mo4kMN/services.txt.exit-code.txt\",\n          \"bytes\": 2,\n          \"sha256\": \"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa\",\n          \"readStatus\": \"complete\"\n        },\n        \"scope\": {\n          \"path\": \"race-observation.mo4kMN/services.txt.scope.txt\",\n          \"bytes\": 40,\n          \"sha256\": \"489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22\",\n          \"readStatus\": \"complete\"\n        }\n      },\n      \"nativeExitCode\": 0,\n      \"captureStatus\": \"complete\",\n      \"scopeVerified\": true,\n      \"command\": [\n        \"adb\",\n        \"shell\",\n        \"dumpsys\",\n        \"activity\",\n        \"services\"\n      ],\n      \"fields\": {\n        \"kind\": \"framework-bookkeeping-observation-not-acceptance\",\n        \"sha256\": \"4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9\",\n        \"bytes\": 344616,\n        \"package\": \"app.passengercount\",\n        \"userId\": 0,\n        \"commandComplete\": true,\n        \"unfilteredFrameworkDump\": true,\n        \"headerPresent\": true,\n        \"decodedWithReplacement\": false,\n        \"activeForegroundApps\": [],\n        \"trackServices\": [],\n        \"parseErrors\": [],\n        \"targetUserForegroundSectionCount\": 1,\n        \"limitations\": [\n          \"Not atomic with other commands; dump takes AMS locks and can affect timing.\",\n          \"No runtime caller/stack, causation, UID/process absence or acceptance claim.\",\n          \"Not-listed means not printed in this capture, not runtime absence.\"\n        ],\n        \"status\": \"complete\",\n        \"activeForegroundAppsStatus\": \"target-not-listed\",\n        \"trackServicesStatus\": \"target-not-listed\"\n      }\n    }\n  ],\n  \"ordering\": \"Presentation only: random attempt names do not establish chronology.\",\n  \"limitations\": [\n    \"Sampled fields, not runtime caller/stack, cause or policy emulation.\",\n    \"Dump takes AMS locks and can affect timing; not atomic with other commands.\",\n    \"No UID/process absence, recovery or acceptance verdict.\"\n  ]\n}\n"
+    },
+    "rootAndFreshAttemptBytesEqual": true
+  },
+  "sources": [
+    {
+      "phase": "before",
+      "captureAttempt": null,
+      "status": "complete",
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "identities": {
+        "stdout": {
+          "path": "race-before-services.txt",
+          "bytes": 319606,
+          "sha256": "da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-before-services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-before-services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-before-services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "zipAndExtractedBytesMatch": true
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.De6EOw",
+      "status": "complete",
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "identities": {
+        "stdout": {
+          "path": "race-observation.De6EOw/services.txt",
+          "bytes": 360262,
+          "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-observation.De6EOw/services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-observation.De6EOw/services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-observation.De6EOw/services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "zipAndExtractedBytesMatch": true
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.kqpePd",
+      "status": "complete",
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "identities": {
+        "stdout": {
+          "path": "race-observation.kqpePd/services.txt",
+          "bytes": 368180,
+          "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-observation.kqpePd/services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-observation.kqpePd/services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-observation.kqpePd/services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "zipAndExtractedBytesMatch": true
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.mo4kMN",
+      "status": "complete",
+      "nativeExitCode": 0,
+      "captureStatus": "complete",
+      "scopeVerified": true,
+      "identities": {
+        "stdout": {
+          "path": "race-observation.mo4kMN/services.txt",
+          "bytes": 344616,
+          "sha256": "4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9",
+          "readStatus": "complete"
+        },
+        "stderr": {
+          "path": "race-observation.mo4kMN/services.txt.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "readStatus": "complete"
+        },
+        "exitCode": {
+          "path": "race-observation.mo4kMN/services.txt.exit-code.txt",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "readStatus": "complete"
+        },
+        "scope": {
+          "path": "race-observation.mo4kMN/services.txt.scope.txt",
+          "bytes": 40,
+          "sha256": "489868d4426cc6c60fc89b4a8e0135da0912f0e54b02b9895b904ca8a1488d22",
+          "readStatus": "complete"
+        }
+      },
+      "zipAndExtractedBytesMatch": true
+    }
+  ],
+  "serviceAndMapExcerpts": [
+    {
+      "phase": "before",
+      "captureAttempt": null,
+      "source": {
+        "archivePath": "race-before-services.txt",
+        "bytes": 319606,
+        "sha256": "da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f"
+      },
+      "sourceLineCount": 4529,
+      "fullUser0ForegroundMap": {
+        "source": {
+          "archivePath": "race-before-services.txt",
+          "bytes": 319606,
+          "sha256": "da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f"
+        },
+        "selection": "Entire printed user0 ActiveForegroundApps section; here it extends to EOF.",
+        "lineNumbersAreOneBased": true,
+        "selectedLines": [
+          {
+            "line": 4526,
+            "raw": "Active foreground apps - user 0:\n",
+            "sha256": "25c746f56697f706dd28563c50af32164ee1d2f3416e76d84f27146c9213fc48"
+          },
+          {
+            "line": 4527,
+            "raw": "  #0: app.passengercount\n",
+            "sha256": "5eb456712a3a110c1fd2a60699c382b6f8d45bd9f61f19952a0aa78f63efbf7f"
+          },
+          {
+            "line": 4528,
+            "raw": "    mNumActive=1 mAppOnTop=false mShownWhileTop=true mShownWhileScreenOn=true\n",
+            "sha256": "8678274c14a16ae0a488287adcf75f9805a7762769d9ed6bbe3872f0b369d2e7"
+          },
+          {
+            "line": 4529,
+            "raw": "    mStartTime=-5s445ms mStartVisibleTime=-5s445ms\n",
+            "sha256": "ca1f364c0670953c61c7b0b5463fe0cc348a97c3fe44b3f8401e4706037e0624"
+          }
+        ],
+        "selectedRawConcatenationSha256": "6787d82be8707b941b66343673bf17f4a1de5d4192a86753fa4b2f0625d1c40e"
+      },
+      "targetMapStatus": "observed",
+      "helperEntryListed": false,
+      "trackServices": [
+        {
+          "parsedFields": {
+            "token": "d5f580",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "active",
+            "lineStart": 248,
+            "lineEnd": 282,
+            "app": "ProcessRecord{b81872b 3059:app.passengercount:tracking/u0a209}",
+            "appIsNull": false,
+            "startForegroundCount": 1,
+            "isForeground": true,
+            "foregroundServiceType": "0x00000008",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "PROC_STATE_TOP",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "PROC_STATE_TOP",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          },
+          "enclosingRecordRange": {
+            "start": 248,
+            "end": 282
+          },
+          "excerpt": {
+            "source": {
+              "archivePath": "race-before-services.txt",
+              "bytes": 319606,
+              "sha256": "da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f"
+            },
+            "selection": "Record header and selected exact target app/mode/restriction/count/foreground/sticky/restart field lines; other record fields omitted.",
+            "lineNumbersAreOneBased": true,
+            "selectedLines": [
+              {
+                "line": 248,
+                "raw": "  * ServiceRecord{d5f580 u0 app.passengercount/.TrackService c:app.passengercount}\n",
+                "sha256": "26b0b89bd1e1949f6570f7b455697c4c9b07656c0b7895c6cf676a5c2d746aeb"
+              },
+              {
+                "line": 255,
+                "raw": "    app=ProcessRecord{b81872b 3059:app.passengercount:tracking/u0a209}\n",
+                "sha256": "6fd9afdeecc4dd37f8fbae7076269852c00c97b34f6452999c07066b2083882d"
+              },
+              {
+                "line": 256,
+                "raw": "    useNewWiuLogic_forCapabilities()=true\n",
+                "sha256": "31689edc4f7b7b53fd815b3e4571c09de3976788db5de82daf235ec219dd50dd"
+              },
+              {
+                "line": 257,
+                "raw": "    useNewWiuLogic_forStart()=true\n",
+                "sha256": "2902aeb1ed6e5879c2f673989b855d338844e1049add9b031178b4a3118a91c2"
+              },
+              {
+                "line": 258,
+                "raw": "    useNewBfslLogic()=true\n",
+                "sha256": "349b7d32fa1946bb26f495231ac54d03d72aa9764dc6a8f9c43f3f9bef505540"
+              },
+              {
+                "line": 259,
+                "raw": "    mAllowWiu_noBinding=PROC_STATE_TOP\n",
+                "sha256": "2616f5238ff5451ea2b128fa981e33d464ff03ca33e540aad77d286a868ca8ff"
+              },
+              {
+                "line": 260,
+                "raw": "    mAllowWiu_inBindService=DENIED\n",
+                "sha256": "c48e3db73f45b04aa51857e0f60307c0b50de40d97cf7382e82aa19641699a43"
+              },
+              {
+                "line": 261,
+                "raw": "    mAllowWiu_byBindings=DENIED\n",
+                "sha256": "444283623e8d85f729c98ae48d643c5aa6f6947961e01df124d9292a5f5d712e"
+              },
+              {
+                "line": 269,
+                "raw": "    mAllowStart_noBinding=PROC_STATE_TOP\n",
+                "sha256": "a0b077ea56bc602f3460d8f975a00f59c0f8ab30f253e7f444fd24ab8215f231"
+              },
+              {
+                "line": 270,
+                "raw": "    mAllowStart_inBindService=DENIED\n",
+                "sha256": "592cf824b49d22b5f9be551e734bce10cea59944e853f182fd75f902ef4d7578"
+              },
+              {
+                "line": 271,
+                "raw": "    mAllowStart_byBindings=DENIED\n",
+                "sha256": "6be059c3f0b15dbbaaa5e2eddc8ec268bdb734c2a417cbb9a4676f4dc5b71a68"
+              },
+              {
+                "line": 275,
+                "raw": "    startForegroundCount=1\n",
+                "sha256": "80b1bdd7488c81ecf949ab03f43ca5e84a3943de8f0192732a7d08fbd62af469"
+              },
+              {
+                "line": 277,
+                "raw": "    isForeground=true foregroundId=19 types=0x00000008 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)\n",
+                "sha256": "5b1f49eadf413dd72630889aab2f2939bf18a92554939835041c32a6625e7329"
+              },
+              {
+                "line": 280,
+                "raw": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1\n",
+                "sha256": "5d6fb4038b875d2cfced852da291a3acf9a1c80558c4ad4042b14bdbeecaa9bc"
+              },
+              {
+                "line": 281,
+                "raw": " startCommandResult=1\n",
+                "sha256": "3ddcc9518d656b68929657c1e63ecf525ffd6ede5195602b147a40cb387f24cf"
+              }
+            ],
+            "selectedRawConcatenationSha256": "02b3a72f5f563372f94f8adfff8958e2e1bf1daeffac976605669e9c28bd8603"
+          }
+        }
+      ],
+      "handlerSearch": {
+        "allSourceLinesScanned": true,
+        "patterns": [
+          "  Handler - user ",
+          "what=2",
+          "Handler (com.android.server.am.ActiveServices$ServiceMap)"
+        ],
+        "matchingLines": [],
+        "interpretation": "No printed Handler/what2 observation; not evidence that no update was queued or dispatched."
+      }
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.De6EOw",
+      "source": {
+        "archivePath": "race-observation.De6EOw/services.txt",
+        "bytes": 360262,
+        "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928"
+      },
+      "sourceLineCount": 5100,
+      "fullUser0ForegroundMap": {
+        "source": {
+          "archivePath": "race-observation.De6EOw/services.txt",
+          "bytes": 360262,
+          "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928"
+        },
+        "selection": "Entire printed user0 ActiveForegroundApps section; here it extends to EOF.",
+        "lineNumbersAreOneBased": true,
+        "selectedLines": [
+          {
+            "line": 5097,
+            "raw": "Active foreground apps - user 0:\n",
+            "sha256": "25c746f56697f706dd28563c50af32164ee1d2f3416e76d84f27146c9213fc48"
+          },
+          {
+            "line": 5098,
+            "raw": "  #0: app.passengercount.tests\n",
+            "sha256": "aa30aaeed52cfe0bf5401404b609e08fc0591cafaf31cdce389b40e5f439a8f3"
+          },
+          {
+            "line": 5099,
+            "raw": "    mNumActive=1 mAppOnTop=false mShownWhileTop=false mShownWhileScreenOn=true\n",
+            "sha256": "a70404ec15836617102151b54a6528e402a900582cdfec3582ef058b6d733ee8"
+          },
+          {
+            "line": 5100,
+            "raw": "    mStartTime=-933ms mStartVisibleTime=-933ms\n",
+            "sha256": "241a5b47312146e28efc6c53ac049ce2ca91093d54b4f3da854c6ca87c9de318"
+          }
+        ],
+        "selectedRawConcatenationSha256": "ba2e2e8134a29e11aa249f7dca4c71fcd24f6f37c7bbe15f71e4a2af549efbcb"
+      },
+      "targetMapStatus": "target-not-listed",
+      "helperEntryListed": true,
+      "trackServices": [
+        {
+          "parsedFields": {
+            "token": "d5f580",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "active",
+            "lineStart": 414,
+            "lineEnd": 449,
+            "app": "null",
+            "appIsNull": true,
+            "startForegroundCount": 1,
+            "isForeground": false,
+            "foregroundServiceType": "0x00000000",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "DENIED",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "DENIED",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          },
+          "enclosingRecordRange": {
+            "start": 414,
+            "end": 449
+          },
+          "excerpt": {
+            "source": {
+              "archivePath": "race-observation.De6EOw/services.txt",
+              "bytes": 360262,
+              "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928"
+            },
+            "selection": "Record header and selected exact target app/mode/restriction/count/foreground/sticky/restart field lines; other record fields omitted.",
+            "lineNumbersAreOneBased": true,
+            "selectedLines": [
+              {
+                "line": 414,
+                "raw": "  * ServiceRecord{d5f580 u0 app.passengercount/.TrackService c:app.passengercount}\n",
+                "sha256": "26b0b89bd1e1949f6570f7b455697c4c9b07656c0b7895c6cf676a5c2d746aeb"
+              },
+              {
+                "line": 421,
+                "raw": "    app=null\n",
+                "sha256": "a716716e909471d42eeb0a44661439f1c0e85b26f18943e0ef9f90c77cd84949"
+              },
+              {
+                "line": 422,
+                "raw": "    useNewWiuLogic_forCapabilities()=true\n",
+                "sha256": "31689edc4f7b7b53fd815b3e4571c09de3976788db5de82daf235ec219dd50dd"
+              },
+              {
+                "line": 423,
+                "raw": "    useNewWiuLogic_forStart()=true\n",
+                "sha256": "2902aeb1ed6e5879c2f673989b855d338844e1049add9b031178b4a3118a91c2"
+              },
+              {
+                "line": 424,
+                "raw": "    useNewBfslLogic()=true\n",
+                "sha256": "349b7d32fa1946bb26f495231ac54d03d72aa9764dc6a8f9c43f3f9bef505540"
+              },
+              {
+                "line": 425,
+                "raw": "    mAllowWiu_noBinding=DENIED\n",
+                "sha256": "fa082156dc3b697a80aacc5257a14457050e2a1e68d957a7b7697121ce0cd278"
+              },
+              {
+                "line": 426,
+                "raw": "    mAllowWiu_inBindService=DENIED\n",
+                "sha256": "c48e3db73f45b04aa51857e0f60307c0b50de40d97cf7382e82aa19641699a43"
+              },
+              {
+                "line": 427,
+                "raw": "    mAllowWiu_byBindings=DENIED\n",
+                "sha256": "444283623e8d85f729c98ae48d643c5aa6f6947961e01df124d9292a5f5d712e"
+              },
+              {
+                "line": 435,
+                "raw": "    mAllowStart_noBinding=DENIED\n",
+                "sha256": "9390f581686188b033fa099cceef2e833e3e80a9e67bc5177b4a143ebb8afa17"
+              },
+              {
+                "line": 436,
+                "raw": "    mAllowStart_inBindService=DENIED\n",
+                "sha256": "592cf824b49d22b5f9be551e734bce10cea59944e853f182fd75f902ef4d7578"
+              },
+              {
+                "line": 437,
+                "raw": "    mAllowStart_byBindings=DENIED\n",
+                "sha256": "6be059c3f0b15dbbaaa5e2eddc8ec268bdb734c2a417cbb9a4676f4dc5b71a68"
+              },
+              {
+                "line": 441,
+                "raw": "    startForegroundCount=1\n",
+                "sha256": "80b1bdd7488c81ecf949ab03f43ca5e84a3943de8f0192732a7d08fbd62af469"
+              },
+              {
+                "line": 443,
+                "raw": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)\n",
+                "sha256": "d649f8f7e03bff5a94c27756bde1ba9051218b5a057fa51be10c05dd0220437d"
+              },
+              {
+                "line": 446,
+                "raw": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1\n",
+                "sha256": "5d6fb4038b875d2cfced852da291a3acf9a1c80558c4ad4042b14bdbeecaa9bc"
+              },
+              {
+                "line": 447,
+                "raw": " startCommandResult=1\n",
+                "sha256": "3ddcc9518d656b68929657c1e63ecf525ffd6ede5195602b147a40cb387f24cf"
+              },
+              {
+                "line": 448,
+                "raw": "    restartCount=1 restartDelay=-1m2s458ms nextRestartTime=-50ms crashCount=0\n",
+                "sha256": "540b82a0893cdfefe780ccf8d3c2b9c21ab8d80b84419f570d90f2e5f30296e2"
+              }
+            ],
+            "selectedRawConcatenationSha256": "69681f62532f41bc8fed7d952ac98784018ca19b741e98a7b54bdc1684716e54"
+          }
+        },
+        {
+          "parsedFields": {
+            "token": "d5f580",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "pending",
+            "lineStart": 4531,
+            "lineEnd": 4567,
+            "app": "null",
+            "appIsNull": true,
+            "startForegroundCount": 1,
+            "isForeground": false,
+            "foregroundServiceType": "0x00000000",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "DENIED",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "DENIED",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          },
+          "enclosingRecordRange": {
+            "start": 4531,
+            "end": 4567
+          },
+          "excerpt": {
+            "source": {
+              "archivePath": "race-observation.De6EOw/services.txt",
+              "bytes": 360262,
+              "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928"
+            },
+            "selection": "Record header and selected exact target app/mode/restriction/count/foreground/sticky/restart field lines; other record fields omitted.",
+            "lineNumbersAreOneBased": true,
+            "selectedLines": [
+              {
+                "line": 4531,
+                "raw": "  * Pending ServiceRecord{d5f580 u0 app.passengercount/.TrackService c:app.passengercount}\n",
+                "sha256": "c0de3041806bac9dcd31c884c9798eb5b9e301836ad2185191ca5c05bebe2e82"
+              },
+              {
+                "line": 4538,
+                "raw": "    app=null\n",
+                "sha256": "a716716e909471d42eeb0a44661439f1c0e85b26f18943e0ef9f90c77cd84949"
+              },
+              {
+                "line": 4539,
+                "raw": "    useNewWiuLogic_forCapabilities()=true\n",
+                "sha256": "31689edc4f7b7b53fd815b3e4571c09de3976788db5de82daf235ec219dd50dd"
+              },
+              {
+                "line": 4540,
+                "raw": "    useNewWiuLogic_forStart()=true\n",
+                "sha256": "2902aeb1ed6e5879c2f673989b855d338844e1049add9b031178b4a3118a91c2"
+              },
+              {
+                "line": 4541,
+                "raw": "    useNewBfslLogic()=true\n",
+                "sha256": "349b7d32fa1946bb26f495231ac54d03d72aa9764dc6a8f9c43f3f9bef505540"
+              },
+              {
+                "line": 4542,
+                "raw": "    mAllowWiu_noBinding=DENIED\n",
+                "sha256": "fa082156dc3b697a80aacc5257a14457050e2a1e68d957a7b7697121ce0cd278"
+              },
+              {
+                "line": 4543,
+                "raw": "    mAllowWiu_inBindService=DENIED\n",
+                "sha256": "c48e3db73f45b04aa51857e0f60307c0b50de40d97cf7382e82aa19641699a43"
+              },
+              {
+                "line": 4544,
+                "raw": "    mAllowWiu_byBindings=DENIED\n",
+                "sha256": "444283623e8d85f729c98ae48d643c5aa6f6947961e01df124d9292a5f5d712e"
+              },
+              {
+                "line": 4552,
+                "raw": "    mAllowStart_noBinding=DENIED\n",
+                "sha256": "9390f581686188b033fa099cceef2e833e3e80a9e67bc5177b4a143ebb8afa17"
+              },
+              {
+                "line": 4553,
+                "raw": "    mAllowStart_inBindService=DENIED\n",
+                "sha256": "592cf824b49d22b5f9be551e734bce10cea59944e853f182fd75f902ef4d7578"
+              },
+              {
+                "line": 4554,
+                "raw": "    mAllowStart_byBindings=DENIED\n",
+                "sha256": "6be059c3f0b15dbbaaa5e2eddc8ec268bdb734c2a417cbb9a4676f4dc5b71a68"
+              },
+              {
+                "line": 4558,
+                "raw": "    startForegroundCount=1\n",
+                "sha256": "80b1bdd7488c81ecf949ab03f43ca5e84a3943de8f0192732a7d08fbd62af469"
+              },
+              {
+                "line": 4560,
+                "raw": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)\n",
+                "sha256": "d649f8f7e03bff5a94c27756bde1ba9051218b5a057fa51be10c05dd0220437d"
+              },
+              {
+                "line": 4563,
+                "raw": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1\n",
+                "sha256": "5d6fb4038b875d2cfced852da291a3acf9a1c80558c4ad4042b14bdbeecaa9bc"
+              },
+              {
+                "line": 4564,
+                "raw": " startCommandResult=1\n",
+                "sha256": "3ddcc9518d656b68929657c1e63ecf525ffd6ede5195602b147a40cb387f24cf"
+              },
+              {
+                "line": 4565,
+                "raw": "    restartCount=1 restartDelay=-1m2s498ms nextRestartTime=-90ms crashCount=0\n",
+                "sha256": "678b10513a79dd268c1b1161196150155e83bc8d8167557d7162031b924f6fbe"
+              }
+            ],
+            "selectedRawConcatenationSha256": "3b4b0c6fcea765d8c337e781bf354dba036e95279fb5d29ac617a60b88739cde"
+          }
+        }
+      ],
+      "handlerSearch": {
+        "allSourceLinesScanned": true,
+        "patterns": [
+          "  Handler - user ",
+          "what=2",
+          "Handler (com.android.server.am.ActiveServices$ServiceMap)"
+        ],
+        "matchingLines": [],
+        "interpretation": "No printed Handler/what2 observation; not evidence that no update was queued or dispatched."
+      }
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.kqpePd",
+      "source": {
+        "archivePath": "race-observation.kqpePd/services.txt",
+        "bytes": 368180,
+        "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794"
+      },
+      "sourceLineCount": 5235,
+      "fullUser0ForegroundMap": {
+        "source": {
+          "archivePath": "race-observation.kqpePd/services.txt",
+          "bytes": 368180,
+          "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794"
+        },
+        "selection": "Entire printed user0 ActiveForegroundApps section; here it extends to EOF.",
+        "lineNumbersAreOneBased": true,
+        "selectedLines": [
+          {
+            "line": 5232,
+            "raw": "Active foreground apps - user 0:\n",
+            "sha256": "25c746f56697f706dd28563c50af32164ee1d2f3416e76d84f27146c9213fc48"
+          },
+          {
+            "line": 5233,
+            "raw": "  #0: app.passengercount.tests\n",
+            "sha256": "aa30aaeed52cfe0bf5401404b609e08fc0591cafaf31cdce389b40e5f439a8f3"
+          },
+          {
+            "line": 5234,
+            "raw": "    mNumActive=1 mAppOnTop=false mShownWhileTop=false mShownWhileScreenOn=true\n",
+            "sha256": "a70404ec15836617102151b54a6528e402a900582cdfec3582ef058b6d733ee8"
+          },
+          {
+            "line": 5235,
+            "raw": "    mStartTime=-327ms mStartVisibleTime=-327ms\n",
+            "sha256": "a9414fbafdc0c69fb8ebf86fd989e07231853194af1d528af0474a0cbd0714fa"
+          }
+        ],
+        "selectedRawConcatenationSha256": "9577377c5e5af4101875a33f1637f371c0c75a881c2a20822ada6eed8675cb13"
+      },
+      "targetMapStatus": "target-not-listed",
+      "helperEntryListed": true,
+      "trackServices": [
+        {
+          "parsedFields": {
+            "token": "d5f580",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "active",
+            "lineStart": 377,
+            "lineEnd": 412,
+            "app": "null",
+            "appIsNull": true,
+            "startForegroundCount": 1,
+            "isForeground": false,
+            "foregroundServiceType": "0x00000000",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "DENIED",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "DENIED",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          },
+          "enclosingRecordRange": {
+            "start": 377,
+            "end": 412
+          },
+          "excerpt": {
+            "source": {
+              "archivePath": "race-observation.kqpePd/services.txt",
+              "bytes": 368180,
+              "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794"
+            },
+            "selection": "Record header and selected exact target app/mode/restriction/count/foreground/sticky/restart field lines; other record fields omitted.",
+            "lineNumbersAreOneBased": true,
+            "selectedLines": [
+              {
+                "line": 377,
+                "raw": "  * ServiceRecord{d5f580 u0 app.passengercount/.TrackService c:app.passengercount}\n",
+                "sha256": "26b0b89bd1e1949f6570f7b455697c4c9b07656c0b7895c6cf676a5c2d746aeb"
+              },
+              {
+                "line": 384,
+                "raw": "    app=null\n",
+                "sha256": "a716716e909471d42eeb0a44661439f1c0e85b26f18943e0ef9f90c77cd84949"
+              },
+              {
+                "line": 385,
+                "raw": "    useNewWiuLogic_forCapabilities()=true\n",
+                "sha256": "31689edc4f7b7b53fd815b3e4571c09de3976788db5de82daf235ec219dd50dd"
+              },
+              {
+                "line": 386,
+                "raw": "    useNewWiuLogic_forStart()=true\n",
+                "sha256": "2902aeb1ed6e5879c2f673989b855d338844e1049add9b031178b4a3118a91c2"
+              },
+              {
+                "line": 387,
+                "raw": "    useNewBfslLogic()=true\n",
+                "sha256": "349b7d32fa1946bb26f495231ac54d03d72aa9764dc6a8f9c43f3f9bef505540"
+              },
+              {
+                "line": 388,
+                "raw": "    mAllowWiu_noBinding=DENIED\n",
+                "sha256": "fa082156dc3b697a80aacc5257a14457050e2a1e68d957a7b7697121ce0cd278"
+              },
+              {
+                "line": 389,
+                "raw": "    mAllowWiu_inBindService=DENIED\n",
+                "sha256": "c48e3db73f45b04aa51857e0f60307c0b50de40d97cf7382e82aa19641699a43"
+              },
+              {
+                "line": 390,
+                "raw": "    mAllowWiu_byBindings=DENIED\n",
+                "sha256": "444283623e8d85f729c98ae48d643c5aa6f6947961e01df124d9292a5f5d712e"
+              },
+              {
+                "line": 398,
+                "raw": "    mAllowStart_noBinding=DENIED\n",
+                "sha256": "9390f581686188b033fa099cceef2e833e3e80a9e67bc5177b4a143ebb8afa17"
+              },
+              {
+                "line": 399,
+                "raw": "    mAllowStart_inBindService=DENIED\n",
+                "sha256": "592cf824b49d22b5f9be551e734bce10cea59944e853f182fd75f902ef4d7578"
+              },
+              {
+                "line": 400,
+                "raw": "    mAllowStart_byBindings=DENIED\n",
+                "sha256": "6be059c3f0b15dbbaaa5e2eddc8ec268bdb734c2a417cbb9a4676f4dc5b71a68"
+              },
+              {
+                "line": 404,
+                "raw": "    startForegroundCount=1\n",
+                "sha256": "80b1bdd7488c81ecf949ab03f43ca5e84a3943de8f0192732a7d08fbd62af469"
+              },
+              {
+                "line": 406,
+                "raw": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)\n",
+                "sha256": "d649f8f7e03bff5a94c27756bde1ba9051218b5a057fa51be10c05dd0220437d"
+              },
+              {
+                "line": 409,
+                "raw": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1\n",
+                "sha256": "5d6fb4038b875d2cfced852da291a3acf9a1c80558c4ad4042b14bdbeecaa9bc"
+              },
+              {
+                "line": 410,
+                "raw": " startCommandResult=1\n",
+                "sha256": "3ddcc9518d656b68929657c1e63ecf525ffd6ede5195602b147a40cb387f24cf"
+              },
+              {
+                "line": 411,
+                "raw": "    restartCount=1 restartDelay=-33s121ms nextRestartTime=+29s287ms crashCount=0\n",
+                "sha256": "c010310601d9995ee86c53a8b206000b9c9cebf17d0a201eaf4ac6ce07f9dc3d"
+              }
+            ],
+            "selectedRawConcatenationSha256": "0352ec1781a9e6e437c0a48e19c5a5beeec8b742662a3e638cf719276d42211e"
+          }
+        },
+        {
+          "parsedFields": {
+            "token": "d5f580",
+            "userId": 0,
+            "component": "app.passengercount/.TrackService",
+            "listing": "restarting",
+            "lineStart": 4602,
+            "lineEnd": 4638,
+            "app": "null",
+            "appIsNull": true,
+            "startForegroundCount": 1,
+            "isForeground": false,
+            "foregroundServiceType": "0x00000000",
+            "foregroundId": 19,
+            "startRequested": true,
+            "stopIfKilled": false,
+            "callStart": true,
+            "startCommandResult": 1,
+            "reasons": {
+              "mAllowWiu_noBinding": "DENIED",
+              "mAllowWiu_inBindService": "DENIED",
+              "mAllowWiu_byBindings": "DENIED",
+              "mAllowStart_noBinding": "DENIED",
+              "mAllowStart_inBindService": "DENIED",
+              "mAllowStart_byBindings": "DENIED"
+            },
+            "fieldsComplete": true
+          },
+          "enclosingRecordRange": {
+            "start": 4602,
+            "end": 4638
+          },
+          "excerpt": {
+            "source": {
+              "archivePath": "race-observation.kqpePd/services.txt",
+              "bytes": 368180,
+              "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794"
+            },
+            "selection": "Record header and selected exact target app/mode/restriction/count/foreground/sticky/restart field lines; other record fields omitted.",
+            "lineNumbersAreOneBased": true,
+            "selectedLines": [
+              {
+                "line": 4602,
+                "raw": "  * Restarting ServiceRecord{d5f580 u0 app.passengercount/.TrackService c:app.passengercount}\n",
+                "sha256": "5c7e654f067ec58e45bdd76c00943eab108d44ec356227e537880b7626e88648"
+              },
+              {
+                "line": 4609,
+                "raw": "    app=null\n",
+                "sha256": "a716716e909471d42eeb0a44661439f1c0e85b26f18943e0ef9f90c77cd84949"
+              },
+              {
+                "line": 4610,
+                "raw": "    useNewWiuLogic_forCapabilities()=true\n",
+                "sha256": "31689edc4f7b7b53fd815b3e4571c09de3976788db5de82daf235ec219dd50dd"
+              },
+              {
+                "line": 4611,
+                "raw": "    useNewWiuLogic_forStart()=true\n",
+                "sha256": "2902aeb1ed6e5879c2f673989b855d338844e1049add9b031178b4a3118a91c2"
+              },
+              {
+                "line": 4612,
+                "raw": "    useNewBfslLogic()=true\n",
+                "sha256": "349b7d32fa1946bb26f495231ac54d03d72aa9764dc6a8f9c43f3f9bef505540"
+              },
+              {
+                "line": 4613,
+                "raw": "    mAllowWiu_noBinding=DENIED\n",
+                "sha256": "fa082156dc3b697a80aacc5257a14457050e2a1e68d957a7b7697121ce0cd278"
+              },
+              {
+                "line": 4614,
+                "raw": "    mAllowWiu_inBindService=DENIED\n",
+                "sha256": "c48e3db73f45b04aa51857e0f60307c0b50de40d97cf7382e82aa19641699a43"
+              },
+              {
+                "line": 4615,
+                "raw": "    mAllowWiu_byBindings=DENIED\n",
+                "sha256": "444283623e8d85f729c98ae48d643c5aa6f6947961e01df124d9292a5f5d712e"
+              },
+              {
+                "line": 4623,
+                "raw": "    mAllowStart_noBinding=DENIED\n",
+                "sha256": "9390f581686188b033fa099cceef2e833e3e80a9e67bc5177b4a143ebb8afa17"
+              },
+              {
+                "line": 4624,
+                "raw": "    mAllowStart_inBindService=DENIED\n",
+                "sha256": "592cf824b49d22b5f9be551e734bce10cea59944e853f182fd75f902ef4d7578"
+              },
+              {
+                "line": 4625,
+                "raw": "    mAllowStart_byBindings=DENIED\n",
+                "sha256": "6be059c3f0b15dbbaaa5e2eddc8ec268bdb734c2a417cbb9a4676f4dc5b71a68"
+              },
+              {
+                "line": 4629,
+                "raw": "    startForegroundCount=1\n",
+                "sha256": "80b1bdd7488c81ecf949ab03f43ca5e84a3943de8f0192732a7d08fbd62af469"
+              },
+              {
+                "line": 4631,
+                "raw": "    isForeground=false foregroundId=19 types=0x00000000 foregroundNoti=Notification(channel=passengercount_track shortcut=null contentView=null vibrate=null sound=null defaults=0 flags=ONGOING_EVENT|FOREGROUND_SERVICE color=0x00000000 category=service vis=PRIVATE)\n",
+                "sha256": "d649f8f7e03bff5a94c27756bde1ba9051218b5a057fa51be10c05dd0220437d"
+              },
+              {
+                "line": 4634,
+                "raw": "    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=1\n",
+                "sha256": "5d6fb4038b875d2cfced852da291a3acf9a1c80558c4ad4042b14bdbeecaa9bc"
+              },
+              {
+                "line": 4635,
+                "raw": " startCommandResult=1\n",
+                "sha256": "3ddcc9518d656b68929657c1e63ecf525ffd6ede5195602b147a40cb387f24cf"
+              },
+              {
+                "line": 4636,
+                "raw": "    restartCount=1 restartDelay=-33s151ms nextRestartTime=+29s257ms crashCount=0\n",
+                "sha256": "cbcacbe575abe443df24a0f43d764b95fd4aec5ea23107598c5e7cbf89e3251b"
+              }
+            ],
+            "selectedRawConcatenationSha256": "813c2d8124c9d62adbfb053d616678de377da1757c61bcd110edb9f836fb012a"
+          }
+        }
+      ],
+      "handlerSearch": {
+        "allSourceLinesScanned": true,
+        "patterns": [
+          "  Handler - user ",
+          "what=2",
+          "Handler (com.android.server.am.ActiveServices$ServiceMap)"
+        ],
+        "matchingLines": [],
+        "interpretation": "No printed Handler/what2 observation; not evidence that no update was queued or dispatched."
+      }
+    },
+    {
+      "phase": "attempt",
+      "captureAttempt": "race-observation.mo4kMN",
+      "source": {
+        "archivePath": "race-observation.mo4kMN/services.txt",
+        "bytes": 344616,
+        "sha256": "4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9"
+      },
+      "sourceLineCount": 4844,
+      "fullUser0ForegroundMap": {
+        "source": {
+          "archivePath": "race-observation.mo4kMN/services.txt",
+          "bytes": 344616,
+          "sha256": "4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9"
+        },
+        "selection": "Entire printed user0 ActiveForegroundApps section; here it extends to EOF.",
+        "lineNumbersAreOneBased": true,
+        "selectedLines": [
+          {
+            "line": 4841,
+            "raw": "Active foreground apps - user 0:\n",
+            "sha256": "25c746f56697f706dd28563c50af32164ee1d2f3416e76d84f27146c9213fc48"
+          },
+          {
+            "line": 4842,
+            "raw": "  #0: app.passengercount.tests\n",
+            "sha256": "aa30aaeed52cfe0bf5401404b609e08fc0591cafaf31cdce389b40e5f439a8f3"
+          },
+          {
+            "line": 4843,
+            "raw": "    mNumActive=1 mAppOnTop=false mShownWhileTop=false mShownWhileScreenOn=true\n",
+            "sha256": "a70404ec15836617102151b54a6528e402a900582cdfec3582ef058b6d733ee8"
+          },
+          {
+            "line": 4844,
+            "raw": "    mStartTime=-1s523ms mStartVisibleTime=-1s523ms\n",
+            "sha256": "7ba178503873d99590e45a0a7ef9849a096e3f77496fc06c13d6b6e962c8265d"
+          }
+        ],
+        "selectedRawConcatenationSha256": "cee41c24332ff780efc569ed0f1408b93dba35385e3e47d7dca5db0a53a3dfdb"
+      },
+      "targetMapStatus": "target-not-listed",
+      "helperEntryListed": true,
+      "trackServices": [],
+      "handlerSearch": {
+        "allSourceLinesScanned": true,
+        "patterns": [
+          "  Handler - user ",
+          "what=2",
+          "Handler (com.android.server.am.ActiveServices$ServiceMap)"
+        ],
+        "matchingLines": [],
+        "interpretation": "No printed Handler/what2 observation; not evidence that no update was queued or dispatched."
+      }
+    }
+  ],
+  "pairedClassifierInputs": [
+    {
+      "captureAttempt": "race-observation.kqpePd",
+      "resultIdentity": {
+        "archivePath": "race-observation.kqpePd/result.json",
+        "bytes": 805,
+        "sha256": "50aaad9765bf1b7c51b168f8d3d1bb83739495528087bf35b87869efac3c6e6d"
+      },
+      "evidence": {
+        "log": {
+          "path": "race-observation.kqpePd/logcat.txt",
+          "bytes": 6785463,
+          "sha256": "3fd5f9b6cb2f0cb8ea5714f6af4e448a6a27502c3aa7840230f777e112bbbf15"
+        },
+        "services": {
+          "path": "race-observation.kqpePd/services.txt",
+          "bytes": 368180,
+          "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794"
+        }
+      },
+      "captureNativeExits": {
+        "log": 0,
+        "services": 0
+      },
+      "captureStderrEmpty": true,
+      "classifierNativeStatus": {
+        "archivePath": "race-observation.kqpePd/classifier-exit-code.txt",
+        "bytes": 2,
+        "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+        "rawEncoding": "utf-8",
+        "raw": "2\n"
+      },
+      "outcome": "interleaving-unverified",
+      "oldPid": "3059",
+      "newPid": null
+    },
+    {
+      "captureAttempt": "race-observation.De6EOw",
+      "resultIdentity": {
+        "archivePath": "race-observation.De6EOw/result.json",
+        "bytes": 805,
+        "sha256": "a9c765d133b587c32b9249d5854adc7d12d689c19719b861d5797313cd7ffa0c"
+      },
+      "evidence": {
+        "log": {
+          "path": "race-observation.De6EOw/logcat.txt",
+          "bytes": 6831159,
+          "sha256": "770742b6803529aed828f7a4354c55799170f98ea8b871152513681abef9002b"
+        },
+        "services": {
+          "path": "race-observation.De6EOw/services.txt",
+          "bytes": 360262,
+          "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928"
+        }
+      },
+      "captureNativeExits": {
+        "log": 0,
+        "services": 0
+      },
+      "captureStderrEmpty": true,
+      "classifierNativeStatus": {
+        "archivePath": "race-observation.De6EOw/classifier-exit-code.txt",
+        "bytes": 2,
+        "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+        "rawEncoding": "utf-8",
+        "raw": "2\n"
+      },
+      "outcome": "interleaving-unverified",
+      "oldPid": "3059",
+      "newPid": null
+    },
+    {
+      "captureAttempt": "race-observation.mo4kMN",
+      "resultIdentity": {
+        "archivePath": "race-observation.mo4kMN/result.json",
+        "bytes": 811,
+        "sha256": "479a476e63708edc09b49d46028535a9d8a1fd5ce748934f06195ac92902f983"
+      },
+      "evidence": {
+        "log": {
+          "path": "race-observation.mo4kMN/logcat.txt",
+          "bytes": 6889164,
+          "sha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2"
+        },
+        "services": {
+          "path": "race-observation.mo4kMN/services.txt",
+          "bytes": 344616,
+          "sha256": "4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9"
+        }
+      },
+      "captureNativeExits": {
+        "log": 0,
+        "services": 0
+      },
+      "captureStderrEmpty": true,
+      "classifierNativeStatus": {
+        "archivePath": "race-observation.mo4kMN/classifier-exit-code.txt",
+        "bytes": 3,
+        "sha256": "917df3320d778ddbaa5c5c7742bc4046bf803c36ed2b050f30844ed206783469",
+        "rawEncoding": "utf-8",
+        "raw": "10\n"
+      },
+      "outcome": "automatic-restart-denied",
+      "oldPid": "3059",
+      "newPid": "3964"
+    }
+  ],
+  "ordering": {
+    "evidenceBasedOrder": [
+      "race-observation.kqpePd",
+      "race-observation.De6EOw",
+      "race-observation.mo4kMN"
+    ],
+    "proof": "Exact strict-prefix comparisons of paired logcat captures, not sorting random directory names. Each services capture follows its paired logcat command.",
+    "prefixComparisons": [
+      {
+        "earlier": {
+          "archivePath": "race-observation.kqpePd/logcat.txt",
+          "bytes": 6785463,
+          "sha256": "3fd5f9b6cb2f0cb8ea5714f6af4e448a6a27502c3aa7840230f777e112bbbf15"
+        },
+        "later": {
+          "archivePath": "race-observation.De6EOw/logcat.txt",
+          "bytes": 6831159,
+          "sha256": "770742b6803529aed828f7a4354c55799170f98ea8b871152513681abef9002b"
+        },
+        "comparedPrefixBytes": 6785463,
+        "prefixBytesEqual": true
+      },
+      {
+        "earlier": {
+          "archivePath": "race-observation.De6EOw/logcat.txt",
+          "bytes": 6831159,
+          "sha256": "770742b6803529aed828f7a4354c55799170f98ea8b871152513681abef9002b"
+        },
+        "later": {
+          "archivePath": "race-observation.mo4kMN/logcat.txt",
+          "bytes": 6889164,
+          "sha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2"
+        },
+        "comparedPrefixBytes": 6831159,
+        "prefixBytesEqual": true
+      }
+    ],
+    "limit": "No absolute services-capture timestamp or exact callback time inferred from printed relative durations."
+  },
+  "eventExcerpts": {
+    "source": {
+      "archivePath": "race-observation.mo4kMN/logcat.txt",
+      "bytes": 6889164,
+      "sha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2"
+    },
+    "selection": "Relevant warm-up, detach/death/UID-gone, trigger, AppOps-warning, memory-pressure rescheduling, automatic process start and denial events.",
+    "lineNumbersAreOneBased": true,
+    "selectedLines": [
+      {
+        "line": 31426,
+        "raw": "10-26 05:30:58.733  2708  2708 I PassengerRaceTrigger: RACE_WARM_READY pid=2708 uid=10210\n",
+        "sha256": "6d641c112664f68e363a5e0d7b10c3a718e675a5d8a1a106a89abd1963c3c32e"
+      },
+      {
+        "line": 48665,
+        "raw": "10-26 05:31:19.759  3059  3059 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=3059\n",
+        "sha256": "5b203df5e6b5e05abce1f1d470c9fcc5b46ee17b9d6d08882065a5fc370766d8"
+      },
+      {
+        "line": 48691,
+        "raw": "10-26 05:31:19.801   554   995 I ActivityManager: Process app.passengercount (pid 2780) has died: prev LAST\n",
+        "sha256": "d1ff94f41362ebd3779ca987f5f60a72d371a59a5416fbd37e66adcc74f53995"
+      },
+      {
+        "line": 48713,
+        "raw": "10-26 05:31:19.856   554  1420 I ActivityManager: Process app.passengercount:tracking (pid 3059) has died: prcp FGS \n",
+        "sha256": "e183c0c47e140a0d2b642e970866c885cf525d45f26780d29ee7641abd358ef2"
+      },
+      {
+        "line": 48714,
+        "raw": "10-26 05:31:19.858   554  1420 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 30000ms for start-requested\n",
+        "sha256": "e213ca8ac14779502e7a529bfd2e2efa24fba5e234a86c9a3e3f0838dd3dd4a0"
+      },
+      {
+        "line": 48715,
+        "raw": "10-26 05:31:19.858   554   577 D DisplayManagerService: Drop pending events for gone uid 10209\n",
+        "sha256": "7169372afa2bf619675bb84b32338aa3e19b0ea1f5806cb684d27a8c6908c6cd"
+      },
+      {
+        "line": 48964,
+        "raw": "10-26 05:31:20.274  2708  2708 I PassengerRaceTrigger: RACE_TRIGGER_ENTER pid=2708 uid=10210\n",
+        "sha256": "c0adf25febc9c41355f95dbd960c018cbd49ef9ac2c890b27c92efb45e1e643d"
+      },
+      {
+        "line": 48978,
+        "raw": "10-26 05:31:20.318  2708  2708 I PassengerRaceTrigger: RACE_TRIGGER_FOREGROUND pid=2708 uid=10210\n",
+        "sha256": "2077be57432b45b384db87368ad491bc8932364912d22e1abf9a8672aac64ce2"
+      },
+      {
+        "line": 48981,
+        "raw": "10-26 05:31:20.321   554   588 E AppOps  : Operation not started: uid=10209 pkg=app.passengercount(null) op=START_FOREGROUND\n",
+        "sha256": "e1658857f973b148c80b8d01c765ba1ac6da38b2ae434efb300befa71c61004c"
+      },
+      {
+        "line": 49227,
+        "raw": "10-26 05:31:20.887   554   587 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 8975ms for mem-pressure-event\n",
+        "sha256": "d680be3264841e18fde45651b4f09a4c4ba0d1843e9e109399a6a2d37c61477a"
+      },
+      {
+        "line": 49281,
+        "raw": "10-26 05:31:21.120   554   587 W ActivityManager: Rescheduling restart of crashed service app.passengercount/.TrackService in 0ms for mem-pressure-event\n",
+        "sha256": "d1104291d607f836dac5d59853ce6d238eba26bae35ead08aaab790790ae8c50"
+      },
+      {
+        "line": 49399,
+        "raw": "10-26 05:31:21.210   554   589 I ActivityManager: Start proc 3964:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}\n",
+        "sha256": "2d5ee1ca17d3ef043d2a77befea72ae6c8dd6e19e1c6d1fd4e7deb2019e35dde"
+      },
+      {
+        "line": 49480,
+        "raw": "10-26 05:31:21.295   554  1814 W ActivityManager: Background started FGS: Disallowed [callingPackage: app.passengercount; callingUid: 10209; uidState: SVC ; uidBFSL: n/a; intent: Intent { act=app.passengercount.START_TRACK cmp=app.passengercount/.TrackService }; code:DENIED; tempAllowListReason:<null>; targetSdkVersion:35; callerTargetSdkVersion:35; startForegroundCount:1; bindFromPackage:null: isBindService:false]\n",
+        "sha256": "ddf5209a5510ddd8dc21db9f3438cd033ab32d97c9fb829b76e5011f158d2479"
+      },
+      {
+        "line": 49481,
+        "raw": "10-26 05:31:21.295   554  1814 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService\n",
+        "sha256": "fc7e73a3ff304f349b4ce306f35612aa6489f3091097158719d7daa826185f61"
+      },
+      {
+        "line": 49482,
+        "raw": "10-26 05:31:21.298  3964  3964 E PassengerTrack: Background tracking restart denied; interruption saved; reopen the active survey\n",
+        "sha256": "1c79a7fb48d07bb0537cf7661ae839bd138b1750c989e4cb86b240a0e6ab813f"
+      }
+    ],
+    "selectedRawConcatenationSha256": "7d6ad55ed64851d8a6617706327c08bcdb90934ed6259fd57c46fd60b85534e7"
+  },
+  "limits": [
+    "A missing map entry, service listing, Handler section or what=2 message is only not printed in that completed capture, not runtime absence.",
+    "Dumping takes AMS locks and changes timing; observations are not atomic with logcat or other commands.",
+    "No runtime caller, stack, causation, framework regression, application fix or acceptance success is established.",
+    "Raw Services/Logcat files are retained in the verified artifact rather than duplicated here."
+  ],
+  "installedFramework": {
+    "receiptIdentity": {
+      "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/receipt.json",
+      "bytes": 9862,
+      "sha256": "fb4be972a1e572de363ec28a8335c6798d092ae3c67070633711679f4a717aab"
+    },
+    "receiptStatus": "complete-static-analysis",
+    "serial": "emulator-5556",
+    "remotePath": "/system/framework/services.jar",
+    "deviceHashBefore": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+    "deviceHashAfter": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+    "archiveMeasuredFromZip": {
+      "archivePath": "framework-static.pqOLE4/framework-binary-sob5bfe5/services.jar",
+      "bytes": 21446452,
+      "sha256": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6"
+    },
+    "hashAgreement": true,
+    "sameJarAsPreviouslyAnalyzedRun116": true,
+    "dexIdentities": [
+      {
+        "entry": "classes.dex",
+        "bytes": 9848536,
+        "sha256": "51c668be9387f76e46eec3c5fdaaa1b544f9e76ff14ec7b9983f021c0dafcb85"
+      },
+      {
+        "entry": "classes2.dex",
+        "bytes": 9084864,
+        "sha256": "5f49d723b85f83ec734bf4f28764c6d015f47aecceb8f36c0f0f12a84d5a697a"
+      },
+      {
+        "entry": "classes3.dex",
+        "bytes": 2408764,
+        "sha256": "318fb48b46c030bc6b2255712e8ef5bbe0eec6ec51c672aa8d0d32a8808ab1d9"
+      }
+    ]
+  },
+  "contrastConfound": {
+    "name": "Observed memory-pressure restart rescheduling",
+    "scheduledDelaysMs": [
+      30000,
+      8975,
+      0
+    ],
+    "source": {
+      "archivePath": "race-observation.mo4kMN/logcat.txt",
+      "bytes": 6889164,
+      "sha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2"
+    },
+    "oneBasedLines": [
+      48714,
+      49227,
+      49281
+    ],
+    "implication": "Restart-window length changed independently of a fixed requested delay; preserve measured events in any trigger/no-trigger comparison, without attributing the change to the helper."
+  },
+  "newDiscriminator": {
+    "observed": "Before: only target foreground-map entry; later: only helper entry. Warm helper entry is not listed in the before snapshot.",
+    "supportedInference": "Consistent with the existing external helper creating a new ActiveForegroundApp entry, which takes the installed +060a enqueue branch; target demotion/removal is already observed before restart promotion.",
+    "notEstablished": "Exact creation/enqueue instant, handler dispatch, stopAll caller or cause; no intermediate snapshot at the warning."
+  }
+}

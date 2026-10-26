@@ -1,0 +1,366 @@
+{
+  "run": 40273911376,
+  "attempt": 1,
+  "head": "c80f6008cc3512e986ae2c40461da3286992d511",
+  "testedMerge": "da0a060fc343cfaca3cbad367edf7de30a465ce1",
+  "tree": "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1",
+  "conclusion": "failure",
+  "fullGateAccepted": false,
+  "artifacts": [
+    {
+      "role": "diagnostic",
+      "id": 12630165446,
+      "name": "PassengerCount-API35-restart-diagnostic-da0a060fc343cfaca3cbad367edf7de30a465ce1",
+      "size_in_bytes": 69642362,
+      "digest": "sha256:59ae1452028a588362ff179fd9d40806594b0617e2794184758b8b00be1bb8ad",
+      "expires_at": "2027-01-24T05:22:58Z",
+      "zipVerified": true,
+      "exitCode": 1,
+      "source": [
+        "da0a060fc343cfaca3cbad367edf7de30a465ce1",
+        "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1"
+      ],
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "3059",
+        "newPid": "3964",
+        "interleaved": true,
+        "cleanupDuringAbsence": true,
+        "triggerBeforeCleanup": true,
+        "foreground": false,
+        "lines": {
+          "marker": 48664,
+          "death": 48712,
+          "scheduled": 48713,
+          "entering": 48963,
+          "promoted": 48977,
+          "reset": 48980,
+          "start": 49398,
+          "denied": 49480
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.mo4kMN/logcat.txt",
+            "bytes": 6889164,
+            "sha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2"
+          },
+          "services": {
+            "path": "race-observation.mo4kMN/services.txt",
+            "bytes": 344616,
+            "sha256": "4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9"
+          }
+        }
+      },
+      "capabilityCaptures": [
+        {
+          "stage": "after-tests",
+          "collectorExit": 0,
+          "receiptPath": "platform-capability-after-tests.GjTIXR/platform-preflight-7h5kpv1o/receipt.json",
+          "jdwpObservation": {
+            "status": "complete-empty",
+            "systemServerPid": 554,
+            "pids": [],
+            "stablePidBracket": true,
+            "scope": "initial advertised snapshot only; no attach permission claim",
+            "nonemptyListMayBeTruncated": false
+          },
+          "jdwpCommand": {
+            "name": "jdwp-initial-frame",
+            "command": [
+              "/usr/local/lib/android/sdk/platform-tools/adb",
+              "-s",
+              "emulator-5556",
+              "track-jdwp"
+            ],
+            "startNs": 1792992682532835676,
+            "endNs": 1792992682627620944,
+            "monotonicStartNs": 716529115334,
+            "monotonicEndNs": 716623899872,
+            "stdoutBytes": 4,
+            "stderrBytes": 0,
+            "stdoutSha256": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "status": "complete-frame",
+            "nativeReturnCode": -15,
+            "frame": {
+              "pids": [],
+              "length": 0,
+              "frameBytes": 4,
+              "emptyRegistrySnapshot": true,
+              "nonemptyListMayBeTruncated": false
+            },
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "termination": {
+              "requested": true,
+              "forcedKill": false,
+              "reason": "complete-frame",
+              "cleanupErrors": []
+            }
+          }
+        },
+        {
+          "stage": "before-tests",
+          "collectorExit": 0,
+          "receiptPath": "platform-capability-before-tests.t4H6cB/platform-preflight-jbydszuw/receipt.json",
+          "jdwpObservation": {
+            "status": "complete-empty",
+            "systemServerPid": 554,
+            "pids": [],
+            "stablePidBracket": true,
+            "scope": "initial advertised snapshot only; no attach permission claim",
+            "nonemptyListMayBeTruncated": false
+          },
+          "jdwpCommand": {
+            "name": "jdwp-initial-frame",
+            "command": [
+              "/usr/local/lib/android/sdk/platform-tools/adb",
+              "-s",
+              "emulator-5556",
+              "track-jdwp"
+            ],
+            "startNs": 1792992649526358033,
+            "endNs": 1792992649621644913,
+            "monotonicStartNs": 683522637591,
+            "monotonicEndNs": 683617923840,
+            "stdoutBytes": 4,
+            "stderrBytes": 0,
+            "stdoutSha256": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "status": "complete-frame",
+            "nativeReturnCode": -15,
+            "frame": {
+              "pids": [],
+              "length": 0,
+              "frameBytes": 4,
+              "emptyRegistrySnapshot": true,
+              "nonemptyListMayBeTruncated": false
+            },
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "termination": {
+              "requested": true,
+              "forcedKill": false,
+              "reason": "complete-frame",
+              "cleanupErrors": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "role": "original",
+      "id": 12629821306,
+      "name": "PassengerCount-API35-lifecycle-da0a060fc343cfaca3cbad367edf7de30a465ce1",
+      "size_in_bytes": 90804437,
+      "digest": "sha256:c067762193312cf822ff43205ccecc8e4e8e0f375dbecc325d2bea06bb4ff13c",
+      "expires_at": "2027-01-24T05:22:58Z",
+      "zipVerified": true,
+      "exitCode": 1,
+      "source": [
+        "da0a060fc343cfaca3cbad367edf7de30a465ce1",
+        "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1"
+      ],
+      "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:15/AE3A.240806.043/12960925:userdebug/dev-keys",
+      "result": {
+        "outcome": "automatic-restart-denied",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6686",
+        "newPid": "6934",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": false,
+        "lines": {
+          "marker": 78770,
+          "death": 78772,
+          "scheduled": 78773,
+          "entering": 78825,
+          "promoted": 78827,
+          "reset": -1,
+          "start": 78833,
+          "denied": 78850
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.Tjw2ZF/logcat.txt",
+            "bytes": 11245063,
+            "sha256": "e46d7b4519f1851ac1376d213ac4a5a3a95e6a166a35e8080453413b6d7929e4"
+          },
+          "services": {
+            "path": "race-observation.Tjw2ZF/services.txt",
+            "bytes": 2414,
+            "sha256": "1f8f8f80719b96f418de4f203e7a7d8608e70e6ede52321cc5e8aad917c53f84"
+          }
+        }
+      },
+      "capabilityCaptures": [
+        {
+          "stage": "after-tests",
+          "collectorExit": 0,
+          "receiptPath": "platform-capability-after-tests.OPBAxE/platform-preflight-si4a5ons/receipt.json",
+          "jdwpObservation": {
+            "status": "complete-empty",
+            "systemServerPid": 559,
+            "pids": [],
+            "stablePidBracket": true,
+            "scope": "initial advertised snapshot only; no attach permission claim",
+            "nonemptyListMayBeTruncated": false
+          },
+          "jdwpCommand": {
+            "name": "jdwp-initial-frame",
+            "command": [
+              "/usr/local/lib/android/sdk/platform-tools/adb",
+              "-s",
+              "emulator-5556",
+              "track-jdwp"
+            ],
+            "startNs": 1792992607721523885,
+            "endNs": 1792992607818220046,
+            "monotonicStartNs": 641717803183,
+            "monotonicEndNs": 641814498563,
+            "stdoutBytes": 4,
+            "stderrBytes": 0,
+            "stdoutSha256": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "status": "complete-frame",
+            "nativeReturnCode": -15,
+            "frame": {
+              "pids": [],
+              "length": 0,
+              "frameBytes": 4,
+              "emptyRegistrySnapshot": true,
+              "nonemptyListMayBeTruncated": false
+            },
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "termination": {
+              "requested": true,
+              "forcedKill": false,
+              "reason": "complete-frame",
+              "cleanupErrors": []
+            }
+          }
+        },
+        {
+          "stage": "before-tests",
+          "collectorExit": 0,
+          "receiptPath": "platform-capability-before-tests.8EPVfo/platform-preflight-7_2wssbq/receipt.json",
+          "jdwpObservation": {
+            "status": "complete-empty",
+            "systemServerPid": 559,
+            "pids": [],
+            "stablePidBracket": true,
+            "scope": "initial advertised snapshot only; no attach permission claim",
+            "nonemptyListMayBeTruncated": false
+          },
+          "jdwpCommand": {
+            "name": "jdwp-initial-frame",
+            "command": [
+              "/usr/local/lib/android/sdk/platform-tools/adb",
+              "-s",
+              "emulator-5556",
+              "track-jdwp"
+            ],
+            "startNs": 1792992406627664593,
+            "endNs": 1792992406728599523,
+            "monotonicStartNs": 440623944211,
+            "monotonicEndNs": 440724878170,
+            "stdoutBytes": 4,
+            "stderrBytes": 0,
+            "stdoutSha256": "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0",
+            "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "status": "complete-frame",
+            "nativeReturnCode": -15,
+            "frame": {
+              "pids": [],
+              "length": 0,
+              "frameBytes": 4,
+              "emptyRegistrySnapshot": true,
+              "nonemptyListMayBeTruncated": false
+            },
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "termination": {
+              "requested": true,
+              "forcedKill": false,
+              "reason": "complete-frame",
+              "cleanupErrors": []
+            }
+          }
+        }
+      ],
+      "phaseCommandStatuses": {
+        "basics-command-exit-code.txt": "0\n",
+        "bootstrap-command-exit-code.txt": "0\n",
+        "ipc-basics-command-exit-code.txt": "0\n",
+        "ipc-death-command-exit-code.txt": "0\n",
+        "ipc-drain-command-exit-code.txt": "0\n",
+        "ipc-prepare-ui-death-command-exit-code.txt": "0\n",
+        "prepare-deleted-command-exit-code.txt": "0\n",
+        "prepare-denied-command-exit-code.txt": "0\n",
+        "prepare-ipc-barrier-command-exit-code.txt": "0\n",
+        "prepare-ipc-death-command-exit-code.txt": "0\n",
+        "prepare-ipc-pipe-command-exit-code.txt": "0\n",
+        "prepare-race-command-exit-code.txt": "0\n",
+        "prepare-valid-command-exit-code.txt": "0\n",
+        "receipts-final-command-exit-code.txt": "0\n",
+        "receipts-prepare-command-exit-code.txt": "0\n",
+        "receipts-recover-command-exit-code.txt": "0\n",
+        "recover-command-exit-code.txt": "0\n",
+        "recover-denied-command-exit-code.txt": "0\n",
+        "service-only-race/prepare-split-command-exit-code.txt": "0\n",
+        "service-only-race/verify-split-command-exit-code.txt": "0\n",
+        "verify-deleted-command-exit-code.txt": "0\n",
+        "verify-denied-command-exit-code.txt": "0\n",
+        "verify-ui-death-command-exit-code.txt": "0\n",
+        "verify-valid-command-exit-code.txt": "0\n"
+      },
+      "serviceOnlyResult": {
+        "outcome": "foreground-restored",
+        "process": "app.passengercount:tracking",
+        "oldPid": "6153",
+        "newPid": "6686",
+        "interleaved": true,
+        "cleanupDuringAbsence": false,
+        "triggerBeforeCleanup": false,
+        "foreground": true,
+        "lines": {
+          "marker": 77881,
+          "death": 77888,
+          "scheduled": 77889,
+          "entering": 77921,
+          "promoted": 77923,
+          "reset": -1,
+          "start": 77931,
+          "denied": -1
+        },
+        "evidence": {
+          "log": {
+            "path": "race-observation.gRM5gN/logcat.txt",
+            "bytes": 11095216,
+            "sha256": "6e8385047e7c73d51d236a299d4a738c820cf69e7f6ed2e4a0cde165aac5273b"
+          },
+          "services": {
+            "path": "race-observation.gRM5gN/services.txt",
+            "bytes": 8288,
+            "sha256": "4acf37f1714c8642a02238a18de670c24c92c30e45765889f8f12ff17dadc58a"
+          }
+        }
+      }
+    }
+  ],
+  "hosted": {
+    "node": {
+      "passed": 486,
+      "failed": 0
+    },
+    "native": "passed",
+    "browser": "passed",
+    "appBuild": "passed",
+    "testBuild": "passed"
+  },
+  "jobLogSha256": "f2a2a98ee3e9cbdf19283dc7cbc74e002865ac616bee7a8a0fcc06310d17b7a2"
+}

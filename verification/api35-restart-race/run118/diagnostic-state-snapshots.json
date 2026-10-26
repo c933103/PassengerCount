@@ -1,0 +1,62 @@
+[
+  {
+    "archivePath": "apk-sha256.txt",
+    "bytes": 326,
+    "sha256": "9e7f902630582cee89ba5c32f83a9f18768403e8859f4ce1c02f64a74a13453f",
+    "content": "d2205fb9bf9171001d9bf99760f6f5a7e67511ba3bec046e1b5ca3e38d89f1d5  /home/runner/work/PassengerCount/PassengerCount/android/build/PassengerCount.apk\n46390262be85528ff84932dc649e07daca5382d7d48ef25434653dd77d86339b  /home/runner/work/PassengerCount/PassengerCount/android/build/lifecycle-tests/PassengerCount-lifecycle-tests.apk\n"
+  },
+  {
+    "archivePath": "exit-code.txt",
+    "bytes": 2,
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "content": "1\n"
+  },
+  {
+    "archivePath": "package.txt",
+    "bytes": 4464,
+    "sha256": "006fb867dae257e5377a59f9087f80f10237c20fa2b2f102c4d12746954e48a1",
+    "content": "Activity Resolver Table:\n  Non-Data Actions:\n      android.intent.action.MAIN:\n        b570ac1 app.passengercount/.MainActivity filter b9c9266\n          Action: \"android.intent.action.MAIN\"\n          Category: \"android.intent.category.LAUNCHER\"\n\nDomain verification status:\n\nRegistered ContentProviders:\n  app.passengercount/.TrackProvider:\n    Provider{e3f1832 app.passengercount/.TrackProvider}\n\nContentProvider Authorities:\n  [app.passengercount.tracking]:\n    Provider{e3f1832 app.passengercount/.TrackProvider}\n      applicationInfo=ApplicationInfo{2e8b983 app.passengercount}\n\nKey Set Manager:\n  [app.passengercount]\n      Signing KeySets: 59\n\nPackages:\n  Package [app.passengercount] (3ef1700):\n    appId=10209\n    pkg=Package{fcefb39 app.passengercount}\n    codePath=/data/app/~~Rued5IolXBFidUSIjn0SyA==/app.passengercount-8JvzxyA2Jk7zOqLyCPLcxA==\n    resourcePath=/data/app/~~Rued5IolXBFidUSIjn0SyA==/app.passengercount-8JvzxyA2Jk7zOqLyCPLcxA==\n    legacyNativeLibraryDir=/data/app/~~Rued5IolXBFidUSIjn0SyA==/app.passengercount-8JvzxyA2Jk7zOqLyCPLcxA==/lib\n    extractNativeLibs=true\n    primaryCpuAbi=null\n    secondaryCpuAbi=null\n    cpuAbiOverride=null\n    versionCode=12 minSdk=26 targetSdk=35\n    minExtensionVersions=[]\n    versionName=1.11\n    hiddenApiEnforcementPolicy=2\n    usesNonSdkApi=false\n    splits=[base]\n    apkSigningVersion=4\n    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]\n    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]\n    forceQueryable=false\n    scannedAsStoppedSystemApp=false\n    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]\n    timeStamp=2026-10-26 05:30:45\n    lastUpdateTime=2026-10-26 05:30:46\n    installerPackageName=null\n    installerPackageUid=-1\n    initiatingPackageName=com.android.shell\n    originatingPackageName=null\n    packageSource=1\n    loadingProgress=100%\n    loadingCompletedTime=2026-10-26 05:30:46\n    appMetadataFilePath=null\n    appMetadataSource=0\n    signatures=PackageSignatures{2c2857e version:4, signatures:[d622bfc1], past signatures:[]}\n    installPermissionsFixed=false\n    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]\n    privatePkgFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]\n    apexModuleName=null\n    requested permissions:\n      android.permission.ACCESS_FINE_LOCATION\n      android.permission.FOREGROUND_SERVICE\n      android.permission.FOREGROUND_SERVICE_LOCATION\n      android.permission.INTERNET\n      android.permission.ACCESS_COARSE_LOCATION\n    install permissions:\n      android.permission.FOREGROUND_SERVICE: granted=true\n      android.permission.FOREGROUND_SERVICE_LOCATION: granted=true\n      android.permission.INTERNET: granted=true\n    User 0: ceDataInode=352493 deDataInode=57604 installed=true hidden=false suspended=false distractionFlags=0 stopped=true notLaunched=true enabled=0 instant=false virtual=false quarantined=false\n      installReason=0\n      dataDir=/data/user/0/app.passengercount\n      firstInstallTime=2026-10-26 05:30:46\n      uninstallReason=0\n      overlay paths:\n        /product/overlay/NavigationBarModeGestural/NavigationBarModeGesturalOverlay.apk\n        /data/resource-cache/com.android.systemui-neutral-IFed.frro\n        /data/resource-cache/com.android.systemui-accent-1wai.frro\n        /data/resource-cache/com.android.systemui-dynamic-8flA.frro\n      legacy overlay paths:\n        /product/overlay/NavigationBarModeGestural/NavigationBarModeGesturalOverlay.apk\n      gids=[3003]\n      runtime permissions:\n        android.permission.ACCESS_FINE_LOCATION: granted=true\n        android.permission.ACCESS_COARSE_LOCATION: granted=true\n\nQueries:\n  system apps queryable: false\n  queries via forceQueryable:\n  queries via package name:\n    app.passengercount:\n      app.passengercount.tests\n    app.passengercount.tests:\n      app.passengercount\n  queries via component:\n    com.google.android.settings.intelligence:\n      app.passengercount\n  queryable via interaction:\n    User 0:\n  queryable via uses-library:\n\nDexopt state:\n  [app.passengercount]\n    path: /data/app/~~Rued5IolXBFidUSIjn0SyA==/app.passengercount-8JvzxyA2Jk7zOqLyCPLcxA==/base.apk\n      x86_64: [status=run-from-apk] [reason=unknown] [primary-abi]\n        [location is error]\n\nCompiler stats:\n  [app.passengercount]\n    (No recorded stats)\n"
+  },
+  {
+    "archivePath": "race-absent-pids.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "content": ""
+  },
+  {
+    "archivePath": "race-before-services.txt",
+    "bytes": 319606,
+    "sha256": "da3d90b2996b7355a3da257555b26a9c32738f6c6ab0fe6b96f2df414c7bb37f",
+    "contentStorage": "Full byte-verified artifact12630165446; relevant exact excerpts in foreground-observation-evidence.json"
+  },
+  {
+    "archivePath": "race-observation.De6EOw/services.txt",
+    "bytes": 360262,
+    "sha256": "7df76357200957cac7b62430625a103fc0d6b2582ee36fb1e63c735d7cb08928",
+    "contentStorage": "Full byte-verified artifact12630165446; relevant exact excerpts in foreground-observation-evidence.json"
+  },
+  {
+    "archivePath": "race-observation.kqpePd/services.txt",
+    "bytes": 368180,
+    "sha256": "3092e9fff1f8835a11972e2497ac7cd291016ff41312799ffe51476d31fe1794",
+    "contentStorage": "Full byte-verified artifact12630165446; relevant exact excerpts in foreground-observation-evidence.json"
+  },
+  {
+    "archivePath": "race-observation.mo4kMN/services.txt",
+    "bytes": 344616,
+    "sha256": "4a8fdf47d0a437054fbba0a2b185c84b4d97e879c9673bcef10f1600a0826bb9",
+    "contentStorage": "Full byte-verified artifact12630165446; relevant exact excerpts in foreground-observation-evidence.json"
+  },
+  {
+    "archivePath": "race-process-scope.txt",
+    "bytes": 48,
+    "sha256": "42ae205fa2f9debc5123eded43c2ad59cd82d3358cf7ec8f25c88732b80cd2fa",
+    "content": "ALL_PACKAGE_PROCESSES_ABSENT before_helper=true\n"
+  },
+  {
+    "archivePath": "source.txt",
+    "bytes": 82,
+    "sha256": "bd4350a1b8a79a0f3d8b10daae242941c307808a3621a60bf99200215764c8aa",
+    "content": "da0a060fc343cfaca3cbad367edf7de30a465ce1\n5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1\n"
+  }
+]
