@@ -8,9 +8,12 @@ import argparse
 import hashlib
 import json
 import pathlib
+import re
 import subprocess
 import tempfile
 import time
+
+from android_jdwp_snapshot import capture_initial_frame
 
 
 def collect(serial, output_root, adb="adb", sdk_image_dir=None):
@@ -20,6 +23,7 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
     root.mkdir(parents=True, exist_ok=True)
     dest = pathlib.Path(tempfile.mkdtemp(prefix="platform-preflight-", dir=root))
     entries = []
+    jdwp_observation = {"status": "inconclusive", "reason": "transport unavailable"}
 
     def query(name, args, timeout=8):
         command = [adb, "-s", serial, *args]
@@ -46,9 +50,38 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
                      "ro.build.version.sdk", "ro.build.version.security_patch", "ro.build.type",
                      "ro.debuggable", "ro.product.cpu.abi", "persist.debug.dalvik.vm.jdwp.enabled"):
             query(prop, ["shell", "getprop", prop])
-        query("system-server-pid", ["shell", "pidof", "system_server"])
-        # adb jdwp returns a finite PID snapshot (track-jdwp is the streaming service).
-        query("jdwp-pids", ["jdwp"], timeout=2)
+        before_status, before_pid = query("system-server-pid", ["shell", "pidof", "system_server"])
+        before_stderr = entries[-1]["stderrBytes"]
+        # A protocol-complete initial tracker frame distinguishes an empty list
+        # from the silent adb jdwp timeouts retained in run114. Never attach to a PID.
+        command = [adb, "-s", serial, "track-jdwp"]
+        start, monotonic_start = time.time_ns(), time.monotonic_ns()
+        captured = capture_initial_frame(command, timeout=3.0)
+        stdout, stderr = captured.pop("stdout"), captured.pop("stderr")
+        (dest / "jdwp-initial-frame.stdout").write_bytes(stdout)
+        (dest / "jdwp-initial-frame.stderr").write_bytes(stderr)
+        entries.append({"name": "jdwp-initial-frame", "command": command,
+                        "startNs": start, "endNs": time.time_ns(),
+                        "monotonicStartNs": monotonic_start, "monotonicEndNs": time.monotonic_ns(),
+                        "stdoutBytes": len(stdout), "stderrBytes": len(stderr),
+                        "stdoutSha256": hashlib.sha256(stdout).hexdigest(),
+                        "stderrSha256": hashlib.sha256(stderr).hexdigest(), **captured})
+        after_status, after_pid = query("system-server-pid-after", ["shell", "pidof", "system_server"])
+        stable = (before_status == after_status == 0 and before_stderr == 0
+                  and entries[-1]["stderrBytes"] == 0 and before_pid.strip() == after_pid.strip()
+                  and re.fullmatch(rb"[1-9][0-9]*", before_pid.strip()) is not None)
+        frame = captured.get("frame")
+        if captured["status"] == "complete-frame" and not stderr and frame is not None and stable:
+            pid = int(before_pid.strip())
+            status = ("complete-empty" if frame["emptyRegistrySnapshot"] else
+                      "observed-present" if pid in frame["pids"] else "not-listed-in-reported-frame")
+            jdwp_observation = {"status": status, "systemServerPid": pid,
+                                "pids": frame["pids"], "stablePidBracket": True,
+                                "scope": "initial advertised snapshot only; no attach permission claim",
+                                "nonemptyListMayBeTruncated": frame["nonemptyListMayBeTruncated"]}
+        else:
+            jdwp_observation = {"status": "inconclusive", "frameStatus": captured["status"],
+                                "stablePidBracket": stable}
         query("package", ["shell", "dumpsys", "package", "app.passengercount"])
         query("appops", ["shell", "cmd", "appops", "get", "app.passengercount"])
         query("services", ["shell", "dumpsys", "activity", "services", "app.passengercount"])
@@ -67,15 +100,19 @@ def collect(serial, output_root, adb="adb", sdk_image_dir=None):
             except OSError as error:
                 sdk_files.append({"name": name, "error": str(error)})
     receipt = {"kind": "capability-observation-not-acceptance", "serial": serial,
-               "commands": entries, "sdkFiles": sdk_files,
+               "commands": entries, "sdkFiles": sdk_files, "jdwpObservation": jdwp_observation,
                "deviceStateChangedByCollector": False,
                "limitations": ["Sequential observations, not an atomic snapshot.",
                                "A listed JDWP PID does not by itself prove attach permissions or field-event support.",
+                               "A missing PID in a nonempty frame is not global absence proof; daemon lists may be truncated.",
                                "No full-restart test or debugger attachment performed."]}
     (dest / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
     # No unavailable/failed query becomes a pass. This status is NOT the original gate's status.
     valid = state == 0 and out.strip() == b"device"
-    valid = valid and all(e["status"] == 0 and e["stderrBytes"] == 0 for e in entries)
+    valid = valid and all((e["status"] == 0 or
+                           (e["name"] == "jdwp-initial-frame" and e["status"] == "complete-frame"))
+                          and e["stderrBytes"] == 0 for e in entries)
+    valid = valid and jdwp_observation["status"] != "inconclusive"
     valid = valid and all("error" not in f for f in sdk_files)
     return dest, 0 if valid else 2
 

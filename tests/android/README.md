@@ -174,7 +174,7 @@ original lifecycle, permission, race or acceptance check.
 
 `scripts/capture-android-platform-preflight.py` requires the explicitly selected
 owned emulator serial; blank serials are rejected. It reads fixed build/JDWP
-properties, system_server PID and the finite `adb jdwp` PID snapshot, target
+properties, system_server PID before/after a length-framed `track-jdwp` initial snapshot, target
 package/app-op/service state, framework JAR digests, platform-test package presence
 and SDK image metadata. It does not attach a debugger, start/stop an app, install,
 root, set properties, reboot, forward ports or change permissions/settings.
@@ -197,3 +197,33 @@ full-restart acceptance still requires the unchanged device gate. This is a
 meaningfully new diagnostic capture, not an APK restart fix or a platform patch.
 The prior observed transition and alternative tracing/build routes are archived
 [here](https://github.com/c933103/PassengerCount/blob/dd80561e8cb5c9b94ffe4786c201a443275fea69/verification/api35-restart-race/route-20261026/route-plan.md).
+
+
+### Complete initial tracker frame versus silent timeout
+
+Run114's four `adb jdwp` calls timed out with no bytes. Those observations remain
+incomplete in the [immutable archive](https://github.com/c933103/PassengerCount/blob/ceeb9e3866c2019288e2d13baaf6fe9a7f72a6fe/verification/api35-restart-race/run114/README.md);
+they are not reclassified as an empty process list. The successor uses ADB's
+[documented tracker framing](https://android.googlesource.com/platform/packages/modules/adb/+/a8ab5ceccb41035804ad83bfa625adac4a8ccf83/SERVICES.TXT):
+four ASCII hex length bytes and exactly that many decimal-PID/newline bytes.
+The helper reads one complete initial frame within a 3-second monotonic bound,
+then terminates/reaps only its spawned local client. A small bounded drain catches
+immediate stderr/native failures; total capture/cleanup is also bounded by the
+existing 35-second outer wrapper.
+
+`complete-frame` describes protocol completion, not a fabricated adb exit 0:
+`nativeReturnCode` and intentional termination/forced-kill metadata remain separate.
+Timeout, malformed/truncated frame, stderr, unexpected native exit, output-limit
+and cleanup failure remain incomplete. `0000` is a complete empty advertised
+snapshot. A nonempty list may be capacity-truncated, so a missing PID is labelled
+`not-listed-in-reported-frame`, not unavailable. A single stable system_server PID
+must bracket the frame for a capability observation; a listed PID still does not
+prove attach permission. No `jdwp:<pid>` connection, debugger attach, port forward,
+policy override or debug/security-setting change is made.
+
+Raw bytes, frame boundaries, native statuses, hashes and timestamps are retained.
+Host regressions exercise actual local subprocess pipes, fragmented/extra frames,
+empty/partial/malformed data, stderr/native failure, output bounds and client
+termination/reaping; separate collector tests check target identity and provenance.
+Neither suite models or substitutes for real Android policy. Original acceptance
+checks and their exit 1 failures are unchanged.

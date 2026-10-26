@@ -21,6 +21,13 @@ test('platform metadata collector host regressions use no actual Android target'
   assert.match(r.stderr,/Ran \d+ tests/);
 });
 
+test('framed JDWP transport uses only real local fake subprocesses, no device',()=>{
+  const r=spawnSync('python3',[fileURLToPath(new URL('./android-jdwp-snapshot.test.py',import.meta.url))],
+    {encoding:'utf8',timeout:30000});
+  assert.equal(r.status,0,r.stdout+r.stderr);
+  assert.match(r.stderr,/Ran \d+ tests/);
+});
+
 function fixture({gate=1,capture=0,cleanupMode=false,ready=true,repeat=false,mkdirFailure=false,receiptFailure=false}={}) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pc-platform-wiring-'));
   try {
