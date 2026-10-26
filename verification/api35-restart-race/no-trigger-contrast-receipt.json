@@ -1,7 +1,7 @@
 {
   "kind": "paired-independent-no-trigger-contrast-and-read-only-profiling-preflight",
-  "baseHead": "c80f6008cc3512e986ae2c40461da3286992d511",
-  "baseTree": "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1",
+  "baseHead": "61c3c6b156136ebf0cb4bf7e2ff2609b2ad67d5d",
+  "baseTree": "f5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb",
   "acceptance": {
     "fullAllProcessAbsenceRequired": true,
     "original13PhasesUnchanged": true,
@@ -71,11 +71,11 @@
   },
   "validation": {
     "focusedNode": {
-      "passed": 284,
+      "passed": 286,
       "failed": 0
     },
     "ownedContrastNode": {
-      "passed": 192,
+      "passed": 194,
       "failed": 0
     },
     "profilingPreflightPython": {
@@ -87,17 +87,49 @@
       "failed": 0
     },
     "localAggregate": {
-      "passed": 590,
-      "total": 591,
+      "passed": 592,
+      "total": 593,
       "failure": "Known local government-routes.json.gz materialization limit; no skipped assertion; complete hosted checkout required"
     },
-    "native": "passed:102 journal,26 session,928 export,304 deletion,14 target-access,22 interruption assertions plus classloader negative control",
+    "native": "Passed on unchanged native/production inputs; hosted run119 native also passed",
     "syntaxAndDiff": "passed",
     "nativeIndependentReview": "No remaining material findings after stale-control-directory, pre-kill-trigger contamination and profiler-completeness fixes",
     "hostTests": "Transport fixtures and actual monotonic/GNU timeout/TERM/forced-kill processes; no Android policy emulation or device claim",
     "oneTimeComparisons": "Strict analyzeRestartRace function and phase() through EOF are byte-identical to published base; no permanent historical-source hash gate",
     "exactHeadCodex": "pending fresh request after publication",
-    "exactHeadHosted": "pending natural CI after publication"
+    "exactHeadHosted": "pending natural CI after publication",
+    "reviewFindingFixed": {
+      "url": "https://github.com/c933103/PassengerCount/pull/19#discussion_r4374448080",
+      "finding": "300ms timeout regression could expire before pyenv/Python startup installed signal handler",
+      "fix": "Test-only readiness handshake before injecting SIGALRM into real GNU timeout; retain actual TERM/forced-kill handling and bounded safety timeout",
+      "regression": "Normal and TERM-resistant fixtures at0 and750ms startup delay must publish readiness before injected timeout; retain native124/137, partial traces and triggered denial1",
+      "productionBudgetsOrSourceChanged": false
+    }
   },
-  "nextStep": "Interpret actual triggered/control provenance, before-service/runtime permission state, schedule events and measured timing together. Separately inspect read-only AMS profiler/candidate ART identity; starting method sampling would be stateful and perturb timing, not a capability query. Atrace/Perfetto category activation remains unperformed."
+  "nextStep": "Interpret actual triggered/control provenance, before-service/runtime permission state, schedule events and measured timing together. Separately inspect read-only AMS profiler/candidate ART identity; starting method sampling would be stateful and perturb timing, not a capability query. Atrace/Perfetto category activation remains unperformed.",
+  "latestExecutedPriorHead": {
+    "run": 40278271990,
+    "number": 119,
+    "attempt": 1,
+    "head": "61c3c6b156136ebf0cb4bf7e2ff2609b2ad67d5d",
+    "tree": "f5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb",
+    "conclusion": "failure",
+    "hostedNode": {
+      "passed": 591,
+      "total": 591
+    },
+    "originalExit": 1,
+    "triggeredExit": 1,
+    "controlExit": 0,
+    "pairedWrapperExit": 1,
+    "controlOutcome": "foreground-observed-no-trigger; no reattachment/GPS/session acceptance",
+    "originalLogSha256": "b281a118fa31525d134a761a435c19279e72daabf48295bf9c88bb97dbba8b3c",
+    "triggeredLogSha256": "b90d46513084354ec5a12bccd959c6e686aa19d34d8bc645a861c3c423abe82d",
+    "controlLogSha256": "f1c26bee9bd9e3c61984ef542eaaa50b9337b6a2ff46a54ce0248df9b0598ed8",
+    "timingEqualityEstablished": false,
+    "controlFirstServicesEarlierNs": 261366645,
+    "profilingState": "Six complete snapshots have no AMS profile fields, shell permission granted; not direct ART absence/native support proof",
+    "artCandidateSha256": "cf1c0b8e7fe7b9200a89bf30a076f44509c9a21fe18d7b33c63a48f673746cd1",
+    "receipt": "https://github.com/c933103/PassengerCount/actions/runs/40278271990"
+  }
 }

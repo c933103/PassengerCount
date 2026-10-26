@@ -245,17 +245,45 @@ test('control KVM failure does not run the third emulator or replace triggered d
  assert.equal(r.diagnosticCode,'1\n');assert.equal(r.originalCode,'1\n');
 });
 
-function shortControlTimeout(source) {
+function readyControlTimeout(source) {
  const command='timeout --kill-after=5s "${control_budget}s"';
- assert.equal(source.split(command).length,2,'shorten only the control timeout in the fixture copy');
- return source.replace(command,'timeout --kill-after=0.1s 0.3s');
+ assert.equal(source.split(command).length,2,'inject only the control timeout in the fixture copy');
+ // Keep real GNU timeout/TERM/KILL handling, but trigger its alarm only after
+ // the Python fixture has installed its handler and published readiness.
+ // A short wall deadline incorrectly tested interpreter startup latency.
+ const helper=`
+fixture_ready_timeout() {
+  local watchdog code ready=false
+  command timeout --kill-after=1s 10s "$@" &
+  watchdog=$!
+  for ((attempt=0; attempt<800; attempt++)); do
+    if [[ -f "$CONTROL/timeout-fixture-ready" ]]; then ready=true; break; fi
+    kill -0 "$watchdog" 2>/dev/null || break
+    sleep 0.01
+  done
+  if [[ "$ready" != true ]]; then
+    echo 'TIMEOUT_FIXTURE_NEVER_READY: no signal-handling conclusion' >&2
+    kill -ALRM "$watchdog" 2>/dev/null || true
+    wait "$watchdog" || true
+    return 98
+  fi
+  printf 'ready-before-timeout-alarm\\n' > "$CONTROL/timeout-readiness-observed.txt"
+  kill -ALRM "$watchdog" || return 99
+  if wait "$watchdog"; then code=0; else code=$?; fi
+  return "$code"
 }
-for(const resistant of [false,true])test(`real host control timeout${resistant?' with forced kill':''} retains partial bytes and triggered denial`,()=>{
+`;
+ return source.replace(command,'fixture_ready_timeout').replace('CONTROL_MAX_SECONDS=180','CONTROL_MAX_SECONDS=180\n'+helper);
+}
+for(const resistant of [false,true])for(const startupDelay of [0,0.75])
+test(`real host ready-synchronized control timeout${resistant?' with forced kill':''}, startup delay ${startupDelay}s retains partial bytes and triggered denial`,()=>{
  const body=resistant?
-   `exec python3 -u -c 'import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); print("CONTROL READY",flush=True); time.sleep(60)'`:
-   `exec python3 -u -c 'import time; print("CONTROL READY",flush=True); time.sleep(60)'`;
- const r=run({diagnostic:1,controlBody:body,runnerTransform:shortControlTimeout});
+   `sleep ${startupDelay}; exec python3 -u -c 'import pathlib,signal,sys,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); print("CONTROL READY",flush=True); pathlib.Path(sys.argv[1]).write_text("ready\\n"); time.sleep(60)' "$OUT/timeout-fixture-ready"`:
+   `sleep ${startupDelay}; exec python3 -u -c 'import pathlib,sys,time; print("CONTROL READY",flush=True); pathlib.Path(sys.argv[1]).write_text("ready\\n"); time.sleep(60)' "$OUT/timeout-fixture-ready"`;
+ const r=run({diagnostic:1,controlBody:body,runnerTransform:readyControlTimeout});
  assert.equal(r.error,undefined,r.stderr);assert.equal(r.status,1,r.stdout+r.stderr);
+ assert.equal(r.files['no-trigger-control/timeout-fixture-ready'],'ready\n');
+ assert.equal(r.files['no-trigger-control/timeout-readiness-observed.txt'],'ready-before-timeout-alarm\n');
  assert.equal(r.files['no-trigger-control/control-exit-code.txt'],resistant?'137\n':'124\n');
  assert.equal(r.files['no-trigger-control/control-status.txt'],resistant?'incomplete-forced-kill\n':'incomplete-timeout\n');
  assert.match(r.files['no-trigger-control/runner.stdout'],/CONTROL READY/);
