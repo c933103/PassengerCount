@@ -1,0 +1,35 @@
+{
+  "archivePath": "race-observation.GfrDnC/logcat.txt",
+  "sha256": "73eecc86e4fa00743e0fbbb62d5e2a4c3091c9d7033efa5539775d131405984c",
+  "indexConvention": "zero-based classifier indices",
+  "lines": [
+    {
+      "index": 84336,
+      "text": "10-26 04:54:46.243  6699  6699 I PassengerJournalTest: SIGKILL_AFTER_DETACH prepare-race pid=6699"
+    },
+    {
+      "index": 84338,
+      "text": "10-26 04:54:46.257   558  1185 I ActivityManager: Process app.passengercount:tracking (pid 6699) has died: prcp FGS "
+    },
+    {
+      "index": 84339,
+      "text": "10-26 04:54:46.257   558  1185 W ActivityManager: Scheduling restart of crashed service app.passengercount/.TrackService in 1000ms for start-requested"
+    },
+    {
+      "index": 84393,
+      "text": "10-26 04:54:46.618  6431  6431 I PassengerRaceTrigger: RACE_TRIGGER_ENTER pid=6431 uid=10210"
+    },
+    {
+      "index": 84395,
+      "text": "10-26 04:54:46.620  6431  6431 I PassengerRaceTrigger: RACE_TRIGGER_FOREGROUND pid=6431 uid=10210"
+    },
+    {
+      "index": 84400,
+      "text": "10-26 04:54:47.265   558   597 I ActivityManager: Start proc 6963:app.passengercount:tracking/u0a209 for service {app.passengercount/app.passengercount.TrackService}"
+    },
+    {
+      "index": 84418,
+      "text": "10-26 04:54:47.300   558  1548 W ActivityManager: Service.startForeground() not allowed due to mAllowStartForeground false: service app.passengercount/.TrackService"
+    }
+  ]
+}

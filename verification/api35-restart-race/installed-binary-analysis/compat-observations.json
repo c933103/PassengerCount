@@ -1,0 +1,132 @@
+[
+  {
+    "role": "original",
+    "artifactId": 12628766327,
+    "archivePath": "race-observation.cr71Bp/logcat.txt",
+    "bytes": 11727049,
+    "sha256": "1da3dd591903f09a26fa65acc0f874817323f162a48037f96ec69302d1748d59",
+    "uid": 10209,
+    "binaryDerivedChangeIds": [
+      311208629,
+      313677553,
+      311208749
+    ],
+    "lineConvention": "one-based raw lines",
+    "observations": [
+      {
+        "line": 30684,
+        "text": "10-26 04:44:27.314   558  1472 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 35148,
+        "text": "10-26 04:44:35.774   558  1472 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 35152,
+        "text": "10-26 04:44:35.782   558  1472 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 35203,
+        "text": "10-26 04:44:35.833   558  1471 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 54949,
+        "text": "10-26 04:44:53.252   558  1906 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 56881,
+        "text": "10-26 04:44:58.574   558  1251 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 56883,
+        "text": "10-26 04:44:58.580   558  1251 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 56902,
+        "text": "10-26 04:44:58.631   558  1698 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 62675,
+        "text": "10-26 04:45:13.074   558   647 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 62680,
+        "text": "10-26 04:45:13.075   558   647 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 62681,
+        "text": "10-26 04:45:13.076   558   647 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 70151,
+        "text": "10-26 04:45:19.495   558  1808 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 70162,
+        "text": "10-26 04:45:19.505   558  1808 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 71721,
+        "text": "10-26 04:45:24.431   558  1472 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 75918,
+        "text": "10-26 04:45:42.059   558   587 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 76245,
+        "text": "10-26 04:45:56.962   558  1014 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 76299,
+        "text": "10-26 04:45:57.967   558  1806 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 80194,
+        "text": "10-26 04:47:00.433   558  1367 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 80565,
+        "text": "10-26 04:47:12.710   558  1014 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 80566,
+        "text": "10-26 04:47:12.710   558  1014 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      }
+    ],
+    "scope": "Reported enabled states in this run; sequential logs, no setting changes or atomic runtime-call assertion"
+  },
+  {
+    "role": "diagnostic",
+    "artifactId": 12628861107,
+    "archivePath": "race-observation.LuCjFL/logcat.txt",
+    "bytes": 6753827,
+    "sha256": "51969376294a0b5b6b0292d9f3ad28c85d162639155a816a309fd8b89738cad6",
+    "uid": 10209,
+    "binaryDerivedChangeIds": [
+      311208629,
+      313677553,
+      311208749
+    ],
+    "lineConvention": "one-based raw lines",
+    "observations": [
+      {
+        "line": 27539,
+        "text": "10-26 04:48:19.114   558  1659 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 33377,
+        "text": "10-26 04:48:26.623   558  1547 D CompatChangeReporter: Compat change id reported: 311208749; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 33379,
+        "text": "10-26 04:48:26.623   558  1547 D CompatChangeReporter: Compat change id reported: 311208629; UID 10209; state: ENABLED"
+      },
+      {
+        "line": 33407,
+        "text": "10-26 04:48:26.656   558  1269 D CompatChangeReporter: Compat change id reported: 313677553; UID 10209; state: ENABLED"
+      }
+    ],
+    "scope": "Reported enabled states in this run; sequential logs, no setting changes or atomic runtime-call assertion"
+  }
+]
