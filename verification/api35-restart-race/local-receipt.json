@@ -1,0 +1,103 @@
+{
+  "baseCommit": "cad97d57685e4b7a123b780f5c9ab026440f7bcf",
+  "date": "2026-10-17",
+  "scope": "Candidate bounded production correction: separate tracking process with acknowledged private IPC; all-process absence automatic-restart requirement remains open",
+  "inputSha256": {
+    "android/AndroidManifest.xml": "1b8e2f0a705cea6a03e7a1cc6f9afd51a8f5dae00770d8332b5a4f2a641e1450",
+    "android/src/app/passengercount/MainActivity.java": "9439def9e0e5497edeffee4d06acfc2d71b062b7b3c3a7018a435a1a6471cae5",
+    "android/src/app/passengercount/TrackClient.java": "9c7aa2cb62dd41200ae046ad40a46ede89226adbf9743b2d0524221af63c20c6",
+    "android/src/app/passengercount/TrackJournal.java": "743f73afe912561bddad958fc105fbaa1f5272894ad35f5c580622be96361776",
+    "android/src/app/passengercount/TrackProvider.java": "96e0688e609e3a56d5e00f6eb47b33c9b707a673751e5a5399df7f9fa4111724",
+    "android/src/app/passengercount/TrackService.java": "76b571db920e5515cb075222134a3d75ea3500ce07b681f3e9236524b4a7d305",
+    "scripts/analyze-android-restart-race.mjs": "68176fca73a406e19d93b63d46e59e2b215b1c45207878ea47c72509bcd91cdc",
+    "scripts/android-restart-race.sh": "0c6526682c4fe3ac8e2b71f593e1dcadfe1d0e28c17954d072db83e5f98a7d49",
+    "scripts/test-android-installed.sh": "6384d6b124040732161cf310b915c34667859b80b790597b27e233de1277e82c",
+    "scripts/test-track-deletion.cjs": "eb38804ad0295f4a63874dc4f233c1202391dfe405b18713f5ba382fec55f8fa",
+    "tests/android-restart-race.test.js": "604c9a8da2d3891d5ac5a7ad46978a91734192ad34fab097516ef96965409057",
+    "tests/android/AndroidManifest.xml": "5550215cc443d667a6e9ea2c39762d4a272cfb556b9ae03c71d5f383ee6708b7",
+    "tests/android/JournalLifecycleInstrumentation.java": "1d296d654ac67b826947316d1e6d49545a87335f9232180b2bee52ed7e0c5eb8",
+    "tests/android/README.md": "c03163a6a8f1694bd03f994f824beb68ab00e8d359801f2ae67f8d587e59377d",
+    "tests/android/UiLifecycleInstrumentation.java": "b9be474625767680e4b5b7e7eeaf88b4839ad5c351d5b5eda9706e453c9a229f",
+    "tests/native/ExportPermissionFixture.java": "106eb3fe23c3112b02ff4024c69e073b0e2448005cc6ac54c3856afd2145d1b1",
+    "tests/native/TrackDeletionFixture.java": "e61bff30498dfc9f2cbbb0159be3e88294fce677608aad2bb965eb9dedf42a4f",
+    "tests/native/TrackIpcShims.java": "6aad01dd1bf0099726e4cce529f3d4ce760df092cd734b9494966e4b6fd308c5",
+    "tests/native/TrackJournalTest.java": "774860e1c0d6e3ba0ebb4583bc85782f0d173295574e44edf5bb23c5358b6521",
+    "verification/api35-restart-race/README.md": "28d5a530c6ff91f9b128b3e60d453051520293a32f8b87c2f982e56c348e7755",
+    "tests/android-harness.test.js": "74c49f8d0406ff63a2af76db90c04c19801db840dce9a10044e45439cac1574e",
+    "verification/api35-restart-race/process-layout-receipt.json": "62a551cb9bc8365d61c7dcfd2a6c27c739ec03437657fa922485fd1e429b47a0"
+  },
+  "checks": [
+    {
+      "command": "npm test",
+      "result": "passed",
+      "tests": 411,
+      "pass": 411,
+      "fail": 0,
+      "scope": "Final aggregate after semantic remote-provider observer correction"
+    },
+    {
+      "command": "bash scripts/test-native-track.sh",
+      "result": "passed",
+      "details": "TrackJournal 102; TrackSession 26; ExportStorage 928; TrackDeletion/IPC 304; TargetAccess 14; interruption 22 assertions; export permission fixture passed"
+    },
+    {
+      "command": "node --test tests/android-restart-race.test.js tests/android-harness.test.js tests/android-restart-after-failure.test.js",
+      "result": "passed",
+      "tests": 104
+    },
+    {
+      "command": "SDK35 production/test Java compilation, both production aapt2 manifest links/dumps, test manifest link and d8 dex",
+      "result": "passed",
+      "limitations": "Unsigned local compile; stock d8 warns API35 exceeds supported API34"
+    },
+    {
+      "command": "bash -n scripts/test-android-installed.sh scripts/android-restart-race.sh; git diff --check",
+      "result": "passed"
+    },
+    {
+      "command": "root independent node scripts/test-track-deletion.cjs",
+      "result": "passed",
+      "assertions": 291,
+      "scope": "Synthetic host transport/files; bounded source review also completed; no installed claim"
+    },
+    {
+      "command": "installed API35 process split, Binder drain/death, pipe/UI death, service-only and all-process death races",
+      "result": "run110: original 13 phases and real UI IPC basics passed; append-drain observer failed; all-package-death denial reproduced",
+      "reason": "Corrected semantic observer requires fresh exact-head installed drain/death and controlled service-only tests"
+    },
+    {
+      "command": "browser checks",
+      "result": "passed on cad97d5 in run110; newest head pending",
+      "reason": "No web source change; exact-head hosted workflow still required"
+    },
+    {
+      "command": "node scripts/test-track-deletion.cjs; focused shell/classifier/failure-path tests after observer correction",
+      "result": "passed",
+      "assertions": 304,
+      "nodeTests": 104,
+      "scope": "Twelve source-extracted remote-provider stack/state positives and negatives; provider barrier observer; strict process scope and UI relay/absence checks. SDK35 test recompile/dex passed."
+    },
+    {
+      "command": "one-time aapt2-linked production manifest and Application initialization audit",
+      "result": "passed",
+      "receipt": "process-layout-receipt.json",
+      "scope": "All three resolved production component processes and all six permissions unchanged; no library manifests or custom Application initializer"
+    }
+  ],
+  "preservedFailures": {
+    "run107": "https://github.com/c933103/PassengerCount/actions/runs/39008116648",
+    "evidence": "https://github.com/c933103/PassengerCount/tree/b05aababba2580231587357e079f46152f49f015/verification/api35-restart-race/run107",
+    "result": "Two independent controlled automatic-restart denials; original 13 phases passed before first appended failure; separate diagnostic also failed",
+    "run109": "https://github.com/c933103/PassengerCount/tree/564a3360fc954f46ee7875db0de1d526cfea23f9/verification/api35-restart-race/run109",
+    "run110": "https://github.com/c933103/PassengerCount/tree/51021a0f94e2709b42f4ad597ad16a7d73dabe70/verification/api35-restart-race/run110"
+  },
+  "acceptance": "No merge/release approval: the candidate may improve target-service-only or UI-only death, but all-process-absent denial remains a binding failure. Prior failure is not replaced by diagnostic success.",
+  "permissions": "No new production permission, watchdog, persistent binding, hidden Activity or policy bypass; existing tracking data paths retained.",
+  "harnessCorrection": {
+    "change": "Respect API35 --no-restart application-default process selection; supported declared UI instrumentation relay detaches owner before cross-process tests. Require independent ordered same-PID UI entry/pass/detachment; provider barrier observer and exact OS absence evidence.",
+    "run108": "Both installed paths failed before death/interleaving on wrong-process owner fixture; no new product restart result.",
+    "evidence": "https://github.com/c933103/PassengerCount/tree/5c2a83b88ec9835e47d3995cb51c028c71878577/verification/api35-restart-race/run108",
+    "run109": "Retain each exact command and actual exit code; no automatic phase retry or acceptance relaxation. Original empty-bootstrap failure remains unclassified.",
+    "run110": "Use blocked production-provider + framework transport + Binder dispatch frames instead of thread-name case; preserve actual stack diagnostics and no success until installed observer recognizes them."
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "kind": "independent-read-only-framework-bookkeeping-observation",
+  "baseHead": "31d693bb821efbf97baaa4d21d5c30c20544a4a4",
+  "baseTree": "6fb112b74c989b274d343f7a135cb3c269543706",
+  "scope": [
+    "Replace only independent diagnostic existing service-dump slots with unfiltered services dump, without application dump callbacks",
+    "Post-terminal host-only transactional interpretation; separate observation status never replaces original or diagnostic exit",
+    "Stricter active TrackService classifier boundaries isolate Pending/Restarting/Destroy records; receipt-write failures preserve diagnostic process exit"
+  ],
+  "acceptance": {
+    "fullAllProcessAbsenceRequired": true,
+    "original13PhasesUnchanged": true,
+    "originalPackageFilteredServiceCommandUnchanged": true,
+    "originalFailureStillBinding": true,
+    "runtimeCallerStackObserved": false,
+    "apkRestartFixClaimed": false,
+    "permissionsSigningWorkflowApplicationUnchanged": true
+  },
+  "route": {
+    "command": [
+      "adb",
+      "shell",
+      "dumpsys",
+      "activity",
+      "services"
+    ],
+    "scopeMarker": "ALL_SERVICES_NO_CLIENTS_DIAGNOSTIC_ONLY",
+    "independentOnly": "PASSENGER_RESTART_RACE_ONLY=1",
+    "extraAbsenceIntervalCommands": 0,
+    "clientCallbacks": false,
+    "timingNeutralityClaimed": false,
+    "parserTiming": "Host files only, after independent diagnostic terminal exit",
+    "uidProcessAbsence": "Separate existing strict absence checks and raw death/UID logs; map omission is not absence proof"
+  },
+  "sourceEvidence": {
+    "archiveCommit": "f689fbcac329c01b980ea6abe9bf22156c75e639",
+    "installedServicesJarSha256": "1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6",
+    "classesDexRawDumpSha256": "5c1882408308b5d27ef5c19f7a5f161af43f67cabf0bd3d176d5df3b68f42b6d",
+    "exactInstalledRoute": [
+      "AMS.doDump lines1662776-1662797: services dumpAll true +06ba, factory +06c5, dumpLocked +06c9",
+      "ServiceDumper.dumpRemainsLocked: ItemMatcher.all gate +01c6/+01c8, foreground fields +021f onward",
+      "ServiceDumper.dumpServiceClient +0023 invokes app; not chosen"
+    ],
+    "candidateReport": "https://github.com/c933103/PassengerCount/blob/f689fbcac329c01b980ea6abe9bf22156c75e639/verification/api35-restart-race/installed-binary-analysis/active/report.md",
+    "fieldInventory": "https://github.com/c933103/PassengerCount/blob/f689fbcac329c01b980ea6abe9bf22156c75e639/verification/api35-restart-race/installed-binary-analysis/record/report.md"
+  },
+  "priorRun": {
+    "runId": 40270931898,
+    "runNumber": 117,
+    "attempt": 1,
+    "conclusion": "failure",
+    "mergeCommit": "705782a5bacbaceb1dc22a618c5b7b89447dc7bc",
+    "testedTree": "6fb112b74c989b274d343f7a135cb3c269543706",
+    "originalExit": 1,
+    "independentExit": 1,
+    "originalLogSha256": "73eecc86e4fa00743e0fbbb62d5e2a4c3091c9d7033efa5539775d131405984c",
+    "independentLogSha256": "0b0d37b6879b5f231618ab89e2dfd6cf488a3bd5481001eed0978a588812f02f",
+    "receipt": "https://github.com/c933103/PassengerCount/blob/f689fbcac329c01b980ea6abe9bf22156c75e639/verification/api35-restart-race/run117/README.md",
+    "frameworkCollectors": "Both complete; every actual installed DEX disassembled; not a restart pass"
+  },
+  "validation": {
+    "focusedNode": {
+      "passed": 179,
+      "failed": 0
+    },
+    "foregroundParserPython": {
+      "passed": 18,
+      "failed": 0
+    },
+    "actualRun116TrackServiceBlocksParsed": 10,
+    "localAggregate": {
+      "passed": 485,
+      "total": 486,
+      "failure": "Known local government-routes.json.gz materialization limit; no skipped assertion; prior complete hosted checkout 470/470"
+    },
+    "native": "passed: TrackJournal102, TrackSession26, ExportStorage928, TrackDeletion304, TargetAccess14, TrackInterruption22; direct classloader negative control passed",
+    "syntaxAndDiff": "passed",
+    "independentNativeReview": "No remaining material findings on final helper/wiring/classifier",
+    "hostedExactHead": "pending publication and natural CI",
+    "codexExactHead": "pending publication and fresh request",
+    "negativeControls": [
+      "Success then partial/invalid input and publication failure retain prior complete summary/raw evidence",
+      "Capture/scope/status/stderr/hash/path validation and no chronology from randomized directories",
+      "Exact user/package/TrackService selection; ActiveForegroundApp membership alone is not foreground restoration",
+      "Unrelated Pending/Restarting/Destroy foreground fields cannot turn target inactive record green",
+      "Independent mode retains full absence negative controls and original native errors",
+      "Parser/receipt failures preserve actual diagnostic exits0/1/2/255; original failure1 retained"
+    ]
+  },
+  "limits": {
+    "parserInputMiB": 32,
+    "parserTotalMiB": 128,
+    "observationCount": 512,
+    "hostSeconds": 15,
+    "forcedKillGraceSeconds": 2
+  },
+  "interpretation": "This next real-framework observation can discriminate sampled ActiveForegroundApp bookkeeping alongside retained service tokens and existing absence evidence. It cannot identify the executed runtime caller/stack or substitute for the full restart acceptance. Richer diagnostic dumps can perturb timing."
+}

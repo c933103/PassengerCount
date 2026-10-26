@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-26",
+  "scope": "Transactional diagnostic capture/result pairing only; full automatic-restart requirement remains open.",
+  "baseHead": "052fbb20ed7edd6f849681bf60e2862176b40aaf",
+  "sourceBlobs": {
+    "scripts/analyze-android-restart-race.mjs": "983f5ff649668c86d895c64ab54c0e5bf9d4733e",
+    "scripts/android-restart-race.sh": "2677a2f6dcecd9c05d8d337043ee64bac63aab78",
+    "tests/android-restart-race.test.js": "827cc03f4fc4e14327a9c15b1eac99e5134a565a",
+    "tests/android/README.md": "0a88619b7a4e62769e0b4c94f7b41eacc50f5871"
+  },
+  "reproducedEvidence": {
+    "originalRun": "https://github.com/c933103/PassengerCount/actions/runs/39013057272",
+    "immutableReceipt": "https://github.com/c933103/PassengerCount/blob/69cd32be3d37392f4e1a69fcee7f0aad7af630dd/verification/api35-restart-race/run111/receipt.json",
+    "diagnosticArtifact": 12093389294,
+    "diagnosticZipSha256": "ca62ec0dc4d54a11ae8bb419477aaa210195b85b3c733559554826d307dff7f6",
+    "retainedPartialLogSha256": "9d215f0a62378446ea140dfe3dca2e392b89e1582e3766d1f6b59e1c3b3c5efb",
+    "retainedPartialLogLines": 20529,
+    "priorClassifierMarkerLine": 42508,
+    "priorClassifierHelperPromotionLine": 43827,
+    "finding": "A later failed logcat dump replaced the prior classifier's raw input. Empty stderr does not identify the cause of capture failure.",
+    "originalInstalledExit": 1,
+    "independentDiagnosticExit": 2,
+    "originalArtifactsUnchanged": true
+  },
+  "localValidation": {
+    "environment": "Temporary source-bound text snapshot; Node v24.22.1, OpenJDK 21.0.12.1",
+    "focused": {
+      "command": "node --test tests/android-restart-race.test.js tests/android-restart-after-failure.test.js",
+      "passed": 73,
+      "failed": 0,
+      "logSha256": "5d8380a42ff9f2ceab85fb37a86e205cb0ed0cb4baf7cbb2b89fb29c7afdc6f6"
+    },
+    "nodeAggregate": {
+      "command": "npm test",
+      "passed": 434,
+      "failed": 1,
+      "total": 435,
+      "outcome": "not a full pass",
+      "failure": "Existing bundled N8 test cannot read data/government-routes.json.gz, absent from the temporary partial materialization. No assertion or source fixture was skipped/changed; complete hosted checkout remains required.",
+      "logSha256": "43dce1fd64cc777dbff30cdd11ae2a05e97f13a4a3f3f99a7cd67a62772013a9"
+    },
+    "native": {
+      "command": "npm run test:native",
+      "outcome": "passed",
+      "logSha256": "94c8a3e7d51058a32d10b3fb212813a35bbabfc26c48c0136e1521f472883c45"
+    },
+    "browser": {
+      "command": "npm run test:browser",
+      "outcome": "blocked before launch",
+      "reason": "Playwright Chromium headless executable is absent in this temporary environment; no local browser acceptance."
+    },
+    "shellSyntax": "passed",
+    "diffCheck": "passed",
+    "hosted": "pending exact-successor-head natural PR validation and Codex review"
+  },
+  "unchanged": [
+    "Production source and permissions",
+    "All-process-absence requirement and process proof",
+    "Original 13 lifecycle phases and original failure binding",
+    "Denial remains exit 1, including observed denial followed by publication error",
+    "No workflow changes, manual rerun, merge or release"
+  ],
+  "nextTechnicalEvidence": "Use a source/build/flag-pinned instrumentable framework target to correlate ServiceRecord identity, pending restart, caller stacks and eligibility-field changes through all-process absence; then add actual framework lifecycle regressions and matched installed comparison. Current application-only hosted workflow does not build that framework. This harness repair is not a full restart fix.",
+  "repairPredecessor": "4abc74bff3dc5744b747c8ccd93cf14e77c8a57b",
+  "additionalBoundary": "A generic classifier launch exit 1 was reproduced as a false Android-denial report. Publish mode now reserves internal 10 for classified denial, mapped to unchanged harness exit 1; generic launch failures remain inconclusive. Standalone 0/1/2 interface is unchanged.",
+  "priorRepairReview": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6407121597",
+  "priorRepairRun": "https://github.com/c933103/PassengerCount/actions/runs/40260793268",
+  "priorRepairRunStatus": "Terminal failure; Node/native/browser/APK stages passed; both installed/diagnostic steps failed. Does not satisfy successor-head acceptance."
+}

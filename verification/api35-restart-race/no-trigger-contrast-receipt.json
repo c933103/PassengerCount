@@ -1,0 +1,205 @@
+{
+  "kind": "paired-independent-no-trigger-contrast-and-read-only-profiling-preflight",
+  "baseHead": "8b985de9fb048dde130bd1aed476ea892f83848d",
+  "baseTree": "da0dda15e0492b36f18a2c1e0cce22c2a97617f6",
+  "acceptance": {
+    "fullAllProcessAbsenceRequired": true,
+    "original13PhasesUnchanged": true,
+    "originalStrictClassifierUnchanged": true,
+    "originalTriggeredGateUnchanged": true,
+    "originalFailureStillBinding": true,
+    "appRestartFixClaimed": false,
+    "runtimeCallerProven": false
+  },
+  "contrast": {
+    "triggeredDestination": "android/build/restart-race-evidence",
+    "controlDestination": "android/build/restart-race-evidence/no-trigger-control",
+    "freshOwnedEmulatorPerLeg": true,
+    "retainedTriggeredNativeBeforeControl": true,
+    "exclusiveControlDirectory": true,
+    "changedAction": "Control withholds later external TRIGGER, replays measured host-only slot, then targets triggered first-services elapsed-from-absence with bounded host-only deadline wait; same device-command sequence/full absence proof",
+    "timing": "Host monotonic verified-absence, slot and first-services brackets; SHA/byte-paired receipts and signed differences, never timing equality",
+    "maxReplaySeconds": 10,
+    "controlMaxSeconds": 180,
+    "existingStepReservedSeconds": 40,
+    "forcedKillGraceSeconds": 5,
+    "otherDifferences": [
+      "Sequential fresh AVD identity and scheduling",
+      "Measurement/Python invocation and log/dump command costs",
+      "Actual restart delay and memory-pressure rescheduling",
+      "Runtime grants/process state must be checked, not assumed from source/fingerprint"
+    ],
+    "provenance": "Exact APK hashes, source head/tree and build fingerprint receipts validated; not whole-image or runtime-equivalence proof",
+    "controlResult": "foreground-observed-no-trigger is observation only; no verify-race reattachment or GPS/session acceptance",
+    "failurePriority": "Triggered nonzero preserved; otherwise control nonzero propagates; observed denial1 cannot be erased by metadata or timing uncertainty2; outer124/137 retained separately",
+    "unexpectedTrigger": "Any ENTER/FOREGROUND marker anywhere in fresh control invalidates comparison",
+    "firstServicesAlignment": {
+      "maxReferenceSeconds": 10,
+      "clock": "time.monotonic_ns",
+      "controlOnly": true,
+      "extraDeviceCommands": 0,
+      "lateDeadline": "Explicit deadline-already-passed; never pretend waiting occurred",
+      "fields": [
+        "targetFromAbsenceNs",
+        "deadlineNs",
+        "waitStartedNs",
+        "waitCompletedNs",
+        "requestedWaitNs",
+        "waitedNs",
+        "initialLatenessNs",
+        "overshootNs"
+      ],
+      "pairing": "Exact triggered slot/first-services and own slot hashes plus native status/stdout/stderr; arithmetic validated before comparison eligibility",
+      "failure": "Still capture real log/services; known denial1 retained; uncertain comparison2 otherwise",
+      "limitation": "Host bracket precedes receipt/stdout publication, process exit and shell dispatch; not equal device events, scheduling or causality"
+    },
+    "rejectedAbsenceEvidence": "Record actual independent pidof native status before validation, including returned-PID and transport/stderr rejection. Never infer missing status, relax empty-output/native1 criterion, issue trigger or align after rejection."
+  },
+  "profilingPreflight": {
+    "timing": "Existing before-preparation/after-terminal metadata flow only; never inside absence",
+    "readOnlyQueries": [
+      "dumpsys activity processes (unfiltered)",
+      "dumpsys package com.android.shell",
+      "ls -ld /data/local/tmp",
+      "cat /apex/apex-info-list.xml",
+      "sha256sum /apex/com.android.art/lib64/libart.so",
+      "getprop persist.sys.dalvik.vm.lib.2",
+      "getprop debug.traceview-buffer-size-mb"
+    ],
+    "stateScope": "AMS-recorded fields only; not-listed does not exclude direct ART profiling; prior profiler must be preserved",
+    "completeness": "native0/empty stderr/strict UTF8/single header/newline and source-proven final mForceBackgroundCheck field; partial/error/oversize remains inconclusive",
+    "installedSourceAnchor": "run116 services.jar SHA256 1d241dbf234d4773e80fc0d0fd137920bb4c5b1d1ce51b3ddf79d1afbc65a6c6; dumpProcessesLocked +03d4 calls profiler dump, +04ee..04fc unconditionally prints terminal field",
+    "nativeIdentityLimit": "Candidate library/APEX identity is not a verified loaded native implementation or asynchronous runtime capability",
+    "profilingStartStopPerformed": false,
+    "traceTagActivationPerformed": false,
+    "deviceSettingsOrPermissionsChanged": false
+  },
+  "priorEvidence": {
+    "run": 40273911376,
+    "number": 118,
+    "attempt": 1,
+    "head": "c80f6008cc3512e986ae2c40461da3286992d511",
+    "tree": "5a8f9531e0ea7c972873f4f60bb53ccd6e9b61d1",
+    "conclusion": "failure",
+    "originalExit": 1,
+    "triggeredDiagnosticExit": 1,
+    "observerExit": 0,
+    "originalLogSha256": "e46d7b4519f1851ac1376d213ac4a5a3a95e6a166a35e8080453413b6d7929e4",
+    "diagnosticLogSha256": "302d85883651702541ebdc6ffd8fffb240d9948e95a01923de0f8dc6b1cbedb2",
+    "archiveCommit": "7b3d519a935675055732d32cfdd1d19deae74aef",
+    "archive": "https://github.com/c933103/PassengerCount/blob/7b3d519a935675055732d32cfdd1d19deae74aef/verification/api35-restart-race/run118/README.md",
+    "confound": "Actual mem-pressure rescheduling30000ms to8975ms to0ms retained"
+  },
+  "validation": {
+    "focusedNode": {
+      "passed": 342,
+      "failed": 0
+    },
+    "ownedContrastNode": {
+      "passed": 250,
+      "failed": 0
+    },
+    "profilingPreflightPython": {
+      "passed": 26,
+      "failed": 0
+    },
+    "observerPython": {
+      "passed": 18,
+      "failed": 0
+    },
+    "localAggregate": {
+      "passed": 648,
+      "total": 649,
+      "failure": "Known local government-routes.json.gz materialization limit; no skipped assertion; complete hosted checkout required"
+    },
+    "native": "Native/production inputs unchanged; hosted run121 native passed",
+    "syntaxAndDiff": "passed",
+    "nativeIndependentReview": "Prior alignment clean exact-head Codex on8b985de; narrow rejected-native-status correction gets fresh exact-head review",
+    "hostTests": "342 focused Node tests; new returned-PID, native0/1/255, empty/stderr and triggered/control rejection cases assert no trigger/alignment or classification. No Android policy emulation.",
+    "oneTimeComparisons": "Strict analyzeRestartRace function and phase() through EOF are byte-identical to published base; no permanent historical-source hash gate",
+    "exactHeadCodex": "pending fresh exact-head request after publication",
+    "exactHeadHosted": "pending natural CI after publication",
+    "reviewFindingFixed": {
+      "url": "https://github.com/c933103/PassengerCount/pull/19#discussion_r4374448080",
+      "finding": "300ms timeout regression could expire before pyenv/Python startup installed signal handler",
+      "fix": "Test-only readiness handshake before injecting SIGALRM into real GNU timeout; retain actual TERM/forced-kill handling and bounded safety timeout",
+      "regression": "Normal and TERM-resistant fixtures at0 and750ms startup delay must publish readiness before injected timeout; retain native124/137, partial traces and triggered denial1",
+      "productionBudgetsOrSourceChanged": false
+    }
+  },
+  "nextStep": "Natural hosted validation of rejected-absence native-status retention, retaining the already-reviewed bounded deadline alignment for an actually observed full-absence control. Run121 never reached alignment, so no output inferred. Original gate remains unchanged and failed; no unchanged manual rerun or profiling activation.",
+  "priorExecutedContrast119": {
+    "run": 40278271990,
+    "number": 119,
+    "attempt": 1,
+    "head": "61c3c6b156136ebf0cb4bf7e2ff2609b2ad67d5d",
+    "tree": "f5ac734774cfaa44503ae2f7b1aefbcc8df3d9cb",
+    "conclusion": "failure",
+    "hostedNode": {
+      "passed": 591,
+      "total": 591
+    },
+    "originalExit": 1,
+    "triggeredExit": 1,
+    "controlExit": 0,
+    "pairedWrapperExit": 1,
+    "controlOutcome": "foreground-observed-no-trigger; no reattachment/GPS/session acceptance",
+    "originalLogSha256": "b281a118fa31525d134a761a435c19279e72daabf48295bf9c88bb97dbba8b3c",
+    "triggeredLogSha256": "b90d46513084354ec5a12bccd959c6e686aa19d34d8bc645a861c3c423abe82d",
+    "controlLogSha256": "f1c26bee9bd9e3c61984ef542eaaa50b9337b6a2ff46a54ce0248df9b0598ed8",
+    "timingEqualityEstablished": false,
+    "controlFirstServicesEarlierNs": 261366645,
+    "profilingState": "Six complete snapshots have no AMS profile fields, shell permission granted; not direct ART absence/native support proof",
+    "artCandidateSha256": "cf1c0b8e7fe7b9200a89bf30a076f44509c9a21fe18d7b33c63a48f673746cd1",
+    "receipt": "https://github.com/c933103/PassengerCount/blob/e44d42de22775d778e8e5a66f4ba2787f670d2cf/verification/api35-restart-race/run119/README.md"
+  },
+  "priorExecutedContrast120": {
+    "run": 40280094337,
+    "number": 120,
+    "attempt": 1,
+    "head": "bf28a3aa9af0ca1f2d302b5b18722979448cc829",
+    "tree": "8525b3ab50ef239a72465ac7d6b619223d635f38",
+    "conclusion": "failure",
+    "hostedNode": {
+      "passed": 593,
+      "total": 593
+    },
+    "originalExit": 1,
+    "triggeredExit": 1,
+    "controlExit": 0,
+    "pairedWrapperExit": 1,
+    "controlOutcome": "foreground-observed-no-trigger; no reattachment/GPS/session acceptance",
+    "timingEqualityEstablished": false,
+    "controlFirstServicesEarlierNs": 81167250,
+    "counterevidence": "Cleanup06:37:47.951 precedes helper ENTER48.071/FOREGROUND48.099; helper promotion is not established immediate cause; pre-log command/launch effects only hypothesis",
+    "memoryPressure": "Initial both10000ms; triggered19798\u21927771\u21920ms, control363ms",
+    "receipt": "https://github.com/c933103/PassengerCount/blob/e44d42de22775d778e8e5a66f4ba2787f670d2cf/verification/api35-restart-race/run120/README.md",
+    "originalLogSha256": "51f8d8a43dc9f88e3a62d30ac74492a17984d7301994fcf376aa73b7a5561664",
+    "triggeredLogSha256": "9d65252ae53be8fb06a0186e5b6c7e058223b98ac3da0b71b38415208f89f49f",
+    "controlLogSha256": "7e16d940a458742aaade72803890873cdf3adaa04a05edb1e6c20e5fedd51c2b"
+  },
+  "latestExecutedPriorHead": {
+    "run": 40282796603,
+    "number": 121,
+    "attempt": 1,
+    "head": "8b985de9fb048dde130bd1aed476ea892f83848d",
+    "tree": "da0dda15e0492b36f18a2c1e0cce22c2a97617f6",
+    "conclusion": "failure",
+    "hostedNode": {
+      "passed": 644,
+      "total": 644
+    },
+    "codex": "https://github.com/c933103/PassengerCount/pull/19#issuecomment-6410241990",
+    "originalExit": 255,
+    "originalStatus": "Stopped after deleted-phase detachment; terminal services dump says adb device offline; precise initial failing command/cause unproven. Later original phases/full race not reached.",
+    "triggeredExit": 1,
+    "triggeredOutcome": "automatic-restart-denied3032\u21923919",
+    "controlExit": 2,
+    "controlStatus": "RACE_ALL_PROCESS_ABSENCE_UNVERIFIED with returned PID3874, empty stderr; prior code did not retain native absence status on this rejected branch",
+    "alignmentExecuted": false,
+    "controlClassifierResultProduced": false,
+    "pairedWrapperExit": 1,
+    "priorFullRestartFailuresStillBinding": true,
+    "receipt": "https://github.com/c933103/PassengerCount/actions/runs/40282796603"
+  }
+}

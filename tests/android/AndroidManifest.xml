@@ -1,6 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.passengercount.tests">
     <uses-sdk android:minSdkVersion="35" android:targetSdkVersion="35" />
-    <application android:label="PassengerCount lifecycle tests" />
+    <!-- Only the separate test APK can make the independent foreground transition. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <application android:label="PassengerCount lifecycle tests">
+        <service android:name="app.passengercount.RestartRaceTriggerService"
+            android:exported="true" android:foregroundServiceType="shortService" />
+    </application>
     <instrumentation android:name="app.passengercount.JournalLifecycleInstrumentation"
-        android:targetPackage="app.passengercount" android:functionalTest="true" />
+        android:targetPackage="app.passengercount" android:targetProcesses="app.passengercount:tracking,app.passengercount" android:functionalTest="true" />
+    <instrumentation android:name="app.passengercount.UiLifecycleInstrumentation"
+        android:targetPackage="app.passengercount" android:targetProcesses="app.passengercount" android:functionalTest="true" />
 </manifest>

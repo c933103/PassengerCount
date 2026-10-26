@@ -18,9 +18,17 @@ try {
   const service = fs.readFileSync(path.join(root, 'android/src/app/passengercount/TrackService.java'), 'utf8');
   const fixture = fs.readFileSync(path.join(root, 'tests/native/TrackDeletionFixture.java'), 'utf8')
     .replace('/* BRIDGE_METHODS */', ['public boolean deleteTrack(', 'public void startTracking(', 'public String getTrackPage(', 'public String getTrack('].map(x => method(activity, x)).join('\n'))
+    .replace('/* BLOCKED_IN_DELETION */', method(fs.readFileSync(path.join(root, 'tests/android/JournalLifecycleInstrumentation.java'), 'utf8'), 'private boolean blockedInDeletion('))
+    .replace('/* BLOCKED_IN_REMOTE_PROVIDER */', method(fs.readFileSync(path.join(root, 'tests/android/JournalLifecycleInstrumentation.java'), 'utf8'), 'private static boolean blockedInRemoteProvider('))
     .replace('/* START_PENDING */', method(activity, 'private void startPendingTrack('))
     .replace('/* SERVICE_METHODS */', ['public int onStartCommand(', 'private static final class Api31', 'static synchronized TrackSession session(', 'static void finishStop(', 'static String safeId(', 'static File trackFile(', 'static boolean isDeleted(', 'static boolean deleteTrack('].map(x => method(service, x)).join('\n'));
-  const sources = [write('MainActivity.java', fixture)];
+  const sources = [write('MainActivity.java', fixture), path.join(root, 'tests/native/TrackIpcShims.java')];
+  for (const name of ['TrackClient', 'TrackProvider']) {
+    const code=fs.readFileSync(path.join(root, `android/src/app/passengercount/${name}.java`), 'utf8')
+      .replace(/^import android\.[^;]+;\s*$/gm, '');
+    sources.push(write(name+'.java', code));
+  }
+  sources.push(write('android/os/Process.java', 'package android.os; public class Process { public static int myUid() { return 100; } }'));
   sources.push(write('android/system/ErrnoException.java', 'package android.system; public class ErrnoException extends Exception {}'));
   // Match public SDK names; an invented O_DIRECTORY stub hid an Android build error.
   sources.push(write('android/system/OsConstants.java', 'package android.system; public class OsConstants { public static final int O_RDONLY=0; public static boolean S_ISDIR(int mode) { return (mode & 0170000) == 0040000; } }'));
@@ -55,9 +63,13 @@ try {
   sources.push(write('android/util/Log.java', 'package android.util; public class Log { public static int errors; public static int e(String tag, String message, Throwable error) { errors++; return 0; } }'));
   sources.push(write('org/json/JSONException.java', 'package org.json; public class JSONException extends RuntimeException {}'));
   sources.push(write('org/json/JSONObject.java', `package org.json;
-    public class JSONObject { private String raw="{}"; public JSONObject() {} public JSONObject(String s) { raw=s; }
-      public Object opt(String key) { return null; } public String optString(String key) { return ""; }
-      public JSONObject put(String key,Object value) { return this; } public String toString() { return raw; } }`));
+    import java.util.*;
+    public class JSONObject { private String raw="{}"; private final Map<String,Object> added=new LinkedHashMap<>();
+      public JSONObject() {} public JSONObject(String s) { raw=s; }
+      public Object opt(String key) { return added.get(key); } public String optString(String key) { Object v=opt(key);return v instanceof String?(String)v:""; }
+      public JSONObject put(String key,Object value) { added.put(key,value);return this; }
+      public String toString() { StringBuilder out=new StringBuilder(raw.substring(0,raw.length()-1));
+        for(Map.Entry<String,Object> e:added.entrySet()) { if(out.length()>1)out.append(',');out.append('"').append(e.getKey()).append('"').append(':');Object v=e.getValue();if(v instanceof String)out.append('"').append(v).append('"');else out.append(v); }return out.append('}').toString(); } }`));
   sources.push(write('org/json/JSONArray.java', `package org.json; import java.util.*;
     public class JSONArray { private final List<Object> items=new ArrayList<>(); public JSONArray put(Object x) { items.add(x);return this; }
       public String toString() { return items.toString(); } }`));

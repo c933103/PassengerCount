@@ -492,6 +492,13 @@ public final class MainActivity extends Activity {
         System.out.println(assertions + " assertions; " + failures + " failing scenarios");
         if (failures > 0) System.exit(1);
     }
+    // Permission/lifecycle fixture transport stub; real IPC is tested separately.
+    static final class TrackClient {
+        static TrackSession.Request request(MainActivity activity) {
+            TrackSession.Request request = activity.trackingControl.request();
+            return activity.trackingControl.accepts(request) ? request : null;
+        }
+    }
     static final class TrackService {
         static final String ACTION_START = "start", EXTRA_ID = "id", EXTRA_TOKEN = "token";
         static TrackSession session(MainActivity activity) { return activity.trackingControl; }

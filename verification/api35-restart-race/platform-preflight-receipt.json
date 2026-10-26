@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-26",
+  "scope": "Read-only platform capability and source-identity capture, before test preparation and after terminal result; not an APK fix.",
+  "baseHead": "328d87d3c6bae32ba081aef6c1890e45e59bb9bd",
+  "sourceBlobs": {
+    "scripts/capture-android-platform-preflight.py": "bdf2345291c874c095980de7bb912f9156473850",
+    "scripts/test-android-installed.sh": "7212a377f7b27e8ff42eb5d73c764ffd7208e516",
+    "tests/android-platform-preflight.test.js": "7205db31aeb18c56d4c0f4922f1a64cfd516f5ac",
+    "tests/android-platform-preflight.test.py": "9e940f3498bb93453f42574b900082d9ab96d462",
+    "tests/android/README.md": "8d3366881a019d1a282ff375426a31704d3698fe"
+  },
+  "priorEvidence": "https://github.com/c933103/PassengerCount/blob/dd80561e8cb5c9b94ffe4786c201a443275fea69/verification/api35-restart-race/route-20261026/route-plan.md",
+  "priorOriginalFailure": {
+    "run": 40261475995,
+    "exit": 1,
+    "artifact": 12624841544,
+    "zipSha256": "29c4e4d5d263d5da57982b986625762421e187d4314e83135e946cce29de6f1c"
+  },
+  "priorIndependentFailure": {
+    "artifact": 12623729936,
+    "exit": 1,
+    "zipSha256": "6b220ba14bb4e2224cda27a87e7841ce2dc12bfaa880640073d0a413dcc6d8b0"
+  },
+  "invariants": [
+    "All-process-absence criterion, race classifier and original lifecycle gates unchanged",
+    "Original process exit stored before cleanup metadata; receipt write failure cannot mask original1/2/255 or skip teardown",
+    "Capture owns unique attempt directories and separate command/collector statuses; no result substitution",
+    "Existing opt-in/owned serial reused; no root/setprop/reboot/install/permission/attach operations added",
+    "No workflow, application, manifest, signing, release or merge change"
+  ],
+  "localValidation": {
+    "focused": {
+      "command": "node --test tests/android-platform-preflight.test.js tests/android-harness.test.js tests/android-restart-race.test.js tests/android-restart-after-failure.test.js",
+      "passed": 146,
+      "failed": 0,
+      "logSha256": "71c1f722cff2f36f7ca8f4b3ee50478a43d61cedd60e25455af8bf20064a39aa"
+    },
+    "python": {
+      "passed": 12,
+      "scope": "Mock transport/capture only, includes all18 command boundaries, not Android policy"
+    },
+    "nodeAggregate": {
+      "command": "npm test",
+      "passed": 452,
+      "failed": 1,
+      "total": 453,
+      "logSha256": "5485101882468bd76ac891f8b4c869bd41a0d5c805abd727a883025195954e7e",
+      "limitation": "Temporary materialization lacks data/government-routes.json.gz. Exact-ref fetch_file encoding base64 returned empty content with blob75a7bf6e1614adb91907d233af691bbf8ad8c7a1 (tree size1246628); Git blob JSON read returned UTF-8-only format error. No fixture/assertion skipped or changed. Complete hosted checkout required."
+    },
+    "native": {
+      "command": "npm run test:native",
+      "outcome": "passed",
+      "logSha256": "94c8a3e7d51058a32d10b3fb212813a35bbabfc26c48c0136e1521f472883c45"
+    },
+    "browser": {
+      "command": "npm run test:browser",
+      "outcome": "blocked before launch: local Chromium executable absent",
+      "logSha256": "35c7d43a79c0cd68e033104562c072098100237beb4fb2599392d9f04c501451"
+    },
+    "syntax": "bash -n, py_compile and diff --check passed",
+    "oneTimeComparison": "All phase functions and test/acceptance sequence from phase() onward byte-identical to328d; not a permanent source-hash test",
+    "nativeReview": "Two material draft findings corrected before implementation publication: finite JDWP timeout semantics; original receipt-write failure cleanup boundary. Final review no remaining material findings."
+  },
+  "hosted": "Pending natural exact-head validation and fresh Codex review; no manual rerun",
+  "nextObservation": "Actual system_server JDWP PID visibility, existing debug property, image/framework identity and app-op state. Choose further allowed tracing from observed capability; do not enable debug settings or attach under this change."
+}

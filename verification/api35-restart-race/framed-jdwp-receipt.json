@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-26",
+  "scope": "Complete a read-only advertised JDWP initial-frame observation; no debugger attachment or Android policy model.",
+  "baseHead": "061f9d22036572163fa0c68551cf4953d0d556c1",
+  "sourceBlobs": {
+    "scripts/android_jdwp_snapshot.py": "a04e8cc8a58a7eef1190ed57248c70bae1b4bf32",
+    "scripts/capture-android-platform-preflight.py": "78db8586e32c8fd8cb1e3e2cbcd54ed3eb639f0b",
+    "tests/android-jdwp-snapshot.test.py": "6af08a632350109f54db519f87921b3f1edaeb14",
+    "tests/android-platform-preflight.test.py": "dd8fcfe5d6030df2770071ec9592a637620b5892",
+    "tests/android-platform-preflight.test.js": "1d99b861f8d156a6832b60df253d6afbb9c4907d",
+    "tests/android/README.md": "3434d92a4d3e0061e8719af55fe5323895b82de7"
+  },
+  "motivatingEvidence": {
+    "run": 40265931593,
+    "originalExit": 1,
+    "diagnosticExit": 1,
+    "collectorExit": 2,
+    "jdwpQueries": 4,
+    "actualOutcome": "Each legacy adb jdwp query timed out with empty stdout/stderr; not a completed empty list or proof of unavailability.",
+    "archive": "https://github.com/c933103/PassengerCount/blob/ceeb9e3866c2019288e2d13baaf6fe9a7f72a6fe/verification/api35-restart-race/run114/README.md",
+    "originalZipSha256": "29e52e2587eaada09c444a927e6671ce100c8954a8ef5ae310ddbfb8f293ab6e",
+    "diagnosticZipSha256": "4fccd4a4ec5c46bce346bbf25f393113ae03d6cb32e1cced6456f2b0eb8a6d9d"
+  },
+  "protocolSources": [
+    "https://android.googlesource.com/platform/packages/modules/adb/+/a8ab5ceccb41035804ad83bfa625adac4a8ccf83/SERVICES.TXT",
+    "https://android.googlesource.com/platform/packages/modules/adb/+/f8a7480bc3500502d5f12c8fd6d1aecc394a604f/daemon/jdwp_service.cpp",
+    "https://android.googlesource.com/platform/packages/modules/adb/+/a877adddefdf011bfb5d4045919c6df3d3727ed3/client/commandline.h"
+  ],
+  "protocolSourceLimit": "Published protocol/Android15 source evidence; not claimed to be the exact source manifest of run114 binaries.",
+  "completionContract": [
+    "Require complete four-ASCII-hex length header and exact declared PID/newline payload",
+    "0000 is complete-empty only at initial observed snapshot with stable preceding/following system_server PID",
+    "Nonempty missing PID is not global absence proof; capacity truncation remains explicit",
+    "Complete-frame protocol status and actual local nativeReturnCode/termination are separate",
+    "Timeout, partial/malformed, stderr, unexpected native error, output-limit and cleanup failures remain incomplete",
+    "Terminate/reap only spawned local tracker client; never jdwp:<pid> attach or port forward"
+  ],
+  "unchanged": [
+    "Installed runner and pre/post placement blob7212a377f7b27e8ff42eb5d73c764ffd7208e516 unchanged",
+    "Original13 lifecycle phases, all-process absence, classifier and gate exits unchanged",
+    "No application/manifest/workflow/permission/debug setting/signing/release/merge change",
+    "All run111-114 evidence and raw failure hashes preserved"
+  ],
+  "localValidation": {
+    "focusedNode": {
+      "passed": 147,
+      "failed": 0,
+      "logSha256": "34a32c3e48586a0f8154d7ed7effbb5485a292866f3d8aecb74f2487d863879a"
+    },
+    "realLocalSubprocessTransportTests": 15,
+    "mockTransportCollectorIntegrationTests": 20,
+    "nodeAggregate": {
+      "passed": 453,
+      "failed": 1,
+      "total": 454,
+      "failure": "Only existing government-routes.json.gz absent from temporary materialization; exact-ref base64 connector returned empty content for nonempty blob; no assertion skipped. Hosted run114 already passed complete checkout453/453; successor still requires its own run.",
+      "logSha256": "8e674d0f0bc8e67a821b8a1193ae94130d5ab91876be06badadef655203e2209"
+    },
+    "native": {
+      "outcome": "passed",
+      "logSha256": "94c8a3e7d51058a32d10b3fb212813a35bbabfc26c48c0136e1521f472883c45"
+    },
+    "browser": "Local Chromium executable remains unavailable; no local browser pass claimed. Naturally triggered complete-checkout validation required.",
+    "syntaxAndDiff": "passed",
+    "independentNativeReview": "No material integration issue; host test deadlines widened for parallel CI contention without changing production3s bound."
+  },
+  "hosted": "Pending fresh exact-head Codex review and naturally triggered validation; no unchanged manual OS rerun",
+  "next": "Inspect actual initial raw frame/protocol status and stable system_server PID. Only then choose available next trace route; do not enable settings or infer unavailable from incomplete evidence."
+}
