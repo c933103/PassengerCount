@@ -1,0 +1,37 @@
+--- a/services/core/java/com/android/server/am/ActiveServices.java
++++ b/services/core/java/com/android/server/am/ActiveServices.java
+@@ -600,9 +600,34 @@
+         }
+     }
+ 
++    /**
++     * Process absence alone is not a background-restriction decision. Preserve only an
++     * already-eligible started FGS whose sticky restart is still queued. This does not
++     * authorize a new FGS start, revive a stopped service, or override a restriction.
++     */
++    @GuardedBy("mAm")
++    private boolean shouldPreservePendingForegroundServiceLocked(ServiceRecord r) {
++        if (r.app != null || !r.isForeground() || !r.isStartRequested()
++                || r.stopIfKilled || !r.callStart || r.appInfo == null
++                || !r.isFgsAllowedStart() || !mRestartingServices.contains(r)
++                || r.appInfo.isStopped()) {
++            return false;
++        }
++        final UidRecord uidRec = mAm.mProcessList.getUidRecordLOSP(r.appInfo.uid);
++        if (uidRec != null && uidRec.getProcessInPackage(r.packageName) != null) {
++            return false;
++        }
++        // Unlike ProcessRecord, AppStateTracker survives package-process death. Fail
++        // closed if the authoritative restriction state is unavailable.
++        final AppStateTracker tracker = getAppStateTracker();
++        return tracker != null
++                && !tracker.isAppBackgroundRestricted(r.appInfo.uid, r.packageName);
++    }
++
+     @GuardedBy("mAm")
+     boolean shouldStopForegroundServiceLocked(ServiceRecord r) {
+         return r.isForeground()
++                && !shouldPreservePendingForegroundServiceLocked(r)
+                 && r.mAllowStartForegroundAtEntering != REASON_ALARM_MANAGER_ALARM_CLOCK
+                 && !isDeviceProvisioningPackage(r.packageName);
+     }

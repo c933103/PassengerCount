@@ -1,0 +1,35 @@
+{
+  "status": "UNEXECUTED_FRAMEWORK_CANDIDATE",
+  "source_commit": "45034f0663f960d9ee5fb0a101a4732b71f6e2f4",
+  "source_tree": "6667cba9cf8225451f0822ad94cb21902025dfa3",
+  "original_pr_head": "c7f31ec1f4482170efd8934e9f83603516d5f9a6",
+  "files": {
+    "original_ActiveServices": {
+      "bytes": 481025,
+      "sha256": "47f1d84a31b4d873e1d7145678774d8d270ba637056cdb35aa993348c69fed5f",
+      "git_blob": "5016e9d62c6f095a7a5ba665401ef9cf2efe999c"
+    },
+    "prepared_ActiveServices": {
+      "bytes": 481156,
+      "sha256": "afea9e1fc6e30aead7b94e9f025e4f748c9ccb52954e4399840ed27e88ea623a",
+      "git_blob": "97f08f56cc387731b0aa703bc219f20d114e36b9"
+    },
+    "candidate_ActiveServices": {
+      "bytes": 482456,
+      "sha256": "1d1623c36758d12e94dae1df11cd8d035c312b7f56b2e27c00eab6e72da243cb",
+      "git_blob": "7e0584f28af9111b63ba27e42b1d16059680921b"
+    },
+    "test": {
+      "bytes": 8150,
+      "sha256": "7abb9e351ecd4ae288c3b83a541627d843f70a074ef92d8869ec934aeb088258"
+    },
+    "patch1": {
+      "bytes": 9769,
+      "sha256": "4cd51ddba30a4c6323a4586cc0c8cea9a1731a895f2dd8eb3829e6d170208bb9"
+    },
+    "patch2": {
+      "bytes": 1784,
+      "sha256": "428c70dfea776ed7837f5afce239eb6aaf21633a214a2df5099f43117fc712f6"
+    }
+  }
+}

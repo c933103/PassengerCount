@@ -1,0 +1,13 @@
+{
+  "status": "SOURCE_AND_PATCH_CHECKS_ONLY",
+  "passed": [
+    "pinned source and patch hashes",
+    "0001-regression-and-selection-seam.patch exact application",
+    "0002-preserve-eligible-pending-sticky-fgs.patch exact application",
+    "exact 13-case fixture",
+    "exact reverse to original"
+  ],
+  "java_compilation": "NOT_RUN",
+  "android_runtime_tests": "NOT_RUN",
+  "full_apk_acceptance": "NOT_RUN; original run122 failure remains binding"
+}

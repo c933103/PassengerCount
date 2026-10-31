@@ -1,0 +1,235 @@
+--- a/services/core/java/com/android/server/am/ActiveServices.java
++++ b/services/core/java/com/android/server/am/ActiveServices.java
+@@ -600,6 +600,13 @@
+         }
+     }
+ 
++    @GuardedBy("mAm")
++    boolean shouldStopForegroundServiceLocked(ServiceRecord r) {
++        return r.isForeground()
++                && r.mAllowStartForegroundAtEntering != REASON_ALARM_MANAGER_ALARM_CLOCK
++                && !isDeviceProvisioningPackage(r.packageName);
++    }
++
+     void stopAllForegroundServicesLocked(final int uid, final String packageName) {
+         final ServiceMap smap = getServiceMapLocked(UserHandle.getUserId(uid));
+         final int N = smap.mServicesByInstanceName.size();
+@@ -611,9 +618,7 @@
+                 // If the FGS is started by temp allowlist of alarm-clock
+                 // (REASON_ALARM_MANAGER_ALARM_CLOCK), allow it to continue and do not stop it,
+                 // even the app is background-restricted.
+-                if (r.isForeground()
+-                        && r.mAllowStartForegroundAtEntering != REASON_ALARM_MANAGER_ALARM_CLOCK
+-                        && !isDeviceProvisioningPackage(r.packageName)) {
++                if (shouldStopForegroundServiceLocked(r)) {
+                     toStop.add(r);
+                 }
+             }
+--- /dev/null
++++ b/services/tests/mockingservicestests/src/com/android/server/am/PendingForegroundRestartTest.java
+@@ -0,0 +1,205 @@
++/*
++ * Copyright (C) 2026 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package com.android.server.am;
++
++import static android.os.PowerExemptionManager.REASON_PROC_STATE_TOP;
++import static com.android.dx.mockito.inline.extended.ExtendedMockito.mockitoSession;
++import static org.junit.Assert.*;
++import static org.mockito.Mockito.*;
++
++import android.app.Notification;
++import android.app.compat.CompatChanges;
++import android.content.ComponentName;
++import android.content.pm.ApplicationInfo;
++import android.content.pm.ServiceInfo;
++import android.os.HandlerThread;
++import android.util.SparseArray;
++
++import androidx.test.runner.AndroidJUnit4;
++
++import com.android.server.AppStateTracker;
++import com.android.server.LocalServices;
++
++import org.junit.After;
++import org.junit.Before;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.mockito.MockitoSession;
++import org.mockito.quality.Strictness;
++
++import java.lang.reflect.Field;
++import java.util.ArrayList;
++
++/** Real framework policy/record tests, not an installed-app restart acceptance test. */
++@RunWith(AndroidJUnit4.class)
++public class PendingForegroundRestartTest {
++    private static final int UID = 10209;
++    private static final String PKG = "app.passengercount";
++    private MockitoSession mMockingSession;
++    private ActivityManagerService mAm;
++    private ActiveServices mServices;
++    private ProcessList mProcesses;
++    private AppStateTracker mRestrictions;
++    private ArrayList<ServiceRecord> mRestarting;
++    private HandlerThread mThread;
++    private ServiceRecord mRecord;
++
++    @Before public void setUp() throws Exception {
++        mMockingSession = mockitoSession().strictness(Strictness.LENIENT)
++                .mockStatic(CompatChanges.class).mockStatic(LocalServices.class).startMocking();
++        mAm = mock(ActivityManagerService.class);
++        mProcesses = mock(ProcessList.class);
++        setField(ActivityManagerService.class, mAm, "mProcessList", mProcesses);
++        mServices = mock(ActiveServices.class);
++        setField(ActiveServices.class, mServices, "mAm", mAm);
++        mRestarting = new ArrayList<>();
++        setField(ActiveServices.class, mServices, "mRestartingServices", mRestarting);
++        mRestrictions = mock(AppStateTracker.class);
++        mServices.mAppStateTracker = mRestrictions;
++        doCallRealMethod().when(mServices).shouldStopForegroundServiceLocked(any());
++        setField(ActiveServices.class, mServices, "mCachedDeviceProvisioningPackage", "");
++        doCallRealMethod().when(mServices).stopAllForegroundServicesLocked(anyInt(), anyString());
++
++        // Empty test constructor is real; no ServiceRecord method is mocked.
++        mRecord = ServiceRecord.newEmptyInstanceForTest(mAm);
++        mRecord.appInfo = new ApplicationInfo();
++        mRecord.appInfo.uid = UID;
++        mRecord.appInfo.packageName = PKG;
++        ServiceInfo info = new ServiceInfo();
++        info.applicationInfo = mRecord.appInfo;
++        info.packageName = PKG;
++        setField(ServiceRecord.class, mRecord, "packageName", PKG);
++        setField(ServiceRecord.class, mRecord, "serviceInfo", info);
++        mRecord.setIsForeground(true);
++        mRecord.setStartRequested(true);
++        mRecord.setForegroundServiceType(ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
++        mRecord.callStart = true;
++        mRecord.mAllowStart_noBinding = REASON_PROC_STATE_TOP;
++        mRecord.mAllowWiu_noBinding = REASON_PROC_STATE_TOP;
++        mRecord.foregroundId = 19;
++        mRecord.foregroundNoti = new Notification();
++        mRestarting.add(mRecord);
++
++        mThread = new HandlerThread("pending-fgs-restart-test");
++        mThread.start();
++        ActiveServices.ServiceMap map = mServices.new ServiceMap(mThread.getLooper(), 0);
++        map.mServicesByInstanceName.put(new ComponentName(PKG, PKG + ".TrackService"), mRecord);
++        SparseArray<ActiveServices.ServiceMap> maps = new SparseArray<>();
++        maps.put(0, map);
++        setField(ActiveServices.class, mServices, "mServiceMap", maps);
++    }
++
++    @After public void tearDown() throws Exception {
++        if (mMockingSession != null) mMockingSession.finishMocking();
++        if (mThread != null) {
++            mThread.quitSafely();
++            mThread.join(5000);
++            assertFalse("handler thread must stop", mThread.isAlive());
++        }
++    }
++
++    private boolean preserve() {
++        synchronized (mAm) {
++            return !mServices.shouldStopForegroundServiceLocked(mRecord);
++        }
++    }
++
++    @Test public void absentUidPreservesRealRecordThroughRealStopAll() {
++        Notification notification = mRecord.foregroundNoti;
++        assertTrue(preserve());
++        synchronized (mAm) { mServices.stopAllForegroundServicesLocked(UID, PKG); }
++        assertTrue(mRecord.isForeground());
++        assertTrue(mRecord.isFgsAllowedStart());
++        assertTrue(mRecord.isFgsAllowedWiu_forStart());
++        assertEquals(ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION, mRecord.getForegroundServiceType());
++        assertEquals(19, mRecord.foregroundId);
++        assertSame(notification, mRecord.foregroundNoti);
++        assertNull(mRecord.app);
++        assertTrue(mRestarting.contains(mRecord));
++    }
++
++    @Test public void absentPackageInPresentUidPreserves() {
++        when(mProcesses.getUidRecordLOSP(UID)).thenReturn(mock(UidRecord.class));
++        assertTrue(preserve());
++    }
++
++    @Test public void actualBackgroundRestrictionDoesNotPreserve() {
++        when(mRestrictions.isAppBackgroundRestricted(UID, PKG)).thenReturn(true);
++        assertFalse(preserve());
++    }
++
++    @Test public void unknownRestrictionStateDoesNotPreserve() {
++        mServices.mAppStateTracker = null;
++        assertFalse(preserve());
++    }
++
++    @Test public void packageStoppedDoesNotPreserve() {
++        mRecord.appInfo.flags |= ApplicationInfo.FLAG_STOPPED;
++        assertFalse(preserve());
++    }
++
++    @Test public void explicitServiceStopDoesNotPreserve() {
++        mRecord.setStartRequested(false);
++        assertFalse(preserve());
++    }
++
++    @Test public void cancelledRestartDoesNotPreserve() {
++        mRestarting.clear();
++        assertFalse(preserve());
++    }
++
++    @Test public void nonStickyDoesNotPreserve() {
++        mRecord.stopIfKilled = true;
++        assertFalse(preserve());
++    }
++
++    @Test public void noStickyCallbackDoesNotPreserve() {
++        mRecord.callStart = false;
++        assertFalse(preserve());
++    }
++
++    @Test public void alreadyDemotedDoesNotRestore() {
++        mRecord.setIsForeground(false);
++        assertTrue(preserve()); // Not selected for demotion; does not restore foreground.
++        assertFalse(mRecord.isForeground());
++    }
++
++    @Test public void deniedEligibilityDoesNotRestore() {
++        mRecord.clearFgsAllowStart();
++        assertFalse(preserve());
++    }
++
++    @Test public void liveHostDoesNotPreserve() {
++        mRecord.app = mock(ProcessRecord.class);
++        assertFalse(preserve());
++    }
++
++    @Test public void livePackageProcessDoesNotPreserve() {
++        UidRecord uid = mock(UidRecord.class);
++        when(mProcesses.getUidRecordLOSP(UID)).thenReturn(uid);
++        when(uid.getProcessInPackage(PKG)).thenReturn(mock(ProcessRecord.class));
++        assertFalse(preserve());
++    }
++
++    // Fail loudly on field-layout/access changes instead of silently producing a false pass.
++    private static void setField(Class<?> type, Object target, String name, Object value)
++            throws Exception {
++        Field field = type.getDeclaredField(name);
++        field.setAccessible(true);
++        field.set(target, value);
++        assertSame("field installation: " + name, value, field.get(target));
++    }
++}
